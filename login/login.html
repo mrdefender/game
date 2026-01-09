@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Веселые игры</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <main class="game_auth_body">
+        <div class="game_auth">
+            <h1>Веселые игры. Пульт игрока.</h1>
+            <div class="game_auth_container">
+                <div class="form_group">
+                    <label class="form_label">Аккаунт в Telegram</label>
+                    <div>
+                        <input class="form_control" type="text" id="name" name="user_name" placeholder="@user" required>
+                    </div>
+                </div>
+                <div class="form_group">
+                    <label class="form_label">Код игровой комнаты</label>
+                    <div>
+                        <input class="form_control" id="room" type="text" maxlength="8" placeholder="1234" required>
+                    </div>
+                </div>
+                <button class="join" onclick="checkuser()"> Войти!</button>
+            </div>
+        </div>
+
+
+    </main>
+    <script src="join.js"></script>
+
+</body>
+</html>
