@@ -1,0 +1,278 @@
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    max-width:100%;
+    max-height:100%;
+}
+  html body{
+    position: relative;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 300;
+    font-size: larger;
+    background: linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
+    background-image: url(/img/slot.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+   }
+main {
+    box-sizing: border-box;
+    display: block;
+    unicode-bidi: isolate;
+}
+
+.game_box {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    margin: 0 auto;
+    height: 100vh;
+    background: #8312834f;
+    overflow: hidden;
+    grid-area: span;
+}
+
+.game_box h1 {
+    margin: 0;
+    background: rgb(0, 174, 255);
+    font-size: 1.4rem;
+    width: 100%;
+    text-align: center;
+    padding: 8px 0;
+}
+
+h1 {
+    display: block;
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+
+.game_box_container {
+    flex: 0 0 100%;
+    max-height: 100%;
+    display: block;
+    text-align: center;
+    padding: 1rem;
+    z-index: 0;
+}
+.form_group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: .5rem;
+}
+
+.form_label {
+    display: block;
+    font-weight: 500;
+    margin: 5px;
+    font-size: 1.5rem;
+    line-height: 1.25rem;
+    margin-bottom: .25rem;
+    font-style: italic;
+    color: beige;
+}
+.form_label_down {
+    position: relative;
+    top: -24rem;
+    display: block;
+    font-weight: 500;
+    margin: 5px;
+    font-size: 1.3rem;
+    line-height: 1.25rem;
+    margin-bottom: .25rem;
+    font-style:normal;
+    color:aquamarine
+}
+
+.form_control {
+    border: 2px solid #b4b4b4;
+    font-family: Inter;
+    padding: .25rem;
+    font-size: 1.5rem;
+    text-align: center;
+    transition: all .25s 
+    ease;
+}
+.questions{
+    position: relative;
+    top: -38rem;
+    left: 25%;
+    padding: 10px 30px;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: beige;
+    font-size: medium;
+    width: 50%;
+    height: 4%;
+}
+.btn1, .btn2, .btn3, .btn3, .btn4, .btn5 {
+    position: relative;
+    top: -38rem;
+    padding: 10px 30px;
+    color: #fff;
+    clip-path: polygon(85% 0, 100% 50%, 85% 100%, 15% 100%, 0% 50%, 15% 0);
+    background-color: #000c11;
+    color: beige;
+    font-size: medium;
+    width: 8%;
+    height: 4%;
+
+    
+}
+.btn6, .btn7, .btn8, .btn9, .btn10
+{
+    position: relative;
+    text-align: center;
+    top: -37.9rem;
+    padding: 10px 30px;
+    color: #fff;
+    clip-path: polygon(85% 0, 100% 50%, 85% 100%, 15% 100%, 0% 50%, 15% 0);
+    background-color: #000c11;
+    color: beige;
+    font-size: medium;
+    width: 8%;
+    height: 4%;
+}
+.btn11, .btn12, .btn13, .btn14, .btn15
+{
+    position: relative;
+    text-align: center;
+    top: -37.8rem;
+    padding: 10px 30px;
+    color: #fff;
+    clip-path: polygon(85% 0, 100% 50%, 85% 100%, 15% 100%, 0% 50%, 15% 0);
+    background-color: #000c11;
+    color: beige;
+    font-size: medium;
+    width: 8%;
+    height: 1%;
+}
+
+
+
+
+.copyrights{
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    padding: 10px 40px;
+    background: linear-gradient(0deg, #000, #3a3a3a);
+    color: #fff;
+    justify-content: space-between;
+}
+
+footer{
+    font-size: small;
+    max-width:100%;
+    max-height:100%;
+
+}
+
+.status-round {
+    position: relative;
+    top: -2rem;
+    margin: 10px;
+    background-color: #2a3b9b;
+    padding: 8px 1%;
+    transition: all 500ms ease;
+    color: beige;
+    font-size: medium;
+    text-align: center;
+    width: 130px;
+    height: px;
+}
+
+.away {
+    position: relative;
+    top: -2rem;
+    margin: 10px;
+    background-color: #812a9b;
+    padding: 8px 1%;
+    transition: all 500ms ease;
+    color: beige;
+    font-size:medium;
+    width: 130px;
+    height: 60px;
+}
+.current-money {
+   position: relative;
+    top: -12rem;
+    left: 9rem;
+    margin: 10px;
+    background-color: #a7a418;
+    padding: 8px 1%;
+    transition: all 500ms ease;
+    color: beige;
+    font-size: medium;
+    width: 130px;
+    height: 60px;
+}
+.next-money {
+   position: relative;
+    top: -12rem;
+    left: 9rem;
+    margin: 10px;
+    background-color: #4a9b2a;
+    padding: 8px 1%;
+    transition: all 500ms ease;
+    color: beige;
+    font-size: medium;
+    width: 130px;
+    height: 60px;
+}
+.lost-money {
+   position: relative;
+    top: -22rem;
+    left: 18rem;
+    margin: 10px;
+    background-color: #a71818;
+    padding: 8px 1%;
+    transition: all 500ms ease;
+    color: beige;
+    font-size: medium;
+    width: 130px;
+    height: 60px;
+}
+.fix-money {
+   position: relative;
+    top: -22rem;
+    left: 18rem;
+    margin: 10px;
+    background-color: #2a729b;
+    padding: 8px 1%;
+    transition: all 500ms ease;
+    color: beige;
+    font-size: medium;
+    width: 130px;
+    height: 60px;
+}
+
+.tree-container{
+    font-family: sans-serif;
+    font-size:x-large;
+    flex: 0 0 100%;
+    position: relative;
+    top: -29rem;
+    left: 75%;
+    background: rgb(1, 8, 12);
+    color: #fff;
+    max-height: 30%;
+    max-width: 25%;
+    display: block;
+    text-align:start;
+    text-align: left;
+    padding: 5px;
+    padding-left: .1rem;
+}
+
+.p1, .p2, .p4, .p5, .p7, .p8{
+     color: #b95605;
+}

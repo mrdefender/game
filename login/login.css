@@ -25,7 +25,7 @@ main {
     display: flex;
     flex-direction: column;
     min-width: 320px;
-    max-width: 480px;
+    max-width: 580px;
     margin: 0 auto;
     height: 100vh;
     background: #8312834f;
