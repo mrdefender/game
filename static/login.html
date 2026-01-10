@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Веселые игры</title>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet"  href="{{ url_for('static', filename='styles/login.css') }}">
+    
 </head>
 <body>
     <main class="game_auth_body">
         <div class="game_auth">
             <h1>Веселые игры. Пульт игрока.</h1>
             <div class="game_auth_container">
+                <form action="/join" method="post" class="auth">
                 <div class="form_group">
                     <label class="form_label">Аккаунт в Telegram</label>
                     <div>
@@ -20,16 +22,20 @@
                 <div class="form_group">
                     <label class="form_label">Код игровой комнаты</label>
                     <div>
-                        <input class="form_control" id="room" type="text" maxlength="8" placeholder="1234" required>
+                        <input class="form_control" id="room", name="room_id" type="text" maxlength="8" placeholder="1234" required>
                     </div>
                 </div>
-                <button class="join" onclick="checkuser()"> Войти!</button>
+                <input type="submit" class="submit" value="Войти"/>
+                </form>
+                {%for msg in get_flashed_messages()%}
+                <div class="flash">{{msg}}</div>
+                {%endfor%}
             </div>
         </div>
 
 
     </main>
-    <script src="join.js"></script>
+    <!--script src="/static/login/join.js"></script-->
 
 </body>
 </html>

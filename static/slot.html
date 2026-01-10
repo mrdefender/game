@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Веселые игры</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/slot.css') }}">
+</head>
+<body>
+    <main class="game_auth_body">
+        <div class="game_auth">
+            <h1>Веселые игры. Режим администратора.</h1>
+            <div class="game_auth_container">
+                <div class="form_group">
+                    <label class="form_label">Добро пожаловать на игру </label>
+                    <p>
+                    <label class="form_label">Свободный слот! </label> </p>
+                   
+                </div>
+                 <div class="form_group">
+                    <label class="form_label_down">Выберите режим игры</label>
+                   
+                </div>
+                <div class="form_group">
+                    
+                </div>
+                <!--button class="host" onclick="to_host()"> Режим ведущего</button-->
+                <form action="/host_slot", method="post", class="select_game">
+                <input type="submit" class="submit_host" value="Режим ведущего">
+                </form>
+                <button class="user"> Режим игрока</button>
+                <button class="spec"> Режим зрителя</button>
+            </div>
+        </div>
+
+
+    </main>
+   
+    <!--script src="slot.js"></script-->
+    <footer class="copyrights">
+        Здесь могло бы быть ваше имя и ваша реклама.
+    </footer>
+</body>
+</html>

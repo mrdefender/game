@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Веселые старты</title>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
 </head>
 <body>
     <div class="wrapper">
@@ -18,7 +18,7 @@
                 <p>Будет весело.</p>
             <h2>
                 <div>
-                   <a href="/login/login.html" class = "hero-button"> В игру!!!</a>
+                   <a href="{{ url_for('join') }}" class = "hero-button"> В игру!!!</a>
                  </div> 
             
              </h2>
@@ -26,7 +26,7 @@
     </div>
 
     </div>
-    <img src="img/screen.jpg" alt="">
+    <img src="/static/img/screen.jpg" alt="">
     <footer class="copyrights">
         Здесь могло бы быть ваше имя и ваша реклама.
     </footer>
