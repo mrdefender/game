@@ -466,6 +466,20 @@
     height: 2rem;
     text-wrap:inherit
 }
+.start_game{
+    position: relative;
+    top: 0rem;
+    left: 0%;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 7rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+
 
 .show-right{
     position: relative;
@@ -520,7 +534,7 @@
 }
 
 .cancel_all{
-        position: relative;
+    position: relative;
     top: .4rem;
     left: 0%;
     color: #fff;
@@ -532,6 +546,35 @@
     height: 2rem;
     text-wrap:inherit
 }
+.room_id{
+    position: relative;
+    top: .6rem;
+    left: -1rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 5rem;
+    height: 2rem;
+    text-wrap:inherit;
+    text-align: center;
+
+}
+.open_room{
+    position: relative;
+    top: .6rem;
+    left: 0rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 10rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+
 
 *:disabled
 {

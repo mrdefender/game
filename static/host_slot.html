@@ -120,6 +120,7 @@
              </select>
             </div>
                 <p>
+                <input type="submit" class="start_game" onclick="start_to_game()" value="Начать игру" disabled>
                 <input type="submit" class="invite" onclick="invite_to_game()" value="Пригласить в игру">
                 <input type="submit" class="invite" onclick="gen_task()" value="Отправить задание" disabled>
                 <input type="submit" class="show-right" onclick="show_right()" value="Показать верный ответ" disabled>
@@ -128,6 +129,11 @@
                 <input type="submit" class="next-round" onclick="next_round()" value="Следующий раунд" disabled>
                 <input type="submit" class="fixed_script" onclick="fixed_script()" value="Зафиксировать сценарий игры" disabled>  
                <input type="submit" class="cancel_all" onclick="cancel_all()" value="Сброс">  
+             </p>
+             <p>
+             <input class="room_id" id="room", name="room_id" type="text" maxlength="4" placeholder="1234" required>
+             <input type="submit" class="open_room" onclick="open_room()" value="Открыть комнату">
+             <input type="submit" class="open_room" onclick="close_room()" value="Закрыть комнату"disabled>
              </p>
 
         </div>
