@@ -1,7 +1,8 @@
-from flask import Flask, abort, logging, redirect, render_template, request, send_file, session, url_for, flash, redirect
+from flask import Flask, abort, jsonify, logging, redirect, render_template, request, send_file, session, url_for, flash, redirect
 import random
 import hashlib
 import os
+import json
 from flask_socketio import SocketIO, emit
 
 
@@ -10,7 +11,7 @@ app = Flask(__name__, template_folder="static/")
 app.config["SECRET_KEY"] = os.urandom(32).hex
 app.secret_key = os.urandom(32).hex
 socketio = SocketIO(app)
-
+accepted_user = ""
 
 @app.route('/')
 def index(): 
@@ -57,9 +58,29 @@ def slot():
 def host_slot():
     if request.method == 'POST':
         print (url_for('host_slot'))
+        for i in users:
+            flash (i)
         return render_template("host_slot.html")
     print (url_for('host_slot'))
     return render_template("host_slot.html")
+
+@app.route('/invite_user', methods=["POST", "GET"])
+def invite_user():
+    if request.method == 'POST':
+        u = request.json["user_name"]
+        return json.dumps(u)
+    print (url_for('host_slot'))
+    return render_template("host_slot.html")
+
+@app.route('/gen_task', methods=["POST", "GET"])
+def gen_task():
+    if request.method == 'POST':
+        r = request.json["current_round"]
+        jsn = generate_string(int(r),False)
+        return jsn
+    print (url_for('host_slot'))
+    return render_template("host_slot.html")
+
 
     
 def generate_string(round_id,is_bombed):
@@ -73,8 +94,9 @@ def generate_string(round_id,is_bombed):
         a = random.randint(10,otbor_chislo)
         b = random.randint(otbor_chislo,999)
         md5_hash = hashlib.md5(str(otbor_chislo).encode()).hexdigest()
-        result = [a,b,otbor_chislo,md5_hash]
-        return result
+        result = [current_round,a,b,otbor_chislo,md5_hash]
+        js = json.dumps(result)
+        return js
     else:
         match current_round:
             case 1: count_fatal=1
@@ -90,12 +112,15 @@ def generate_string(round_id,is_bombed):
     if count_fatal == 1:
         fatal = random.randint(1,15)
         md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
-        result = [fatal,md5_hash]
+        result = [current_round.fatal,md5_hash]
+        js = json.dumps(result)
+        return js
     else:
         fatal = random.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
         md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
-        result = [fatal,md5_hash]
-        return result
+        result = [current_round,fatal,md5_hash]
+        js = json.dumps(result)
+        return js
         pass
         
             
