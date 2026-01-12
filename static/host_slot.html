@@ -12,10 +12,10 @@
             <h1>Свободный слот. Пульт ведущего.</h1>
             <div class="game_box_container">
             <div class="form_group">
-             <input type="submit" id="status-round" class="status-round" value="Отборочный тур"> 
+             <input type="submit" id="status-round" class="status-round" value="1"> 
              <input type="submit" id="away" class="away" value="Осталось раундов: 9" > 
              <input type="submit" id="current-money" class ="current-money" value="0"> 
-             <input type="submit" id="next-money" class ="next-money" value="1000" > 
+             <input type="submit" id="next-money" class ="next-money" value="1 000" > 
              <input type="submit" id="lost-money" class ="lost-money" value="0" > 
              <input type="submit" id="fix-money" class ="fix-money" value="0" > 
              <p>
@@ -29,7 +29,9 @@
              <div class="tree-container-c8" id="c2"> 2.    3 000</div>
              <div class="tree-container-c9" id="c1"> 1.    1 000</div>
              </p>
-
+             <p>
+                <input class="in_game" id="in_game" value="В игре:">
+             </p>
                 {%for msg in get_flashed_messages()%}
                 <p>
                     <input type="radio" class="tree-container-button" id="users" name="user_name" value={{msg}} >
@@ -37,7 +39,7 @@
                 </p>
                 {%endfor%}       
             </div> 
-            <p>  
+                <p>  
                 <button class="message" id="au" ></button>
                 <div class = "questions" id="question" value =""></div>
 
@@ -63,30 +65,31 @@
                 </p>
                 <p>
                     <div>
-                    <input type="submit" class="o1" value="1" disabled>
-                    <input type="submit" class="o1" value="2" disabled>
-                    <input type="submit" class="o1" value="3" disabled>
-                    <input type="submit" class="o1" value="4" disabled>
-                    <input type="submit" class="o1" value="5" disabled>
+                    <input type="submit" class="o1" id="o1" onclick="a1()" value="1" disabled>
+                    <input type="submit" class="o1" id="o2" onclick="a2()" value="2" disabled>
+                    <input type="submit" class="o1" id="o3" onclick="a3()" value="3" disabled>
+                    <input type="submit" class="o1" id="o4" onclick="a4()" value="4" disabled>
+                    <input type="submit" class="o1" id="o5" onclick="a5()" value="5" disabled>
                 </p>
                 <p>
-                    <input type="submit" class="o2" value="6" disabled>
-                    <input type="submit" class="o2" value="7" disabled>
-                    <input type="submit" class="o2" value="8" disabled>
-                    <input type="submit" class="o2" value="9" disabled>
-                    <input type="submit" class="o2" value="10" disabled>
+                    <input type="submit" class="o2" id="o6" onclick="a6()" value="6" disabled>
+                    <input type="submit" class="o2" id="o7" onclick="a7()" value="7" disabled>
+                    <input type="submit" class="o2" id="o8" onclick="a8()" value="8" disabled>
+                    <input type="submit" class="o2" id="o9" onclick="a9()" value="9" disabled>
+                    <input type="submit" class="o2" id="o10" onclick="a10()" value="10" disabled>
                 </p>
                 <p>
-                    <input type="submit" class="o3" value="11" disabled>
-                    <input type="submit" class="o3" value="12" disabled>
-                    <input type="submit" class="o3" value="13" disabled>
-                    <input type="submit" class="o3" value="14" disabled>
-                    <input type="submit" class="o3" value="15" disabled> 
+                    <input type="submit" class="o3" id="o11" onclick="a11()" value="11" disabled>
+                    <input type="submit" class="o3" id="o12" onclick="a12()" value="12" disabled>
+                    <input type="submit" class="o3" id="o13" onclick="a13()" value="13" disabled>
+                    <input type="submit" class="o3" id="o14" onclick="a14()" value="14" disabled>
+                    <input type="submit" class="o3" id="o15" onclick="a15()" value="15" disabled> 
                 </p>
             </div>
             <div>
-             <select class="select_round" id="select_round">    
-                <option id="0" value="Отборочный тур" selected>Отборочный тур</option>>
+             <select class="select_round" id="select_round">   
+                <option value="Раунд" selected disabled></option> 
+                <option id="0" value="Отборочный тур" disabled >Отборочный тур</option>>
                 <option id="1" value="Раунд 1" >Раунд 1</option>
                 <option id="2" value="Раунд 2" >Раунд 2</option>
                 <option id="3" value="Раунд 3" >Раунд 3</option>
@@ -114,19 +117,23 @@
             </div>
             <div>
                 <select class="select_script" id="select_script">
+                <option id="0" value="Сценарий" selected disabled></option>ы
                 <option id="1" value="Классика" >Классика</option>
                 <option id="1" value="Рискованный" >Рискованный</option>
                 <option id="2" value="Экстрим" >Экстрим</option>
              </select>
             </div>
                 <p>
-                <input type="submit" class="start_game" onclick="start_to_game()" value="Начать игру" disabled>
+                <input type="submit" class="start_game" id ="start_game" onclick="start_to_game()" value="Начать игру" disabled>
                 <input type="submit" class="invite" onclick="invite_to_game()" value="Пригласить в игру">
-                <input type="submit" class="invite" onclick="gen_task()" value="Отправить задание" disabled>
-                <input type="submit" class="show-right" onclick="show_right()" value="Показать верный ответ" disabled>
+                <input type="submit" class="invite" onclick="gen_task()" value="Получить задание">
                 </p>
                 <p>
-                <input type="submit" class="next-round" onclick="next_round()" value="Следующий раунд" disabled>
+                 <input type="submit" class="cancel-answer" onclick="cancel_answer()" value="Отменить ответ" disabled>
+                 <input type="submit" class="show-right" id="show-right" onclick="show_right()" value="Показать верный ответ" disabled>
+                </p>
+                <p>
+                <input type="submit" class="next-round" id="next-round" onclick="next_round()" value="Следующий раунд" disabled>
                 <input type="submit" class="fixed_script" onclick="fixed_script()" value="Зафиксировать сценарий игры" disabled>  
                <input type="submit" class="cancel_all" onclick="cancel_all()" value="Сброс">  
              </p>
@@ -135,13 +142,8 @@
              <input type="submit" class="open_room" onclick="open_room()" value="Открыть комнату">
              <input type="submit" class="open_room" onclick="close_room()" value="Закрыть комнату"disabled>
              </p>
-
         </div>
- 
-
-   
     <script src="/static/start/slot/host.js"></script>    
-
 </body>
     <footer class="copyrights">
         Здесь могло бы быть ваше имя и ваша реклама.

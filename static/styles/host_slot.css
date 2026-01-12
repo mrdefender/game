@@ -2,20 +2,15 @@
    html body{
     position: relative;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: 300;
-    font-size: larger;
+    font-weight: 200;
     background: linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
     background-image: url(/static/img/slot.jpg);
     background-size: cover;
     background-repeat:initial;
-    width: 100%;
-    height: 100%;
-    max-height: 100%;
     max-width: 100%;
     width: 100%;
-    height: 100%;
-    max-height: 100%;
     z-index: 2;
+    height: 50rem;
    }
 
 
@@ -25,14 +20,12 @@
     font-size: 1.4rem;
     width: 100%;
     text-align: center;
-    padding: 8px 0;
+    padding: 0% 0;
 }
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    max-width:100%;
-    max-height:100%;
     z-index: 1;
 
 }
@@ -47,7 +40,7 @@
     font-size: medium;
     text-align: center;
     width: 150px;
-    height: 50px;
+    height: 50%;
 }
 
 .away {
@@ -122,8 +115,8 @@
 }
 
 .tree-container-c1{
-    font-family: sans-serif;
-    font-size:x-large;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size:large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -139,8 +132,8 @@
     padding-left: .1rem;
 }
 .tree-container-c2{
-    font-family: sans-serif;
-    font-size:x-large;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size:large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -156,8 +149,8 @@
     padding-left: .1rem;
 }
 .tree-container-c3{
-    font-family: sans-serif;
-    font-size:x-large;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size:large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -173,8 +166,8 @@
     padding-left: .1rem;
 }
 .tree-container-c4{
-    font-family: sans-serif;
-    font-size:x-large;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size:large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -190,8 +183,8 @@
     padding-left: .1rem;
 }
 .tree-container-c5{
-    font-family: sans-serif;
-    font-size:x-large;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size:large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -207,8 +200,8 @@
     padding-left: .1rem;
 }
 .tree-container-c6{
-    font-family: sans-serif;
-    font-size:x-large;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size:large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -224,8 +217,8 @@
     padding-left: .1rem;
 }
 .tree-container-c7{
-    font-family: sans-serif;
-    font-size:x-large;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size:large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -241,8 +234,8 @@
     padding-left: .1rem;
 }
 .tree-container-c8{
-    font-family: sans-serif;
-    font-size:x-large;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size:large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -258,8 +251,8 @@
     padding-left: .1rem;
 }
 .tree-container-c9{
-    font-family: sans-serif;
-    font-size:x-large;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size:large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -311,7 +304,19 @@
     width: 45%;
     height: 2rem;
 }
-
+.in_game{
+    position: relative;
+    padding: 20px 30px;
+    top: -18rem;
+    left: -39.9%;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: rgb(7, 127, 224);
+    font-size: medium;
+    width: 16rem;
+    height: 2rem;
+}
 .questions{
     position: relative;
     padding: 10px 30px;
@@ -333,7 +338,7 @@
     left: -5%;
     padding: 10px 30px;
     color: #fff;
-    clip-path: polygon(85% 0, 100% 50%, 85% 100%, 15% 100%, 0% 50%, 15% 0);
+    border-radius: 100px;
     background-color: #000c11;
     color: beige;
     font-size: medium;
@@ -350,7 +355,7 @@
     top: -20.5rem;
     padding: 10px 30px;
     color: #fff;
-    clip-path: polygon(85% 0, 100% 50%, 85% 100%, 15% 100%, 0% 50%, 15% 0);
+    border-radius: 100px;
     background-color: #000c11;
     color: beige;
     font-size: medium;
@@ -365,7 +370,7 @@
     top: -20rem;
     padding: 10px 30px;
     color: #fff;
-    clip-path: polygon(85% 0, 100% 50%, 85% 100%, 15% 100%, 0% 50%, 15% 0);
+    border-radius: 100px;
     background-color: #000c11;
     color: beige;
     font-size: medium;
@@ -374,7 +379,7 @@
 }
 .o1 {
     position: relative;
-    top: 0rem;
+    top: -18rem;
     left: -5%;
     color: #fff;
     border-radius: 100px;
@@ -386,7 +391,7 @@
 }
 .o2 {
     position: relative;
-    top: 0rem;
+    top: -18rem;
     left: -5%;
     color: #fff;
     border-radius: 100px;
@@ -398,7 +403,7 @@
 }
 .o3 {
     position: relative;
-    top: 0rem;
+    top: -18rem;
     left: -5%;
     color: #fff;
     border-radius: 100px;
@@ -411,7 +416,7 @@
 
 .select_round{
     position: relative;
-    top: .7rem;
+    top: -30rem;
     left: -45%;
     color: #fff;
     border-radius: 40px;
@@ -425,7 +430,7 @@
 }
 .select_fix{
     position: relative;
-    top: .9rem;
+    top: -30rem;
     left: -45%;
     color: #fff;
     border-radius: 40px;
@@ -440,7 +445,7 @@
 }
 .select_script{
     position: relative;
-    top: 1.1rem;
+    top: -30rem;
    left: -45%;
     color: #fff;
     border-radius: 40px;
@@ -455,8 +460,8 @@
 }
 .invite{
     position: relative;
-    top: 0rem;
-    left: 0%;
+    top: -22rem;
+    left: -20rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -468,8 +473,8 @@
 }
 .start_game{
     position: relative;
-    top: 0rem;
-    left: 0%;
+    top: -22rem;
+    left: -20rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -483,8 +488,8 @@
 
 .show-right{
     position: relative;
-    top: 0rem;
-    left: 0%;
+    top: -21.5rem;
+    left: -23rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -494,10 +499,23 @@
     height: 2rem;
     text-wrap:inherit
 }
+.cancel-answer{
+    position: relative;
+    top: -21.5rem;
+    left: -23rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 9rem;
+    height: 2rem;
+    text-wrap:inherit
+}
 .next-round{
     position: relative;
-    top: .4rem;
-    left: 0%;
+    top: -23.5rem;
+    left: 3rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -509,8 +527,8 @@
 }
 .fixed_script{
     position: relative;
-    top: .4rem;
-    left: 0%;
+    top: -23.5rem;
+    left: 3rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -535,8 +553,8 @@
 
 .cancel_all{
     position: relative;
-    top: .4rem;
-    left: 0%;
+    top: -21rem;
+    left: -44rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -548,8 +566,8 @@
 }
 .room_id{
     position: relative;
-    top: .6rem;
-    left: -1rem;
+    top: -20.5rem;
+    left: -21rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -563,8 +581,8 @@
 }
 .open_room{
     position: relative;
-    top: .6rem;
-    left: 0rem;
+    top: -20.5rem;
+    left: -20rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;

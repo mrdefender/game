@@ -78,8 +78,18 @@ def gen_task():
         r = request.json["current_round"]
         jsn = generate_string(int(r),False)
         return jsn
-    print (url_for('host_slot'))
-    return render_template("host_slot.html")
+  #  print (url_for('host_slot'))
+  #  return render_template("host_slot.html")
+
+def get_summs():
+    f = open('txt/sum.txt','r')
+    f_t = open('txt/text_sum.txt', 'r')
+    f1 = f.readlines()
+    f2 = f_t.readlines()
+    print(f1[0])
+    print(f2[0])
+    f.close()
+    f_t.close()
 
 
     
@@ -96,6 +106,7 @@ def generate_string(round_id,is_bombed):
         md5_hash = hashlib.md5(str(otbor_chislo).encode()).hexdigest()
         result = [current_round,a,b,otbor_chislo,md5_hash]
         js = json.dumps(result)
+    
         return js
     else:
         match current_round:
@@ -112,27 +123,49 @@ def generate_string(round_id,is_bombed):
     if count_fatal == 1:
         fatal = random.randint(1,15)
         md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
-        result = [current_round.fatal,md5_hash]
+        result = [current_round,fatal,md5_hash]
         js = json.dumps(result)
+        with open('task.json','w') as file:
+            json.dump(result,file)
         return js
     else:
         fatal = random.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
         md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
         result = [current_round,fatal,md5_hash]
         js = json.dumps(result)
+        with open('task.json','w') as file:
+            json.dump(result,file)
         return js
         pass
         
             
+@app.route('/get_fatal_host', methods=["POST", "GET"])
+def get_fatal_host():
+    if request.method == 'POST':
+        r = request.json["answer"]
+    with open('answered.json', 'w') as file:
+        answered = true
+        json.dump(answered,r)
+    jsn = 0
+    with open('task.json') as file:
+           jsn = json.load(file)
+    return jsn
     
+@app.route('/check_answered', methods=["POST", "GET"])
+def check_answered():
+    if request.method == 'POST':
+        r = request.json["check"]
+    if os.path.exists("answered.json"):
+        return True
+    else:
+        return False    
     
-
     
     
 
 if __name__ == "__main__":
     users = ['test']
-    socketio.run(app,debug=True)
+    socketio.run(app,debug=True, host='0.0.0.0')
     ##app.run(debug=True)
     
     
