@@ -16,18 +16,28 @@ var c9 = document.getElementById("c9");
 var select = document.querySelector('#select_round');
 var select_fix = document.querySelector('#select_fix');
 var select_script = document.querySelector('#select_script');
-
+document.getElementById("show-right").disabled = true;
 
 
 function cancel_all(){
-
-
+   
+   //ch1();
+   //ch2();
+   //ch3();
+    location.reload();
 }
 
 
 
 select_script.addEventListener('change', function(){
-    if (this.value == "Классика")
+    ch1();
+}
+)
+
+
+function ch1()
+{
+    if (select_script.value == "Классика")
     {
         select_fix.disabled = true;
         c1.style.color = "#dd6706";
@@ -39,7 +49,7 @@ select_script.addEventListener('change', function(){
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
     }
-    if (this.value == "Экстрим")
+    if (select_script.value == "Экстрим")
     {
         select_fix.disabled = true;
         c1.style.color = "#dd6706";
@@ -52,19 +62,22 @@ select_script.addEventListener('change', function(){
         c8.style.color = "#dd6706";
         fix_money.value = "0";
     }    
-    if (this.value == "Рискованный")
+    if (select_script.value == "Рискованный")
     {
         select_fix.disabled = false;
     }    
-
-
 }
-)
 
 
 select_fix.addEventListener('change', function(){
-    console.log(this.value);
-    if (this.value =="0")
+   ch2()
+}
+);
+
+
+
+function ch2(){
+    if (select_fix.value =="0")
     {
         fix_money.value = "0";
         c1.style.color = "#dd6706";
@@ -76,7 +89,7 @@ select_fix.addEventListener('change', function(){
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
     }
-    if (this.value == "1 000")
+    if (select_fix.value == "1 000")
     {
         fix_money.value = "1 000";
         c1.style.color = "white";
@@ -88,7 +101,7 @@ select_fix.addEventListener('change', function(){
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
     }
-    if (this.value == "3 000")
+    if (select_fix.value == "3 000")
     {
         fix_money.value = "3 000";
         c1.style.color = "#dd6706";
@@ -100,7 +113,7 @@ select_fix.addEventListener('change', function(){
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
     }
-    if (this.value == "5 000")
+    if (select_fix.value == "5 000")
     {
         fix_money.value = "5 000";
         c1.style.color = "#dd6706";
@@ -113,7 +126,7 @@ select_fix.addEventListener('change', function(){
         c8.style.color = "#dd6706";
 
     }
-     if (this.value == "10 000")
+     if (select_fix.value == "10 000")
     {
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
@@ -125,7 +138,7 @@ select_fix.addEventListener('change', function(){
         c8.style.color = "#dd6706";
 
     }
-     if (this.value == "25 000")
+     if (select_fix.value == "25 000")
     {
         fix_money.value = "25 000";
         c1.style.color = "#dd6706";
@@ -138,7 +151,7 @@ select_fix.addEventListener('change', function(){
         c8.style.color = "#dd6706";
 
     }
-     if (this.value == "50 000")
+     if (select_fix.value == "50 000")
     {
         fix_money.value = "50 000";
         c1.style.color = "#dd6706";
@@ -151,7 +164,7 @@ select_fix.addEventListener('change', function(){
         c8.style.color = "#dd6706";
 
     }
-    if (this.value == "150 000")
+    if (select_fix.value == "150 000")
     {
         fix_money.value = "150 000";
         c1.style.color = "#dd6706";
@@ -163,7 +176,7 @@ select_fix.addEventListener('change', function(){
         c7.style.color = "white";
         c8.style.color = "#dd6706";
     }
-    if (this.value == "500 000")
+    if (select_fix.value == "500 000")
     {
         fix_money.value = "500 000";
         c1.style.color = "#dd6706";
@@ -177,14 +190,14 @@ select_fix.addEventListener('change', function(){
 
     }
 }
-);
-
 
 select.addEventListener('change', function(){
-    console.log(this.value);
+   ch3();
+}
+);
 
-
-    if (this.value == "Отборочный тур")
+function ch3(){
+    if (select.value == "Отборочный тур")
     {
         round.value = "Отборочный тур";
         away.value = "Осталось раундов: 9";
@@ -202,7 +215,7 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     }
-    if (this.value == "Раунд 1")
+    if (select.value == "Раунд 1")
     {
         round.value = "1";
         away.value = "Осталось раундов: 9";
@@ -221,16 +234,21 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     }   
-    if (this.value == "Раунд 2")
+    if (select.value == "Раунд 2")
     {
         round.value = "2";
         away.value = "Осталось раундов: 8";
         current_money.value = "1 000";
         next_money.value = "3 000";
-
-
-
-
+        if(select_script.value != "Рискованный")
+        {
+            document.getElementById("lost-money").value = "1 000";
+        }
+        else{
+            tt = calc_fix(round.value,select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
         c1.style.backgroundColor = "orange";
         c2.style.backgroundColor = "black";
         c3.style.backgroundColor = "black";
@@ -241,14 +259,21 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (this.value == "Раунд 3")
+    if (select.value == "Раунд 3")
     {
         round.value = "3";
         away.value = "Осталось раундов: 7";
         current_money.value = "3 000";
-        next_money.value = "5000";
-
-
+        next_money.value = "5 000";
+        if(select_script.value != "Рискованный")
+        {
+            document.getElementById("lost-money").value = "3 000";
+        }
+        else{
+            tt = calc_fix(round.value,select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
         c1.style.backgroundColor = "black";
         c2.style.backgroundColor = "orange";
         c3.style.backgroundColor = "black";
@@ -259,14 +284,27 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (this.value == "Раунд 4")
+    if (select.value == "Раунд 4")
     {
         round.value = "4";
         away.value = "Осталось раундов: 6";
         current_money.value = "5 000";
         next_money.value = "10 000";
-
-
+        if(select_script.value == "Классика")
+        {
+            document.getElementById("lost-money").value = "0";
+            document.getElementById("fix-money").value = "5 000";
+        }
+        if(select_script.value == "Экстрим")
+        {
+            document.getElementById("lost-money").value = "5 000";
+            document.getElementById("fix-money").value = "0";
+        }
+       if(select_script.value == "Рискованный"){
+            tt = calc_fix(round.value,select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
 
         c1.style.backgroundColor = "black";
         c2.style.backgroundColor = "black";
@@ -278,13 +316,28 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (this.value == "Раунд 5")
+    if (select.value == "Раунд 5")
     {
         round.value = "5";
         away.value = "Осталось раундов: 5";
         current_money.value = "10 000";
         next_money.value = "25 000";
- 
+        if(select_script.value == "Классика")
+        {
+            document.getElementById("lost-money").value = "5 000";
+            document.getElementById("fix-money").value = "5 000";
+        } 
+        if(select_script.value == "Экстрим")
+        {
+            document.getElementById("lost-money").value = "10 000";
+            document
+            .getElementById("fix-money").value = "0";
+        }
+        if(select_script.value == "Рискованный"){
+            tt = calc_fix(round.value,select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
         c1.style.backgroundColor = "black";
         c2.style.backgroundColor = "black";
         c3.style.backgroundColor = "black";
@@ -295,15 +348,27 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (this.value == "Раунд 6")
+    if (select.value == "Раунд 6")
     {
         round.value = "6";
         away.value = "Осталось раундов: 4";
         current_money.value = "25 000";
         next_money.value = "50 000";
-
-
-
+        if(select_script.value == "Классика")
+        {
+            document.getElementById("lost-money").value = "20 000";
+            document.getElementById("fix-money").value = "5 000";
+        }
+        if(select_script.value == "Экстрим")
+        {
+            document.getElementById("lost-money").value = "25 000";
+            document.getElementById("fix-money").value = "0";
+        }
+        if(select_script.value == "Рискованный"){
+            tt = calc_fix(round.value,select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
 
         c1.style.backgroundColor = "black";
         c2.style.backgroundColor = "black";
@@ -315,14 +380,27 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (this.value == "Раунд 7")
+    if (select.value == "Раунд 7")
     {
         round.value = "7";
         away.value = "Осталось раундов: 3";
         current_money.value = "50 000";
         next_money.value = "150 000";
- 
-
+         if(select_script.value == "Классика")
+        {
+            document.getElementById("lost-money").value = "0";
+            document.getElementById("fix-money").value = "50 000";
+        }
+        if(select_script.value == "Экстрим")
+        {
+            document.getElementById("lost-money").value = "50 000";
+            document.getElementById("fix-money").value = "0";
+        }
+        if(select_script.value == "Рискованный"){
+            tt = calc_fix(round.value,select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
         c1.style.backgroundColor = "black";
         c2.style.backgroundColor = "black";
         c3.style.backgroundColor = "black";
@@ -333,15 +411,27 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     }  
-    if (this.value == "Раунд 8")
+    if (select.value == "Раунд 8")
     {
         round.value = "8";
         away.value = "Осталось раундов: 2";
         current_money.value = "150 000";
         next_money.value = "500 000";
-
-
-
+        if(select_script.value == "Классика")
+        {
+            document.getElementById("lost-money").value = "100 000";
+            document.getElementById("fix-money").value = "50 000";
+        }
+        if(select_script.value == "Экстрим")
+        {
+            document.getElementById("lost-money").value = "150 000";
+            document.getElementById("fix-money").value = "0";
+        }
+        if(select_script.value == "Рискованный"){
+            tt = calc_fix(round.value,select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
         c1.style.backgroundColor = "black";
         c2.style.backgroundColor = "black";
         c3.style.backgroundColor = "black";
@@ -352,14 +442,27 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (this.value == "Раунд 9")
+    if (select.value == "Раунд 9")
     {
         round.value = "9";
         away.value = "Осталось раундов: 1";
         current_money.value = "500 000";
         next_money.value = "1 000 000";
-
-
+        if(select_script.value == "Классика")
+        {
+            document.getElementById("lost-money").value = "450 000";
+            document.getElementById("fix-money").value = "50 000";
+        }
+        if(select_script.value == "Экстрим")
+        {
+            document.getElementById("lost-money").value = "500 000";
+            document.getElementById("fix-money").value = "0";
+        }
+        if(select_script.value == "Рискованный"){
+            tt = calc_fix(round.value,select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
 
         c1.style.backgroundColor = "black";
         c2.style.backgroundColor = "black";
@@ -371,7 +474,7 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "orange";
         c9.style.backgroundColor = "black";
     }   
-    if (this.value == "Победа")
+    if (select.value == "Победа")
     {
         round.value = "Победа";
         away.value = "Осталось раундов: 0";
@@ -389,16 +492,13 @@ select.addEventListener('change', function(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "orange";
     }  
-    console.log(current_money.value);
-    console.log(lost_money.value);
-    console.log(fix_money.value);
-    console.log(round.value);
+    console.log("Раунд " + round.value);
 }
-);
+
+
 function invite_to_game()
 {
     var input = document.querySelector('input[name="user_name"]:checked').value;
-    console.log(input)
     fetch('/invite_user', {
         method: 'POST',
         body: JSON.stringify({user_name: input}),
@@ -410,7 +510,7 @@ function invite_to_game()
 .then(response => response.json())
 
 .then(data => {
-        document.getElementById('au').textContent = "В игру вступает " + data;
+        document.getElementById('au').value = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
 .catch(error => {
@@ -446,7 +546,7 @@ function gen_task()
 .then(response => response.json())
 
 .then(data => {
-    console.log(data[2])
+    console.log(data)
     document.getElementById('question').innerText = "md5: "+data[2];
     status_btn (false,"o");
     status_btn (false,"btn");
@@ -655,7 +755,10 @@ function check_answered()
 .then(response => response.json())
 
 .then(data => {
-    return data;
+    if (data = "true")
+        return true;
+    else
+        return false;
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -667,11 +770,12 @@ console.error('Ошибка:', error);
 function a1(){
     btn_answers1 = document.getElementById("o1");
     btn_answers1.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "1"}),
+        body: JSON.stringify({answer: "o1", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -693,11 +797,12 @@ console.error('Ошибка:', error);
 function a2(){
     btn_answers2 = document.getElementById("o2");
     btn_answers2.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "2"}),
+        body: JSON.stringify({answer: "o2", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -718,11 +823,12 @@ console.error('Ошибка:', error);
 function a3(){
     btn_answers3 = document.getElementById("o3");
     btn_answers3.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "3"}),
+        body: JSON.stringify({answer: "o3", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -744,11 +850,12 @@ console.error('Ошибка:', error);
 function a4(){
     btn_answers4 = document.getElementById("o4");
     btn_answers4.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "4"}),
+        body: JSON.stringify({answer: "o4", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -769,11 +876,12 @@ console.error('Ошибка:', error);
 function a5(){
     btn_answers5 = document.getElementById("o5");
     btn_answers5.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "5"}),
+        body: JSON.stringify({answer: "o5", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -794,11 +902,12 @@ console.error('Ошибка:', error);
 function a6(){
     btn_answers6 = document.getElementById("o6");
     btn_answers6.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "6"}),
+        body: JSON.stringify({answer: "o6", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -819,11 +928,12 @@ console.error('Ошибка:', error);
 function a7(){
     btn_answers7 = document.getElementById("o7");
     btn_answers7.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
-    fetch('/get_fatal_host', {
+   // if (check_answered())
+   //     { return;};
+   document.getElementById("show-right").disabled = false; 
+   fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "7"}),
+        body: JSON.stringify({answer: "o7", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -844,11 +954,12 @@ console.error('Ошибка:', error);
 function a8(){
      btn_answers8 = document.getElementById("o8");
     btn_answers8.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "8"}),
+        body: JSON.stringify({answer: "o8", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -870,11 +981,12 @@ console.error('Ошибка:', error);
 function a9(){
     btn_answers9 = document.getElementById("o9");
     btn_answers9.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "9"}),
+        body: JSON.stringify({answer: "o9", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -896,11 +1008,12 @@ console.error('Ошибка:', error);
 function a10(){
     btn_answers10 = document.getElementById("o10");
     btn_answers10.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "10"}),
+        body: JSON.stringify({answer: "o10", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -922,11 +1035,12 @@ console.error('Ошибка:', error);
 function a11(){
  btn_answers11 = document.getElementById("o11");
     btn_answers11.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "11"}),
+        body: JSON.stringify({answer: "o11", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -948,11 +1062,12 @@ console.error('Ошибка:', error);
 function a12(){
      btn_answers12 = document.getElementById("o12");
     btn_answers12.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "12"}),
+        body: JSON.stringify({answer: "o12", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -974,11 +1089,12 @@ console.error('Ошибка:', error);
 function a13(){
      btn_answers13 = document.getElementById("o13");
     btn_answers13.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "13"}),
+        body: JSON.stringify({answer: "o13", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -1000,11 +1116,12 @@ console.error('Ошибка:', error);
 function a14(){
      btn_answers14 = document.getElementById("o14");
     btn_answers14.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "14"}),
+        body: JSON.stringify({answer: "o14", round:round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -1026,11 +1143,12 @@ console.error('Ошибка:', error);
 function a15(){
      btn_answers15 = document.getElementById("o15");
     btn_answers15.style.backgroundColor = "orange";
-    if (check_answered)
-        return;
+    if (check_answered())
+       { return;}
+    document.getElementById("show-right").disabled = false;
     fetch('/get_fatal_host', {
         method: 'POST',
-        body: JSON.stringify({answer: "15"}),
+        body: JSON.stringify({answer: "o15", round: round}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -1051,5 +1169,306 @@ console.error('Ошибка:', error);
 }
 
 function show_right(){
+    if (check_answered)
+        fetch('/show_rights', {
+        method: 'POST',
+        body: JSON.stringify({answer: " ", round:"round"}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    document.getElementById("show-right").disabled = true;
+    console.log(data);
+    document.getElementById("o1").style.backgroundColor = btn1.style.backgroundColor;
+    document.getElementById("o2").style.backgroundColor = btn2.style.backgroundColor;
+    document.getElementById("o3").style.backgroundColor = btn3.style.backgroundColor;
+    document.getElementById("o4").style.backgroundColor = btn4.style.backgroundColor;
+    document.getElementById("o5").style.backgroundColor = btn5.style.backgroundColor;
+    document.getElementById("o6").style.backgroundColor = btn6.style.backgroundColor;
+    document.getElementById("o7").style.backgroundColor = btn7.style.backgroundColor;
+    document.getElementById("o8").style.backgroundColor = btn8.style.backgroundColor;
+    document.getElementById("o9").style.backgroundColor = btn9.style.backgroundColor;
+    document.getElementById("o10").style.backgroundColor = btn10.style.backgroundColor;
+    document.getElementById("o11").style.backgroundColor = btn11.style.backgroundColor;
+    document.getElementById("o12").style.backgroundColor = btn12.style.backgroundColor;
+    document.getElementById("o13").style.backgroundColor = btn13.style.backgroundColor;
+    document.getElementById("o14").style.backgroundColor = btn14.style.backgroundColor;
+    document.getElementById("o15").style.backgroundColor = btn15.style.backgroundColor;
+    if (document.getElementById(data[0]).style.backgroundColor !="red")
+    {
+        document.getElementById(data[0]).style.backgroundColor ="green";
+        document.getElementById("au").value = next_money.value;
+        if (data[1] == "1")
+        {
+            select.value = "Раунд 2";
+            document.getElementById("status-round").value = "2";
+           if(select_script.value == "Классика")
+           {
+            document.getElementById("lost-money").value = "1 000";
+           }
+            if(select_script.value == "Рискованный"){
+            tt = calc_fix("2",select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
+        }
+        if (data[1] == "2")
+        {
+            select.value = "Раунд 3";
+            document.getElementById("status-round").value = "3";
+           if(select_script.value == "Классика")
+           {
+            document.getElementById("lost-money").value = "3 000";
+           }   
+           if(select_script.value == "Рискованный"){
+            tt = calc_fix("3",select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }         
+        }
+        if (data[1] == "3")
+        {
+            select.value = "Раунд 4";
+            document.getElementById("status-round").value = "4";
+           if(select_script.value == "Классика")
+           {
+            document.getElementById("fix-money").value = "5 000";
+            document.getElementById("lost-money").value = "0";
+           }
+           if(select_script.value == "Рискованный"){
+            tt = calc_fix("4",select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
+        }
+        if (data[1] == "4")
+        {
+            select.value = "Раунд 5";
+            document.getElementById("status-round").value = "5";
+           if(select_script.value == "Классика")
+           {
+            document.getElementById("fix-money").value = "5 000";
+            document.getElementById("lost-money").value = "5 000";
+           }    
+           if(select_script.value == "Рискованный"){
+            tt = calc_fix("5",select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }        
+        }
+        if (data[1] == "5")
+        {
+            select.value = "Раунд 6";
+            document.getElementById("status-round").value = "6";
+            if(select_script.value == "Классика")
+           {
+            document.getElementById("fix-money").value = "5 000";
+            document.getElementById("lost-money").value = "20 000";
+           }  
+           if(select_script.value == "Рискованный"){
+            tt = calc_fix("6",select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
+        }
+        if (data[1] == "6")
+        {
+            select.value = "Раунд 7";
+            document.getElementById("status-round").value = "7";
+            if(select_script.value == "Классика")
+           {
+            document.getElementById("fix-money").value = "50 000";
+            document.getElementById("lost-money").value = "0";
+           }  
+           if(select_script.value == "Рискованный"){
+            tt = calc_fix("7",select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
+        }
+
+        if (data[1] == "7")
+        {
+            select.value = "Раунд 8";
+            document.getElementById("status-round").value = "8";
+            if(select_script.value == "Классика")
+           {
+            document.getElementById("fix-money").value = "50 000";
+            document.getElementById("lost-money").value = "100 000";
+           }  
+           if(select_script.value == "Рискованный"){
+            tt = calc_fix("8",select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }
+        }
+        if (data[1] == "8")
+        {
+            select.value = "Раунд 9";
+            document.getElementById("status-round").value = "9";
+           if(select_script.value == "Классика")
+           {
+            document.getElementById("fix-money").value = "50 000";
+            document.getElementById("lost-money").value = "450 000";
+           }  
+            if(select_script.value == "Рискованный")
+        {
+            tt = calc_fix("9",select_fix.value);
+            fix_money.value = tt[0];
+            lost_money.value = tt[1];
+        }            
+        }
+        if (data[1] == "9")
+        {
+            select.value = "Победа";
+            document.getElementById("status-round").value = "Победа";
+            if(select_script.value == "Классика")
+           {
+            document.getElementById("fix-money").value = "1 000 000";
+            document.getElementById("lost-money").value = "0";
+           }              
+        }
+        
+        if (select.value == "Победа")
+        {
+            document.getElementById("next-round").disabled = true;
+        }
+        document.getElementById("next-round").disabled = false;   
+
+    }
+        else 
+    {
+        document.getElementById("au").value = fix_money.value;
+        document.getElementById("next-round").disabled = true;
+    }   
+
+    document.getElementById("show-right").disabled = true;
+    ch3();
+        //document.getElementById('au').textContent = "В игру вступает " + data;
+    //document.getElementById('au').innerText = "В игру вступает " + data;
+}
+)
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
 
 }
+
+
+function next_round()
+{
+    ch3();
+    document.getElementById("o1").style.backgroundColor = "#000c11";
+    document.getElementById("o2").style.backgroundColor = "#000c11";
+    document.getElementById("o3").style.backgroundColor = "#000c11";
+    document.getElementById("o4").style.backgroundColor = "#000c11";
+    document.getElementById("o5").style.backgroundColor = "#000c11";
+    document.getElementById("o6").style.backgroundColor = "#000c11";
+    document.getElementById("o7").style.backgroundColor = "#000c11";
+    document.getElementById("o8").style.backgroundColor = "#000c11";
+    document.getElementById("o9").style.backgroundColor = "#000c11";
+    document.getElementById("o10").style.backgroundColor = "#000c11";
+    document.getElementById("o11").style.backgroundColor = "#000c11";
+    document.getElementById("o12").style.backgroundColor = "#000c11";
+    document.getElementById("o13").style.backgroundColor = "#000c11";
+    document.getElementById("o14").style.backgroundColor = "#000c11";
+    document.getElementById("o15").style.backgroundColor = "#000c11";
+    document.getElementById("question").value = " ";
+    document.getElementById("question").innerText = " ";
+    btn1.style.backgroundColor = "#000c11";
+    btn2.style.backgroundColor = "#000c11";
+    btn3.style.backgroundColor = "#000c11";
+    btn4.style.backgroundColor = "#000c11";
+    btn5.style.backgroundColor = "#000c11";
+    btn6.style.backgroundColor = "#000c11";
+    btn7.style.backgroundColor = "#000c11";
+    btn8.style.backgroundColor = "#000c11";
+    btn9.style.backgroundColor = "#000c11";
+    btn10.style.backgroundColor = "#000c11";
+    btn11.style.backgroundColor = "#000c11";
+    btn12.style.backgroundColor = "#000c11";
+    btn13.style.backgroundColor = "#000c11";
+    btn14.style.backgroundColor = "#000c11";
+    btn15.style.backgroundColor = "#000c11";
+     document.getElementById("show-right").disabled = true;
+    document.getElementById("next-round").disabled = true;
+
+}
+
+function calc_fix(id_round, id_fix)
+{
+      res_money = []
+    var id_fix_int;
+    switch (id_fix){
+        case "1 000": id_fix_int = 1000; break;
+        case "3 000": id_fix_int = 3000; break;
+        case "5 000": id_fix_int = 5000; break;
+        case "10 000": id_fix_int = 10000; break;
+        case "25 000": id_fix_int = 25000; break;
+        case "50 000": id_fix_int = 50000; break;
+        case "150 000":id_fix_int = 150000; break;
+        case "500 000":id_fix_int = 500000; break;
+    }
+    var id_round_int;
+    switch (id_round){
+        case "2": id_round_int = 1000; break;
+        case "3": id_round_int = 3000; break;
+        case "4": id_round_int = 5000; break;
+        case "5": id_round_int = 10000; break;
+        case "6": id_round_int = 25000; break;
+        case "7": id_round_int = 50000; break;
+        case "8":id_round_int = 150000; break;
+        case "9":id_round_int = 500000; break;
+    }
+
+    console.log (id_fix_int , id_round_int);
+
+    var tmp = id_fix_int - id_round_int;
+    if (tmp == 0)
+        res_money = [id_fix,"0"];
+    if (tmp>0)
+    {
+        switch (id_round){
+        case "2": res_money = ["0","1 000"]; break;
+        case "3": res_money = ["0","3 000"]; break;
+        case "4":  res_money = ["0","5 000"]; break;
+        case "5":  res_money = ["0","10 000"]; break;
+        case "6":  res_money = ["0","25 000"]; break;
+        case "7":  res_money = ["0","50 000"]; break;
+        case "8": res_money = ["0","150 000"]; break;
+        case "9": res_money = ["0","500 000"]; break;
+    }
+    }
+    if (tmp<0)
+    {
+       tmp *=-1;
+        var tmp_str = tmp.toString();
+       console.log(tmp_str);
+       
+       var tmp_str_res
+        if (tmp_str.length == 6)
+        {
+            tmp_str_res = tmp_str[0]+tmp_str[1]+tmp_str[2]+" "+tmp.toString().slice(-3);
+        }
+        if (tmp_str.length == 5)
+        {
+            tmp_str_res = tmp_str[0]+tmp_str[1]+" "+tmp.toString().slice(-3);
+        }
+        if (tmp_str.length == 4)
+        {
+            tmp_str_res = tmp_str[0]+" "+tmp.toString().slice(-3);
+        }
+        res_money = [id_fix,tmp_str_res];
+    }
+
+    console.log(res_money);
+
+    return res_money;
+    
+}
+

@@ -143,11 +143,12 @@ def generate_string(round_id,is_bombed):
 def get_fatal_host():
     if request.method == 'POST':
         r = request.json["answer"]
-    with open('answered.json', 'w') as file:
-        answered = true
-        json.dump(answered,r)
-    jsn = 0
-    with open('task.json') as file:
+        r1 = request.json["round"]
+        res = [r, r1]
+        with open('answered.json', 'w') as file:
+            json.dump(res, file)
+        jsn = 0
+        with open('task.json') as file:
            jsn = json.load(file)
     return jsn
     
@@ -156,9 +157,23 @@ def check_answered():
     if request.method == 'POST':
         r = request.json["check"]
     if os.path.exists("answered.json"):
-        return True
+        return "true"
     else:
-        return False    
+        return "false"   
+    
+@app.route('/show_rights', methods=["POST", "GET"])
+def show_rights():
+    if request.method == 'POST':
+        r = request.json["round"]
+        if os.path.exists("answered.json"):
+            with open('answered.json') as file:
+                jsn = json.load(file)
+            os.remove("task.json")
+            os.remove("answered.json")
+            return jsn
+        
+               
+               
     
     
     
