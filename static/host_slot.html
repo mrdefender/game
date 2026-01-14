@@ -123,10 +123,47 @@
                 <option id="2" value="Экстрим" >Экстрим</option>
              </select>
             </div>
+            <div>
+             <p>
+             <input type="checkbox" id="p50_50" class = "helps1"> 
+             <label for="checkbox"  class="helps1">50:50 </label>
+            </p>
+            <p>
+             <input type="checkbox" id="palter" class= "helps2"> 
+             <label for="checkbox" class="helps2">Альтернатива </label>
+             </p>
+             <p>
+             <input type="checkbox" id="pnavi" class = "helps3"> 
+             <label for="checkbox" class="helps3">Навигатор </label>
+             </p>
+             <p>
+             <input type="checkbox" id="px2" class= "helps4">
+             <label for="checkbox" class="helps4">x2 </label>
+             </p>
+             <p>
+             <input type="checkbox" id="phelp_auden" class= "helps5" disabled> 
+              <label for="checkbox" class="helps5">Помощь интерактива</label>
+             </p>
+             <p>
+             <input type="submit" class="p50_50" id ="h50_50" onclick="h50_50()" value="50:50" disabled>
+             <input type="submit" class="alter" id ="alter" onclick="alter()" value="Альтернатива" disabled>
+             <input type="submit" class="navi" id ="navi"  onclick="navi()" value="Навигатор" disabled>
+             <input type="submit" class="x2" id ="x2" onclick="x2()" value="x2" disabled>
+             </p>
+             <p>
+             <input type="submit" class="help_auden" id ="help_auden" onclick="help_auden()" value="Помощь интерактива" disabled>
+                </p>
+             
+             disabled>
+            </div>
                 <p>
                 <input type="submit" class="start_game" id ="start_game" onclick="start_to_game()" value="Начать игру" disabled>
-                <input type="submit" class="invite" onclick="invite_to_game()" value="Пригласить в игру">
-                <input type="submit" class="invite" onclick="gen_task()" value="Получить задание">
+                <input type="submit" class="invite" id="invite" onclick="invite_to_game()" value="Пригласить в игру">
+                <input type="submit" class="invite" id="get_task" onclick="gen_task()" value="Получить задание" disabled >
+                <input type="submit" class="take_money" id="take_money" onclick="take_money()" value="Забрать деньги" disabled>  
+                </p>
+                <p>
+
                 </p>
                 <p>
                  <input type="submit" class="cancel-answer" onclick="cancel_answer()" value="Отменить ответ" disabled>
@@ -134,7 +171,7 @@
                 </p>
                 <p>
                 <input type="submit" class="next-round" id="next-round" onclick="next_round()" value="Следующий раунд" disabled>
-                <input type="submit" class="fixed_script" onclick="fixed_script()" value="Зафиксировать сценарий игры" disabled>  
+                <input type="submit" class="fixed_script" id="fixed_script" onclick="fixed_script()" value="Зафиксировать сценарий игры" disabled>  
                <input type="submit" class="cancel_all" onclick="cancel_all()" value="Сброс">  
              </p>
              <p>

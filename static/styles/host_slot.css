@@ -293,7 +293,6 @@
 }
 .message{
     position: relative;
-    padding: 20px 30px;
     top: -25rem;
     left: -1%;
     color: #fff;
@@ -302,7 +301,7 @@
     color: rgb(7, 127, 224);
     font-size: medium;
     width: 45%;
-    height: 2rem;
+    height: 4rem;
 }
 .in_game{
     position: relative;
@@ -455,13 +454,79 @@
     width: 8rem;
     height: 1.5rem;
     text-wrap: inherit;
-
-
 }
+.helps1{
+    position: relative;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size:large;
+    top: -29rem;
+    left: -30rem;
+    border-radius: 2px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    width: 2rem;
+    height: 1rem;
+    text-wrap: inherit;
+}
+
+.helps2 {
+    position: relative;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size:large;
+    top: -29rem;
+    left: -28.1rem;
+    border-radius: 2px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    width: 2rem;
+    height: 1rem;
+    text-wrap: inherit;
+}
+.helps3{
+    position: relative;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size:large;
+    top: -29rem;
+    left: -29rem;
+    border-radius: 2px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    width: 2rem;
+    height: 1rem;
+    text-wrap: inherit;
+}
+ .helps4 {
+    position: relative;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size:large;
+    top: -29rem;
+    left: -31rem;
+    border-radius: 2px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    width: 2rem;
+    height: 1rem;
+    text-wrap: inherit;
+}
+.helps5 {
+    position: relative;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size:large;
+    top: -29rem;
+    left: -26.3rem;
+    border-radius: 2px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    width: 2rem;
+    height: 1rem;
+    text-wrap: inherit;
+}
+
+
 .invite{
     position: relative;
     top: -22rem;
-    left: -20rem;
+    left: -15rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -471,10 +536,79 @@
     height: 2rem;
     text-wrap:inherit
 }
+.p50_50{
+    position: relative;
+    top: -28rem;
+    left: -27%;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 5rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+.alter{
+    position: relative;
+    top: -28rem;
+    left: -27%;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 7rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+.navi{
+    position: relative;
+    top: -28rem;
+    left: -27%;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 7rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+.x2{
+    position: relative;
+    top: -28rem;
+    left: -27%;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 4rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+
+.help_auden{
+    position: relative;
+    top: -27.7rem;
+    left: -27%;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 9rem;
+    height: rem;
+    text-wrap:inherit;
+}
+
+
+
 .start_game{
     position: relative;
     top: -22rem;
-    left: -20rem;
+    left: -15rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -538,6 +672,20 @@
     height: 2rem;
     text-wrap:inherit
 }
+.take_money{
+    position: relative;
+    top: -22rem;
+    left: -15rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 9rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+
 .copyrights{
     position: relative;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

@@ -114,16 +114,16 @@ def generate_string(round_id,is_bombed):
             case 2: count_fatal=2
             case 3: count_fatal=3
             case 4: count_fatal=5
-            case 5: count_fatal=8
-            case 6: count_fatal=10
-            case 7: count_fatal=12
-            case 8: count_fatal=13
+            case 5: count_fatal=6
+            case 6: count_fatal=8
+            case 7: count_fatal=10
+            case 8: count_fatal=12
             case 9: count_fatal=14
     
     if count_fatal == 1:
         fatal = random.randint(1,15)
         md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
-        result = [current_round,fatal,md5_hash]
+        result = [current_round,fatal,md5_hash, count_fatal]
         js = json.dumps(result)
         with open('task.json','w') as file:
             json.dump(result,file)
@@ -131,7 +131,7 @@ def generate_string(round_id,is_bombed):
     else:
         fatal = random.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
         md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
-        result = [current_round,fatal,md5_hash]
+        result = [current_round,fatal,md5_hash,count_fatal]
         js = json.dumps(result)
         with open('task.json','w') as file:
             json.dump(result,file)
@@ -151,6 +151,195 @@ def get_fatal_host():
         with open('task.json') as file:
            jsn = json.load(file)
     return jsn
+
+@app.route('/h50_50', methods=["POST", "GET"])
+def h50_50():
+    if request.method == 'POST':
+        r = request.json["round"]
+        jsn = 0
+        with open('task.json') as file:
+           jsn = json.load(file)
+        f = jsn[1]
+        cf = round(len(f)/2)
+        res_f = []
+        for i in range(cf):
+            res_f.append(f[i])
+        return res_f
+
+@app.route('/alter', methods=["POST", "GET"])
+def alter():
+    if request.method == 'POST':
+        r = request.json["round"]
+        jsn = 0
+        with open('task.json') as file:
+           jsn = json.load(file)
+        f = jsn[1]
+        cf = len(f)
+        random.seed()
+        rf = random.randint(1,cf-1)
+        random.seed()
+        j = 0
+        checked = False
+        while (checked==False):
+            checked = True
+            j = random.randint(1,15)
+            for i in f:
+                if i == j:
+                    checked = False
+                    break
+        
+        res = [f[rf],str(j)]
+        
+        return res
+    
+@app.route('/navi', methods=["POST", "GET"])
+def navi():
+    if request.method == 'POST':
+        r = request.json["round"]
+        jsn = 0
+        with open('task.json') as file:
+           jsn = json.load(file)
+        f = jsn[1]
+        f.sort()
+        row1 = [0,0,0,0,0]
+        row2 = [0,0,0,0,0]
+        row3 = [0,0,0,0,0]
+
+        for i in f:
+            if (i >=1) & (i<=5):
+                row1[i-1] = i
+            if (i>=6) & (i<=10):
+                row2[i-6] = i
+            if (i>=11) & (i<=15):
+                row3[i-11] = i
+        
+        col1 = [row1[0],row2[0],row3[0]]
+        col2 = [row1[1],row2[1],row3[1]]
+        col3 = [row1[2],row2[2],row3[2]]
+        col4 = [row1[3],row2[3],row3[3]]
+        col5 = [row1[4],row2[4],row3[4]]
+        
+        col_s = 0
+        for i in row1:
+            if (i == 0):
+                col_s+=1
+                
+        row1s = round(col_s/5*100)
+        col_s = 0
+        for i in row2:
+            if (i == 0):
+                col_s+=1
+                
+        row2s = round(col_s/5*100)
+        col_s = 0
+        for i in row3:
+            if (i == 0):
+                col_s+=1
+                
+        row3s = round(col_s/5*100)
+        
+        
+        row_max = [row1s,row2s,row3s]
+        
+        col_s = 0
+        for i in col1:
+            if (i == 0):
+                col_s+=1
+                
+        col1s = round(col_s/3*100)
+        col_s = 0
+        for i in col2:
+            if (i == 0):
+                col_s+=1
+                
+        col2s = round(col_s/3*100)
+        col_s = 0
+        for i in col3:
+            if (i == 0):
+                col_s+=1
+                
+        col3s = round(col_s/3*100)
+        col_s = 0
+        for i in col4:
+            if (i == 0):
+                col_s+=1
+                
+        col4s = round(col_s/3*100)
+        col_s = 0
+        for i in col5:
+            if (i == 0):
+                col_s+=1
+                
+        col5s = round(col_s/3*100)
+        
+        col_max=[col1s,col2s,col3s,col4s,col5s]
+        
+        max_c = max(col_max)
+        max_r = max(row_max)
+        if max_c > max_r:
+            tmp = -1
+            for i in range(0,5):
+                if max_c == col_max[i]:
+                    tmp = i
+                    break
+            if tmp==0:
+                res = ["1","6","11"]
+            if tmp==1:
+                res = ["2","7","12"]
+            if tmp==2:
+                res = ["3","8","13"]
+            if tmp==3:
+                res = ["4","9","14"]
+            if tmp==4:
+                res = ["5","10","15"]
+            return res
+        if max_c < max_r:
+            tmp = -1
+            for i in range(0,3):
+                if max_r == row_max[i]:
+                    tmp = i
+                    break
+            if tmp==0:
+                res = ["1","2","3","4","5"]
+            if tmp==1:
+                res = ["6","7","8","9","10"]
+            if tmp==2:
+                res = ["11","12","13","14","15"]
+            return res
+        if max_r == max_c:
+            j = random(1,2)
+            if j==1:
+                tmp = -1
+                for i in range(0,5):
+                 if max_c == col_max[i]:
+                     tmp = i
+                     break
+                if tmp==0:
+                    res = ["1","6","11"]
+                if tmp==1:
+                    res = ["2","7","12"]
+                if tmp==2:
+                    res = ["3","8","13"]
+                if tmp==3:
+                    res = ["4","9","14"]
+                if tmp==4:
+                    res = ["5","10","15"]
+                return res
+            if j==2:
+                tmp = -1
+                for i in range(0,3):
+                    if max_r == row_max[i]:
+                        tmp = i
+                        break
+                if tmp==0:
+                    res = ["1","2","3","4","5"]
+                if tmp==1:
+                    res = ["6","7","8","9","10"]
+                if tmp==2:
+                    res = ["11","12","13","14","15"]
+                return res
+
+
     
 @app.route('/check_answered', methods=["POST", "GET"])
 def check_answered():
@@ -168,7 +357,6 @@ def show_rights():
         if os.path.exists("answered.json"):
             with open('answered.json') as file:
                 jsn = json.load(file)
-            os.remove("task.json")
             os.remove("answered.json")
             return jsn
         

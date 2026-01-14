@@ -245,7 +245,7 @@ function ch3(){
             document.getElementById("lost-money").value = "1 000";
         }
         else{
-            tt = calc_fix(round.value,select_fix.value);
+            tt = calc_fix("2",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
         }
@@ -270,7 +270,7 @@ function ch3(){
             document.getElementById("lost-money").value = "3 000";
         }
         else{
-            tt = calc_fix(round.value,select_fix.value);
+            tt = calc_fix("3",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
         }
@@ -301,7 +301,7 @@ function ch3(){
             document.getElementById("fix-money").value = "0";
         }
        if(select_script.value == "Рискованный"){
-            tt = calc_fix(round.value,select_fix.value);
+            tt = calc_fix("4",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
         }
@@ -334,7 +334,7 @@ function ch3(){
             .getElementById("fix-money").value = "0";
         }
         if(select_script.value == "Рискованный"){
-            tt = calc_fix(round.value,select_fix.value);
+            tt = calc_fix("5",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
         }
@@ -365,7 +365,7 @@ function ch3(){
             document.getElementById("fix-money").value = "0";
         }
         if(select_script.value == "Рискованный"){
-            tt = calc_fix(round.value,select_fix.value);
+            tt = calc_fix("6",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
         }
@@ -397,7 +397,7 @@ function ch3(){
             document.getElementById("fix-money").value = "0";
         }
         if(select_script.value == "Рискованный"){
-            tt = calc_fix(round.value,select_fix.value);
+            tt = calc_fix("7",_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
         }
@@ -428,7 +428,7 @@ function ch3(){
             document.getElementById("fix-money").value = "0";
         }
         if(select_script.value == "Рискованный"){
-            tt = calc_fix(round.value,select_fix.value);
+            tt = calc_fix("8",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
         }
@@ -459,7 +459,7 @@ function ch3(){
             document.getElementById("fix-money").value = "0";
         }
         if(select_script.value == "Рискованный"){
-            tt = calc_fix(round.value,select_fix.value);
+            tt = calc_fix("9",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
         }
@@ -496,6 +496,24 @@ function ch3(){
 }
 
 
+function start_to_game()
+{
+    
+    document.getElementById("start_game").disabled = true;
+    document.getElementById("get_task").disabled = false;
+}
+
+function fixed_script()
+{
+document.getElementById("fixed_script").disabled = true;
+document.getElementById("start_game").disabled = false;
+document.getElementById("h50_50").disabled = false;
+document.getElementById("alter").disabled = false;
+document.getElementById("navi").disabled = false;
+document.getElementById("x2").disabled = false;
+
+}
+
 function invite_to_game()
 {
     var input = document.querySelector('input[name="user_name"]:checked').value;
@@ -512,6 +530,7 @@ function invite_to_game()
 .then(data => {
         document.getElementById('au').value = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
+    document.getElementById("fixed_script").disabled = false;
 })
 .catch(error => {
 console.error('Ошибка:', error);
@@ -547,7 +566,7 @@ function gen_task()
 
 .then(data => {
     console.log(data)
-    document.getElementById('question').innerText = "md5: "+data[2];
+    document.getElementById('question').innerText = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
     status_btn (false,"o");
     status_btn (false,"btn");
 
@@ -665,6 +684,40 @@ function get_btn(answer)
         return "btn15";
     
 }
+function get_o(answer)
+{
+    if (answer == "1")
+        return "o1";
+    if (answer == "2")
+        return "o2";
+    if (answer == "3")
+        return "o3";
+    if (answer == "4")
+        return "o4";
+    if (answer == "5")
+        return "o5";
+    if (answer == "6")
+        return "o6";
+    if (answer == "7")
+        return "o7";
+    if (answer == "8")
+        return "o8";
+    if (answer == "9")
+        return "o9";
+    if (answer == "10")
+        return "o10";
+    if (answer == "11")
+        return "o11";
+    if (answer == "12")
+        return "o2";
+    if (answer == "13")
+        return "o13";
+    if (answer == "14")
+        return "o14";
+    if (answer == "15")
+        return "o15";
+    
+}
 
 
 function show_fatal_to_host_panel(n_r,fatal)
@@ -744,6 +797,8 @@ function show_fatal_to_host_panel(n_r,fatal)
 
 function check_answered()
 {
+    if(document.getElementById("x2").style.backgroundColor == "orange")
+        return false;
     fetch('/check_answered', {
         method: 'POST',
         body: JSON.stringify({check: "true"}),
@@ -1181,8 +1236,21 @@ function show_right(){
 .then(response => response.json())
 
 .then(data => {
+
     document.getElementById("show-right").disabled = true;
+    
     console.log(data);
+    if(document.getElementById("x2").style.backgroundColor == "orange")
+    {
+        document.getElementById("x2").style.backgroundColor ==  "#1a1b02"
+        if(document.getElementById(o_to_btn(data[0])).style.backgroundColor == "red")
+        {
+            document.getElementById(data[0]).style.backgroundColor ="red"
+            document.getElementById("x2").style.backgroundColor =  "#1a1b02";
+            return;
+        }
+
+    };
     document.getElementById("o1").style.backgroundColor = btn1.style.backgroundColor;
     document.getElementById("o2").style.backgroundColor = btn2.style.backgroundColor;
     document.getElementById("o3").style.backgroundColor = btn3.style.backgroundColor;
@@ -1198,6 +1266,12 @@ function show_right(){
     document.getElementById("o13").style.backgroundColor = btn13.style.backgroundColor;
     document.getElementById("o14").style.backgroundColor = btn14.style.backgroundColor;
     document.getElementById("o15").style.backgroundColor = btn15.style.backgroundColor;
+
+    var tm = document.getElementById("take_money");
+    console.log(tm.style.backgroundColor);
+    if (tm.style.backgroundColor == "lime")
+        return;
+
     if (document.getElementById(data[0]).style.backgroundColor !="red")
     {
         document.getElementById(data[0]).style.backgroundColor ="green";
@@ -1210,7 +1284,9 @@ function show_right(){
            {
             document.getElementById("lost-money").value = "1 000";
            }
-            if(select_script.value == "Рискованный"){
+            if(select_script.value == "Рискованный")
+        {
+            console.log(select_script.value);
             tt = calc_fix("2",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
@@ -1347,9 +1423,11 @@ function show_right(){
     }   
 
     document.getElementById("show-right").disabled = true;
-    ch3();
+   // ch3();
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
+
+    
 }
 )
 .catch(error => {
@@ -1397,11 +1475,17 @@ function next_round()
     btn15.style.backgroundColor = "#000c11";
      document.getElementById("show-right").disabled = true;
     document.getElementById("next-round").disabled = true;
+    status_btn(true,"btn");
+    status_btn(true,"o");
+    document.getElementById("alter").style.backgroundColor = "#1a1b02";
+    document.getElementById("x2").style.backgroundColor =  "#1a1b02";
+
 
 }
 
 function calc_fix(id_round, id_fix)
 {
+    console.log(id_round, id_fix);
       res_money = []
     var id_fix_int;
     switch (id_fix){
@@ -1472,3 +1556,188 @@ function calc_fix(id_round, id_fix)
     
 }
 
+function take_money()
+{
+    if(document.getElementById("x2").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("alter").style.backgroundColor == "orange")
+        return;
+    document.getElementById("au").value = "Выигрыш: " + '\n' + current_money.value;
+   var tm = document.getElementById("take_money");
+    tm.style.backgroundColor = "lime";
+     console.log(tm.style.backgroundColor);
+}
+
+
+function h50_50(){
+    if(document.getElementById("x2").style.backgroundColor == "orange")
+        return;
+    if(check_answered())
+        return;
+    if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
+        return;
+    fetch('/h50_50', {
+        method: 'POST',
+        body: JSON.stringify({ round:document.getElementById("status-round").value}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    for (var i =0;i<data.length;i++)
+    {
+        document.getElementById(get_btn(data[i])).disabled = true;
+        document.getElementById(get_o(data[i])).disabled = true;
+    }
+    document.getElementById('p50_50').checked = false;
+
+
+        //document.getElementById('au').textContent = "В игру вступает " + data;
+    //document.getElementById('au').innerText = "В игру вступает " + data;
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+
+
+
+
+}
+function alter(){
+    if(document.getElementById("x2").style.backgroundColor == "orange")
+        return;
+    if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
+        return;
+    
+    fetch('/alter', {
+        method: 'POST',
+        body: JSON.stringify({ round:document.getElementById("status-round").value}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    var f = data[0]
+    var nf = data[1]
+    console.log(f,nf);
+    status_btn(true,"btn");
+    status_btn(true,"o");
+    document.getElementById(get_btn(f)).disabled = false;
+    document.getElementById(get_o(f)).disabled = false;
+    document.getElementById(get_btn(nf)).disabled = false;
+    document.getElementById(get_o(nf)).disabled = false;
+
+    document.getElementById("palter").checked = false;
+    document.getElementById("alter").style.backgroundColor = "orange";
+
+
+
+
+        //document.getElementById('au').textContent = "В игру вступает " + data;
+    //document.getElementById('au').innerText = "В игру вступает " + data;
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+}
+function navi(){
+    if(document.getElementById("x2").style.backgroundColor == "orange")
+        return;
+    if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
+        return;
+    if (document.getElementById("alter").style.backgroundColor == "orange")
+        return;
+    document.getElementById("pnavi").checked = false;
+
+    fetch('/navi', {
+        method: 'POST',
+        body: JSON.stringify({ round:document.getElementById("status-round").value}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    for (var i = 0; data.length;i++)
+    {
+    document.getElementById(get_btn(data[i])).style.backgroundColor = "#d905ec";
+    document.getElementById(get_o(data[i])).style.backgroundColor = "#d905ec";
+    }
+
+
+
+
+
+
+
+        //document.getElementById('au').textContent = "В игру вступает " + data;
+    //document.getElementById('au').innerText = "В игру вступает " + data;
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+function x2(){
+    if(check_answered())
+        return;
+    if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
+        return;
+    if (document.getElementById("alter").style.backgroundColor == "orange")
+        return;
+
+    document.getElementById("x2").style.backgroundColor = "orange";
+    
+
+
+}
+
+
+function o_to_btn(o)
+{
+    if (o == "o1")
+        return "btn1"
+    if (o == "o2")
+        return "btn2"
+    if (o == "o3")
+        return "btn3"
+    if (o == "o4")
+        return "btn4"
+    if (o == "o5")
+        return "btn5"
+    if (o == "o6")
+        return "btn6"
+    if (o == "o7")
+        return "btn7"
+    if (o == "o8")
+        return "btn8"
+    if (o == "o9")
+        return "btn9"
+    if (o == "o10")
+        return "btn10"
+    if (o == "o11")
+        return "btn11"
+    if (o == "o12")
+        return "btn12"
+    if (o == "o13")
+        return "btn13"
+    if (o == "o14")
+        return "btn14"
+    if (o == "o15")
+        return "btn15"
+}
