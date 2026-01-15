@@ -1,8 +1,10 @@
-from flask import Flask, abort, jsonify, logging, redirect, render_template, request, send_file, session, url_for, flash, redirect
+from flask import Flask, Response, abort, jsonify, logging, redirect, render_template, request, send_file, session, url_for, flash, redirect
 import random
 import hashlib
 import os
 import json
+
+import flask, flask.views
 from flask_socketio import SocketIO, emit
 
 
@@ -359,8 +361,11 @@ def show_rights():
                 jsn = json.load(file)
             os.remove("answered.json")
             return jsn
-        
-               
+         
+
+    
+
+   
                
     
     
@@ -368,7 +373,9 @@ def show_rights():
 
 if __name__ == "__main__":
     users = ['test']
+
     socketio.run(app,debug=True, host='0.0.0.0')
+    
     ##app.run(debug=True)
     
     

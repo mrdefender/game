@@ -20,11 +20,52 @@ document.getElementById("show-right").disabled = true;
 
 
 function cancel_all(){
-   
-   //ch1();
-   //ch2();
-   //ch3();
-    location.reload();
+    var select = document.querySelector('#select_round');
+    var select_fix = document.querySelector('#select_fix');
+    document.getElementById("au").value = "";
+    document.getElementById("question").value = "";
+    status_btn(true,"btn");
+    status_btn(true,"o");
+    select.value = "Раунд 1";
+    select_fix.value = "0";
+    document.getElementById("take_money").disabled = true;
+    document.getElementById("take_money").style.backgroundColor ="#1a1b02";
+    document.getElementById("o1").style.backgroundColor = "#000c11";
+    document.getElementById("o2").style.backgroundColor = "#000c11";
+    document.getElementById("o3").style.backgroundColor = "#000c11";
+    document.getElementById("o4").style.backgroundColor = "#000c11";
+    document.getElementById("o5").style.backgroundColor = "#000c11";
+    document.getElementById("o6").style.backgroundColor = "#000c11";
+    document.getElementById("o7").style.backgroundColor = "#000c11";
+    document.getElementById("o8").style.backgroundColor = "#000c11";
+    document.getElementById("o9").style.backgroundColor = "#000c11";
+    document.getElementById("o10").style.backgroundColor = "#000c11";
+    document.getElementById("o11").style.backgroundColor = "#000c11";
+    document.getElementById("o12").style.backgroundColor = "#000c11";
+    document.getElementById("o13").style.backgroundColor = "#000c11";
+    document.getElementById("o14").style.backgroundColor = "#000c11";
+    document.getElementById("o15").style.backgroundColor = "#000c11";
+    document.getElementById("question").value = " ";
+    document.getElementById("question").innerText = " ";
+    btn1.style.backgroundColor = "#000c11";
+    btn2.style.backgroundColor = "#000c11";
+    btn3.style.backgroundColor = "#000c11";
+    btn4.style.backgroundColor = "#000c11";
+    btn5.style.backgroundColor = "#000c11";
+    btn6.style.backgroundColor = "#000c11";
+    btn7.style.backgroundColor = "#000c11";
+    btn8.style.backgroundColor = "#000c11";
+    btn9.style.backgroundColor = "#000c11";
+    btn10.style.backgroundColor = "#000c11";
+    btn11.style.backgroundColor = "#000c11";
+    btn12.style.backgroundColor = "#000c11";
+    btn13.style.backgroundColor = "#000c11";
+    btn14.style.backgroundColor = "#000c11";
+    btn15.style.backgroundColor = "#000c11";
+   ch1();
+   ch2();
+   ch3();
+  //  location.reload();
 }
 
 
@@ -79,7 +120,7 @@ select_fix.addEventListener('change', function(){
 function ch2(){
     if (select_fix.value =="0")
     {
-        fix_money.value = "0";
+        //fix_money.value = "0";
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
         c3.style.color = "#dd6706";
@@ -91,7 +132,7 @@ function ch2(){
     }
     if (select_fix.value == "1 000")
     {
-        fix_money.value = "1 000";
+       // fix_money.value = "1 000";
         c1.style.color = "white";
         c2.style.color = "#dd6706";
         c3.style.color = "#dd6706";
@@ -103,7 +144,7 @@ function ch2(){
     }
     if (select_fix.value == "3 000")
     {
-        fix_money.value = "3 000";
+       // fix_money.value = "3 000";
         c1.style.color = "#dd6706";
         c2.style.color = "white";
         c3.style.color = "#dd6706";
@@ -115,7 +156,7 @@ function ch2(){
     }
     if (select_fix.value == "5 000")
     {
-        fix_money.value = "5 000";
+       // fix_money.value = "5 000";
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
         c3.style.color = "white";
@@ -140,7 +181,7 @@ function ch2(){
     }
      if (select_fix.value == "25 000")
     {
-        fix_money.value = "25 000";
+       // fix_money.value = "25 000";
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
         c3.style.color = "#dd6706";
@@ -153,7 +194,7 @@ function ch2(){
     }
      if (select_fix.value == "50 000")
     {
-        fix_money.value = "50 000";
+       // fix_money.value = "50 000";
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
         c3.style.color = "#dd6706";
@@ -166,7 +207,7 @@ function ch2(){
     }
     if (select_fix.value == "150 000")
     {
-        fix_money.value = "150 000";
+      //  fix_money.value = "150 000";
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
         c3.style.color = "#dd6706";
@@ -178,7 +219,7 @@ function ch2(){
     }
     if (select_fix.value == "500 000")
     {
-        fix_money.value = "500 000";
+        //fix_money.value = "500 000";
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
         c3.style.color = "#dd6706";
@@ -197,6 +238,8 @@ select.addEventListener('change', function(){
 );
 
 function ch3(){
+    round = document.getElementById("status-round");
+    console.log (select.value);
     if (select.value == "Отборочный тур")
     {
         round.value = "Отборочный тур";
@@ -397,7 +440,7 @@ function ch3(){
             document.getElementById("fix-money").value = "0";
         }
         if(select_script.value == "Рискованный"){
-            tt = calc_fix("7",_fix.value);
+            tt = calc_fix("7",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
         }
@@ -501,7 +544,19 @@ function start_to_game()
     
     document.getElementById("start_game").disabled = true;
     document.getElementById("get_task").disabled = false;
+
+
+
+
+    
+
 }
+
+
+
+
+
+
 
 function fixed_script()
 {
@@ -540,6 +595,7 @@ console.error('Ошибка:', error);
 
 function gen_task()
 {
+    console.log(audio);
     var input = document.querySelector('input[name="user_name"]:checked').value;
     round = document.getElementById("status-round").value;
     round = parseInt(round)
@@ -569,6 +625,7 @@ function gen_task()
     document.getElementById('question').innerText = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
     status_btn (false,"o");
     status_btn (false,"btn");
+    document.getElementById('take_money').disabled = false;
 
 
 })
@@ -709,7 +766,7 @@ function get_o(answer)
     if (answer == "11")
         return "o11";
     if (answer == "12")
-        return "o2";
+        return "o12";
     if (answer == "13")
         return "o13";
     if (answer == "14")
@@ -723,6 +780,7 @@ function get_o(answer)
 function show_fatal_to_host_panel(n_r,fatal)
 {
         document.getElementById("show-right").disabled = false;
+        document.getElementById("take_money").disabled = true;
         if (n_r == 1)
     {
         document.getElementById(get_btn(fatal)).style.backgroundColor = "red";
@@ -754,7 +812,7 @@ function show_fatal_to_host_panel(n_r,fatal)
     }
     if (n_r==5)
     {
-        for (i=0;i<8;i++)
+        for (i=0;i<6;i++)
         {
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
         }
@@ -762,7 +820,7 @@ function show_fatal_to_host_panel(n_r,fatal)
     }
     if (n_r==6)
     {
-        for (i=0;i<10;i++)
+        for (i=0;i<8;i++)
         {
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
         }
@@ -770,7 +828,7 @@ function show_fatal_to_host_panel(n_r,fatal)
     }
     if (n_r==7)
     {
-        for (i=0;i<12;i++)
+        for (i=0;i<10;i++)
         {
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
         }
@@ -778,7 +836,7 @@ function show_fatal_to_host_panel(n_r,fatal)
     }
     if (n_r==8)
     {
-        for (i=0;i<13;i++)
+        for (i=0;i<12;i++)
         {
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
         }
@@ -1740,4 +1798,16 @@ function o_to_btn(o)
         return "btn14"
     if (o == "o15")
         return "btn15"
+}
+
+function open_room(){
+
+    if (document.getElementById("room").value=="")
+    {
+        return;
+    }
+       console.log(document.getElementById("room").value);
+
+
+
 }
