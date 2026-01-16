@@ -649,7 +649,7 @@
 .next-round{
     position: relative;
     top: -23.5rem;
-    left: 3rem;
+    left: 9rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -662,7 +662,7 @@
 .fixed_script{
     position: relative;
     top: -23.5rem;
-    left: 3rem;
+    left: 9rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -702,13 +702,26 @@
 .cancel_all{
     position: relative;
     top: -21rem;
-    left: -44rem;
+    left: -38rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 5rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+.stop_sounds{
+    position: relative;
+    top: -21rem;
+    left: -38rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 10rem;
     height: 2rem;
     text-wrap:inherit
 }

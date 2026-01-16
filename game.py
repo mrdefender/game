@@ -1,8 +1,10 @@
-from flask import Flask, Response, abort, jsonify, logging, redirect, render_template, request, send_file, session, url_for, flash, redirect
+from flask import Flask, Response, abort, jsonify, logging, redirect, render_template, request, send_file, send_from_directory, session, url_for, flash, redirect
 import random
 import hashlib
 import os
 import json
+from werkzeug.utils import secure_filename  
+import mimetypes  
 
 import flask, flask.views
 from flask_socketio import SocketIO, emit
@@ -363,6 +365,25 @@ def show_rights():
             return jsn
          
 
+    
+ 
+@app.route('/sounds/<filename>')  
+def serve_audio(filename):
+    CUSTOM_AUDIO_DIR = "sounds/"
+    if request.method == 'GET':
+        sanitized_filename = secure_filename(filename)  
+
+    # Check if the sanitized file exists in the custom directory  
+        #if not os.path.isfile(sanitized_filename):  
+        #    abort(404, description="File not found.")    
+        mime_type, _ = mimetypes.guess_type(sanitized_filename) 
+        if not mime_type or not mime_type.startswith('audio/'):  
+         abort(400, description="Unsupported audio format.") 
+        result = send_from_directory(CUSTOM_AUDIO_DIR, sanitized_filename,  mimetype=mime_type, as_attachment=False)
+               
+        return result
+      ##  result = CUSTOM_AUDIO_DIR + filename;         
+    ##return result;    
     
 
    

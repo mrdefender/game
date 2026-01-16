@@ -17,6 +17,7 @@ var select = document.querySelector('#select_round');
 var select_fix = document.querySelector('#select_fix');
 var select_script = document.querySelector('#select_script');
 document.getElementById("show-right").disabled = true;
+var audio = new Audio("http://10.73.12.4:5000/sounds/q1-3.ogg");//добавить все звуки
 
 
 function cancel_all(){
@@ -544,11 +545,8 @@ function start_to_game()
     
     document.getElementById("start_game").disabled = true;
     document.getElementById("get_task").disabled = false;
-
-
-
-
     
+       
 
 }
 
@@ -590,12 +588,44 @@ function invite_to_game()
 .catch(error => {
 console.error('Ошибка:', error);
 });
-}
 
+}
+ var audio = new Audio("http://10.73.12.4:5000/sounds/q1-3.ogg");
+function start_sounds_for_questions(){
+
+
+    
+       audio.currentTime = 0;
+       audio.pause();
+       audio.play();
+        
+       /*
+       fetch('/sounds/q1-3.ogg', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'audio/ogg'
+        }
+    }
+)
+.then(response =>  {
+        console.log(response);
+     //   player = document.getElementById('audioPlayer');  
+       //  player.src = `/sounds/${encodeURIComponent(response)}`
+         
+         //player.play().catch(error => console.error("Playback failed:", error));  
+      
+        
+     
+       
+}
+)
+
+*/
+}
 
 function gen_task()
 {
-    console.log(audio);
+    
     var input = document.querySelector('input[name="user_name"]:checked').value;
     round = document.getElementById("status-round").value;
     round = parseInt(round)
@@ -626,7 +656,6 @@ function gen_task()
     status_btn (false,"o");
     status_btn (false,"btn");
     document.getElementById('take_money').disabled = false;
-
 
 })
 .catch(error => {
@@ -1807,7 +1836,13 @@ function open_room(){
         return;
     }
        console.log(document.getElementById("room").value);
-
-
-
 }
+function stop_sounds()
+{
+    //start_sounds_for_questions()
+    let currentUrl = document.URL;
+    let ffffff = currentUrl.split('/host_slot');//адресная строка пользователя без /host_slot http://ip:5000
+    console.log(ffffff);
+    console.log(currentUrl);
+}
+
