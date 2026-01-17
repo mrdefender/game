@@ -5,8 +5,9 @@ import os
 import json
 from werkzeug.utils import secure_filename  
 import mimetypes  
-
+import string
 import flask, flask.views
+import secrets
 from flask_socketio import SocketIO, emit
 
 
@@ -95,19 +96,25 @@ def get_summs():
     f.close()
     f_t.close()
 
-
+def get_md5_hash(stroka):
+    characters = string.ascii_letters + string.punctuation
+    random_string = str(stroka).join(secrets.choice(characters))
+    return hashlib.md5(random_string.encode()).hexdigest()
+    
     
 def generate_string(round_id,is_bombed):
-    random.seed()
+    random.seed(secrets.randbelow(99999))
     current_round = int(round_id); #получить номер раунда, 0 - отборочный тур
     count_fatal = 0
     otbor_chislo = 0
     bomb = is_bombed
     if current_round == 0:
         otbor_chislo = random.randint(10,999)
+        
         a = random.randint(10,otbor_chislo)
         b = random.randint(otbor_chislo,999)
-        md5_hash = hashlib.md5(str(otbor_chislo).encode()).hexdigest()
+       # md5_hash = hashlib.md5(str(otbor_chislo).encode()).hexdigest()
+        md5_hash = get_md5_hash(otbor_chislo)
         result = [current_round,a,b,otbor_chislo,md5_hash]
         js = json.dumps(result)
     
@@ -126,7 +133,8 @@ def generate_string(round_id,is_bombed):
     
     if count_fatal == 1:
         fatal = random.randint(1,15)
-        md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
+        #md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
+        md5_hash = get_md5_hash(fatal)
         result = [current_round,fatal,md5_hash, count_fatal]
         js = json.dumps(result)
         with open('task.json','w') as file:
@@ -134,7 +142,8 @@ def generate_string(round_id,is_bombed):
         return js
     else:
         fatal = random.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
-        md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
+        #md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
+        md5_hash = get_md5_hash(fatal)
         result = [current_round,fatal,md5_hash,count_fatal]
         js = json.dumps(result)
         with open('task.json','w') as file:
@@ -179,9 +188,9 @@ def alter():
            jsn = json.load(file)
         f = jsn[1]
         cf = len(f)
-        random.seed()
+        random.seed(secrets.randbelow(99999))
         rf = random.randint(1,cf-1)
-        random.seed()
+        random.seed(secrets.randbelow(99999))
         j = 0
         checked = False
         while (checked==False):
@@ -385,12 +394,7 @@ def serve_audio(filename):
       ##  result = CUSTOM_AUDIO_DIR + filename;         
     ##return result;    
     
-
-   
-               
-    
-    
-    
+  
 
 if __name__ == "__main__":
     users = ['test']

@@ -63,6 +63,11 @@ function cancel_all(){
     btn13.style.backgroundColor = "#000c11";
     btn14.style.backgroundColor = "#000c11";
     btn15.style.backgroundColor = "#000c11";
+    document.getElementById("h50_50").style.backgroundColor = "#000c11";
+    document.getElementById("alter").style.backgroundColor = "#000c11";
+    document.getElementById("x2").style.backgroundColor = "#000c11";
+    document.getElementById("help_auden").style.backgroundColor = "#000c11";
+     document.getElementById("navi").style.backgroundColor = "#000c11";
    ch1();
    ch2();
    ch3();
@@ -590,7 +595,7 @@ console.error('Ошибка:', error);
 });
 
 }
- var audio = new Audio("http://10.73.12.4:5000/sounds/q1-3.ogg");
+
 function start_sounds_for_questions(){
 
 
@@ -1840,6 +1845,17 @@ function open_room(){
 function stop_sounds()
 {
     //start_sounds_for_questions()
+
+
+
+
+
+
+
+
+
+
+
     let currentUrl = document.URL;
     let ffffff = currentUrl.split('/host_slot');//адресная строка пользователя без /host_slot http://ip:5000
     console.log(ffffff);

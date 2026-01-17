@@ -1,8 +1,8 @@
 
    html body{
     position: relative;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: 200;
+    font-style: normal;
+    font-weight: auto;
     background: linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
     background-image: url(/static/img/slot.jpg);
     background-size: cover;
@@ -27,7 +27,8 @@
     padding: 0;
     box-sizing: border-box;
     z-index: 1;
-
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
 }
 .status-round {
     position: relative;
@@ -115,7 +116,6 @@
 }
 
 .tree-container-c1{
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-size:large;
     flex: 0 0 100%;
     position: relative;
@@ -132,7 +132,7 @@
     padding-left: .1rem;
 }
 .tree-container-c2{
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+
     font-size:large;
     flex: 0 0 100%;
     position: relative;
@@ -149,7 +149,7 @@
     padding-left: .1rem;
 }
 .tree-container-c3{
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    
     font-size:large;
     flex: 0 0 100%;
     position: relative;
@@ -166,7 +166,6 @@
     padding-left: .1rem;
 }
 .tree-container-c4{
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-size:large;
     flex: 0 0 100%;
     position: relative;
@@ -183,7 +182,6 @@
     padding-left: .1rem;
 }
 .tree-container-c5{
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-size:large;
     flex: 0 0 100%;
     position: relative;
@@ -200,7 +198,6 @@
     padding-left: .1rem;
 }
 .tree-container-c6{
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-size:large;
     flex: 0 0 100%;
     position: relative;
@@ -217,7 +214,6 @@
     padding-left: .1rem;
 }
 .tree-container-c7{
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-size:large;
     flex: 0 0 100%;
     position: relative;
@@ -234,7 +230,6 @@
     padding-left: .1rem;
 }
 .tree-container-c8{
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-size:large;
     flex: 0 0 100%;
     position: relative;
@@ -251,7 +246,6 @@
     padding-left: .1rem;
 }
 .tree-container-c9{
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-size:large;
     flex: 0 0 100%;
     position: relative;
@@ -269,7 +263,6 @@
 }
 
 .tree-container{
-    font-family: sans-serif;
     font-size:x-large;
     flex: 0 0 100%;
     position: relative;
@@ -445,7 +438,7 @@
 .select_script{
     position: relative;
     top: -30rem;
-   left: -45%;
+    left: -45%;
     color: #fff;
     border-radius: 40px;
     background-color: #1a1b02;
@@ -457,10 +450,9 @@
 }
 .helps1{
     position: relative;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size:large;
     top: -29rem;
-    left: -30rem;
+    left: -38%;
     border-radius: 2px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
@@ -471,10 +463,9 @@
 
 .helps2 {
     position: relative;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size:large;
     top: -29rem;
-    left: -28.1rem;
+    left: -36%;
     border-radius: 2px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
@@ -484,10 +475,9 @@
 }
 .helps3{
     position: relative;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size:large;
     top: -29rem;
-    left: -29rem;
+    left: -39.5%;
     border-radius: 2px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
@@ -497,10 +487,9 @@
 }
  .helps4 {
     position: relative;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size:large;
     top: -29rem;
-    left: -31rem;
+    left: -39.5%;
     border-radius: 2px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
@@ -510,10 +499,9 @@
 }
 .helps5 {
     position: relative;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size:large;
     top: -29rem;
-    left: -26.3rem;
+    left: -38.5%;
     border-radius: 2px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
@@ -539,7 +527,7 @@
 .p50_50{
     position: relative;
     top: -28rem;
-    left: -27%;
+    left: -31%;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -552,7 +540,7 @@
 .alter{
     position: relative;
     top: -28rem;
-    left: -27%;
+    left: -31%;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -565,7 +553,7 @@
 .navi{
     position: relative;
     top: -28rem;
-    left: -27%;
+    left: -31%;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -577,8 +565,8 @@
 }
 .x2{
     position: relative;
-    top: -28rem;
-    left: -27%;
+    top: -27rem;
+    left: -31%;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -591,15 +579,15 @@
 
 .help_auden{
     position: relative;
-    top: -27.7rem;
-    left: -27%;
+    top: -27rem;
+    left: -31%;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
     font-size: medium;
-    width: 9rem;
-    height: rem;
+    width: auto;
+    height: 2rem;
     text-wrap:inherit;
 }
 
@@ -629,7 +617,7 @@
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
     font-size: medium;
-    width: 12rem;
+    width: auto;
     height: 2rem;
     text-wrap:inherit
 }
@@ -649,7 +637,7 @@
 .next-round{
     position: relative;
     top: -23.5rem;
-    left: 9rem;
+    left: 9.3rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -662,13 +650,13 @@
 .fixed_script{
     position: relative;
     top: -23.5rem;
-    left: 9rem;
+    left: 9.5rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
     font-size: medium;
-    width: 15rem;
+    width: auto;
     height: 2rem;
     text-wrap:inherit
 }
@@ -688,7 +676,6 @@
 
 .copyrights{
     position: relative;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     padding: 10px 50px;
     background: linear-gradient(0deg, #000, #3a3a3a);
