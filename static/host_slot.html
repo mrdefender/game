@@ -161,6 +161,7 @@
                 <input type="submit" class="invite" id="invite" onclick="invite_to_game()" value="Пригласить в игру">
                 <input type="submit" class="invite" id="get_task" onclick="gen_task()" value="Получить задание" disabled >
                 <input type="submit" class="take_money" id="take_money" onclick="take_money()" value="Забрать деньги" disabled>  
+                <input type="submit" class="take_money" id="total_money" onclick="total_money()" value="Выигрыш" disabled>
                 </p>
                 <p>
 
@@ -177,13 +178,21 @@
                 <input type="submit" class="stop_sounds"  onclick="stop_sounds()" value="Остановить звуки"> 
              </p>
              <p>
+                 <input type="submit" class="music"  onclick="start_sound_begin1()" value="Заставка"> 
+                 <input type="submit" class="music"  onclick="start_sound_begin2()" value="Выход ведущего">
+                 <input type="submit" class="music"  onclick="start_background()" value="Фон">
+                 <input type="submit" class="music"  onclick="start_rules_game()" value="Правила основной игры">
+                 <input type="submit" class="music"  onclick="start_pre_final()" value="Окончание">
+                 <input type="submit" class="music"  onclick="start_final()" value="Титры">     
+             </p>
+             <p>
              <input class="room_id" id="room", name="room_id" type="text" maxlength="4" placeholder="Room_id" required>
              <input type="submit" class="open_room" onclick="open_room()" value="Открыть комнату">
              <input type="submit" class="open_room" onclick="close_room()" value="Закрыть комнату"disabled>
              </p>
         </div>
 
-    <script src="/static/start/slot/host.js"></script>
+    <script src="/static/js/host_slot.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>   
      <script type="text/javascript" src="/static/jquery-1.7.1.min.js"></script>

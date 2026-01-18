@@ -66,6 +66,77 @@ h1 {
     z-index: 0;
 }
 
+.questions{
+    position: relative;
+    padding: 10px 30px;
+    height: 30%;
+    top: -55rem;
+    left: 22%;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: beige;
+    font-size: medium;
+    width: 50%;
+     z-index: 10;
+
+}
+
+.btn1, .btn2, .btn3, .btn3, .btn4, .btn5 {
+    position: relative;
+    top: -51rem;
+    padding: 12px 43px;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: beige;
+    font-size: medium;
+    width: 8%;
+    height: auto;
+    z-index: 10;
+    
+}
+.btn6, .btn7, .btn8, .btn9, .btn10
+{
+    position: relative;
+    top: -50.5rem;
+    padding: 12px 43px;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: beige;
+    font-size: medium;
+    width: 8%;
+    height: auto;
+    z-index: 10;
+}
+.btn11, .btn12, .btn13, .btn14, .btn15
+{
+    position: relative;
+    top: -50rem;
+    padding: 12px 43px;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: beige;
+    font-size: medium;
+    width: 8%;
+    height: auto;
+    z-index: 10;
+}
+.message{
+    position: relative;
+    left: 7rem;
+    top: -60rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: rgb(7, 127, 224);
+    font-size: medium;
+    width: 45%;
+    height: 4rem;
+}
+
 
 .form_label {
     display: block;
@@ -93,4 +164,38 @@ footer{
     max-width:100%;
     max-height:100%;
 
+}
+
+.otbor_input{
+    position: relative;
+    top: -40rem;
+    left: 0rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 5rem;
+    height: 2rem;
+    text-wrap:inherit;
+    text-align: center;
+
+}
+.send_answer_otbor{
+    position: relative;
+    top: -40rem;
+    left: 0rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 10rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+
+*:disabled
+{
+    color: #555551;
 }

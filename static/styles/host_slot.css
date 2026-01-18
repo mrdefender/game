@@ -514,7 +514,7 @@
 .invite{
     position: relative;
     top: -22rem;
-    left: -15rem;
+    left: -11rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -546,7 +546,7 @@
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
     font-size: medium;
-    width: 7rem;
+    width: 9rem;
     height: 2rem;
     text-wrap:inherit
 }
@@ -596,7 +596,7 @@
 .start_game{
     position: relative;
     top: -22rem;
-    left: -15rem;
+    left: -11rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -663,13 +663,27 @@
 .take_money{
     position: relative;
     top: -22rem;
-    left: -15rem;
+    left: -11rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 9rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+.total_money
+{
+    position: relative;
+    top: -22rem;
+    left: -15rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: auto;
     height: 2rem;
     text-wrap:inherit
 }
@@ -689,7 +703,7 @@
 .cancel_all{
     position: relative;
     top: -21rem;
-    left: -38rem;
+    left: -40rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -702,7 +716,7 @@
 .stop_sounds{
     position: relative;
     top: -21rem;
-    left: -38rem;
+    left: -40rem;
     color: #fff;
     border-radius: 100px;
     background-color: #1a1b02;
@@ -714,7 +728,7 @@
 }
 .room_id{
     position: relative;
-    top: -20.5rem;
+    top: -19rem;
     left: -21rem;
     color: #fff;
     border-radius: 100px;
@@ -729,7 +743,7 @@
 }
 .open_room{
     position: relative;
-    top: -20.5rem;
+    top: -19rem;
     left: -20rem;
     color: #fff;
     border-radius: 100px;
@@ -739,6 +753,20 @@
     width: 10rem;
     height: 2rem;
     text-wrap:inherit
+}
+
+.music{
+    position: relative;
+    top: -20rem;
+    left: -14rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: auto;
+    height: 2rem;
+    text-wrap:inherit    
 }
 
 
