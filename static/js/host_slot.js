@@ -22,8 +22,10 @@ var currentUrl = document.URL;
 var ffffff = currentUrl.split('/host_slot');//адресная строка пользователя без /host_slot http://ip:5000
 var audioUrl = ffffff[0]+'/sounds/';
 var audio_q1_3 = new Audio(audioUrl+"q1-3.ogg");//добавить все звуки
-var audio_q4_6 = new Audio(audioUrl+"q4-6.ogg");
-var audio_q7_8 = new Audio(audioUrl+"q7-8.ogg");
+var audio_q4_5 = new Audio(audioUrl+"q4-5.ogg");
+var audio_q6 = new Audio(audioUrl+"q6.ogg");
+var audio_q7 = new Audio(audioUrl+"q7.ogg");
+var audio_q8 = new Audio(audioUrl+"q8.ogg");
 var audio_q9 = new Audio(audioUrl+"q9.ogg");
 var audio_r1_2 = new Audio(audioUrl+"r1-2.ogg");
 var audio_r3 = new Audio(audioUrl+"r3.ogg");
@@ -35,7 +37,11 @@ var audio_r8 = new Audio(audioUrl+"r8.ogg");
 var audio_r9 = new Audio(audioUrl+"r9.ogg");
 var audio_a4_9 = new Audio(audioUrl+"a4-9.ogg");
 var audio_w1_3 = new Audio(audioUrl+"w1-3.ogg");
-var audio_w4_8 = new Audio(audioUrl+"w4-8.ogg");
+var audio_w4 = new Audio(audioUrl+"w4.ogg");
+var audio_w5 = new Audio(audioUrl+"w5.ogg");
+var audio_w6 = new Audio(audioUrl+"w6.ogg");
+var audio_w7 = new Audio(audioUrl+"w7.ogg");
+var audio_w8 = new Audio(audioUrl+"w8.ogg");
 var audio_w9 = new Audio(audioUrl+"w9.ogg");
 var audio_n4 = new Audio(audioUrl+"n4.ogg");
 var audio_n5 = new Audio(audioUrl+"n5.ogg");
@@ -43,11 +49,14 @@ var audio_n6 = new Audio(audioUrl+"n6.ogg");
 var audio_n7 = new Audio(audioUrl+"n7.ogg");
 var audio_n8 = new Audio(audioUrl+"n8.ogg");
 var audio_n9 = new Audio(audioUrl+"n9.ogg");
+var audio_h3 = new Audio(audioUrl+"h3.ogg");
+var audio_h4 = new Audio(audioUrl+"h4.ogg");
 var audio_begin1 = new Audio(audioUrl+"begin1.ogg");
 var audio_begin2 = new Audio(audioUrl+"begin2.ogg");
 var audio_otbor_rules= new Audio(audioUrl+"otbor_rules.ogg");
 var audio_otbor_warning= new Audio(audioUrl+"otbor_warning.ogg");
 var audio_otbor_play= new Audio(audioUrl+"otbor_play.ogg");
+var audio_otbor_resullt= new Audio(audioUrl+"otbor_resullt.ogg")
 var audio_start_background= new Audio(audioUrl+"start_background.ogg");
 var audio_rules_player= new Audio(audioUrl+"rules_player.ogg");
 var audio_fix_script= new Audio(audioUrl+"fix_script.ogg");
@@ -55,8 +64,10 @@ var audio_back= new Audio(audioUrl+"back.ogg");
 var audio_reklama= new Audio(audioUrl+"reklama.ogg");
 var audio_invite= new Audio(audioUrl+"invite.ogg");
 var audio_rave_50_50= new Audio(audioUrl+"rave_50_50.ogg");
+var audio_alter= new Audio(audioUrl+"alter.ogg");
 var audio_take_money= new Audio(audioUrl+"take_money.ogg");
 var audio_x2= new Audio(audioUrl+"x2.ogg");
+var audio_x2_2= new Audio(audioUrl+"x2_2.ogg");
 var audio_start_game= new Audio(audioUrl+"start_game.ogg");
 var audio_navigator= new Audio(audioUrl+"navigator.ogg");
 var audio_out_player= new Audio(audioUrl+"out_player.ogg");
@@ -584,6 +595,7 @@ function ch3(){
         c7.style.backgroundColor = "black";
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "orange";
+        document.getElementById("get_task").disabled = true; 
     }  
     console.log("Раунд " + round.value);
 }
@@ -674,6 +686,8 @@ function start_sounds_for_questions(){
 function gen_task()
 {
     
+    if (select.value == "Победа")
+        true;
     var input = document.querySelector('input[name="user_name"]:checked').value;
     round = document.getElementById("status-round").value;
     round = parseInt(round)
@@ -710,15 +724,25 @@ function gen_task()
         audio_q1_3.loop = true;
         audio_q1_3.play(); 
     }
-    if ((data[0]==4) || (data[0]==5) || (data[0]==6))
+    if ((data[0]==4) || (data[0]==5))
     {
-        audio_q4_6.loop = true;
-        audio_q4_6.play();
+        audio_q4_5.loop = true;
+        audio_q4_5.play();
     }
-    if ((data[0]==7) || (data[0]==8))
+    if (data[0]==6)
     {
-        audio_q7_8.loop = true;
-        audio_q7_8.play();
+        audio_q6.loop = true;
+        audio_q6.play();
+    }
+    if (data[0]==7)
+    {
+        audio_q7.loop = true;
+        audio_q7.play();
+    }
+    if (data[0]==8)
+    {
+        audio_q8.loop = true;
+        audio_q8.play();
     }
     if (data[0]==9)
     {
@@ -968,7 +992,9 @@ function show_fatal_to_host_panel(n_r,fatal)
 function check_answered()
 {
     if(document.getElementById("x2").style.backgroundColor == "orange")
+       {
         return false;
+       }
     fetch('/check_answered', {
         method: 'POST',
         body: JSON.stringify({check: "true"}),
@@ -1153,8 +1179,8 @@ console.error('Ошибка:', error);
 function a7(){
     btn_answers7 = document.getElementById("o7");
     btn_answers7.style.backgroundColor = "orange";
-   // if (check_answered())
-   //     { return;};
+   if (check_answered())
+       { return;};
    document.getElementById("show-right").disabled = false; 
    fetch('/get_fatal_host', {
         method: 'POST',
@@ -1412,6 +1438,8 @@ function show_right(){
     console.log(data);
     if(document.getElementById("x2").style.backgroundColor == "orange")
     {
+        stop_sounds();
+        audio_x2_2.play();
         document.getElementById("x2").style.backgroundColor ==  "#1a1b02"
         if(document.getElementById(o_to_btn(data[0])).style.backgroundColor == "red")
         {
@@ -1466,6 +1494,7 @@ function show_right(){
         if (data[1] == "2")
         {
             select.value = "Раунд 3";
+            audio_r1_2.play();
             document.getElementById("status-round").value = "3";
            if(select_script.value == "Классика")
            {
@@ -1475,12 +1504,14 @@ function show_right(){
             tt = calc_fix("3",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
-            audio_r1_2.play();
+
         }         
         }
         if (data[1] == "3")
         {
             select.value = "Раунд 4";
+            stop_sounds();
+            audio_r3.play();
             document.getElementById("status-round").value = "4";
            if(select_script.value == "Классика")
            {
@@ -1491,13 +1522,14 @@ function show_right(){
             tt = calc_fix("4",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
-            stop_sounds();
-            audio_r3.play();
+
         }
         }
         if (data[1] == "4")
         {
             select.value = "Раунд 5";
+            stop_sounds();
+            audio_r4.play();
             document.getElementById("status-round").value = "5";
            if(select_script.value == "Классика")
            {
@@ -1508,13 +1540,14 @@ function show_right(){
             tt = calc_fix("5",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
-            stop_sounds();
-            audio_r4.play();
+
         }        
         }
         if (data[1] == "5")
         {
             select.value = "Раунд 6";
+            stop_sounds();
+            audio_r5.play();
             document.getElementById("status-round").value = "6";
             if(select_script.value == "Классика")
            {
@@ -1525,13 +1558,14 @@ function show_right(){
             tt = calc_fix("6",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
-            stop_sounds();
-            audio_r5.play();
+
         }
         }
         if (data[1] == "6")
         {
             select.value = "Раунд 7";
+            stop_sounds();
+            audio_r6.play();
             document.getElementById("status-round").value = "7";
             if(select_script.value == "Классика")
            {
@@ -1542,14 +1576,15 @@ function show_right(){
             tt = calc_fix("7",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
-            stop_sounds();
-            audio_r6.play();
+            
         }
         }
 
         if (data[1] == "7")
         {
             select.value = "Раунд 8";
+            stop_sounds();
+            audio_r7.play();
             document.getElementById("status-round").value = "8";
             if(select_script.value == "Классика")
            {
@@ -1560,13 +1595,14 @@ function show_right(){
             tt = calc_fix("8",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
-            stop_sounds();
-            audio_r7.play();
+            
         }
         }
         if (data[1] == "8")
         {
             select.value = "Раунд 9";
+            stop_sounds();
+            audio_r8.play()
             document.getElementById("status-round").value = "9";
            if(select_script.value == "Классика")
            {
@@ -1578,28 +1614,32 @@ function show_right(){
             tt = calc_fix("9",select_fix.value);
             fix_money.value = tt[0];
             lost_money.value = tt[1];
-            stop_sounds();
-            audio_r8.play();
+            ;
         }            
         }
         if (data[1] == "9")
         {
             select.value = "Победа";
+            stop_sounds();
+            audio_r9.play();
             document.getElementById("status-round").value = "Победа";
             if(select_script.value == "Классика")
            {
             document.getElementById("fix-money").value = "1 000 000";
             document.getElementById("lost-money").value = "0";
-            stop_sounds();
-            audio_r9.play();
+            
            }              
         }
         
         if (select.value == "Победа")
         {
             document.getElementById("next-round").disabled = true;
+        document.getElementById("total_money").disabled = false;
+        document.getElementById("next-round").disabled = true; 
+         document.getElementById("get_task").disabled = true; 
         }
-        document.getElementById("next-round").disabled = false;  
+        document.getElementById("next-round").disabled = false; 
+
 
     }
         else 
@@ -1612,11 +1652,27 @@ function show_right(){
         {
             audio_w1_3.play();
         }
-        if ((select.value == "Раунд 4") || (select.value == "Раунд 5") || (select.value == "Раунд 6")|| (select.value == "Раунд 7") || (select.value == "Раунд 8"))
+        if (select.value == "Раунд 4")
         {
-            audio_w4_8.play();
+            audio_w4.play();
         }
-        if (data[1]=='9')
+        if (select.value == "Раунд 5")
+        {
+            audio_w5.play();
+        }
+        if (select.value == "Раунд 6")
+        {
+            audio_w6.play();
+        }
+        if (select.value == "Раунд 7")
+        {
+            audio_w7.play();
+        }
+        if (select.value == "Раунд 8")
+        {
+            audio_w8.play();
+        }
+        if (select.value == "Раунд 9")
         {
             audio_w9.play();
         }
@@ -1873,7 +1929,7 @@ function alter(){
 
     document.getElementById("palter").checked = false;
     document.getElementById("alter").style.backgroundColor = "orange";
-    audio_rave_50_50.play();
+    audio_alter.play();
 
 
 
@@ -1936,6 +1992,7 @@ function x2(){
         return;
 
     document.getElementById("x2").style.backgroundColor = "orange";
+    document.getElementById("px2").checked = false;
     stop_sounds();
     audio_x2.play();
 
@@ -1988,15 +2045,17 @@ function open_room(){
 function stop_sounds()
 {
     //start_sounds_for_questions()
-    audio.currentTime = 0;
-    audio.pause();
     audio_q1_3.currentTime = 0;
     audio_q1_3.pause(); //добавить все звуки
-    audio_q4_6.currentTime = 0;
-    audio_q4_6.pause();
-    audio_q7_8.currentTime = 0;
-    audio_q7_8.pause();
-    audio_q9.currentTime = 0;
+    audio_q4_5.currentTime = 0;
+    audio_q4_5.pause();
+	audio_q6.currentTime = 0;
+    audio_q6.pause();
+	audio_q7.currentTime = 0;
+    audio_q7.pause();
+	audio_q8.currentTime = 0;
+    audio_q8.pause();
+	audio_q9.currentTime = 0;
     audio_q9.pause();
     audio_r1_2.currentTime = 0;
     audio_r1_2.pause();
@@ -2018,8 +2077,16 @@ function stop_sounds()
     audio_a4_9.pause();
     audio_w1_3.currentTime = 0;
     audio_w1_3.pause();
-    audio_w4_8.currentTime = 0;
-    audio_w4_8.pause();
+    audio_w4.currentTime = 0;
+    audio_w4.pause();
+    audio_w5.currentTime = 0;
+    audio_w5.pause();
+    audio_w6.currentTime = 0;
+    audio_w6.pause();
+    audio_w7.currentTime = 0;
+    audio_w7.pause();
+    audio_w8.currentTime = 0;
+    audio_w8.pause();
     audio_w9.currentTime = 0;
     audio_w9.pause();
     audio_n4.currentTime = 0;
@@ -2034,6 +2101,10 @@ function stop_sounds()
     audio_n8.pause();
     audio_n9.currentTime = 0;
     audio_n9.pause();
+    audio_h3.currentTime = 0;
+    audio_h3.pause();
+    audio_h4.currentTime = 0;
+    audio_h4.pause();		
     audio_begin1.currentTime = 0;
     audio_begin1.pause();
     audio_begin2.currentTime = 0;
@@ -2044,6 +2115,8 @@ function stop_sounds()
     audio_otbor_warning.pause();
     audio_otbor_play.currentTime = 0;
     audio_otbor_play.pause();
+    audio_otbor_resullt.currentTime = 0;
+    audio_otbor_resullt.pause();
     audio_start_background.currentTime = 0;
     audio_start_background.pause();
     audio_rules_player.currentTime = 0;
@@ -2058,12 +2131,14 @@ function stop_sounds()
     audio_invite.pause();
     audio_rave_50_50.currentTime = 0;
     audio_rave_50_50.pause();
+    audio_alter.currentTime = 0;
+    audio_alter.pause();
     audio_take_money.currentTime = 0;
     audio_take_money.pause();
     audio_x2.currentTime = 0;
     audio_x2.pause();
-    audio_x2.currentTime = 0;
-    audio_x2.pause();
+    audio_x2_2.currentTime = 0;
+    audio_x2_2.pause();
     audio_start_game.currentTime = 0;
     audio_start_game.pause();
     audio_navigator.currentTime = 0;
