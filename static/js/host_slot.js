@@ -75,6 +75,7 @@ var audio_pre_final= new Audio(audioUrl+"pre-final.ogg");
 var audio_final= new Audio(audioUrl+"final.ogg");
 
 function cancel_all(){
+    update_list_user();
     var select = document.querySelector('#select_round');
     var select_fix = document.querySelector('#select_fix');
     document.getElementById("au").value = "";
@@ -2198,4 +2199,59 @@ function total_money()
    }
     stop_sounds();
     audio_out_player.play();
+}
+
+
+function update_list_user()
+{
+    fetch('/update_list_users', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/data'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    console.log(data);
+    var table = document.getElementById("status_users");
+    console.log(table)
+    if (table.rows.length!=1)
+    {
+   for (let i = table.rows.length - 1; i > 0; i--) {
+    table.deleteRow(i); // Помалу прощаемся со строками...
+     }
+   }
+
+    for (var i=0;data.length;i++)
+    {
+    var tr = document.createElement("tr")
+    var cell1 = document.createElement("td")
+    cell1.innerHTML = data[i][0].toString();
+    var cell2 = document.createElement("td")
+    cell2.innerHTML = data[i][1];
+    var cell3 = document.createElement("td")
+    cell3.innerHTML = data[i][2];
+    var cell4 = document.createElement("td")
+    cell4.innerHTML = data[i][3].toString();
+    var cell5 = document.createElement("td")
+    cell5.innerHTML = data[i][4];
+    tr.appendChild(cell1);
+    tr.appendChild(cell2);
+    tr.appendChild(cell3);
+    tr.appendChild(cell4);
+    tr.appendChild(cell5);
+    table.appendChild(tr);
+    }
+
+
+        //document.getElementById('au').textContent = "В игру вступает " + data;
+    //document.getElementById('au').innerText = "В игру вступает " + data;
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
 }

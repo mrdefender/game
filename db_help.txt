@@ -1,0 +1,3 @@
+from <name>.py import app, db
+app.app_context().push()
+db.create.all()

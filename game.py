@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, Response, abort, jsonify, logging, redirect, render_template, request, send_file, send_from_directory, session, url_for, flash, redirect
 import random
 import hashlib
@@ -9,14 +10,41 @@ import string
 import flask, flask.views
 import secrets
 from flask_socketio import SocketIO, emit
+from flask_sqlalchemy import SQLAlchemy
+
+
 
 
 
 app = Flask(__name__, template_folder="static/")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
 app.config["SECRET_KEY"] = os.urandom(32).hex
 app.secret_key = os.urandom(32).hex
 socketio = SocketIO(app)
 accepted_user = ""
+db = SQLAlchemy(app)
+
+
+
+
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    username = db.Column(db.String(10), unique=True, nullable=False)
+    answer = db.Column(db.Text)
+    money = db.Column(db.Integer)
+    time = db.Column(db.Text)
+    status = db.Column(db.Text)
+    def __repr__(self):
+        return '<Users %r>' %self.id
+
+
+def init_game():
+    if os.path.exists("answered.json"):
+        os.remove("answered.json")
+    if os.path.exists("task.json"):
+        os.remove("task.json")
+
+
 
 @app.route('/')
 def index(): 
@@ -33,12 +61,23 @@ def join():
            flash ('Неверный код комнаты')
            return render_template("login.html")
         if (request.form['user_name']=="admin") & (request.form['room_id']=="99999999"):
-            users[0] = request.form['user_name']
+            _users[0] = request.form['user_name']
+            init_game()
             return render_template("select.html")
         else:
-            users.append = request.form['user_name']
-            flash ('Неверный код комнаты')
+            u = Users()
+            u.username = request.form['user_name']
+            u.answer = "0"
+            u.money = 0
+            u.time = datetime.now()
+            u.status = status="wait command"
+            db.session.add(u)
+            db.session.flush()
+            db.session.commit()
+            #users.append = request.form['user_name']
             print("lol")
+            print (url_for('join'))
+            return render_template("user_slot.html")
     print (url_for('join'))
     return render_template("login.html")
 
@@ -63,7 +102,7 @@ def slot():
 def host_slot():
     if request.method == 'POST':
         print (url_for('host_slot'))
-        for i in users:
+        for i in _users:
             flash (i)
         return render_template("host_slot.html")
     print (url_for('host_slot'))
@@ -394,11 +433,38 @@ def serve_audio(filename):
       ##  result = CUSTOM_AUDIO_DIR + filename;         
     ##return result;    
     
+@app.route('/update_list_users', methods=["POST", "GET"])
+def update_list_users():
+    if request.method == 'POST':
+        js = Users.query.all()
+        if len(js)==1:
+            id = js.id
+            username = js.username
+            answer = js.answer
+            money = js.money
+            time = js.time
+            jsn = [id,username,answer,money,time]
+            result = json.dumps(jsn)
+            return result
+        else:
+            jsn = []
+            for i in range(0,len(js)):
+                id = js[i].id
+                username = js[i].username
+                answer = js[i].answer
+                money = js[i].money
+                time = js[i].time
+                tmp = [id,username,answer,money,time]
+                jsn.append(tmp)
+            result = json.dumps(jsn)
+            return result
+
+
   
 
 if __name__ == "__main__":
-    users = ['test']
-
+    _users = ['test']
+    
     socketio.run(app,debug=True, host='0.0.0.0')
     
     ##app.run(debug=True)

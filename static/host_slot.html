@@ -35,6 +35,8 @@
              <p>
                 <input class="in_game" id="in_game" value="В игре:">
              </p>
+             
+
                 {%for msg in get_flashed_messages()%}
                 <p>
                     <input type="radio" class="tree-container-button" id="users" name="user_name" value={{msg}} >
@@ -191,6 +193,25 @@
              <input type="submit" class="open_room" onclick="close_room()" value="Закрыть комнату"disabled>
              </p>
         </div>
+        <div>
+                <table class="status_users" id="status_users">
+                    <tr id="row0"> 
+                        <th>№</th>
+                        <th>Игрок</th>
+                        <th>Ответ</th>
+                        <th>Количество очков</th>
+                        <th>Время</th>
+                    </tr>
+                    <tr id="row1"> 
+                        <td></td>
+                        <td></th>
+                        <td></th>
+                        <td></th>
+                        <td></th>
+                    </tr>
+                </table>
+            </div>
+
 
     <script src="/static/js/host_slot.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

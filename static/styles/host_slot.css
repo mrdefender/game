@@ -775,6 +775,23 @@
     color: #555551;
 }
 
+.status_users{
+    background: #f5e8d0; /* Цвет фона таблицы */
+    border-spacing: 0;
+    position: relative;
+    left: 75%;
+    top: -40rem;
+    text-wrap:initial;
+}
+th {
+    background: #496791; /* Цвет фона ячеек */
+    color: #fff; /* Цвет текста */
+    width: 2rem;
+   }
+   td, th {
+   padding: 10px; /* Поля в ячейках */
+    border: 1px solid #333; /* Параметры рамки */
+   }
  /*
 
 
