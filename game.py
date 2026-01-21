@@ -43,13 +43,28 @@ def init_game():
         os.remove("answered.json")
     if os.path.exists("task.json"):
         os.remove("task.json")
-
+    if os.path.exists("room.json"):
+        os.remove("room.json")
 
 
 @app.route('/')
 def index(): 
     print (url_for('index'))
     return render_template("index.html")
+
+
+def check_id_room(room_id):
+    if not os.path.exists("room.json"):
+        return False
+    else:
+        with open('room.json') as file:
+           jsn = json.load(file)
+        if jsn == room_id:
+            True
+        else:
+            return False
+
+
 
 @app.route('/join', methods=["POST", "GET"])
 def join():
@@ -65,20 +80,30 @@ def join():
             init_game()
             return render_template("select.html")
         else:
+            if check_id_room(request.form['room_id'])==False:
+                flash ('Неверный код комнаты')
+                return render_template("login.html")
             u = Users()
             u.username = request.form['user_name']
             u.answer = "0"
             u.money = 0
             u.time = datetime.now()
-            u.status = status="wait command"
+            u.status = status="wait"
+            tmp = Users.query.filter(Users.username==u.username).first()
+            if tmp!=None:
+                if tmp.username == u.username:
+                    tmp.answer = u.answer
+                    tmp.money = 0
+                    tmp.time = u.time
+                    tmp.status = u.status
+                    db.session.commit()
+                    print (url_for('join'))
+                    return render_template("user_slot.html",value=u.username)                           
             db.session.add(u)
             db.session.flush()
             db.session.commit()
-            #users.append = request.form['user_name']
-            print("lol")
             print (url_for('join'))
-            return render_template("user_slot.html")
-    print (url_for('join'))
+            return render_template("user_slot.html",value=u.username)
     return render_template("login.html")
 
 @app.route('/select', methods=["POST", "GET"])
@@ -458,6 +483,30 @@ def update_list_users():
                 jsn.append(tmp)
             result = json.dumps(jsn)
             return result
+
+
+@app.route('/open_room', methods=["POST", "GET"])
+def open_room():
+    if request.method == 'POST':
+        id_room = request.json["room_id"]
+        with open('room.json','w') as file:
+            json.dump(id_room,file)
+        return id_room
+    else:
+        return id_room
+  
+        
+@app.route('/close_room', methods=["POST", "GET"])
+def close_room():
+    if request.method == 'POST':
+        id_room = request.json["room_id"]
+        if os.path.exists("room.json"):
+            os.remove("room.json")
+        return id_room
+    else:
+        return id_room
+        
+
 
 
   

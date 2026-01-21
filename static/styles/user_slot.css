@@ -57,7 +57,7 @@ h1 {
 }
 
 .game_auth_container {
-    flex: 0 0 100%;
+    flex:  100%;
     height: 100%;
     max-height: 100%;
     display: block;
@@ -68,9 +68,9 @@ h1 {
 
 .questions{
     position: relative;
-    padding: 10px 30px;
-    height: 30%;
-    top: -55rem;
+    padding: 12px 35px;
+    height: auto;
+    top: -33rem;
     left: 22%;
     color: #fff;
     border-radius: 100px;
@@ -84,8 +84,8 @@ h1 {
 
 .btn1, .btn2, .btn3, .btn3, .btn4, .btn5 {
     position: relative;
-    top: -51rem;
-    padding: 12px 43px;
+    top: -30rem;
+    padding: 12px 35px;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -99,8 +99,8 @@ h1 {
 .btn6, .btn7, .btn8, .btn9, .btn10
 {
     position: relative;
-    top: -50.5rem;
-    padding: 12px 43px;
+   top: -29.5rem;
+    padding: 12px 35px;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -113,8 +113,8 @@ h1 {
 .btn11, .btn12, .btn13, .btn14, .btn15
 {
     position: relative;
-    top: -50rem;
-    padding: 12px 43px;
+    top: -29rem;
+    padding: 12px 35px;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -126,15 +126,15 @@ h1 {
 }
 .message{
     position: relative;
-    left: 7rem;
-    top: -60rem;
+    left: 0rem;
+    top: -34rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
     color: rgb(7, 127, 224);
     font-size: medium;
-    width: 45%;
-    height: 4rem;
+    width: 35%;
+    height: 2rem;
 }
 
 

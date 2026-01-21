@@ -2042,6 +2042,74 @@ function open_room(){
         return;
     }
        console.log(document.getElementById("room").value);
+
+    
+
+     fetch('/open_room', {
+        method: 'POST',
+        body: JSON.stringify({ room_id:document.getElementById("room").value}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+   console.log(data);
+    
+    
+        document.getElementById("open_room").disabled = true;
+        document.getElementById("close_room").disabled = false;
+        document.getElementById("room").disabled = true;
+    
+        //document.getElementById('au').textContent = "В игру вступает " + data;
+    //document.getElementById('au').innerText = "В игру вступает " + data;
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+function close_room(){
+
+    if (document.getElementById("room").value=="")
+    {
+        return;
+    }
+       console.log(document.getElementById("room").value);
+
+    
+
+     fetch('/close_room', {
+        method: 'POST',
+        body: JSON.stringify({ room_id:document.getElementById("room").value}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+   console.log(data);
+    
+    
+        document.getElementById("open_room").disabled = false;
+        document.getElementById("close_room").disabled = true;
+        document.getElementById("room").disabled = false;
+         document.getElementById("room").value = "";
+    
+        //document.getElementById('au').textContent = "В игру вступает " + data;
+    //document.getElementById('au').innerText = "В игру вступает " + data;
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+
+
+
 }
 function stop_sounds()
 {

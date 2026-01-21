@@ -13,36 +13,39 @@
             <h1>Веселые игры. Пульт игрока.</h1>
             <div class="game_auth_container">
                 <div class="form_group">
-                    <label class="form_label">Добро пожаловать на игру </label>
-                    <p>
-                    <label class="form_label">Свободный слот! </label> </p>
-                   
+                    <label class="form_label" id = "welcome">Добро пожаловать на игру </label>
+                    <label class="form_label" id="welcome2">Свободный слот! </label> 
+                   <label class="form_label" id="welcome3">Ожидайте дальнейших укзананий! </label> 
                 </div>
+                 
+
+               
                 <!--button class="host" onclick="to_host()"> Режим ведущего</button-->
                             </div> 
                 <p>  
-                <input type="submit" class="message" id="au" ></button>
-                <div class = "questions" id="question" value =""></div>
+
+                <input type="submit" class="message" id="user_name" value={{value}}>
+                <div class = "questions" id="question" value ="" hidden></div>
                 </p>
                 <p>
-                <button class="btn1" id=btn1 disabled>1</button> 
-                <button class="btn2" id=btn2 disabled>2</button>
-                <button class="btn3" id=btn3 disabled>3</button>
-                <button class="btn4" id=btn4 disabled>4</button>
-                <button class="btn5" id=btn5 disabled>5</button>
+                <button class="btn1" id=btn1 disabled hidden>1</button> 
+                <button class="btn2" id=btn2 disabled hidden>2</button>
+                <button class="btn3" id=btn3 disabled hidden>3</button>
+                <button class="btn4" id=btn4 disabled hidden>4</button>
+                <button class="btn5" id=btn5 disabled hidden>5</button>
                 <div> 
-                 <button class="btn6" id=btn6 disabled>6</button>
-                    <button class="btn7" id=btn7 disabled>7</button>
-                    <button class="btn8" id=btn8 disabled>8</button>
-                    <button class="btn9" id=btn9 disabled>9</button>
-                    <button class="btn10"id=btn10 disabled>10</button>
+                 <button class="btn6" id=btn6 disabled hidden>6</button>
+                    <button class="btn7" id=btn7 disabled hidden>7</button>
+                    <button class="btn8" id=btn8 disabled hidden>8</button>
+                    <button class="btn9" id=btn9 disabled hidden>9</button>
+                    <button class="btn10"id=btn10 disabled hidden>10</button>
                 </div>
                 <div>      
-                    <button class="btn11" id=btn11 disabled>11</button>
-                    <button class="btn12" id=btn12 disabled>12</button>
-                    <button class="btn13" id=btn13 disabled>13</button>
-                    <button class="btn14" id=btn14 disabled>14</button>
-                    <button class="btn15" id=btn15 disabled>15</button>
+                    <button class="btn11" id=btn11 disabled hidden>11</button>
+                    <button class="btn12" id=btn12 disabled hidden>12</button>
+                    <button class="btn13" id=btn13 disabled hidden>13</button>
+                    <button class="btn14" id=btn14 disabled hidden>14</button>
+                    <button class="btn15" id=btn15 disabled hidden>15</button>
                 </div>
                 </p>
                 <p>
