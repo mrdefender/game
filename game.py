@@ -19,8 +19,8 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 
 app = Flask(__name__, template_folder="static/")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
-app.config["SECRET_KEY"] = "000001C9E687F6E0" #os.urandom(32).hex
-app.secret_key = "000001C9E687F6E0" #os.urandom(32).hex
+app.config["SECRET_KEY"] = "ce07970d34c80634ce4ab5ef66270f64" #"000001C9E687F6E0" #os.urandom(32).hex
+app.secret_key = "ce07970d34c80634ce4ab5ef66270f64" #"000001C9E687F6E0" #os.urandom(32).hex
 socketio = SocketIO(app)
 accepted_user = ""
 db = SQLAlchemy(app)
