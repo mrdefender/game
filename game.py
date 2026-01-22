@@ -11,6 +11,7 @@ import flask, flask.views
 import secrets
 from flask_socketio import SocketIO, emit
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required 
 
 
 
@@ -18,17 +19,24 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__, template_folder="static/")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
-app.config["SECRET_KEY"] = os.urandom(32).hex
-app.secret_key = os.urandom(32).hex
+app.config["SECRET_KEY"] = "000001C9E687F6E0" #os.urandom(32).hex
+app.secret_key = "000001C9E687F6E0" #os.urandom(32).hex
 socketio = SocketIO(app)
 accepted_user = ""
 db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.session_protection = "strong"
+login_manager.login_view = "login"
+login_manager.login_message_category = "info"
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(user_id)
 
 
-class Users(db.Model):
-    id = db.Column(db.Integer, primary_key=True, unique=True)
+class Users(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     username = db.Column(db.String(10), unique=True, nullable=False)
     answer = db.Column(db.Text)
     money = db.Column(db.Integer)
@@ -92,17 +100,16 @@ def join():
             tmp = Users.query.filter(Users.username==u.username).first()
             if tmp!=None:
                 if tmp.username == u.username:
-                    tmp.answer = u.answer
-                    tmp.money = 0
-                    tmp.time = u.time
-                    tmp.status = u.status
-                    db.session.commit()
-                    print (url_for('join'))
-                    return render_template("user_slot.html",value=u.username)                           
+                    if tmp.username in session['username']:
+                        print (url_for('join'))
+                        return render_template("user_slot.html",value=u.username)   
+                    else:
+                        return render_template("login.html")                       
             db.session.add(u)
             db.session.flush()
             db.session.commit()
-            print (url_for('join'))
+            session['username'] = u.username
+            ch = login_user(u)
             return render_template("user_slot.html",value=u.username)
     return render_template("login.html")
 
@@ -463,12 +470,13 @@ def update_list_users():
     if request.method == 'POST':
         js = Users.query.all()
         if len(js)==1:
-            id = js.id
-            username = js.username
-            answer = js.answer
-            money = js.money
-            time = js.time
-            jsn = [id,username,answer,money,time]
+            id = js[0].id
+            username = js[0].username
+            answer = js[0].answer
+            money = js[0].money
+            time = js[0].time
+            status = js[0].status
+            jsn = [id,username,answer,money,time, status]
             result = json.dumps(jsn)
             return result
         else:
@@ -479,7 +487,8 @@ def update_list_users():
                 answer = js[i].answer
                 money = js[i].money
                 time = js[i].time
-                tmp = [id,username,answer,money,time]
+                status = js[i].status
+                tmp = [id,username,answer,money,time, status]
                 jsn.append(tmp)
             result = json.dumps(jsn)
             return result
@@ -507,6 +516,18 @@ def close_room():
         return id_room
         
 
+@app.route('/get_user_status', methods=["POST", "GET"])
+def get_user_status():
+    if request.method == 'POST':
+         tmp = request.json['user']
+         user = Users()
+         user = Users.query.filter(Users.username==tmp).first()
+         jsn = user.status
+         return json.dumps(jsn)
+        
+
+
+
 
 
   
@@ -518,4 +539,4 @@ if __name__ == "__main__":
     
     ##app.run(debug=True)
     
-    
+

@@ -156,10 +156,11 @@
              <input type="submit" class="help_auden" id ="help_auden" onclick="help_auden()" value="Помощь интерактива" disabled>
                 </p>
              
-
+                <input class="user_id" id="user_id", name="user_id" type="text" maxlength="4" placeholder="User_id" required>
             </div>
                 
                 <input type="submit" class="start_game" id ="start_game" onclick="start_to_game()" value="Начать игру"  disabled>
+
                 <input type="submit" class="invite" id="invite" onclick="invite_to_game()" value="Пригласить в игру">
                 <input type="submit" class="invite" id="get_task" onclick="gen_task()" value="Получить задание" disabled >
                 <input type="submit" class="take_money" id="take_money" onclick="take_money()" value="Забрать деньги" disabled>  
@@ -201,6 +202,7 @@
                         <th>Ответ</th>
                         <th>Количество очков</th>
                         <th>Время</th>
+                        <th>Статус</th>
                     </tr>
                     <tr id="row1"> 
                         <td></td>

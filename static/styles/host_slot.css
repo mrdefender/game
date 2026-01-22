@@ -741,6 +741,22 @@
     text-align: center;
 
 }
+.user_id{
+    position: relative;
+    top: -23rem;
+    left: -21rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #1a1b02;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 5rem;
+    height: 2rem;
+    text-wrap:inherit;
+    text-align: center;
+}
+
+
 .open_room{
     position: relative;
     top: -19rem;
@@ -777,11 +793,13 @@
 
 .status_users{
     background: #f5e8d0; /* Цвет фона таблицы */
+    font-size: smaller;
     border-spacing: 0;
     position: relative;
-    left: 75%;
+    left: 68%;
     top: -40rem;
     text-wrap:initial;
+    text-align: center;
 }
 th {
     background: #496791; /* Цвет фона ячеек */

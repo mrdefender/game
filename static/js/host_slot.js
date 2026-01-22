@@ -2270,6 +2270,8 @@ function total_money()
 }
 
 
+let timerId = setInterval(() => update_list_user(), 5000);
+
 function update_list_user()
 {
     fetch('/update_list_users', {
@@ -2286,7 +2288,6 @@ function update_list_user()
 
     console.log(data);
     var table = document.getElementById("status_users");
-    console.log(table)
     if (table.rows.length!=1)
     {
    for (let i = table.rows.length - 1; i > 0; i--) {
@@ -2294,24 +2295,28 @@ function update_list_user()
      }
    }
 
+
     for (var i=0;data.length;i++)
     {
     var tr = document.createElement("tr")
     var cell1 = document.createElement("td")
-    cell1.innerHTML = data[i][0].toString();
+    cell1.innerHTML = data[i][0];
     var cell2 = document.createElement("td")
     cell2.innerHTML = data[i][1];
     var cell3 = document.createElement("td")
     cell3.innerHTML = data[i][2];
     var cell4 = document.createElement("td")
-    cell4.innerHTML = data[i][3].toString();
+    cell4.innerHTML = data[i][3];
     var cell5 = document.createElement("td")
     cell5.innerHTML = data[i][4];
+    var cell6 = document.createElement("td")
+    cell6.innerHTML = data[i][5];
     tr.appendChild(cell1);
     tr.appendChild(cell2);
     tr.appendChild(cell3);
     tr.appendChild(cell4);
     tr.appendChild(cell5);
+    tr.appendChild(cell6);
     table.appendChild(tr);
     }
 
