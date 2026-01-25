@@ -37,12 +37,12 @@
              </p>
              
 
-                {%for msg in get_flashed_messages()%}
+                
                 <p>
-                    <input type="radio" class="tree-container-button" id="users" name="user_name" value={{msg}} >
-                    <label for={{msg}} class="tree-container">{{msg}}</label>
-                </p>
-                {%endfor%}       
+                    <input type="radio" class="tree-container-button" id="users" name="user_name" value=bbb disabled >
+                    <label for=bbb class="tree-container">Количество ответов в интерактиве:</label>
+                    <label for=bbb class="tree-container" id="count_interactive">0</label>
+                </p>   
             </div> 
                 <p>  
                 <input type="submit" class="message" id="au" ></button>

@@ -263,7 +263,7 @@
 }
 
 .tree-container{
-    font-size:x-large;
+    font-size:med;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -292,7 +292,7 @@
     border-radius: 100px;
     background-color: #000c11;
     color: rgb(7, 127, 224);
-    font-size: medium;
+    font-size: large;
     width: 45%;
     height: 4rem;
 }

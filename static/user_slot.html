@@ -6,6 +6,7 @@
     <title>Веселые игры</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/user_slot.css') }}">
      <link rel="stylesheet" href='styles/user_slot.css'>
+     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <main class="game_auth_body">
@@ -13,9 +14,11 @@
             <h1>Свободный слот. Пульт игрока.</h1>
             <div class="game_auth_container">
                 <div class="form_group">
-                    <label class="form_label" id = "welcome">Добро пожаловать на игру </label>
+                    <label class="form_label" id ="welcome">Добро пожаловать на игру </label>
                     <label class="form_label" id="welcome2">Свободный слот! </label> 
-                   <label class="form_label" id="welcome3">Ожидайте дальнейших укзананий! </label> 
+                  <p>  
+                   <label class="form_label1" id="welcome3" > Ожидайте дальнейших указаний!</label> 
+                  </p>
                 </div>
                  
 
@@ -28,30 +31,43 @@
                 <div class = "questions" id="question" value ="" hidden></div>
                 </p>
                 <p>
-                <button class="btn1" id=btn1 disabled hidden>1</button> 
-                <button class="btn2" id=btn2 disabled hidden>2</button>
-                <button class="btn3" id=btn3 disabled hidden>3</button>
-                <button class="btn4" id=btn4 disabled hidden>4</button>
-                <button class="btn5" id=btn5 disabled hidden>5</button>
+                <input type="button" class="btn1" id="o1" value="1" onclick="a1()" disabled hidden></button> 
+                <input type="button" class="btn2" id="o2" value="2" onclick="a2()" disabled hidden></button> 
+                <input type="button" class="btn3" id="o3" value="3" onclick="a3()" disabled hidden></button> 
+                <input type="button" class="btn4" id="o4" value="4" onclick="a4()" disabled hidden></button> 
+                <input type="button" class="btn5" id="o5" value="5" onclick="a5()" disabled hidden></button> 
                 <div> 
-                 <button class="btn6" id=btn6 disabled hidden>6</button>
-                    <button class="btn7" id=btn7 disabled hidden>7</button>
-                    <button class="btn8" id=btn8 disabled hidden>8</button>
-                    <button class="btn9" id=btn9 disabled hidden>9</button>
-                    <button class="btn10"id=btn10 disabled hidden>10</button>
+                    <input type="button" class="btn6" id="o6" value="6" onclick="a6()" disabled hidden></button> 
+                    <input type="button" class="btn7" id="o7" value="7" onclick="a7()" disabled hidden></button> 
+                    <input type="button" class="btn8" id="o8" value="8" onclick="a8()" disabled hidden></button> 
+                    <input type="button" class="btn9" id="o9" value="9" onclick="a9()" disabled hidden></button> 
+                    <input type="button" class="btn10" id="o10" value="10" onclick="a10()" disabled hidden></button> 
                 </div>
                 <div>      
-                    <button class="btn11" id=btn11 disabled hidden>11</button>
-                    <button class="btn12" id=btn12 disabled hidden>12</button>
-                    <button class="btn13" id=btn13 disabled hidden>13</button>
-                    <button class="btn14" id=btn14 disabled hidden>14</button>
-                    <button class="btn15" id=btn15 disabled hidden>15</button>
+                    <input type="button" class="btn11" id="o11" value="11" onclick="a11()" disabled hidden></button> 
+                    <input type="button" class="btn12" id="o12" value="12" onclick="a12()" disabled hidden></button> 
+                    <input type="button" class="btn13" id="o13" value="13" onclick="a13()" disabled hidden></button> 
+                    <input type="button" class="btn14" id="o14" value="14" onclick="a14()" disabled hidden></button> 
+                    <input type="button" class="btn15" id="o15" value="15" onclick="a15()" disabled hidden></button> 
                 </div>
+                <div>      
+                    <input type="button" class="p50_50" id="p50_50" value="50:50" onclick="p50_50()" disabled hidden></button> 
+                    <input type="button" class="palter" id="palter" value="⇆" onclick="palter()"  disabled hidden></button> 
+                    <input type="button" class="pnavi" id="pnavi" value="𖤂" onclick="pnavi()" disabled hidden></button> 
+                    <input type="button" class="px2" id="px2" value="x2" onclick="px2()"  disabled hidden></button> 
+                    <input type="button" class="pauden" id="pauden" value="👪" onclick="pauden()"  disabled hidden></button> 
+                </div>
+
                 </p>
                 <p>
              <input class="otbor_input" id="otbor_input", name="otbor_input" type="text" placeholder="Ответ" required hidden>
              <input type="submit" class="send_answer_otbor" value="Ответить" disabled hidden>
+             <input type="submit" id="time-start" value="" disabled >
+             <input type="submit" id="count_fatal" value="" disabled >
+             <input type="submit" id="ex2" value="" disabled >
              </p>
+
+
             </div>
 
 
