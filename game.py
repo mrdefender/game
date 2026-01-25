@@ -476,7 +476,7 @@ def update_list_users():
             money = js[0].money
             time = js[0].time
             status = js[0].status
-            jsn = [id,username,answer,money,time, status]
+            jsn = [id,username,answer,money,time, status,"true"]
             result = json.dumps(jsn)
             return result
         else:
@@ -488,7 +488,7 @@ def update_list_users():
                 money = js[i].money
                 time = js[i].time
                 status = js[i].status
-                tmp = [id,username,answer,money,time, status]
+                tmp = [id,username,answer,money,time, status,"false"]
                 jsn.append(tmp)
             result = json.dumps(jsn)
             return result

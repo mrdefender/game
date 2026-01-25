@@ -2287,6 +2287,7 @@ function update_list_user()
 .then(data => {
 
     console.log(data);
+
     var table = document.getElementById("status_users");
     if (table.rows.length!=1)
     {
@@ -2295,6 +2296,30 @@ function update_list_user()
      }
    }
 
+   if (data[6]=="true")
+   {
+    var tr = document.createElement("tr")
+    var cell1 = document.createElement("td")
+    cell1.innerHTML = data[0];
+    var cell2 = document.createElement("td")
+    cell2.innerHTML = data[1];
+    var cell3 = document.createElement("td")
+    cell3.innerHTML = data[2];
+    var cell4 = document.createElement("td")
+    cell4.innerHTML = data[3];
+    var cell5 = document.createElement("td")
+    cell5.innerHTML = data[4];
+    var cell6 = document.createElement("td")
+    cell6.innerHTML = data[5];
+    tr.appendChild(cell1);
+    tr.appendChild(cell2);
+    tr.appendChild(cell3);
+    tr.appendChild(cell4);
+    tr.appendChild(cell5);
+    tr.appendChild(cell6);
+    table.appendChild(tr);
+    return;
+   }
 
     for (var i=0;data.length;i++)
     {
