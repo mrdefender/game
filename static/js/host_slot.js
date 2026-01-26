@@ -73,8 +73,15 @@ var audio_navigator= new Audio(audioUrl+"navigator.ogg");
 var audio_out_player= new Audio(audioUrl+"out_player.ogg");
 var audio_pre_final= new Audio(audioUrl+"pre-final.ogg");
 var audio_final= new Audio(audioUrl+"final.ogg");
+var timerWaitAnswer;
+var timerHelps;
 
 function cancel_all(){
+    clearInterval(timerHelps);
+    document.getElementById("user_id").disabled = false;
+    document.getElementById("user_id").value = "";
+    document.getElementById("in_game").value = "В игре: ";
+    reset_user_to_wait();
     update_list_user();
     var select = document.querySelector('#select_round');
     var select_fix = document.querySelector('#select_fix');
@@ -130,6 +137,27 @@ function cancel_all(){
   //  location.reload();
 }
 
+function reset_user_to_wait()
+{
+     fetch('/reset_user_to_wait', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+     //document.getElementById('au').textContent = "В игру вступает " + data;
+    //document.getElementById('au').innerText = "В игру вступает " + data;
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
 
 
 select_script.addEventListener('change', function(){
@@ -609,6 +637,27 @@ function start_to_game()
     document.getElementById("get_task").disabled = false;
     stop_sounds();
     audio_start_game.play();
+    fetch('/start_game', {
+        method: 'POST',
+        body: JSON.stringify({"": ""}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    if (data == 'fail')
+        return;
+    
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+
     
        
 
@@ -624,11 +673,66 @@ document.getElementById("navi").disabled = false;
 document.getElementById("x2").disabled = false;
 stop_sounds();
 audio_fix_script.play();
+var helps = [];
+    if (document.getElementById("p50_50").checked)
+        helps.push("50:50");
+    if (document.getElementById("palter").checked)
+        helps.push("alter");
+    if (document.getElementById("pnavi").checked)
+        helps.push("navi");
+    if (document.getElementById("px2").checked)
+        helps.push("x2");
+    if (document.getElementById("phelp_auden").checked)
+        helps.push("help_auden");
+    send_helps(helps);
+    timerHelps = setInterval(() => update_helps(), 5000);
+
+
+}
+
+    function update_helps(){
+        var helps = [];
+    if (document.getElementById("p50_50").checked)
+        helps.push("50:50");
+    if (document.getElementById("palter").checked)
+        helps.push("alter");
+    if (document.getElementById("pnavi").checked)
+        helps.push("navi");
+    if (document.getElementById("px2").checked)
+        helps.push("x2");
+    if (document.getElementById("phelp_auden").checked)
+        helps.push("help_auden");
+    send_helps(helps);
+}
+
+    function send_helps(val_helps)
+{
+    fetch('/send_helps', {
+        method: 'POST',
+        body: JSON.stringify({helps: val_helps}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    if (data == 'fail')
+        return;
+    
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
 }
 
 function invite_to_game()
 {
-    var input = document.querySelector('input[name="user_name"]:checked').value;
+
+    var input = document.getElementById("user_id").value;
+    if ((input == "") || (input==undefined))
+        return;
     fetch('/invite_user', {
         method: 'POST',
         body: JSON.stringify({user_name: input}),
@@ -641,6 +745,7 @@ function invite_to_game()
 
 .then(data => {
         document.getElementById('au').value = "В игру вступает " + data;
+        document.getElementById('in_game').value = "В игре:    " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
     document.getElementById("fixed_script").disabled = false;
     stop_sounds();
@@ -689,7 +794,7 @@ function gen_task()
     
     if (select.value == "Победа")
         true;
-    var input = document.querySelector('input[name="user_name"]:checked').value;
+    var input = document.getElementById("user_id").value;
     round = document.getElementById("status-round").value;
     round = parseInt(round)
     console.log(round)
@@ -751,6 +856,7 @@ function gen_task()
         audio_q9.play();
     }
   
+    timerWaitAnswer = setInterval(() => wait_answer(), 5000);
 
 })
 .catch(error => {
@@ -2346,8 +2452,109 @@ function update_list_user()
     }
 
 
-        //document.getElementById('au').textContent = "В игру вступает " + data;
-    //document.getElementById('au').innerText = "В игру вступает " + data;
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+
+
+function wait_answer(){
+    fetch('/wait_answer_for_host', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/data'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+
+    console.log(data);
+    if (data == 'fail')
+        return;
+    clearInterval(timerWaitAnswer)
+    if (data == "1")
+    {
+        a1();
+        return;
+    }
+    if (data == "2")
+     {
+        a2();
+        return;
+    }
+    if (data == "3")
+       {
+        a3();
+        return;
+    }
+    if (data == "4")
+       {
+        a4();
+        return;
+       }
+    if (data == "5")
+      {
+        a5();
+        return;
+    }
+    if (data == "6")
+       {
+        a6();
+        return;
+    }
+    if (data == "7")
+       {
+        a7();
+        return;
+    }
+    if (data == "8")
+       {
+        a8();
+        return;
+    }
+    if (data == "9")
+       {
+        a9();
+        return;
+    }
+    if (data == "10")
+       {
+        a10();
+        return;
+    }
+    if (data == "11")
+       {
+        a11();
+        return;
+    }
+    if (data == "12")
+       {
+        a12();
+        return;
+    }
+    if (data == "13")
+       {
+        a13();
+        return;
+    }
+    if (data == "14")
+       {
+        a14();
+        return
+    }
+    if (data == "15")
+       {
+        a15();
+        return;
+    }
+
+
+
 })
 .catch(error => {
 console.error('Ошибка:', error);

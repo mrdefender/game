@@ -51,8 +51,14 @@ def init_game():
         os.remove("answered.json")
     if os.path.exists("task.json"):
         os.remove("task.json")
-    if os.path.exists("room.json"):
-        os.remove("room.json")
+    if os.path.exists("helps.json"):
+        os.remove("helps.json")
+    if os.path.exists("50_50.json"):
+        os.remove("50_50.json")  
+    if os.path.exists("alter.json"):
+        os.remove("alter.json")
+    if os.path.exists("navi.json"):
+        os.remove("navi.json") 
 
 
 @app.route('/')
@@ -100,11 +106,11 @@ def join():
             tmp = Users.query.filter(Users.username==u.username).first()
             if tmp!=None:
                 if tmp.username == u.username:
-                    if tmp.username in session['username']:
+                   # if tmp.username in session['username']:
                         print (url_for('join'))
                         return render_template("user_slot.html",value=u.username)   
-                    else:
-                        return render_template("login.html")                       
+                    #else:
+                     #   return render_template("login.html")                       
             db.session.add(u)
             db.session.flush()
             db.session.commit()
@@ -143,10 +149,28 @@ def host_slot():
 @app.route('/invite_user', methods=["POST", "GET"])
 def invite_user():
     if request.method == 'POST':
-        u = request.json["user_name"]
+        try:
+            u = request.json['user_name']
+            tmp = Users.query.filter(Users.id==int(u)).first()
+            u = str(tmp.username)
+        except:
+            return json.dumps("fail")
+        if tmp == None:
+            return json.dumps("fail")
+        tmp.status = 'main'
+        db.session.commit()
+        js = Users.query.all()
+        if len(js)!=1:
+            for i in range(len(js)):
+                if js[i].status !="main":
+                    js[i].status = 'interactive'
+            db.session.commit()
         return json.dumps(u)
     print (url_for('host_slot'))
     return render_template("host_slot.html")
+
+
+
 
 @app.route('/gen_task', methods=["POST", "GET"])
 def gen_task():
@@ -220,8 +244,8 @@ def generate_string(round_id,is_bombed):
         with open('task.json','w') as file:
             json.dump(result,file)
         return js
-        pass
-        
+
+
             
 @app.route('/get_fatal_host', methods=["POST", "GET"])
 def get_fatal_host():
@@ -391,7 +415,7 @@ def navi():
                 res = ["11","12","13","14","15"]
             return res
         if max_r == max_c:
-            j = random(1,2)
+            j = random.randint(1,2)
             if j==1:
                 tmp = -1
                 for i in range(0,5):
@@ -519,16 +543,170 @@ def close_room():
 @app.route('/get_user_status', methods=["POST", "GET"])
 def get_user_status():
     if request.method == 'POST':
+        try:
          tmp = request.json['user']
          user = Users()
          user = Users.query.filter(Users.username==tmp).first()
          jsn = user.status
          return json.dumps(jsn)
+        except:
+            json.dumps("fail")
+        
+@app.route('/reset_user_to_wait', methods=["POST", "GET"])
+def reset_user_to_wait():
+    if request.method == 'POST':
+         if os.path.exists('helps.json'):
+            os.remove('helps.json')
+         if os.path.exists('answered.json'):
+            os.remove('answered.json')
+         if os.path.exists("task.json"):
+            os.remove("task.json")
+         js = Users.query.all()
+         for i in range(0,len(js)):
+            js[i].status = "wait"
+            js[i].answer = "0"
+            db.session.commit()
+         init_game()
+         return json.dumps(" ")
+
+@app.route('/get_helps', methods=["POST", "GET"])
+def get_helps():
+    if request.method == 'POST':
+        tmp_u = request.json['user']
+        try:
+            if os.path.exists("helps.json"):
+                user = Users()
+                user = Users.query.filter(Users.username==tmp_u).first()
+                if (user.status == "main"):
+                    db.session.commit()
+                with open('helps.json') as file:
+                    jsn = json.load(file)
+                return jsn
+            else:
+                 return json.dumps("fail")   
+        except:
+            return json.dumps("fail")
+
+@app.route('/send_helps', methods=["POST", "GET"])
+def send_helps():
+    if request.method == 'POST':
+        tmp = request.json['helps']
+        with open('helps.json','w') as file:
+            json.dump(tmp,file)
+        return json.dumps("OK") 
+    else:
+        return json.dumps("fail")
+  
+@app.route('/start_game', methods=["POST", "GET"])
+def start_game():
+    if request.method == 'POST':
+        try:
+            js = Users.query.all()
+            if len(js)!=1:
+                for i in range(len(js)):
+                    if js[i].status =="main":
+                        js[i].status = "wait task main"
+                    if js[i].status =="interactive":
+                        js[i].status = "wait task interactive"
+                db.session.commit()
+            else: 
+                return json.dumps("fail")
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+  
+@app.route('/get_task_user', methods=["POST", "GET"])
+def get_task_user():
+    if request.method == 'POST':
+        if not os.path.exists("task.json"):
+            return json.dumps("fail")
+        with open('task.json') as file:
+            jsn = json.load(file)  
+        try:
+            js = Users.query.all()
+            if len(js)!=1:
+                for i in range(len(js)):
+                    if js[i].status =="wait task main":
+                        js[i].status = "given task main"
+                        break
+                    if js[i].status =="wait task interactive":
+                        js[i].status = "given task interactive"
+                db.session.commit()
+              
+            return json.dumps(jsn)
+        except:
+            return json.dumps("fail")
         
 
+@app.route('/check_answered_main', methods=["POST", "GET"])
+def check_answered_main():
+    if request.method == 'POST':
+        try:
+            u_tmp = request.json['user']
+            user2 = Users.query.filter(Users.status == "answered main").first_or_404()
+            user = Users.query.filter(Users.username == u_tmp).first()
+            user.status = "interactive no answer"
+            db.session.commit()
+            return json.dumps("ok")
+            
+        except:
+            return json.dumps("fail")
+    
+@app.route('/send_answer', methods=["POST", "GET"])
+def send_answer():
+    if request.method == 'POST':
+        try:
+            u_tmp = request.json['user']
+            a_tnp = request.json['answer_user']
+            t_tmp = request.json['time_answer']
+            user = Users.query.filter(Users.username == u_tmp).first()
+            if (user.status == "given task main"):
+                user.status = "answered main"
+                user.answer = a_tnp
+                user.time = t_tmp
+                db.session.commit()
+                return json.dumps("ok")
+            if (user.status == "given task interactive"):
+                user.status = "answered interactive"
+                user.answer = a_tnp
+                user.time = t_tmp
+                with open('task.json') as file:
+                    jsn = json.load(file)
+                fatals = jsn[1]
+                c_fatals = jsn[3]
+                r = jsn[0]
+                wrong = False
+                if r==1:
+                    if int(user.answer)==fatals:
+                        user.money = user.money - 50
+                        wrong = True
+                if r>1:
+                    for i in range(c_fatals):
+                        if int(user.answer)==fatals[i]:
+                            user.money = user.money - 50*r
+                            break
+                if not wrong:
+                    user.money = user.money + 100*r
+            db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
 
 
 
+@app.route('/wait_answer_for_host', methods=["POST", "GET"])
+def wait_answer_for_host():
+    if request.method == 'POST':
+        try:
+            user = Users.query.filter(Users.status == "answered main").first()
+            if user == None:
+                return json.dumps("fail")
+            res = user.answer
+            if res == '0':
+                return json.dumps("fail")
+            return json.dumps(res)
+        except:
+            return json.dumps("fail")
 
   
 
