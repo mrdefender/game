@@ -181,13 +181,15 @@ function get_helps(){
 .then(data => {
 
     if (data=="fail")
-        return;
-
-    document.getElementById("p50_50").disabled = true;
+    {
+        document.getElementById("p50_50").disabled = true;
     document.getElementById("palter").disabled = true;
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+       return;
+    
+    }
     document.getElementById("p50_50").hidden = true;
     document.getElementById("palter").hidden = true;
     document.getElementById("pnavi").hidden = true;
@@ -343,9 +345,14 @@ console.error('Ошибка:', error);
 
 function check_answered_main(){
     var user_name = document.getElementById("user_name").value;
+    var inter = false;
+    if (timeWainAnswerFromMain == undefined)
+        return;
+    if (document.getElementById("welcome3").innerHTML=="Интерактивная игра")
+        inter = true;
     fetch('/check_answered_main', {
         method: 'POST',
-        body: JSON.stringify({ user:user_name}),
+        body: JSON.stringify({ user:user_name, inter:inter}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -363,6 +370,7 @@ function check_answered_main(){
     {
         status_btn(true);
         clearInterval(timeWainAnswerFromMain);
+        timeWainAnswerFromMain = undefined;
     }
     
 })
@@ -443,56 +451,490 @@ console.error('Ошибка:', error);
 }
 
 function a2(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o2").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"2",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a3(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o3").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"3",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a4(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o4").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"4",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a5(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o5").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"5",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a6(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o6").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"6",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a7(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o7").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"7",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a8(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o8").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"8",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 function a9(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o9").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"9",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a10(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o10").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"10",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a11(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o11").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"11",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a12(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o12").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"12",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a13(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o13").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"13",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a14(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o14").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"14",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }
 
 function a15(){
+     var user_name = document.getElementById("user_name").value;
+    document.getElementById("o15").style.backgroundColor = "orange";
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+    fetch('/send_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name,answer_user:"15",time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    status_btn(true);
+    clearInterval(timeWainAnswerFromMain);
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }

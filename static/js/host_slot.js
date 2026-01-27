@@ -2393,6 +2393,7 @@ function update_list_user()
 .then(data => {
 
     console.log(data);
+    var interactive_col = 0;
 
     var table = document.getElementById("status_users");
     if (table.rows.length!=1)
@@ -2442,6 +2443,8 @@ function update_list_user()
     cell5.innerHTML = data[i][4];
     var cell6 = document.createElement("td")
     cell6.innerHTML = data[i][5];
+    if (data[i][5]=="answered interactive")
+        interactive_col++;
     tr.appendChild(cell1);
     tr.appendChild(cell2);
     tr.appendChild(cell3);
@@ -2450,7 +2453,7 @@ function update_list_user()
     tr.appendChild(cell6);
     table.appendChild(tr);
     }
-
+    document.getElementById("count_interactive").innerHTML = interactive_col.toString();
 
 })
 .catch(error => {
@@ -2471,14 +2474,19 @@ function wait_answer(){
 .then(response => response.json())
 
 .then(data => {
-
+    
 
     console.log(data);
     if (data == 'fail')
         return;
-    clearInterval(timerWaitAnswer)
+    console.log(timerWaitAnswer)
+    clearInterval(timerWaitAnswer);
+    if (timerWaitAnswer == undefined)
+        return;
+    timerWaitAnswer = undefined;
     if (data == "1")
     {
+        
         a1();
         return;
     }

@@ -577,11 +577,13 @@ def get_helps():
             if os.path.exists("helps.json"):
                 user = Users()
                 user = Users.query.filter(Users.username==tmp_u).first()
-                if (user.status == "main"):
+                if (user.status == "main") | (user.status == "wait task main") | (user.status == "given task main"):
                     db.session.commit()
-                with open('helps.json') as file:
-                    jsn = json.load(file)
-                return jsn
+                    with open('helps.json') as file:
+                        jsn = json.load(file)
+                    return jsn
+                else:
+                    return json.dumps("fail")
             else:
                  return json.dumps("fail")   
         except:
@@ -643,6 +645,9 @@ def check_answered_main():
     if request.method == 'POST':
         try:
             u_tmp = request.json['user']
+            s_tmp = request.json['inter']
+            if not s_tmp:
+                return json.dumps("fail")
             user2 = Users.query.filter(Users.status == "answered main").first_or_404()
             user = Users.query.filter(Users.username == u_tmp).first()
             user.status = "interactive no answer"
@@ -684,6 +689,7 @@ def send_answer():
                     for i in range(c_fatals):
                         if int(user.answer)==fatals[i]:
                             user.money = user.money - 50*r
+                            wrong = True
                             break
                 if not wrong:
                     user.money = user.money + 100*r
