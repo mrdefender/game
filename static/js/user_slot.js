@@ -134,12 +134,44 @@ function get_status(){
     }
     if (data == "wait task interactive")
         {
+            document.getElementById("question").value = "";
+            document.getElementById("o1").style.backgroundColor = "#000c11";
+            document.getElementById("o2").style.backgroundColor = "#000c11";
+            document.getElementById("o3").style.backgroundColor = "#000c11";
+            document.getElementById("o4").style.backgroundColor = "#000c11";
+            document.getElementById("o5").style.backgroundColor = "#000c11";
+            document.getElementById("o6").style.backgroundColor = "#000c11";
+            document.getElementById("o7").style.backgroundColor = "#000c11";
+            document.getElementById("o8").style.backgroundColor = "#000c11";
+            document.getElementById("o9").style.backgroundColor = "#000c11";
+            document.getElementById("o10").style.backgroundColor = "#000c11";
+            document.getElementById("o11").style.backgroundColor = "#000c11";
+            document.getElementById("o12").style.backgroundColor = "#000c11";
+            document.getElementById("o13").style.backgroundColor = "#000c11";
+            document.getElementById("o14").style.backgroundColor = "#000c11";
+            document.getElementById("o15").style.backgroundColor = "#000c11";
             get_task();
             //clearInterval(timerToGame);
             
         }
     if (data == "wait task main")
         {
+            document.getElementById("question").value = "";
+            document.getElementById("o1").style.backgroundColor = "#000c11";
+            document.getElementById("o2").style.backgroundColor = "#000c11";
+            document.getElementById("o3").style.backgroundColor = "#000c11";
+            document.getElementById("o4").style.backgroundColor = "#000c11";
+            document.getElementById("o5").style.backgroundColor = "#000c11";
+            document.getElementById("o6").style.backgroundColor = "#000c11";
+            document.getElementById("o7").style.backgroundColor = "#000c11";
+            document.getElementById("o8").style.backgroundColor = "#000c11";
+            document.getElementById("o9").style.backgroundColor = "#000c11";
+            document.getElementById("o10").style.backgroundColor = "#000c11";
+            document.getElementById("o11").style.backgroundColor = "#000c11";
+            document.getElementById("o12").style.backgroundColor = "#000c11";
+            document.getElementById("o13").style.backgroundColor = "#000c11";
+            document.getElementById("o14").style.backgroundColor = "#000c11";
+            document.getElementById("o15").style.backgroundColor = "#000c11";
             get_task();
             //clearInterval(timerToGame);
         }
@@ -153,8 +185,14 @@ function get_status(){
         {
             get_task();
         }
-
-
+    if (data == "check main")
+        {
+            show_right_user();
+        }
+    if (data == "check interactive")
+        {
+            show_right_user();
+        }
 
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
@@ -346,8 +384,12 @@ console.error('Ошибка:', error);
 function check_answered_main(){
     var user_name = document.getElementById("user_name").value;
     var inter = false;
-    if (timeWainAnswerFromMain == undefined)
-        return;
+    clearInterval(timeWainAnswerFromMain);
+    clearInterval(timeWainAnswerFromMain);
+    clearInterval(timeWainAnswerFromMain);
+    clearInterval(timeWainAnswerFromMain);
+    //if (timeWainAnswerFromMain == undefined)
+       // return;
     if (document.getElementById("welcome3").innerHTML=="Интерактивная игра")
         inter = true;
     fetch('/check_answered_main', {
@@ -370,7 +412,9 @@ function check_answered_main(){
     {
         status_btn(true);
         clearInterval(timeWainAnswerFromMain);
-        timeWainAnswerFromMain = undefined;
+        clearInterval(timeWainAnswerFromMain);
+        clearInterval(timeWainAnswerFromMain);
+        //timeWainAnswerFromMain = undefined;
     }
     
 })
@@ -938,3 +982,108 @@ console.error('Ошибка:', error);
 });
 
 }
+
+
+function show_right_user(){
+    var user_name = document.getElementById("user_name").value;
+    fetch('/check_answer', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    if (data[0] == 1)
+    {
+        f = data[1].toString()
+        a = get_o(f)
+        document.getElementById(a).style.backgroundColor = "red";
+        for (var i = 1; i<16;i++)
+        {
+            b = i.toString();
+            bb = get_o(b)
+            if (document.getElementById(bb).style.backgroundColor == 'orange')
+                document.getElementById(bb).style.backgroundColor = 'green';
+            break;
+        }
+    }
+    if (data[0]>1)
+    {
+        f = data[1]
+        for (var i = 0; i<data[3];i++)
+        {
+            var a = get_o(f[i])
+            document.getElementById(a).style.backgroundColor = "red"
+        }
+        for (var i = 1; i<16;i++)
+        {
+            b = i.toString();
+            bb = get_o(b);
+            if (document.getElementById(bb).style.backgroundColor == 'orange')
+                document.getElementById(bb).style.backgroundColor = 'green';
+            break;
+        }
+
+
+    }
+
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+}
+
+
+
+
+
+
+function get_o(answer)
+{
+    if (answer == "1")
+        return "o1";
+    if (answer == "2")
+        return "o2";
+    if (answer == "3")
+        return "o3";
+    if (answer == "4")
+        return "o4";
+    if (answer == "5")
+        return "o5";
+    if (answer == "6")
+        return "o6";
+    if (answer == "7")
+        return "o7";
+    if (answer == "8")
+        return "o8";
+    if (answer == "9")
+        return "o9";
+    if (answer == "10")
+        return "o10";
+    if (answer == "11")
+        return "o11";
+    if (answer == "12")
+        return "o12";
+    if (answer == "13")
+        return "o13";
+    if (answer == "14")
+        return "o14";
+    if (answer == "15")
+        return "o15";
+    
+}
+

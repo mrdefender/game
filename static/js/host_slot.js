@@ -1873,6 +1873,27 @@ function next_round()
     status_btn(true,"o");
     document.getElementById("alter").style.backgroundColor = "#1a1b02";
     document.getElementById("x2").style.backgroundColor =  "#1a1b02";
+    fetch('/next_round', {
+        method: 'POST',
+        body: JSON.stringify({ round:document.getElementById("status-round").value}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == 'fail')
+        return;
+
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
     
 
 }
@@ -2445,6 +2466,8 @@ function update_list_user()
     cell6.innerHTML = data[i][5];
     if (data[i][5]=="answered interactive")
         interactive_col++;
+    console.log(interactive_col);
+    document.getElementById("count_interactive").value = interactive_col.toString();
     tr.appendChild(cell1);
     tr.appendChild(cell2);
     tr.appendChild(cell3);
@@ -2453,7 +2476,7 @@ function update_list_user()
     tr.appendChild(cell6);
     table.appendChild(tr);
     }
-    document.getElementById("count_interactive").innerHTML = interactive_col.toString();
+    
 
 })
 .catch(error => {
@@ -2481,9 +2504,14 @@ function wait_answer(){
         return;
     console.log(timerWaitAnswer)
     clearInterval(timerWaitAnswer);
-    if (timerWaitAnswer == undefined)
-        return;
-    timerWaitAnswer = undefined;
+    clearInterval(timerWaitAnswer);
+    clearInterval(timerWaitAnswer);
+    clearInterval(timerWaitAnswer);
+    clearInterval(timerWaitAnswer);
+    clearInterval(timerWaitAnswer);
+   // if (timerWaitAnswer == undefined)
+     //   return;
+   // timerWaitAnswer = undefined;
     if (data == "1")
     {
         

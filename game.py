@@ -461,13 +461,30 @@ def check_answered():
 @app.route('/show_rights', methods=["POST", "GET"])
 def show_rights():
     if request.method == 'POST':
+        js = Users.query.all()
+        if len(js)==1:
+            js.status = "check main"
+        else:
+            jjj = Users.query.all()
+            for i in range(0,len(jjj)):
+                if jjj[i].status == "answered interactive":
+                    jjj[i].status = "check interactive"
+                if jjj[i].status == "answered main":
+                    jjj[i].status = "check main"
+                if jjj[i].status == "interactive no answer":
+                    jjj[i].status = "check interactive"
+            db.session.commit()                                       
         r = request.json["round"]
         if os.path.exists("answered.json"):
             with open('answered.json') as file:
                 jsn = json.load(file)
             os.remove("answered.json")
+            
             return jsn
-         
+           ## answered interactive
+            
+            
+                
 
     
  
@@ -711,6 +728,46 @@ def wait_answer_for_host():
             if res == '0':
                 return json.dumps("fail")
             return json.dumps(res)
+        except:
+            return json.dumps("fail")
+
+@app.route('/check_answer', methods=["POST", "GET"])
+def check_answer():
+    if request.method == 'POST':
+        try:
+            tmp_u = request.json['user']
+            user = Users.query.filter(Users.username == tmp_u).first()
+            if user.status == "check main":
+                user.status = "wait next round main"
+            if user.status == "check interactive":
+                user.status = "wait next round interactive"
+            with open('task.json') as file:
+                    jsn = json.load(file)
+            db.session.commit()
+            return json.dumps(jsn)
+        except:
+            return json.dumps("fail")
+
+
+@app.route('/next_round', methods=["POST", "GET"])
+def next_round():
+    if request.method == 'POST':
+        try:
+            user = Users.query.all()
+            if len(user)==1:
+                user.status = "wait task main"
+            else:
+                for i in range(len(user)):
+                    if user[i].status == "wait next round main":
+                        user[i].status = "wait task main"
+                        user[i].answer = "0"
+                    if user[i].status == "wait next round interactive":
+                        user[i].status = "wait task interactive"
+                        user[i].answer = "0"
+            if os.path.exists('task.json'):
+                os.remove('task.json')
+            db.session.commit()
+            return json.dumps("ok")
         except:
             return json.dumps("fail")
 
