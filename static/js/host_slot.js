@@ -130,7 +130,7 @@ function cancel_all(){
     document.getElementById("alter").style.backgroundColor = "#000c11";
     document.getElementById("x2").style.backgroundColor = "#000c11";
     document.getElementById("help_auden").style.backgroundColor = "#000c11";
-     document.getElementById("navi").style.backgroundColor = "#000c11";
+    document.getElementById("navi").style.backgroundColor = "#000c11";
    ch1();
    ch2();
    ch3();
@@ -1786,7 +1786,7 @@ function show_right(){
     }   
 
     document.getElementById("show-right").disabled = true;
-   // ch3();
+    ch3();
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 
@@ -2013,6 +2013,7 @@ function h50_50(){
     }
     document.getElementById('p50_50').checked = false;
     audio_rave_50_50.play();
+    document.getElementById("h50_50").style.backgroundColor = "#000c11";
 
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
@@ -2073,11 +2074,13 @@ console.error('Ошибка:', error);
 function navi(){
     if(document.getElementById("x2").style.backgroundColor == "orange")
         return;
+    
     if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
         return;
     if (document.getElementById("alter").style.backgroundColor == "orange")
         return;
     document.getElementById("pnavi").checked = false;
+    document.getElementById("navi").style.backgroundColor = "#000c11";
 
     fetch('/navi', {
         method: 'POST',
@@ -2096,8 +2099,8 @@ function navi(){
     document.getElementById(get_btn(data[i])).style.backgroundColor = "#d905ec";
     document.getElementById(get_o(data[i])).style.backgroundColor = "#d905ec";
     }
-   
 
+    document.getElementById("navi").style.backgroundColor = "#000c11";
 
 
 
@@ -2466,6 +2469,22 @@ function update_list_user()
     cell6.innerHTML = data[i][5];
     if (data[i][5]=="answered interactive")
         interactive_col++;
+    if (data[i][5]=="50:50")
+    {
+        document.getElementById("h50_50").style.backgroundColor = "blue";
+    }
+    if (data[i][5]=="alter")
+    {
+        document.getElementById("alter").style.backgroundColor = "blue";
+    }
+    if (data[i][5]=="navi")
+    {
+        document.getElementById("navi").style.backgroundColor = "blue";
+    }
+       if (data[i][5]=="x2")
+    {
+        document.getElementById("x2").style.backgroundColor = "orange";
+    }
     console.log(interactive_col);
     document.getElementById("count_interactive").value = interactive_col.toString();
     tr.appendChild(cell1);
@@ -2509,9 +2528,13 @@ function wait_answer(){
     clearInterval(timerWaitAnswer);
     clearInterval(timerWaitAnswer);
     clearInterval(timerWaitAnswer);
-   // if (timerWaitAnswer == undefined)
-     //   return;
-   // timerWaitAnswer = undefined;
+    clearInterval(timerWaitAnswer);
+    clearInterval(timerWaitAnswer);
+    clearInterval(timerWaitAnswer);
+    clearInterval(timerWaitAnswer);
+   if (timerWaitAnswer == undefined)
+        return;
+    timerWaitAnswer = undefined;
     if (data == "1")
     {
         

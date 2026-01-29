@@ -32,6 +32,7 @@ function get_status(){
             document.getElementById('welcome3').innerHTML = "Ожидайте дальнейших указаний!";
             document.getElementById("question").hidden = true;
             document.getElementById("question").value = "";
+            document.getElementById("ex2").value ="0"
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
             document.getElementById("o3").hidden = true;
@@ -74,6 +75,11 @@ function get_status(){
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
             clearInterval(timerHelps);
+            clearInterval(timeWainAnswerFromMain);
+            clearInterval(timeWainAnswerFromMain);
+            clearInterval(timeWainAnswerFromMain);
+            clearInterval(timeWainAnswerFromMain);
+            clearInterval(timeWainAnswerFromMain);clearInterval(timeWainAnswerFromMain);
     }
     if (data == "interactive")
         {
@@ -189,6 +195,10 @@ function get_status(){
         {
             show_right_user();
         }
+    if (data == "check main x2")
+        {
+            show_right_user();
+        }
     if (data == "check interactive")
         {
             show_right_user();
@@ -228,6 +238,17 @@ function get_helps(){
        return;
     
     }
+
+    if ((document.getElementById("ex2").value == "alter") || (document.getElementById("ex2").value == "x2"))
+    {
+    document.getElementById("p50_50").disabled = true;
+    document.getElementById("palter").disabled = true;
+    document.getElementById("pnavi").disabled = true;
+    document.getElementById("px2").disabled = true;
+    document.getElementById("pauden").disabled = true;
+    return;
+    }
+
     document.getElementById("p50_50").hidden = true;
     document.getElementById("palter").hidden = true;
     document.getElementById("pnavi").hidden = true;
@@ -279,6 +300,8 @@ function get_task(){
     {
         return;
     }
+    if (document.getElementById("ex2").value !="0")
+        return;
     document.getElementById("time-start").value = Date.now().toString();
     document.getElementById('question').innerText = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
     document.getElementById("o1").disabled = false;
@@ -385,11 +408,8 @@ function check_answered_main(){
     var user_name = document.getElementById("user_name").value;
     var inter = false;
     clearInterval(timeWainAnswerFromMain);
-    clearInterval(timeWainAnswerFromMain);
-    clearInterval(timeWainAnswerFromMain);
-    clearInterval(timeWainAnswerFromMain);
-    //if (timeWainAnswerFromMain == undefined)
-       // return;
+    if (timeWainAnswerFromMain == undefined)
+        return;
     if (document.getElementById("welcome3").innerHTML=="Интерактивная игра")
         inter = true;
     fetch('/check_answered_main', {
@@ -412,9 +432,9 @@ function check_answered_main(){
     {
         status_btn(true);
         clearInterval(timeWainAnswerFromMain);
-        clearInterval(timeWainAnswerFromMain);
-        clearInterval(timeWainAnswerFromMain);
-        //timeWainAnswerFromMain = undefined;
+        timeWainAnswerFromMain = undefined;
+        console.log(timeWainAnswerFromMain)
+       // timeWainAnswerFromMain = undefined;
     }
     
 })
@@ -985,10 +1005,11 @@ console.error('Ошибка:', error);
 
 
 function show_right_user(){
+    
     var user_name = document.getElementById("user_name").value;
     fetch('/check_answer', {
         method: 'POST',
-        body: JSON.stringify({ user:user_name}),
+        body: JSON.stringify({ user:user_name, double: "0"}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -1012,12 +1033,21 @@ function show_right_user(){
             b = i.toString();
             bb = get_o(b)
             if (document.getElementById(bb).style.backgroundColor == 'orange')
+            {
                 document.getElementById(bb).style.backgroundColor = 'green';
             break;
+            }
         }
     }
     if (data[0]>1)
     {
+        if (document.getElementById("ex2").value == "x2")
+        {
+            document.getElementById("ex2").value ="0";
+                   
+        return;
+        }
+
         f = data[1]
         for (var i = 0; i<data[3];i++)
         {
@@ -1029,11 +1059,13 @@ function show_right_user(){
             b = i.toString();
             bb = get_o(b);
             if (document.getElementById(bb).style.backgroundColor == 'orange')
+            {
                 document.getElementById(bb).style.backgroundColor = 'green';
             break;
+            }
         }
-
-
+        
+        document.getElementById("ex2").value ="0"
     }
 
 
@@ -1087,3 +1119,151 @@ function get_o(answer)
     
 }
 
+
+function p50_50(){
+
+     var user_name = document.getElementById("user_name").value;
+     document.getElementById("p50_50").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "50:50"
+    fetch('/get_50_50', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    for (var i=0;i<data.length;i++)
+    {
+        ff = data[i].toString();
+        document.getElementById(get_o(ff)).disabled = true;
+    }
+   
+
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+
+function palter(){
+     var user_name = document.getElementById("user_name").value;
+     document.getElementById("palter").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "alter"
+    fetch('/get_alter', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    status_btn(true);
+    
+    b1 = data[0].toString();
+    b2 = data[1].toString();
+
+    document.getElementById(get_o(b1)).disabled = false;
+    document.getElementById(get_o(b2)).disabled = false;
+
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+
+function pnavi(){
+    var user_name = document.getElementById("user_name").value;
+     document.getElementById("pnavi").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "navi"
+    fetch('/get_navi', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    
+    for (var i = 0;i<data.length;i++)
+    {
+        n = data[i];
+        document.getElementById(get_o(n)).style.backgroundColor = "#d905ec"
+    }
+    
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+function px2(){
+
+    var user_name = document.getElementById("user_name").value;
+     document.getElementById("px2").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "nx2"
+    fetch('/get_x2', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+}
+
+function pauden(){
+
+}

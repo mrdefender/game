@@ -272,6 +272,8 @@ def h50_50():
         res_f = []
         for i in range(cf):
             res_f.append(f[i])
+        with open('50_50.json', 'w') as file:
+            json.dump(res_f, file)
         return res_f
 
 @app.route('/alter', methods=["POST", "GET"])
@@ -297,7 +299,8 @@ def alter():
                     break
         
         res = [f[rf],str(j)]
-        
+        with open('alter.json', 'w') as file:
+            json.dump(res, file)
         return res
     
 @app.route('/navi', methods=["POST", "GET"])
@@ -400,6 +403,8 @@ def navi():
                 res = ["4","9","14"]
             if tmp==4:
                 res = ["5","10","15"]
+            with open('navi.json','w') as file:
+                json.dump(res,file)
             return res
         if max_c < max_r:
             tmp = -1
@@ -413,6 +418,8 @@ def navi():
                 res = ["6","7","8","9","10"]
             if tmp==2:
                 res = ["11","12","13","14","15"]
+            with open('navi.json','w') as file:
+                json.dump(res,file)
             return res
         if max_r == max_c:
             j = random.randint(1,2)
@@ -432,6 +439,8 @@ def navi():
                     res = ["4","9","14"]
                 if tmp==4:
                     res = ["5","10","15"]
+                with open('navi.json','w') as file:
+                    json.dump(res,file)
                 return res
             if j==2:
                 tmp = -1
@@ -445,6 +454,8 @@ def navi():
                     res = ["6","7","8","9","10"]
                 if tmp==2:
                     res = ["11","12","13","14","15"]
+                with open('navi.json','w') as file:
+                    json.dump(res,file)
                 return res
 
 
@@ -471,6 +482,8 @@ def show_rights():
                     jjj[i].status = "check interactive"
                 if jjj[i].status == "answered main":
                     jjj[i].status = "check main"
+                if jjj[i].status ==  "answered main x2":
+                    jjj[i].status = "check main x2"
                 if jjj[i].status == "interactive no answer":
                     jjj[i].status = "check interactive"
             db.session.commit()                                       
@@ -665,7 +678,7 @@ def check_answered_main():
             s_tmp = request.json['inter']
             if not s_tmp:
                 return json.dumps("fail")
-            user2 = Users.query.filter(Users.status == "answered main").first_or_404()
+            user2 = Users.query.filter((Users.status == "answered main")|(Users.status == "answered main x2")).first_or_404()
             user = Users.query.filter(Users.username == u_tmp).first()
             user.status = "interactive no answer"
             db.session.commit()
@@ -682,8 +695,14 @@ def send_answer():
             a_tnp = request.json['answer_user']
             t_tmp = request.json['time_answer']
             user = Users.query.filter(Users.username == u_tmp).first()
-            if (user.status == "given task main"):
+            if (user.status == "given task main") | (user.status == "check main x2") :
                 user.status = "answered main"
+                user.answer = a_tnp
+                user.time = t_tmp
+                db.session.commit()
+                return json.dumps("ok")
+            if (user.status == "x2"):
+                user.status = "answered main x2"
                 user.answer = a_tnp
                 user.time = t_tmp
                 db.session.commit()
@@ -721,7 +740,7 @@ def send_answer():
 def wait_answer_for_host():
     if request.method == 'POST':
         try:
-            user = Users.query.filter(Users.status == "answered main").first()
+            user = Users.query.filter((Users.status == "answered main")|(Users.status == "answered main x2")).first()
             if user == None:
                 return json.dumps("fail")
             res = user.answer
@@ -758,10 +777,10 @@ def next_round():
                 user.status = "wait task main"
             else:
                 for i in range(len(user)):
-                    if user[i].status == "wait next round main":
+                    if (user[i].status == "wait next round main") | (user[i].status == "check main x2"):
                         user[i].status = "wait task main"
                         user[i].answer = "0"
-                    if user[i].status == "wait next round interactive":
+                    if (user[i].status == "wait next round interactive") | (user[i].status == "interactive no answer"):
                         user[i].status = "wait task interactive"
                         user[i].answer = "0"
             if os.path.exists('task.json'):
@@ -771,7 +790,86 @@ def next_round():
         except:
             return json.dumps("fail")
 
-  
+
+@app.route('/get_50_50', methods=["POST", "GET"])
+def get_50_50():
+    if request.method == 'POST':
+        try:
+            tmp_u = request.json['user']
+            user = Users.query.filter(Users.username==tmp_u).first()
+            find = False
+            user.status = "50:50"
+            db.session.commit()
+            while not find:
+                if os.path.exists("50_50.json"):
+                    with open('50_50.json') as file:
+                        p = json.load(file)
+                        find = True
+                        user.status = "given task main"
+            db.session.commit()
+            os.remove("50_50.json")
+            return json.dumps(p)
+        except:
+            return json.dumps("fail")
+
+@app.route('/get_alter', methods=["POST", "GET"])
+def get_alter():
+    if request.method == 'POST':
+        try:
+            tmp_u = request.json['user']
+            user = Users.query.filter(Users.username==tmp_u).first()
+            find = False
+            user.status = "alter"
+            db.session.commit()
+            while not find:
+                if os.path.exists("alter.json"):
+                    with open('alter.json') as file:
+                        p = json.load(file)
+                        find = True
+                        user.status = "given task main"
+            db.session.commit()
+            os.remove("alter.json")
+            return json.dumps(p)
+        except:
+            return json.dumps("fail")
+
+
+
+@app.route('/get_navi', methods=["POST", "GET"])
+def get_navi():
+    if request.method == 'POST':
+        try:
+            tmp_u = request.json['user']
+            user = Users.query.filter(Users.username==tmp_u).first()
+            find = False
+            user.status = "navi"
+            db.session.commit()
+            while not find:
+                if os.path.exists("navi.json"):
+                    with open('navi.json') as file:
+                        p = json.load(file)
+                        find = True
+                        user.status = "given task main"
+            db.session.commit()
+            os.remove("navi.json")
+            return json.dumps(p)
+        except:
+            return json.dumps("fail")
+
+
+@app.route('/get_x2', methods=["POST", "GET"])
+def get_x2():
+    if request.method == 'POST':
+        try:
+            tmp_u = request.json['user']
+            user = Users.query.filter(Users.username==tmp_u).first()
+            user.status = "x2"
+            db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+
+
 
 if __name__ == "__main__":
     _users = ['test']
