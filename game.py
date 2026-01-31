@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 from flask import Flask, Response, abort, jsonify, logging, redirect, render_template, request, send_file, send_from_directory, session, url_for, flash, redirect
 import random
 import hashlib
@@ -45,6 +45,14 @@ class Users(db.Model, UserMixin):
     def __repr__(self):
         return '<Users %r>' %self.id
 
+class Facts(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    slot = db.Column(db.Text, nullable=False)
+    des_fact = db.Column(db.Text)
+    def __repr__(self):
+        return '<Facts %r>' %self.id
+
+
 
 def init_game():
     if os.path.exists("answered.json"):
@@ -59,6 +67,10 @@ def init_game():
         os.remove("alter.json")
     if os.path.exists("navi.json"):
         os.remove("navi.json") 
+    if os.path.exists("auden.json"):
+        os.remove("auden.json") 
+    if os.path.exists("fact.json"):
+        os.remove("fact.json") 
 
 
 @app.route('/')
@@ -724,11 +736,11 @@ def send_answer():
                 if r>1:
                     for i in range(c_fatals):
                         if int(user.answer)==fatals[i]:
-                            user.money = user.money - 50*r
+                            user.money = user.money - 50*c_fatals
                             wrong = True
                             break
                 if not wrong:
-                    user.money = user.money + 100*r
+                    user.money = user.money + 100*c_fatals
             db.session.commit()
             return json.dumps("ok")
         except:
@@ -869,6 +881,165 @@ def get_x2():
         except:
             return json.dumps("fail")
 
+
+@app.route('/help_auden', methods=["POST", "GET"])
+def help_auden():
+    if request.method == 'POST':
+        try:
+            tmp_u = Users.query.all()
+            a1 = 0
+            a2 = 0
+            a3 = 0
+            a4 = 0
+            a5 = 0
+            a6 = 0
+            a7 = 0
+            a8 = 0
+            a9 = 0
+            a10 = 0
+            a11 = 0
+            a12 = 0
+            a13 = 0
+            a14 = 0
+            a15 = 0
+            result = []
+            for i in range (len(tmp_u)):
+                if tmp_u[i].status == "answered interactive":
+                    if tmp_u[i].answer == "1":
+                        a1 += 1
+                    if tmp_u[i].answer == "2":
+                        a2 += 1
+                    if tmp_u[i].answer == "3":
+                        a3 += 1
+                    if tmp_u[i].answer == "4":
+                        a4 += 1
+                    if tmp_u[i].answer == "5":
+                        a5 += 1
+                    if tmp_u[i].answer == "6":
+                        a6 += 1
+                    if tmp_u[i].answer == "7":
+                        a7 += 1
+                    if tmp_u[i].answer == "8":
+                        a8 += 1
+                    if tmp_u[i].answer == "9":
+                        a9 += 1
+                    if tmp_u[i].answer == "10":
+                        a10 += 1
+                    if tmp_u[i].answer == "11":
+                        a11 += 1
+                    if tmp_u[i].answer == "12":
+                        a12 += 1
+                    if tmp_u[i].answer == "13":
+                        a13 += 1
+                    if tmp_u[i].answer == "14":
+                        a14 += 1
+                    if tmp_u[i].answer == "15":
+                        a15 += 1
+            col_find_fatal = 0
+            col_find_free = 0
+            col_ans = Users.query.filter(Users.status == "answered interactive").count()
+            result.append(round(a1/col_ans*100,2))
+            result.append(round(a2/col_ans*100,2))
+            result.append(round(a3/col_ans*100,2))
+            result.append(round(a4/col_ans*100,2))
+            result.append(round(a5/col_ans*100,2))
+            result.append(round(a6/col_ans*100,2))
+            result.append(round(a7/col_ans*100,2))
+            result.append(round(a8/col_ans*100,2))
+            result.append(round(a9/col_ans*100,2))
+            result.append(round(a10/col_ans*100,2))
+            result.append(round(a11/col_ans*100,2))
+            result.append(round(a12/col_ans*100,2))
+            result.append(round(a13/col_ans*100,2))
+            result.append(round(a14/col_ans*100,2))
+            result.append(round(a15/col_ans*100,2))
+            with open('task.json') as file:
+                jsn = json.load(file)
+            fatals = jsn[1]
+            fatals.sort()
+            for i in range(jsn[3]):
+                for j in range(len(result)):
+                    if ((j+1)==fatals[i]) & (result[j]>0):
+                        col_find_fatal+=1
+                        break
+            
+            result.append(round(col_find_fatal/col_ans*100))
+            result.append(100-round(col_find_fatal/col_ans*100))   
+            with open('auden.json','w') as file:
+                json.dump(result,file)
+           # time.sleep(10)
+            if os.path.exists("auden.json"):
+                os.remove("auden.json")        
+            return json.dumps(result)
+        except:
+            return json.dumps("fail")
+
+@app.route('/get_auden', methods=["POST", "GET"])
+def get_auden():
+    if request.method == 'POST':
+        try:
+            uu = request.json['user']
+            user = Users.query.filter(Users.username==uu).first()
+            user.status = "auden"
+            db.session.commit()
+            while (True):
+                if os.path.exists("auden.json"):
+                    break
+            user.status = "given task main"
+            db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+
+@app.route('/fact', methods=["POST", "GET"])
+def fact():
+    if request.method == 'POST':
+        try:
+            random.seed(secrets.randbelow(99999))
+            slot = random.randint(1,15)
+            with open('task.json') as file:
+                    jsn = json.load(file)
+            fat = jsn[1]
+            find = False
+            
+            while not find:
+                find = True
+                for i in range(jsn[3]):
+                    if fat[i]==slot:
+                        random.seed(secrets.randbelow(99999))
+                        slot = random.randint(1,15)
+                        find = False
+                        break
+            facts = Facts.query.filter(Facts.slot==str(slot)).first()
+            result = []
+            result.append(facts.slot)
+            result.append(facts.des_fact)
+            with open('fact.json','w') as file:
+                json.dump(result,file)
+           # time.sleep(10)
+            if os.path.exists("fact.json"):
+                os.remove("fact.json")   
+            return json.dumps(result)
+        except:
+            return json.dumps("fail")
+
+
+@app.route('/get_fact', methods=["POST", "GET"])
+def get_fact():
+    if request.method == 'POST':
+        try:
+            uu = request.json['user']
+            user = Users.query.filter(Users.username==uu).first()
+            user.status = "fact"
+            db.session.commit()
+            while (True):
+                if os.path.exists("fact.json"):
+                    break
+            user.status = "given task main"
+            db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
 
 
 if __name__ == "__main__":

@@ -58,7 +58,10 @@ function get_status(){
             document.getElementById("pnavi").hidden = true;
             document.getElementById("px2").hidden = true;
             document.getElementById("pauden").hidden = true;
+             document.getElementById("pfact").hidden = true;
+              document.getElementById("pfact").disabled = true;
             document.getElementById("question").value = "";
+            document.getElementById("ans").value = "";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -83,6 +86,7 @@ function get_status(){
     }
     if (data == "interactive")
         {
+            document.getElementById("ans").value = "";
             document.getElementById('welcome').innerHTML = "";
             document.getElementById('welcome2').innerHTML = "";
             document.getElementById('welcome3').innerHTML = "Интерактивная игра";
@@ -110,6 +114,7 @@ function get_status(){
         }
     if (data== "main")
         {
+            document.getElementById("ans").value = "";
             document.getElementById('welcome').innerHTML = " ";
             document.getElementById('welcome2').innerHTML = " ";
             document.getElementById('welcome3').innerHTML = "Основная игра";
@@ -140,6 +145,7 @@ function get_status(){
     }
     if (data == "wait task interactive")
         {
+            document.getElementById("ans").value = "";
             document.getElementById("question").value = "";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
@@ -156,12 +162,14 @@ function get_status(){
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
+            document.getElementById("question").value = "";
             get_task();
             //clearInterval(timerToGame);
             
         }
     if (data == "wait task main")
         {
+            document.getElementById("ans").value = "";
             document.getElementById("question").value = "";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
@@ -178,6 +186,7 @@ function get_status(){
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
+            document.getElementById("question").value = "";
             get_task();
             //clearInterval(timerToGame);
         }
@@ -235,6 +244,7 @@ function get_helps(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
        return;
     
     }
@@ -246,6 +256,7 @@ function get_helps(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     return;
     }
 
@@ -254,6 +265,7 @@ function get_helps(){
     document.getElementById("pnavi").hidden = true;
     document.getElementById("px2").hidden = true;
     document.getElementById("pauden").hidden = true;
+     document.getElementById("pfact").hidden = true;
 
     for (var i = 0; i<data.length;i++)
     {
@@ -267,12 +279,16 @@ function get_helps(){
             document.getElementById("px2").hidden = false;
         if (data[i]=="help_auden")
             document.getElementById("pauden").hidden = false;
+        if (data[i]=="fact")
+            document.getElementById("pfact").hidden = false;
     }
     document.getElementById("p50_50").style.backgroundColor = "#000c11";
     document.getElementById("palter").style.backgroundColor = "#000c11"
     document.getElementById("pnavi").style.backgroundColor = "#000c11"
     document.getElementById("px2").style.backgroundColor = "#000c11"
     document.getElementById("pauden").style.backgroundColor = "#000c11"
+    document.getElementById("pfact").style.backgroundColor = "#000c11"
+    
 
 
 })
@@ -334,6 +350,8 @@ function get_task(){
             document.getElementById("pauden").disabled = true;
         if (document.getElementById("p50_50").hidden == false)
             document.getElementById("p50_50").disabled = true;
+        if (document.getElementById("pfact").hidden == false)
+            document.getElementById("pfact").disabled = true;
     }
     if (data[0]>3)
     {
@@ -347,8 +365,8 @@ function get_task(){
             document.getElementById("px2").disabled = false;
         if (document.getElementById("pauden").hidden == false)
             document.getElementById("pauden").disabled = false;
-        if (document.getElementById("p50_50").hidden == false)
-            document.getElementById("p50_50").disabled = false;
+        if (document.getElementById("pfact").hidden == false)
+            document.getElementById("pfact").disabled = false;
         
 
     }
@@ -390,6 +408,12 @@ function get_task(){
         return
     if (document.getElementById("pnavi").style.backgroundColor == "orange")
         return
+    if (document.getElementById("pfact").style.backgroundColor == "orange")
+        return
+    if (document.getElementById("pauden").style.backgroundColor == "orange")
+        return
+
+     
 
     status_btn (false);
     document.getElementById("count_fatal").value = data[3].toString();
@@ -480,7 +504,10 @@ function status_btn(it_disable)
 }
 
 function a1(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
     var user_name = document.getElementById("user_name").value;
+    document.getElementById("ans").value = "o1";
     document.getElementById("o1").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
@@ -504,6 +531,7 @@ function a1(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -515,6 +543,9 @@ console.error('Ошибка:', error);
 }
 
 function a2(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o2";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o2").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -539,6 +570,7 @@ function a2(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -550,6 +582,9 @@ console.error('Ошибка:', error);
 }
 
 function a3(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o3";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o3").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -574,6 +609,7 @@ function a3(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -585,6 +621,9 @@ console.error('Ошибка:', error);
 }
 
 function a4(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o4";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o4").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -609,6 +648,7 @@ function a4(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -620,6 +660,9 @@ console.error('Ошибка:', error);
 }
 
 function a5(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o5";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o5").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -644,6 +687,7 @@ function a5(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -655,6 +699,9 @@ console.error('Ошибка:', error);
 }
 
 function a6(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o6";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o6").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -679,6 +726,7 @@ function a6(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -690,6 +738,9 @@ console.error('Ошибка:', error);
 }
 
 function a7(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o7";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o7").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -714,6 +765,7 @@ function a7(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -725,6 +777,9 @@ console.error('Ошибка:', error);
 }
 
 function a8(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o8";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o8").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -749,6 +804,7 @@ function a8(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -759,6 +815,9 @@ console.error('Ошибка:', error);
 
 }
 function a9(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o9";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o9").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -783,6 +842,7 @@ function a9(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -794,6 +854,9 @@ console.error('Ошибка:', error);
 }
 
 function a10(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o10";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o10").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -818,6 +881,7 @@ function a10(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -829,6 +893,9 @@ console.error('Ошибка:', error);
 }
 
 function a11(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o11";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o11").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -853,6 +920,7 @@ function a11(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -864,6 +932,9 @@ console.error('Ошибка:', error);
 }
 
 function a12(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o12";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o12").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -888,6 +959,7 @@ function a12(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -899,6 +971,9 @@ console.error('Ошибка:', error);
 }
 
 function a13(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o13";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o13").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -923,6 +998,7 @@ function a13(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+     document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -934,6 +1010,9 @@ console.error('Ошибка:', error);
 }
 
 function a14(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o14";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o14").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -958,6 +1037,7 @@ function a14(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+    document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -969,6 +1049,9 @@ console.error('Ошибка:', error);
 }
 
 function a15(){
+    if (document.getElementById("ex2").value == "x2-2")
+        document.getElementById("ex2").value = ""
+    document.getElementById("ans").value = "o15";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o15").style.backgroundColor = "orange";
     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
@@ -993,6 +1076,7 @@ function a15(){
     document.getElementById("pnavi").disabled = true;
     document.getElementById("px2").disabled = true;
     document.getElementById("pauden").disabled = true;
+    document.getElementById("pfact").disabled = true;
     status_btn(true);
     clearInterval(timeWainAnswerFromMain);
 })
@@ -1041,11 +1125,37 @@ function show_right_user(){
     }
     if (data[0]>1)
     {
+        if (document.getElementById("ex2").value == "x2-2")
+            return;
+
+
         if (document.getElementById("ex2").value == "x2")
         {
-            document.getElementById("ex2").value ="0";
-                   
-        return;
+            document.getElementById("ex2").value ="x2-2";
+            if (data[0]<4)
+                return;
+            ff = data[1];
+            c_ff = data[3];
+            ans_u = document.getElementById("ans").value;
+            for (var i = 0; i<c_ff;i++)
+            {
+                if (document.getElementById("ans").value == get_o(ff[i].toString()))
+                {
+                    document.getElementById(get_o(ff[i].toString())).style.backgroundColor = "red";
+                    break;
+                }
+
+            }
+            
+            if (document.getElementById(ans_u).style.backgroundColor == "red")
+            {
+                for (var i =1; i<16;i++)
+                {
+                    if (get_o(i.toString())!=ans_u)
+                    document.getElementById(get_o(i.toString())).disabled = false;
+                }
+                return;
+            }
         }
 
         f = data[1]
@@ -1236,7 +1346,7 @@ function px2(){
 
     var user_name = document.getElementById("user_name").value;
      document.getElementById("px2").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "nx2"
+     document.getElementById("ex2").value = "x2"
     fetch('/get_x2', {
         method: 'POST',
         body: JSON.stringify({ user:user_name}),
@@ -1265,5 +1375,30 @@ console.error('Ошибка:', error);
 }
 
 function pauden(){
+    document.getElementById("pauden").style.backgroundColor = "orange";
+    var user_name = document.getElementById("user_name").value;
+     fetch('/get_auden', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
 
 }

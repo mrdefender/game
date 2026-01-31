@@ -73,6 +73,7 @@ var audio_navigator= new Audio(audioUrl+"navigator.ogg");
 var audio_out_player= new Audio(audioUrl+"out_player.ogg");
 var audio_pre_final= new Audio(audioUrl+"pre-final.ogg");
 var audio_final= new Audio(audioUrl+"final.ogg");
+var audio_help_auden= new Audio(audioUrl+"help_auden.ogg");
 var timerWaitAnswer;
 var timerHelps;
 
@@ -671,6 +672,8 @@ document.getElementById("h50_50").disabled = false;
 document.getElementById("alter").disabled = false;
 document.getElementById("navi").disabled = false;
 document.getElementById("x2").disabled = false;
+document.getElementById("help_auden").disabled = false;
+document.getElementById("fact").disabled = false;
 stop_sounds();
 audio_fix_script.play();
 var helps = [];
@@ -684,6 +687,8 @@ var helps = [];
         helps.push("x2");
     if (document.getElementById("phelp_auden").checked)
         helps.push("help_auden");
+    if (document.getElementById("pfact").checked)
+        helps.push("fact");
     send_helps(helps);
     timerHelps = setInterval(() => update_helps(), 5000);
 
@@ -702,6 +707,9 @@ var helps = [];
         helps.push("x2");
     if (document.getElementById("phelp_auden").checked)
         helps.push("help_auden");
+    if (document.getElementById("pfact").checked)
+        helps.push("fact");
+    
     send_helps(helps);
 }
 
@@ -1552,6 +1560,7 @@ function show_right(){
         {
             document.getElementById(data[0]).style.backgroundColor ="red"
             document.getElementById("x2").style.backgroundColor =  "#1a1b02";
+            timerWaitAnswer = setInterval(() => wait_answer(), 5000);
             return;
         }
 
@@ -2131,6 +2140,97 @@ function x2(){
 }
 
 
+function help_auden(){
+     if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
+        return;
+    if (document.getElementById("alter").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("x2").style.backgroundColor == "orange")
+        return;
+
+    if (document.getElementById("count_interactive").value==0)
+        return;
+    
+    fetch('/help_auden', {
+        method: 'POST',
+        body: JSON.stringify({" ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fatal")
+        return;
+    document.getElementById("phelp_auden").checked = false;
+    stop_sounds();
+    audio_help_auden.play();
+    document.getElementById("au").value = ""
+    for (var i = 0; i<15;i++)
+    {
+        document.getElementById("au").value = document.getElementById("au").value+" " + (i+1).toString()+" - "+data[i] +"%"+ ";";
+    }
+    document.getElementById("au").value = document.getElementById("au").value + " Фатал- "+ data[15] +"%" + " " + " Cвободный слот - "+data[16]+ "%";
+    document.getElementById("help_auden").style.backgroundColor = "#000c11";
+
+   
+
+   
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+
+function fact(){
+     if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
+        return;
+    if (document.getElementById("alter").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("x2").style.backgroundColor == "orange")
+        return;
+
+    if (document.getElementById("count_interactive").value==0)
+        return;
+    
+    fetch('/fact', {
+        method: 'POST',
+        body: JSON.stringify({" ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fatal")
+        return;
+    document.getElementById("fact").checked = false;
+    stop_sounds();
+    audio_help_auden.play();
+    document.getElementById("au").value = ""
+    document.getElementById("au").value = document.getElementById("au").value + data[0]+": "+ data[1];
+    document.getElementById("fact").style.backgroundColor = "#000c11";
+
+   
+
+   
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+
+
+
+
 function o_to_btn(o)
 {
     if (o == "o1")
@@ -2199,6 +2299,7 @@ function open_room(){
 .catch(error => {
 console.error('Ошибка:', error);
 });
+}
 
 function close_room(){
 
@@ -2240,7 +2341,7 @@ console.error('Ошибка:', error);
 
 
 
-}
+
 function stop_sounds()
 {
     //start_sounds_for_questions()
@@ -2348,6 +2449,9 @@ function stop_sounds()
     audio_pre_final.pause();
     audio_final.currentTime = 0;
     audio_final.pause();
+    audio_help_auden.currentTime = 0;
+    audio_help_auden.pause();
+
     //console.log(currentUrl);
 }
 
@@ -2484,6 +2588,14 @@ function update_list_user()
        if (data[i][5]=="x2")
     {
         document.getElementById("x2").style.backgroundColor = "orange";
+    }
+       if (data[i][5]=="auden")
+    {
+        document.getElementById("help_auden").style.backgroundColor = "blue";
+    }
+     if (data[i][5]=="fact")
+    {
+        document.getElementById("fact").style.backgroundColor = "blue";
     }
     console.log(interactive_col);
     document.getElementById("count_interactive").value = interactive_col.toString();

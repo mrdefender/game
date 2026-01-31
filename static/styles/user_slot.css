@@ -128,7 +128,7 @@ h1 {
     width: 18%;
     z-index: 10;
 }
-.p50_50, .palter, .pnavi, .px2, .pauden
+.p50_50, .palter, .pnavi, .px2, .pauden, .pfact
 {
     position: relative;
     top: -13rem;
@@ -148,7 +148,7 @@ h1 {
 .message{
     position: relative;
     left: 0rem;
-    top: -27rem;
+    top: -25rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
