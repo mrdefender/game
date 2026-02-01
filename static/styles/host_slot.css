@@ -29,6 +29,7 @@
     z-index: 1;
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
+
 }
 .status-round {
     position: relative;
@@ -413,7 +414,7 @@
     left: -45%;
     color: #fff;
     border-radius: 40px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size:small;
     width: 8rem;
@@ -427,7 +428,7 @@
     left: -45%;
     color: #fff;
     border-radius: 40px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size:small;
     width: 8rem;
@@ -530,7 +531,7 @@
     left: -11rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 10rem;
@@ -543,7 +544,7 @@
     left: -31%;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 5rem;
@@ -556,7 +557,7 @@
     left: -31%;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 9rem;
@@ -569,7 +570,7 @@
     left: -31%;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 7rem;
@@ -582,7 +583,7 @@
     left: -31%;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 4rem;
@@ -596,7 +597,7 @@
     left: -31%;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: auto;
@@ -610,7 +611,7 @@
     left: -31%;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 7rem;
@@ -624,7 +625,7 @@
     left: -11rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 7rem;
@@ -639,7 +640,7 @@
     left: -23rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: auto;
@@ -652,7 +653,7 @@
     left: -23rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 9rem;
@@ -665,7 +666,7 @@
     left: 9.3rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 10rem;
@@ -678,7 +679,7 @@
     left: 9.5rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: auto;
@@ -691,7 +692,7 @@
     left: -11rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 9rem;
@@ -705,7 +706,7 @@
     left: -15rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: auto;
@@ -731,7 +732,7 @@
     left: -40rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 5rem;
@@ -744,7 +745,20 @@
     left: -40rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 10rem;
+    height: 2rem;
+    text-wrap:inherit
+}
+.clear_table{
+    position: relative;
+    top: -20.5rem;
+    left: -29rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 10rem;
@@ -757,7 +771,7 @@
     left: -21rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 5rem;
@@ -772,7 +786,7 @@
     left: -21rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 5rem;
@@ -788,7 +802,7 @@
     left: -20rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: 10rem;
@@ -802,7 +816,7 @@
     left: -14rem;
     color: #fff;
     border-radius: 100px;
-    background-color: #1a1b02;
+    background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
     width: auto;

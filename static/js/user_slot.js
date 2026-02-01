@@ -194,6 +194,7 @@ function get_status(){
         {
             get_task();
             //clearInterval(timerToGame);
+           // check_answered_main();
             timeWainAnswerFromMain = setInterval(() => check_answered_main(), 5000);
         }
     if (data == "given task main")

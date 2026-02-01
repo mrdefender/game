@@ -148,6 +148,15 @@ def slot():
     print (url_for('slot'))
     return render_template("slot.html")
 
+@app.route('/spec_slot', methods=["POST", "GET"])
+def spec_slot():
+    if request.method == 'POST':
+        print (url_for('slot'))
+        return render_template("spec_slot.html")
+    print (url_for('spec_slot'))
+    return render_template("spec_slot.html")
+
+
 @app.route('/host_slot', methods=["POST", "GET"])
 def host_slot():
     if request.method == 'POST':
@@ -1040,6 +1049,34 @@ def get_fact():
             return json.dumps("ok")
         except:
             return json.dumps("fail")
+
+##
+@app.route('/clear_table', methods=["POST", "GET"])
+def clear_table():
+    if request.method == 'POST':
+        user_all = Users.query.delete()
+        db.session.commit()
+        
+        
+    return json.dumps("fail")
+
+
+
+@app.route('/update_for_spec', methods=["POST", "GET"])
+def update_for_spec():
+    if request.method == 'POST':
+        user_waits = Users.query.filter(Users.status == "wait").count()
+        user_all = Users.query.all()
+        if (len(user_all)==user_waits):
+            return json.dumps("wait")
+        user_main = Users.query.filter(Users.status == "main").first()
+        if (user_main != None):
+            return json.dumps("main")
+        
+        
+        
+    return json.dumps("fail")
+
 
 
 if __name__ == "__main__":

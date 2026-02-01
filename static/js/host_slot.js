@@ -2615,6 +2615,31 @@ console.error('Ошибка:', error);
 });
 }
 
+function clear_table(){
+    fetch('/clear_table', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/data'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    
+
+    console.log(data);
+    if (data == 'fail')
+        return;
+
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+
 
 function wait_answer(){
     fetch('/wait_answer_for_host', {

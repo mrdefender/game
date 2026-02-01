@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Веселые игры</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/spec_slot.css') }}">
+    <link rel="stylesheet" href="/static/styles/spec_slot.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+        <div class="game_box">
+            <h1>Свободный слот.</h1>
+            <div class="game_box_container">
+            <div class="form_group"> 
+             <p>
+             <div class="tree-container-c1" id="c9"> 9. 1 000 000 </div>
+             <div class="tree-container-c2" id="c8"> 8.  500 000 </div>
+             <div class="tree-container-c3" id="c7"> 7.  150 000</div>
+             <div class="tree-container-c4" id="c6"> 6.   50 000</div>
+             <div class="tree-container-c5" id="c5"> 5.   25 000</div>
+             <div class="tree-container-c6" id="c4"> 4.   10 000</div>
+             <div class="tree-container-c7" id="c3"> 3.    5 000</div>
+             <div class="tree-container-c8" id="c2"> 2.    3 000</div>
+             <div class="tree-container-c9" id="c1"> 1.    1 000</div>
+             </p>
+             <p>
+                <input class="in_game" id="in_game" value="В игре:">
+             </p>
+                <p>
+                    <input type="radio" class="tree-container-button" id="users" name="user_name" value=bbb disabled >
+                    <label for=bbb class="tree-container">Количество ответов в интерактиве:</label>
+                    <input type="text" class="tree-container" id="count_interactive" ></label>
+                </p>   
+            </div> 
+                <p>  
+                <input type="submit" class="message" id="au" ></button>
+                <div class = "questions" id="question" value =""></div>
+                </p>
+                <p>
+                    <div>
+                    <input type="submit" class="o1" id="o1" value="1" disabled>
+                    <input type="submit" class="o1" id="o2" value="2" disabled>
+                    <input type="submit" class="o1" id="o3" value="3" disabled>
+                    <input type="submit" class="o1" id="o4" value="4" disabled>
+                    <input type="submit" class="o1" id="o5" value="5" disabled>
+                </p>
+                <p>
+                    <input type="submit" class="o2" id="o6" value="6" disabled>
+                    <input type="submit" class="o2" id="o7" value="7" disabled>
+                    <input type="submit" class="o2" id="o8" value="8" disabled>
+                    <input type="submit" class="o2" id="o9" value="9" disabled>
+                    <input type="submit" class="o2" id="o10" value="10" disabled>
+                </p>
+                <p>
+                    <input type="submit" class="o3" id="o11" value="11" disabled>
+                    <input type="submit" class="o3" id="o12" value="12" disabled>
+                    <input type="submit" class="o3" id="o13" value="13" disabled>
+                    <input type="submit" class="o3" id="o14" value="14" disabled>
+                    <input type="submit" class="o3" id="o15" value="15" disabled> 
+                </p>
+            </div>
+            <div>      
+                    <input type="button" class="p50_50" id="p50_50" value="50:50") disabled></button> 
+                    <input type="button" class="palter" id="palter" value="⇆"   disabled>
+                
+                    <input type="button" class="pnavi" id="pnavi" value="𖤂" disabled >
+                    <input type="button" class="px2" id="px2" value="x2"   disabled> 
+                    <input type="button" class="pauden" id="pauden" value="👪"   disabled>
+                    <input type="button" class="pfact" id="pfact" value="📚"  disabled >
+                </div>                              
+            
+        </div>      
+        
+
+
+    <script src="/static/js/spec_slot.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>   
+     <script type="text/javascript" src="/static/jquery-1.7.1.min.js"></script>
+     </body>
+    <footer class="copyrights">
+        Здесь могло бы быть ваше имя и ваша реклама.
+    </footer>
+</html>
