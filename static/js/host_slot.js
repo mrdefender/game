@@ -198,6 +198,25 @@ function ch1()
     {
         select_fix.disabled = false;
     }    
+
+    fetch('/send_script', {
+        method: 'POST',
+        body: JSON.stringify({ script:select_script.value}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+     
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
 }
 
 
@@ -321,7 +340,29 @@ function ch2(){
         c8.style.color = "white";
 
     }
+
+     fetch('/send_fix', {
+        method: 'POST',
+        body: JSON.stringify({ fix:select_fix.value}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+     
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
 }
+
+
+
+
 
 select.addEventListener('change', function(){
    ch3();
@@ -628,6 +669,28 @@ function ch3(){
         document.getElementById("get_task").disabled = true; 
     }  
     console.log("Раунд " + round.value);
+
+
+     fetch('/send_round', {
+        method: 'POST',
+        body: JSON.stringify({ round:round.value}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+     
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+
 }
 
 

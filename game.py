@@ -1071,11 +1071,79 @@ def update_for_spec():
             return json.dumps("wait")
         user_main = Users.query.filter(Users.status == "main").first()
         if (user_main != None):
-            return json.dumps("main")
-        
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "wait task main").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
         
         
     return json.dumps("fail")
+
+
+
+
+@app.route('/send_script', methods=["POST", "GET"])
+def send_script():
+    if request.method == 'POST':
+        try:
+            scr = request.json['script']
+            with open('script.json', 'w') as file:
+                json.dump(scr, file)
+            return json.dumps("ok")
+        
+        except:
+            return json.dumps("fail")
+    
+    
+@app.route('/send_fix', methods=["POST", "GET"])
+def send_fix():
+    if request.method == 'POST':
+        try:
+            scr = request.json['fix']
+            with open('fix.json', 'w') as file:
+                json.dump(scr, file)
+            return json.dumps("ok")
+        
+        except:
+            return json.dumps("fail")
+        
+
+@app.route('/send_round', methods=["POST", "GET"])
+def send_round():
+    if request.method == 'POST':
+        try:
+            scr = request.json['round']
+            with open('round.json', 'w') as file:
+                json.dump(scr, file)
+            return json.dumps("ok")
+        
+        except:
+            return json.dumps("fail")
+        
+
+@app.route('/get_tree', methods=["POST", "GET"])
+def get_tree():
+    if request.method == 'POST':
+        try:
+            res = []
+            with open('script.json') as file:
+                jsn = json.load(file)
+            res.append(jsn)
+            with open('fix.json') as file:
+                jsn = json.load(file)
+            res.append(jsn)
+            with open('round.json') as file:
+                jsn = json.load(file)
+            res.append(jsn)
+            return json.dumps(res)
+        except:
+            return json.dumps("fail")
 
 
 

@@ -41,7 +41,7 @@
 }
 
 .tree-container-c1{
-    font-size:large;
+    font-size:x-large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -58,7 +58,7 @@
 }
 .tree-container-c2{
 
-    font-size:large;
+    font-size:x-large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -75,7 +75,7 @@
 }
 .tree-container-c3{
     
-    font-size:large;
+    font-size:x-large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -91,7 +91,7 @@
     padding-left: .1rem;
 }
 .tree-container-c4{
-    font-size:large;
+    font-size:x-large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -107,7 +107,7 @@
     padding-left: .1rem;
 }
 .tree-container-c5{
-    font-size:large;
+    font-size:x-large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -123,7 +123,7 @@
     padding-left: .1rem;
 }
 .tree-container-c6{
-    font-size:large;
+    font-size:x-large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -139,7 +139,7 @@
     padding-left: .1rem;
 }
 .tree-container-c7{
-    font-size:large;
+    font-size:x-large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -155,7 +155,7 @@
     padding-left: .1rem;
 }
 .tree-container-c8{
-    font-size:large;
+    font-size:x-large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -171,7 +171,7 @@
     padding-left: .1rem;
 }
 .tree-container-c9{
-    font-size:large;
+    font-size:x-large;
     flex: 0 0 100%;
     position: relative;
     top: 0rem;
@@ -206,7 +206,7 @@
 
 .message{
     position: relative;
-    top: -25rem;
+    top: 20rem;
     left: -1%;
     color: #fff;
     border-radius: 100px;
@@ -219,19 +219,20 @@
 }
 .in_game{
     position: relative;
+    font-size:x-large;
     padding: 20px 30px;
     top: -18rem;
     left: -39.9%;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
-    color: rgb(7, 127, 224);
     font-size: medium;
     width: 16rem;
     height: 2rem;
 }
 .questions{
     position: relative;
+    font-size:x-large;
     padding: 10px 30px;
     height: 30%;
     top: -22rem;
