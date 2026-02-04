@@ -1,4 +1,4 @@
-var timerStatus = setInterval(() => update_list_user(), 5000);
+var timerStatus = setInterval(() => update_list_user(), 2000);
 var timerHelps;
 var timeWainAnswerFromMain;
 var timerTreeStatus = setInterval(() => update_tree(), 3000);
@@ -20,20 +20,23 @@ function update_list_user()
 .then(response => response.json())
 
 .then(data => {
+    console.log("update " + data);
 
     if (data == "fail")
     {
         return;
     }
 
-    console.log(data);
+    
     if (data == "wait")
         {
             document.getElementById("in_game").value = "В игре: "
             document.getElementById("user").value = ""
             document.getElementById("au").value = ""
+            document.getElementById("ans").value = ""
             document.getElementById("question").hidden = true;
-            document.getElementById("question").value = "";
+            document.getElementById("question").value = " ";
+            document.getElementById("ex2").value = "0"
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
             document.getElementById("o3").hidden = true;
@@ -97,6 +100,8 @@ function update_list_user()
             document.getElementById("o13").hidden = false;
             document.getElementById("o14").hidden = false;
             document.getElementById("o15").hidden = false;
+            document.getElementById("ans").value = ""
+            document.getElementById("ex2").value = "0"
             document.getElementById("p50_50").disabled = false;
             document.getElementById("palter").disabled = false;
             document.getElementById("pnavi").disabled = false;
@@ -129,23 +134,71 @@ function update_list_user()
             return;
             
     }
+    
     if (data[0] == "wait task main")
     {
         document.getElementById("au").value = "";
+        document.getElementById("ex2").value = "0";
+        document.getElementById("ans").value = "";
+        document.getElementById("o1").style.backgroundColor = "#000c11";
+        document.getElementById("o2").style.backgroundColor = "#000c11";
+        document.getElementById("o3").style.backgroundColor = "#000c11";
+        document.getElementById("o4").style.backgroundColor = "#000c11";
+        document.getElementById("o5").style.backgroundColor = "#000c11";
+        document.getElementById("o6").style.backgroundColor = "#000c11";
+        document.getElementById("o7").style.backgroundColor = "#000c11";
+        document.getElementById("o8").style.backgroundColor = "#000c11";
+        document.getElementById("o9").style.backgroundColor = "#000c11";
+        document.getElementById("o10").style.backgroundColor = "#000c11";
+        document.getElementById("o11").style.backgroundColor = "#000c11";
+        document.getElementById("o12").style.backgroundColor = "#000c11";
+        document.getElementById("o13").style.backgroundColor = "#000c11";
+        document.getElementById("o14").style.backgroundColor = "#000c11";
+        document.getElementById("o15").style.backgroundColor = "#000c11";
+        get_task();
+        get_helps();
+        return;
     }
-
-
-    var interactive_col = 0;
-    document.getElementById("count_interactive").value = interactive_col.toString();
-    for (var i=0;data.length;i++)
+        if (data[0] == "given task main")
     {
-
-    if (data[i][5]=="answered interactive")
-        interactive_col++;
-
-    console.log(interactive_col);
-    document.getElementById("count_interactive").value = interactive_col.toString();
+        document.getElementById("au").value = "";
+        document.getElementById("question").value = "";
+        get_task();
+        get_helps();
+        return;
     }
+
+    if (data[0] == "answered main")
+    {
+        console.log(data[0]);
+        answered_main();
+        return;
+
+        
+    }
+    if (data[0] == "check main")
+    {
+        check_answered();
+        document.getElementById("au").value = "";
+        document.getElementById("question").value = "";
+        return;
+    }
+
+    if (data[0] == "game over lose")
+    {
+        document.getElementById("au").value ="Выигрыш:" +'\n'+ document.getElementById("fix").value;
+        document.getElementById("question").value = "";
+        return;
+    }
+    if (data[0] == "game over")
+    {
+        document.getElementById("au").value ="Выигрыш:" +'\n'+ document.getElementById("current").value;
+        document.getElementById("question").value = "";
+        return;
+    }
+
+
+    
 
 
 })
@@ -154,6 +207,234 @@ console.error('Ошибка:', error);
 });
 }
 
+
+
+function answered_main(){
+    fetch('/answered_main_spec', {
+        method: 'POST',
+        body: JSON.stringify({ " ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    console.log(data)
+
+    if (data == "fail")
+    {
+        return;
+    }
+
+    
+    ans = data[0];
+    document.getElementById("ans").value = ans;
+    document.getElementById(ans).style.backgroundColor = "orange";
+ 
+    
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+
+
+function check_answered(){
+    fetch('/answered_check_spec', {
+        method: 'POST',
+        body: JSON.stringify({ " ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+   if (data == "fail")
+    {
+        return;
+    }
+
+    fa = data[1]
+
+    for (var i = 0; i< fa.length;i++)
+    {
+        id = get_o(fa[i].toString());
+        document.getElementById(id).style.backgroundColor = "red";
+    }
+    if (document.getElementById(ans).style.backgroundColor == "orange")
+    {
+        document.getElementById(ans).style.backgroundColor = "green";
+        if (data[0]==1)
+            document.getElementById("au").value = "1 000";
+        if (data[0]==2)
+            document.getElementById("au").value = "3 000";
+        if (data[0]==3)
+            document.getElementById("au").value = "5 000";
+        if (data[0]==4)
+            document.getElementById("au").value = "10 000";
+        if (data[0]==5)
+            document.getElementById("au").value = "25 000";
+        if (data[0]==6)
+            document.getElementById("au").value = "50 000";
+        if (data[0]==7)
+            document.getElementById("au").value = "150 000";
+        if (data[0]==8)
+            document.getElementById("au").value = "150 000";
+        if (data[0]==9)
+            document.getElementById("au").value = "1 000 000";
+    
+
+    }
+    
+
+    
+
+
+ 
+    
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+}
+
+
+function get_o(answer)
+{
+    if (answer == "1")
+        return "o1";
+    if (answer == "2")
+        return "o2";
+    if (answer == "3")
+        return "o3";
+    if (answer == "4")
+        return "o4";
+    if (answer == "5")
+        return "o5";
+    if (answer == "6")
+        return "o6";
+    if (answer == "7")
+        return "o7";
+    if (answer == "8")
+        return "o8";
+    if (answer == "9")
+        return "o9";
+    if (answer == "10")
+        return "o10";
+    if (answer == "11")
+        return "o11";
+    if (answer == "12")
+        return "o12";
+    if (answer == "13")
+        return "o13";
+    if (answer == "14")
+        return "o14";
+    if (answer == "15")
+        return "o15";
+    
+}
+
+
+
+function get_task(){
+    fetch('/get_task_user', {
+        method: 'POST',
+        body: JSON.stringify({ user:"spec"}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    console.log(data);
+
+    if (data == "fail")
+    {
+        return;
+    }
+    if (document.getElementById("ex2").value !="0")
+        return;
+    document.getElementById('question').innerText = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
+    document.getElementById("o1").disabled = false;
+    document.getElementById("o2").disabled = false;
+    document.getElementById("o3").disabled = false;
+    document.getElementById("o4").disabled = false;
+    document.getElementById("o5").disabled = false;
+    document.getElementById("o6").disabled = false;
+    document.getElementById("o7").disabled = false;
+    document.getElementById("o8").disabled = false;
+    document.getElementById("o9").disabled = false;
+    document.getElementById("o10").disabled = false;
+    document.getElementById("o11").disabled = false;
+    document.getElementById("o12").disabled = false;
+    document.getElementById("o13").disabled = false;
+    document.getElementById("o14").disabled = false;
+    document.getElementById("o15").disabled = false;    
+
+    if (document.getElementById("o1").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o2").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o3").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o4").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o5").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o6").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o7").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o8").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o9").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o10").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o11").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o12").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o13").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o14").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("o15").style.backgroundColor == "orange")
+        return;
+    if (document.getElementById("p50_50").style.backgroundColor == "orange")
+        return
+    if (document.getElementById("palter").style.backgroundColor == "orange")
+        return
+    if (document.getElementById("pnavi").style.backgroundColor == "orange")
+        return
+    if (document.getElementById("pfact").style.backgroundColor == "orange")
+        return
+    if (document.getElementById("pauden").style.backgroundColor == "orange")
+        return
+
+     
+
+   
+    
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
 
 
 function update_tree(){
@@ -169,7 +450,6 @@ function update_tree(){
 .then(response => response.json())
 
 .then(data => {
-    console.log(data)
 
     if (data == "fail")
         return;
@@ -520,7 +800,6 @@ function get_helps(){
 .then(response => response.json())
 
 .then(data => {
-    console.log(data)
 
     if (data=="fail")
     {
@@ -572,7 +851,6 @@ function get_helps(){
 console.error('Ошибка:', error);
 });
     }
-
 
 
 

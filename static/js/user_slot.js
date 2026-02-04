@@ -162,7 +162,7 @@ function get_status(){
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
-            document.getElementById("question").value = "";
+            document.getElementById("question").value = " ";
             get_task();
             //clearInterval(timerToGame);
             
@@ -170,7 +170,7 @@ function get_status(){
     if (data == "wait task main")
         {
             document.getElementById("ans").value = "";
-            document.getElementById("question").value = "";
+            document.getElementById("question").value = " ";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -186,7 +186,7 @@ function get_status(){
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
-            document.getElementById("question").value = "";
+            document.getElementById("question").value = " ";
             get_task();
             //clearInterval(timerToGame);
         }
@@ -1379,6 +1379,35 @@ function pauden(){
     document.getElementById("pauden").style.backgroundColor = "orange";
     var user_name = document.getElementById("user_name").value;
      fetch('/get_auden', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+
+function pfact(){
+    document.getElementById("pfact").style.backgroundColor = "orange";
+    var user_name = document.getElementById("user_name").value;
+     fetch('/get_fact', {
         method: 'POST',
         body: JSON.stringify({ user:user_name}),
         headers: {

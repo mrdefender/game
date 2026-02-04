@@ -2256,9 +2256,6 @@ function fact(){
         return;
     if (document.getElementById("x2").style.backgroundColor == "orange")
         return;
-
-    if (document.getElementById("count_interactive").value==0)
-        return;
     
     fetch('/fact', {
         method: 'POST',
@@ -2274,7 +2271,7 @@ function fact(){
 
     if (data == "fatal")
         return;
-    document.getElementById("fact").checked = false;
+    document.getElementById("pfact").checked = false;
     stop_sounds();
     audio_help_auden.play();
     document.getElementById("au").value = ""
@@ -2556,12 +2553,36 @@ function start_final()
 
 function total_money()
 {
+    var lose = "false";
     var tm = document.getElementById("take_money");
    if (tm.style.backgroundColor != "lime")
    {
     var tmp_money = document.getElementById("au").value;
     document.getElementById("au").value = "Выигрыш:" +'\n' + tmp_money;
+    lose = "true"
    }
+    fetch('/game_over', {
+        method: 'POST',
+        body: JSON.stringify({ lose:lose}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    
+
+    if (data == 'fail')
+        return;
+
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
     stop_sounds();
     audio_out_player.play();
 }

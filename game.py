@@ -579,6 +579,23 @@ def open_room():
     else:
         return id_room
   
+ 
+@app.route('/game_over', methods=["POST", "GET"])
+def game_over():
+    if request.method == 'POST':
+        try:
+            lose = request.json['lose']
+            jh = Users.query.all()
+            for i in range(len(jh)):
+                if lose == "true":
+                    jh[i].status = "game over lose"
+                else:
+                    jh[i].status = "game over"
+            db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+ 
         
 @app.route('/close_room', methods=["POST", "GET"])
 def close_room():
@@ -674,7 +691,9 @@ def get_task_user():
         if not os.path.exists("task.json"):
             return json.dumps("fail")
         with open('task.json') as file:
-            jsn = json.load(file)  
+            jsn = json.load(file)
+        if request.json['user']=="spec":
+            return json.dumps(jsn)
         try:
             js = Users.query.all()
             if len(js)!=1:
@@ -707,6 +726,31 @@ def check_answered_main():
             
         except:
             return json.dumps("fail")
+ 
+@app.route('/answered_main_spec', methods=["POST", "GET"])
+def answered_main_spec():
+    if request.method == 'POST':
+        try:
+            if os.path.exists("answered.json"):
+                 with open('answered.json') as file:
+                    jsn = json.load(file)
+            return json.dumps(jsn)
+            
+        except:
+            return json.dumps("fail") 
+
+
+
+@app.route('/answered_check_spec', methods=["POST", "GET"])
+def answered_check_spec():
+    if request.method == 'POST':
+        try:
+            with open('task.json') as file:
+                    jsn = json.load(file)
+            return json.dumps(jsn)
+        except:
+            return json.dumps("fail")  
+
     
 @app.route('/send_answer', methods=["POST", "GET"])
 def send_answer():
@@ -787,6 +831,11 @@ def check_answer():
             return json.dumps(jsn)
         except:
             return json.dumps("fail")
+
+        
+     
+
+
 
 
 @app.route('/next_round', methods=["POST", "GET"])
@@ -1081,7 +1130,37 @@ def update_for_spec():
             res.append(user_main.status)
             res.append(user_main.username)
             return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "given task main").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "answered main").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
         
+        user_main = Users.query.filter(Users.status == "check main").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "game over lose").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "game over").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
         
     return json.dumps("fail")
 
