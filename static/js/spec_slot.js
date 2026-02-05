@@ -1,4 +1,4 @@
-var timerStatus = setInterval(() => update_list_user(), 2000);
+var timerStatus = setInterval(() => update_list_user(), 1500);
 var timerHelps;
 var timeWainAnswerFromMain;
 var timerTreeStatus = setInterval(() => update_tree(), 3000);
@@ -74,6 +74,12 @@ function update_list_user()
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
+            document.getElementById("p50_50").style.backgroundColor = "#000c11";
+            document.getElementById("palter").style.backgroundColor = "#000c11";
+            document.getElementById("pnavi").style.backgroundColor = "#000c11";
+            document.getElementById("px2").style.backgroundColor = "#000c11";
+            document.getElementById("pauden").style.backgroundColor = "#000c11";
+             document.getElementById("pfact").style.backgroundColor = "#000c11";
             
             
             return;
@@ -84,7 +90,7 @@ function update_list_user()
             document.getElementById("au").value = "В игру вступает:" +'\n'+ data[1];
             document.getElementById("user").value = data[1]
             document.getElementById("question").hidden = false;
-            document.getElementById("question").value = "";
+            document.getElementById("question").value = " ";
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -114,7 +120,7 @@ function update_list_user()
             document.getElementById("pauden").hidden = false;
              document.getElementById("pfact").hidden = false;
               document.getElementById("pfact").disabled = false;
-            document.getElementById("question").value = "";
+            document.getElementById("question").value = " ";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -130,14 +136,18 @@ function update_list_user()
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
-            get_helps();
+            for (var i =1; i<16;i++)
+            {
+                document.getElementById(get_o(i.toString())).value = i;
+            }
+
             return;
             
     }
     
     if (data[0] == "wait task main")
     {
-        document.getElementById("au").value = "";
+       // document.getElementById("au").value = "";
         document.getElementById("ex2").value = "0";
         document.getElementById("ans").value = "";
         document.getElementById("o1").style.backgroundColor = "#000c11";
@@ -155,20 +165,26 @@ function update_list_user()
         document.getElementById("o13").style.backgroundColor = "#000c11";
         document.getElementById("o14").style.backgroundColor = "#000c11";
         document.getElementById("o15").style.backgroundColor = "#000c11";
+        for (var i =1; i<16;i++)
+            {
+                document.getElementById(get_o(i.toString())).value = i;
+            }
         get_task();
         get_helps();
         return;
     }
-        if (data[0] == "given task main")
+        if ((data[0] == "given task main") || (data[0] == "x2" ))
     {
-        document.getElementById("au").value = "";
+        if ((document.getElementById("ex2").value != "auden") && (document.getElementById("ex2").value != "fact"))
+            document.getElementById("au").value = "";
         document.getElementById("question").value = "";
         get_task();
         get_helps();
-        return;
+        get_fact();
+       
     }
 
-    if (data[0] == "answered main")
+    if ((data[0] == "answered main") || (data[0] == "answered main x2"))
     {
         console.log(data[0]);
         answered_main();
@@ -176,11 +192,11 @@ function update_list_user()
 
         
     }
-    if (data[0] == "check main")
+    if ((data[0] == "check main") || (data[0] == "check main x2"))
     {
         check_answered();
-        document.getElementById("au").value = "";
-        document.getElementById("question").value = "";
+        //document.getElementById("au").value = " ";
+        document.getElementById("question").value = " ";
         return;
     }
 
@@ -196,6 +212,44 @@ function update_list_user()
         document.getElementById("question").value = "";
         return;
     }
+
+    if (data[0] == "50:50")
+    {
+        get_50_50();
+        return;
+    }
+     if (data[0] == "alter")
+    {
+
+        get_alter();
+        return;
+    }
+    if (data[0] == "navi")
+    {
+
+        get_navi();
+        return;
+    }
+
+    if (data[0] == "x2")
+    {
+
+        get_x2();
+        return;
+    }
+    if (data[0] == "auden")
+    {
+
+        get_auden();
+        return;
+    }
+    if (data[0] == "fact")
+    {
+
+        //get_fact();
+        return;
+    }
+    
 
 
     
@@ -233,6 +287,8 @@ function answered_main(){
     ans = data[0];
     document.getElementById("ans").value = ans;
     document.getElementById(ans).style.backgroundColor = "orange";
+    if (document.getElementById("ex2").value=="x2-2")
+        document.getElementById("ex2").value=="0";
  
     
 })
@@ -255,6 +311,7 @@ function check_answered(){
 .then(response => response.json())
 
 .then(data => {
+    console.log(document.getElementById("ex2").value)
 
    if (data == "fail")
     {
@@ -262,6 +319,24 @@ function check_answered(){
     }
 
     fa = data[1]
+
+    
+
+    if (document.getElementById("ex2").value=="x2")
+    {
+        for (var i = 0; i< fa.length;i++)
+    {
+        id = get_o(fa[i].toString());
+        if (id == ans)
+        {
+           document.getElementById(id).style.backgroundColor = "red";
+           document.getElementById("ex2").value="x2-2"
+            return;
+        }
+        
+       
+    }
+    }
 
     for (var i = 0; i< fa.length;i++)
     {
@@ -294,7 +369,7 @@ function check_answered(){
     }
     
 
-    
+    document.getElementById("ex2").value=="0";
 
 
  
@@ -789,6 +864,9 @@ console.error('Ошибка:', error);
 
 function get_helps(){
         var user_name = document.getElementById("user").value;
+        if ((document.getElementById("ex2").value=="x2") || (document.getElementById("ex2").value=="x2-2"))
+            return;
+        console.log(user_name)
         fetch('/get_helps', {
         method: 'POST',
         body: JSON.stringify({ user:user_name}),
@@ -800,6 +878,7 @@ function get_helps(){
 .then(response => response.json())
 
 .then(data => {
+    console.log("help " + data)
 
     if (data=="fail")
     {
@@ -853,22 +932,12 @@ console.error('Ошибка:', error);
     }
 
 
-
-
-
-
-
-
-/*
-
-
-
-function get_status(){
-
-    var user_name = document.getElementById("user_name").value;
-    fetch('/get_user_status', {
+function get_50_50(){
+     document.getElementById("p50_50").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "50:50"
+    fetch('/get_50_50_spec', {
         method: 'POST',
-        body: JSON.stringify({ user:user_name}),
+        body: JSON.stringify({ " ":" "}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -878,162 +947,179 @@ function get_status(){
 
 .then(data => {
 
-   
-    if (data=="fail")
+    if (data == "fail")
+    {
         return;
-    if (data == "wait")
-    {
-            document.getElementById("question").hidden = true;
-            document.getElementById("question").value = "";
-            document.getElementById("o1").hidden = true;
-            document.getElementById("o2").hidden = true;
-            document.getElementById("o3").hidden = true;
-            document.getElementById("o4").hidden = true;
-            document.getElementById("o5").hidden = true;
-            document.getElementById("o6").hidden = true;
-            document.getElementById("o7").hidden = true;
-            document.getElementById("o8").hidden = true;
-            document.getElementById("o9").hidden = true;
-            document.getElementById("o10").hidden = true;
-            document.getElementById("o11").hidden = true;
-            document.getElementById("o12").hidden = true;
-            document.getElementById("o13").hidden = true;
-            document.getElementById("o14").hidden = true;
-            document.getElementById("o15").hidden = true;
-            document.getElementById("p50_50").disabled = true;
-            document.getElementById("palter").disabled = true;
-            document.getElementById("pnavi").disabled = true;
-            document.getElementById("px2").disabled = true;
-            document.getElementById("pauden").disabled = true;
-            document.getElementById("p50_50").hidden = true;
-            document.getElementById("palter").hidden = true;
-            document.getElementById("pnavi").hidden = true;
-            document.getElementById("px2").hidden = true;
-            document.getElementById("pauden").hidden = true;
-             document.getElementById("pfact").hidden = true;
-              document.getElementById("pfact").disabled = true;
-            document.getElementById("question").value = "";
-            document.getElementById("o1").style.backgroundColor = "#000c11";
-            document.getElementById("o2").style.backgroundColor = "#000c11";
-            document.getElementById("o3").style.backgroundColor = "#000c11";
-            document.getElementById("o4").style.backgroundColor = "#000c11";
-            document.getElementById("o5").style.backgroundColor = "#000c11";
-            document.getElementById("o6").style.backgroundColor = "#000c11";
-            document.getElementById("o7").style.backgroundColor = "#000c11";
-            document.getElementById("o8").style.backgroundColor = "#000c11";
-            document.getElementById("o9").style.backgroundColor = "#000c11";
-            document.getElementById("o10").style.backgroundColor = "#000c11";
-            document.getElementById("o11").style.backgroundColor = "#000c11";
-            document.getElementById("o12").style.backgroundColor = "#000c11";
-            document.getElementById("o13").style.backgroundColor = "#000c11";
-            document.getElementById("o14").style.backgroundColor = "#000c11";
-            document.getElementById("o15").style.backgroundColor = "#000c11";
-            clearInterval(timerHelps);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);clearInterval(timeWainAnswerFromMain);
     }
-    if (data == "interactive")
-        {
-            document.getElementById("question").hidden = false;
-            document.getElementById("question").value = "";
-            document.getElementById("o1").hidden = false;
-            document.getElementById("o2").hidden = false;
-            document.getElementById("o3").hidden = false;
-            document.getElementById("o4").hidden = false;
-            document.getElementById("o5").hidden = false;
-            document.getElementById("o6").hidden = false;
-            document.getElementById("o7").hidden = false;
-            document.getElementById("o8").hidden = false;
-            document.getElementById("o9").hidden = false;
-            document.getElementById("o10").hidden = false;
-            document.getElementById("o11").hidden = false;
-            document.getElementById("o12").hidden = false;
-            document.getElementById("o13").hidden = false;
-            document.getElementById("o14").hidden = false;
-            document.getElementById("o15").hidden = false;
-            status_btn(true);
-           
-            //clearInterval(timerToGame);
-
-        }
-    if (data== "main")
-        {
-            document.getElementById("question").hidden = false;
-            document.getElementById("question").value = "";
-            document.getElementById("o1").hidden = false;
-            document.getElementById("o2").hidden = false;
-            document.getElementById("o3").hidden = false;
-            document.getElementById("o4").hidden = false;
-            document.getElementById("o5").hidden = false;
-            document.getElementById("o6").hidden = false;
-            document.getElementById("o7").hidden = false;
-            document.getElementById("o8").hidden = false;
-            document.getElementById("o9").hidden = false;
-            document.getElementById("o10").hidden = false;
-            document.getElementById("o11").hidden = false;
-            document.getElementById("o12").hidden = false;
-            document.getElementById("o13").hidden = false;
-            document.getElementById("o14").hidden = false;
-            document.getElementById("o15").hidden = false;
-            timerHelps = setInterval(() => get_helps(), 5000);
-            status_btn(true);
-            //clearInterval(timerToGame);
-        }
-    if ((data == "take money") || (data =="end interactive"))
+    for (var i=0;i<data.length;i++)
     {
-            status_btn(true);
+        ff = data[i].toString();
+        document.getElementById(get_o(ff)).disabled = true;
     }
-    if (data == "wait task main")
-        {
-            document.getElementById("question").value = "";
-            document.getElementById("o1").style.backgroundColor = "#000c11";
-            document.getElementById("o2").style.backgroundColor = "#000c11";
-            document.getElementById("o3").style.backgroundColor = "#000c11";
-            document.getElementById("o4").style.backgroundColor = "#000c11";
-            document.getElementById("o5").style.backgroundColor = "#000c11";
-            document.getElementById("o6").style.backgroundColor = "#000c11";
-            document.getElementById("o7").style.backgroundColor = "#000c11";
-            document.getElementById("o8").style.backgroundColor = "#000c11";
-            document.getElementById("o9").style.backgroundColor = "#000c11";
-            document.getElementById("o10").style.backgroundColor = "#000c11";
-            document.getElementById("o11").style.backgroundColor = "#000c11";
-            document.getElementById("o12").style.backgroundColor = "#000c11";
-            document.getElementById("o13").style.backgroundColor = "#000c11";
-            document.getElementById("o14").style.backgroundColor = "#000c11";
-            document.getElementById("o15").style.backgroundColor = "#000c11";
-            document.getElementById("question").value = "";
-            get_task();
-            //clearInterval(timerToGame);
-        }
-    if (data == "given task interactive")
-        {
-            get_task();
-            //clearInterval(timerToGame);
-            timeWainAnswerFromMain = setInterval(() => check_answered_main(), 5000);
-        }
-    if (data == "given task main")
-        {
-            get_task();
-        }
-    if (data == "check main")
-        {
-            show_right_user();
-        }
-    if (data == "check main x2")
-        {
-            show_right_user();
-        }
-    if (data == "check interactive")
-        {
-            show_right_user();
-        }
+   
 
-        //document.getElementById('au').textContent = "В игру вступает " + data;
-    //document.getElementById('au').innerText = "В игру вступает " + data;
+
+
 })
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+}
+function get_alter(){
+     document.getElementById("palter").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "alter"
+    fetch('/get_alter_spec', {
+        method: 'POST',
+        body: JSON.stringify({ " ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    console.log(data)
+    if (data == "fail")
+    {
+        return;
+    }
+    status_btn(true);
+    
+    b1 = data[0].toString();
+    b2 = data[1].toString();
+
+    document.getElementById(get_o(b1)).disabled = false;
+    document.getElementById(get_o(b2)).disabled = false;
+
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+function get_navi(){
+     document.getElementById("pnavi").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "navi"
+    fetch('/get_navi_spec', {
+        method: 'POST',
+        body: JSON.stringify({ " ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    
+    for (var i = 0;i<data.length;i++)
+    {
+        n = data[i];
+        document.getElementById(get_o(n)).style.backgroundColor = "#d905ec"
+    }
+    
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+function get_x2(){
+     document.getElementById("px2").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "x2"
+
+}
+function get_auden(){
+
+     document.getElementById("pauden").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "auden"
+    fetch('/get_auden_spec', {
+        method: 'POST',
+        body: JSON.stringify({ " ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data == "fail")
+    {
+        return;
+    }
+    
+     document.getElementById("au").value = ""
+    for (var i = 0; i<15;i++)
+    {
+        idb = get_o((i+1).toString())
+        document.getElementById(idb).value = document.getElementById(idb).value+'\n' +data[i] +"%";
+    }
+    document.getElementById("au").value = document.getElementById("au").value + " Фатал- "+ data[15] +"%" + " " + " Cвободный слот - "+data[16]+ "%";
+    document.getElementById("help_auden").style.backgroundColor = "#000c11";
+    
+
+
+})
+
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+
+   
+
+}
+
+function get_fact(){
+
+   // document.getElementById("pfact").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "fact"
+    fetch('/get_fact_spec', {
+        method: 'POST',
+        body: JSON.stringify({ " ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    console.log("fact "+ data[1])
+
+    if (data == "fail")
+    {
+        return;
+    }
+    
+    
+     
+    document.getElementById("au").value = data[1];
+    document.getElementById("pfact").style.backgroundColor = "#000c11";
+    
+
+
+})
+
 .catch(error => {
 console.error('Ошибка:', error);
 });
@@ -1041,77 +1127,38 @@ console.error('Ошибка:', error);
 }
 
 
-function get_helps(){
-        var user_name = document.getElementById("user_name").value;
-        fetch('/get_helps', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
 
-.then(data => {
-
-    if (data=="fail")
-    {
-        document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-       return;
+function status_btn(it_disable)
+{
     
-    }
-
-    if ((document.getElementById("ex2").value == "alter") || (document.getElementById("ex2").value == "x2"))
-    {
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    return;
-    }
-
-    document.getElementById("p50_50").hidden = true;
-    document.getElementById("palter").hidden = true;
-    document.getElementById("pnavi").hidden = true;
-    document.getElementById("px2").hidden = true;
-    document.getElementById("pauden").hidden = true;
-     document.getElementById("pfact").hidden = true;
-
-    for (var i = 0; i<data.length;i++)
-    {
-        if (data[i]=="50:50")
-            document.getElementById("p50_50").hidden = false;
-        if (data[i]=="alter")
-            document.getElementById("palter").hidden = false;
-        if (data[i]=="navi")
-            document.getElementById("pnavi").hidden = false;
-        if (data[i]=="x2")
-            document.getElementById("px2").hidden = false;
-        if (data[i]=="help_auden")
-            document.getElementById("pauden").hidden = false;
-        if (data[i]=="fact")
-            document.getElementById("pfact").hidden = false;
-    }
-    document.getElementById("p50_50").style.backgroundColor = "#000c11";
-    document.getElementById("palter").style.backgroundColor = "#000c11"
-    document.getElementById("pnavi").style.backgroundColor = "#000c11"
-    document.getElementById("px2").style.backgroundColor = "#000c11"
-    document.getElementById("pauden").style.backgroundColor = "#000c11"
-    document.getElementById("pfact").style.backgroundColor = "#000c11"
-    
-
-
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
-    }
-*/
+    btn1 = document.getElementById("o1");
+    btn1.disabled = it_disable;
+    btn2 = document.getElementById("o2");
+    btn2.disabled = it_disable;
+    btn3 = document.getElementById("o3");
+    btn3.disabled = it_disable;
+    btn4 = document.getElementById("o4");
+    btn4.disabled = it_disable;
+    btn5 = document.getElementById("o5");
+    btn5.disabled = it_disable;
+    btn6 = document.getElementById("o6");
+    btn6.disabled = it_disable;
+    btn7 = document.getElementById("o7");
+    btn7.disabled = it_disable;
+    btn8 = document.getElementById("o8");
+    btn8.disabled = it_disable;
+    btn9 = document.getElementById("o9");
+    btn9.disabled = it_disable;
+    btn10 = document.getElementById("o10");
+    btn10.disabled = it_disable;
+    btn11 = document.getElementById("o11");
+    btn11.disabled = it_disable;
+    btn12 = document.getElementById("o12");
+    btn12.disabled = it_disable;
+    btn13 = document.getElementById("o13");
+    btn13.disabled = it_disable;
+    btn14 = document.getElementById("o14");
+    btn14.disabled = it_disable;
+    btn15 = document.getElementById("o15");
+    btn15.disabled = it_disable;
+}

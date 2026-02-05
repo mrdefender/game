@@ -132,6 +132,7 @@ function cancel_all(){
     document.getElementById("x2").style.backgroundColor = "#000c11";
     document.getElementById("help_auden").style.backgroundColor = "#000c11";
     document.getElementById("navi").style.backgroundColor = "#000c11";
+    document.getElementById("fact").style.backgroundColor = "#000c11";
    ch1();
    ch2();
    ch3();
@@ -2193,9 +2194,9 @@ function x2(){
         return;
     if (document.getElementById("alter").style.backgroundColor == "orange")
         return;
-
-    document.getElementById("x2").style.backgroundColor = "orange";
     document.getElementById("px2").checked = false;
+    document.getElementById("x2").style.backgroundColor = "orange";
+    
     stop_sounds();
     audio_x2.play();
 

@@ -71,6 +71,16 @@ def init_game():
         os.remove("auden.json") 
     if os.path.exists("fact.json"):
         os.remove("fact.json") 
+    if os.path.exists("50_50_spec.json"):
+        os.remove("50_50_spec.json")  
+    if os.path.exists("alter_spec.json"):
+        os.remove("alter_spec.json")
+    if os.path.exists("navi_spec.json"):
+        os.remove("navi_spec.json") 
+    if os.path.exists("auden_spec.json"):
+        os.remove("auden_spec.json") 
+    if os.path.exists("fact_spec.json"):
+        os.remove("fact_spec.json") 
 
 
 @app.route('/')
@@ -295,6 +305,8 @@ def h50_50():
             res_f.append(f[i])
         with open('50_50.json', 'w') as file:
             json.dump(res_f, file)
+        with open('50_50_spec.json', 'w') as file:
+            json.dump(res_f, file)
         return res_f
 
 @app.route('/alter', methods=["POST", "GET"])
@@ -321,6 +333,8 @@ def alter():
         
         res = [f[rf],str(j)]
         with open('alter.json', 'w') as file:
+            json.dump(res, file)
+        with open('alter_spec.json', 'w') as file:
             json.dump(res, file)
         return res
     
@@ -426,6 +440,8 @@ def navi():
                 res = ["5","10","15"]
             with open('navi.json','w') as file:
                 json.dump(res,file)
+            with open('navi_spec.json', 'w') as file:
+                json.dump(res, file)
             return res
         if max_c < max_r:
             tmp = -1
@@ -441,6 +457,8 @@ def navi():
                 res = ["11","12","13","14","15"]
             with open('navi.json','w') as file:
                 json.dump(res,file)
+            with open('navi_spec.json', 'w') as file:
+                json.dump(res, file)
             return res
         if max_r == max_c:
             j = random.randint(1,2)
@@ -462,6 +480,8 @@ def navi():
                     res = ["5","10","15"]
                 with open('navi.json','w') as file:
                     json.dump(res,file)
+                with open('navi_spec.json', 'w') as file:
+                    json.dump(res, file)
                 return res
             if j==2:
                 tmp = -1
@@ -477,6 +497,8 @@ def navi():
                     res = ["11","12","13","14","15"]
                 with open('navi.json','w') as file:
                     json.dump(res,file)
+                with open('navi_spec.json', 'w') as file:
+                    json.dump(res, file)
                 return res
 
 
@@ -881,6 +903,21 @@ def get_50_50():
             return json.dumps(p)
         except:
             return json.dumps("fail")
+        
+@app.route('/get_50_50_spec', methods=["POST", "GET"])
+def get_50_50_spec():
+    if request.method == 'POST':
+        try:
+            find = False
+            while not find:
+                if os.path.exists("50_50_spec.json"):
+                    with open('50_50_spec.json') as file:
+                        p = json.load(file)
+                        find = True
+            os.remove("50_50_spec.json")
+            return json.dumps(p)
+        except:
+            return json.dumps("fail")        
 
 @app.route('/get_alter', methods=["POST", "GET"])
 def get_alter():
@@ -899,6 +936,21 @@ def get_alter():
                         user.status = "given task main"
             db.session.commit()
             os.remove("alter.json")
+            return json.dumps(p)
+        except:
+            return json.dumps("fail")
+
+@app.route('/get_alter_spec', methods=["POST", "GET"])
+def get_alter_spec():
+    if request.method == 'POST':
+        try:
+            find = False
+            while not find:
+                if os.path.exists("alter_spec.json"):
+                    with open('alter_spec.json') as file:
+                        p = json.load(file)
+                        find = True
+            os.remove("alter_spec.json")
             return json.dumps(p)
         except:
             return json.dumps("fail")
@@ -922,6 +974,22 @@ def get_navi():
                         user.status = "given task main"
             db.session.commit()
             os.remove("navi.json")
+            return json.dumps(p)
+        except:
+            return json.dumps("fail")
+        
+
+@app.route('/get_navi_spec', methods=["POST", "GET"])
+def get_navi_spec():
+    if request.method == 'POST':
+        try:
+            find = False
+            while not find:
+                if os.path.exists("navi_spec.json"):
+                    with open('navi_spec.json') as file:
+                        p = json.load(file)
+                        find = True
+            os.remove("navi_spec.json")
             return json.dumps(p)
         except:
             return json.dumps("fail")
@@ -1025,6 +1093,8 @@ def help_auden():
             result.append(100-round(col_find_fatal/col_ans*100))   
             with open('auden.json','w') as file:
                 json.dump(result,file)
+            with open('auden_spec.json', 'w') as file:
+                json.dump(result, file)
            # time.sleep(10)
             if os.path.exists("auden.json"):
                 os.remove("auden.json")        
@@ -1046,6 +1116,20 @@ def get_auden():
             user.status = "given task main"
             db.session.commit()
             return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+
+@app.route('/get_auden_spec', methods=["POST", "GET"])
+def get_auden_spec():
+    if request.method == 'POST':
+        try:
+            while (True):
+                if os.path.exists("auden_spec.json"):
+                    with open('auden_spec.json') as file:
+                        p = json.load(file)
+                    os.remove('auden_spec.json')
+                    break
+            return json.dumps(p)
         except:
             return json.dumps("fail")
 
@@ -1074,6 +1158,10 @@ def fact():
             result.append(facts.des_fact)
             with open('fact.json','w') as file:
                 json.dump(result,file)
+            with open('fact_spec.json', 'w') as file:
+                json.dump(result, file)
+            db.session.delete(facts)
+            db.session.commit()
            # time.sleep(10)
             if os.path.exists("fact.json"):
                 os.remove("fact.json")   
@@ -1098,6 +1186,21 @@ def get_fact():
             return json.dumps("ok")
         except:
             return json.dumps("fail")
+        
+@app.route('/get_fact_spec', methods=["POST", "GET"])
+def get_fact_spec():
+    if request.method == 'POST':
+        try:
+            if os.path.exists("fact_spec.json"):
+                with open('fact_spec.json') as file:
+                    p = json.load(file)
+                os.remove('fact_spec.json')
+                return json.dumps(p)
+            else:
+                return json.dumps("fail")
+        except:
+            return json.dumps("fail")
+
 
 ##
 @app.route('/clear_table', methods=["POST", "GET"])
@@ -1142,8 +1245,20 @@ def update_for_spec():
             res.append(user_main.status)
             res.append(user_main.username)
             return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "answered main x2").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
         
         user_main = Users.query.filter(Users.status == "check main").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "check main x2").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
@@ -1156,6 +1271,42 @@ def update_for_spec():
             res.append(user_main.username)
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "game over").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "50:50").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "alter").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "x2").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "navi").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "auden").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "fact").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
