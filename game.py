@@ -28,7 +28,7 @@ login_manager = LoginManager(app)
 login_manager.session_protection = "strong"
 login_manager.login_view = "login"
 login_manager.login_message_category = "info"
-app.config['TELEGRAM_BOT_TOKEN'] = '8463794045:AAEVhBUn-7FpjBidx-1d6bUR5lraH2Cq8Co'
+app.config['TELEGRAM_BOT_TOKEN'] = ''
 
 
 
