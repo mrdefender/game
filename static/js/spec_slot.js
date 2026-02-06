@@ -181,6 +181,7 @@ function update_list_user()
         get_task();
         get_helps();
         get_fact();
+        get_auden();
        
     }
 
@@ -240,7 +241,7 @@ function update_list_user()
     if (data[0] == "auden")
     {
 
-        get_auden();
+       // get_auden();
         return;
     }
     if (data[0] == "fact")

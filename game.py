@@ -28,6 +28,8 @@ login_manager = LoginManager(app)
 login_manager.session_protection = "strong"
 login_manager.login_view = "login"
 login_manager.login_message_category = "info"
+app.config['TELEGRAM_BOT_TOKEN'] = '8463794045:AAEVhBUn-7FpjBidx-1d6bUR5lraH2Cq8Co'
+
 
 
 @login_manager.user_loader
@@ -1123,13 +1125,13 @@ def get_auden():
 def get_auden_spec():
     if request.method == 'POST':
         try:
-            while (True):
-                if os.path.exists("auden_spec.json"):
-                    with open('auden_spec.json') as file:
-                        p = json.load(file)
-                    os.remove('auden_spec.json')
-                    break
-            return json.dumps(p)
+            if os.path.exists("auden_spec.json"):
+                with open('auden_spec.json') as file:
+                    p = json.load(file)
+                os.remove('auden_spec.json')
+                return json.dumps(p)
+            else:
+                return json.dumps("fail")      
         except:
             return json.dumps("fail")
 
