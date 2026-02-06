@@ -18,7 +18,13 @@
                     <label class="form_label">Аккаунт в Telegram</label>
                     <div>
                         <p>
-                            <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="mokaque_bot" data-size="large" data-auth-url="http://mokaque-t.ru/join" data-request-access="write"></script>
+                           <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="mokaque_bot" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+                            <script type="text/javascript">
+                            function onTelegramAuth(user) {
+                        alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
+                        document.getElementById("name").value = user.username;
+                        }
+</script>
                         </p>
                         <input class="form_control" type="text" id="name" name="user_name" placeholder="@user" required>
                     </div>
