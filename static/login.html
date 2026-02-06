@@ -22,7 +22,13 @@
                             <script type="text/javascript">
                             function onTelegramAuth(user) {
                         alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
-                        document.getElementById("name").value = user.username;
+                        if (user.username!=undefined)
+                            document.getElementById("name").value = user.username;
+                        else
+                            if (user.last_name!=undefined)
+                                document.getElementById("name").value = user.first_name+' ' + user.last_name;
+                            else
+                                document.getElementById("name").value = user.first_name
                         }
 </script>
                         </p>
