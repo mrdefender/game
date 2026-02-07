@@ -36,6 +36,7 @@ function update_list_user()
             document.getElementById("ans").value = ""
             document.getElementById("question").hidden = true;
             document.getElementById("question").value = " ";
+            document.getElementById("question").innerText = " ";
             document.getElementById("ex2").value = "0"
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
@@ -91,6 +92,7 @@ function update_list_user()
             document.getElementById("user").value = data[1]
             document.getElementById("question").hidden = false;
             document.getElementById("question").value = " ";
+            document.getElementById("question").innerText = " ";
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -121,6 +123,7 @@ function update_list_user()
              document.getElementById("pfact").hidden = false;
               document.getElementById("pfact").disabled = false;
             document.getElementById("question").value = " ";
+            document.getElementById("question").innerText = " ";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -178,6 +181,7 @@ function update_list_user()
         if ((document.getElementById("ex2").value != "auden") && (document.getElementById("ex2").value != "fact"))
             document.getElementById("au").value = "";
         document.getElementById("question").value = "";
+        document.getElementById("question").innerText = " ";
         get_task();
         get_helps();
         get_fact();
@@ -198,6 +202,7 @@ function update_list_user()
         check_answered();
         //document.getElementById("au").value = " ";
         document.getElementById("question").value = " ";
+        document.getElementById("question").innerText = " ";
         return;
     }
 
@@ -205,12 +210,14 @@ function update_list_user()
     {
         document.getElementById("au").value ="Выигрыш:" +'\n'+ document.getElementById("fix").value;
         document.getElementById("question").value = "";
+        document.getElementById("question").innerText = " ";
         return;
     }
     if (data[0] == "game over")
     {
         document.getElementById("au").value ="Выигрыш:" +'\n'+ document.getElementById("current").value;
         document.getElementById("question").value = "";
+        document.getElementById("question").innerText = " ";
         return;
     }
 
@@ -250,7 +257,85 @@ function update_list_user()
         //get_fact();
         return;
     }
-    
+    if (data[0] == "otbor")
+    {
+
+        document.getElementById("in_game").value = "В игре: "
+            document.getElementById("user").value = ""
+            document.getElementById("au").value = ""
+            document.getElementById("ans").value = ""
+            document.getElementById("question").value = " ";
+            document.getElementById("question").innerText = " ";
+            document.getElementById("ex2").value = "0"
+            document.getElementById("o1").hidden = true;
+            document.getElementById("o2").hidden = true;
+            document.getElementById("o3").hidden = true;
+            document.getElementById("o4").hidden = true;
+            document.getElementById("o5").hidden = true;
+            document.getElementById("o6").hidden = true;
+            document.getElementById("o7").hidden = true;
+            document.getElementById("o8").hidden = true;
+            document.getElementById("o9").hidden = true;
+            document.getElementById("o10").hidden = true;
+            document.getElementById("o11").hidden = true;
+            document.getElementById("o12").hidden = true;
+            document.getElementById("o13").hidden = true;
+            document.getElementById("o14").hidden = true;
+            document.getElementById("o15").hidden = true;
+            document.getElementById("p50_50").hidden = true;
+            document.getElementById("palter").hidden = true;
+            document.getElementById("pnavi").hidden = true;
+            document.getElementById("px2").hidden = true;
+            document.getElementById("pauden").hidden = true;
+             document.getElementById("pfact").hidden = true;
+            document.getElementById("question").value = "";
+            document.getElementById("o1").style.backgroundColor = "#000c11";
+            document.getElementById("o2").style.backgroundColor = "#000c11";
+            document.getElementById("o3").style.backgroundColor = "#000c11";
+            document.getElementById("o4").style.backgroundColor = "#000c11";
+            document.getElementById("o5").style.backgroundColor = "#000c11";
+            document.getElementById("o6").style.backgroundColor = "#000c11";
+            document.getElementById("o7").style.backgroundColor = "#000c11";
+            document.getElementById("o8").style.backgroundColor = "#000c11";
+            document.getElementById("o9").style.backgroundColor = "#000c11";
+            document.getElementById("o10").style.backgroundColor = "#000c11";
+            document.getElementById("o11").style.backgroundColor = "#000c11";
+            document.getElementById("o12").style.backgroundColor = "#000c11";
+            document.getElementById("o13").style.backgroundColor = "#000c11";
+            document.getElementById("o14").style.backgroundColor = "#000c11";
+            document.getElementById("o15").style.backgroundColor = "#000c11";
+            document.getElementById("p50_50").style.backgroundColor = "#000c11";
+            document.getElementById("palter").style.backgroundColor = "#000c11";
+            document.getElementById("pnavi").style.backgroundColor = "#000c11";
+            document.getElementById("px2").style.backgroundColor = "#000c11";
+            document.getElementById("pauden").style.backgroundColor = "#000c11";
+             document.getElementById("pfact").style.backgroundColor = "#000c11";
+        document.getElementById("question").hidden = false;
+        get_task_otbor();
+        return;
+    }
+    if (data[0] == "warning otbor")
+    {
+        document.getElementById("au").value = "10";
+    }
+    if (data[0] == "start otbor")
+    {
+        if (document.getElementById("ex2").value == "start otbor")
+                return;
+            document.getElementById("ex2").value = "start otbor";
+            setTimeout(() => {timer_otbor(); }, 2000);
+    }
+    if (data[0] == "otbor end")
+        {
+            //document.getElementById("au").hidden = true;
+            document.getElementById("ex2").value = "0";
+            get_answer_otbor();
+            show_winner_otbor();
+        }
+    if (data[0] == "winner otbor")
+        {
+            show_winner_otbor();
+        }
 
 
     
@@ -261,6 +346,109 @@ function update_list_user()
 console.error('Ошибка:', error);
 });
 }
+
+
+function get_task_otbor(){
+        fetch('/get_task_otbor', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data=="fail")
+    {
+       return; 
+    }
+    document.getElementById('question').innerText= "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];  
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+
+
+function timer_otbor(){
+    if (document.getElementById("au").value == "0")
+    {
+        //document.getElementById("answer_otbor").disabled = false;
+        return;
+    }
+    document.getElementById("au").value = (parseInt(document.getElementById("au").value)-1).toString();
+    setTimeout(() => { timer_otbor(); 
+}, 1000);
+
+}
+
+
+function get_answer_otbor(){
+        fetch('/get_task_otbor', {
+        method: 'POST',
+        body: JSON.stringify({ " ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data=="fail")
+    {
+       return; 
+    }
+    document.getElementById('question').innerText= "Правильный ответ: " + data[3];  
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+
+
+function show_winner_otbor(){
+    fetch('/update_list_users', {
+        method: 'POST',
+        body: JSON.stringify({ " ":" "}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data=="fail")
+    {
+       return; 
+    }
+    for (var i =0 ;data.length;i++)
+    {
+        if (data[i][5]=="winner otbor")
+        {
+            
+            document.getElementById("au").value ="Игрок: " + data[i][1]+ "      " +"Ответ: " + data[i][2]+ "      "+"Время: "+data[i][4];
+            break;
+        }
+    }
+
+
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+}
+
 
 
 

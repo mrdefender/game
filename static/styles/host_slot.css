@@ -824,6 +824,79 @@
     text-wrap:inherit    
 }
 
+.otbor{
+
+    position: relative;
+    top: -20.7rem;
+    left: -7rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 130px;
+    height: 10%;
+    text-wrap:inherit  
+}
+
+.warning_otbor{
+    
+    position: relative;
+    top: -20.7rem;
+    left: -7rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+     width: 130px;
+    height: 10%;
+    text-wrap:inherit  
+}
+
+.start_otbor{
+     position: relative;
+    top: -20.7rem;
+    left: -7rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 160px;
+    height: 10%;
+    text-wrap:inherit  
+    
+}
+.answer_otbor{
+     position: relative;
+    top: -20.7rem;
+    left: -7rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 220px;
+    height: auto;
+    text-wrap:inherit  
+    
+}
+.result_otbor{
+     position: relative;
+    top: -20.7rem;
+   left: -7rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: 220px;
+    height: 10%;
+    text-wrap:inherit  
+    
+}
+
 
 *:disabled
 {

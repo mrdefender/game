@@ -74,6 +74,7 @@ var audio_out_player= new Audio(audioUrl+"out_player.ogg");
 var audio_pre_final= new Audio(audioUrl+"pre-final.ogg");
 var audio_final= new Audio(audioUrl+"final.ogg");
 var audio_help_auden= new Audio(audioUrl+"help_auden.ogg");
+var audio_wait_1min= new Audio(audioUrl+"wait_1min.ogg");
 var timerWaitAnswer;
 var timerHelps;
 
@@ -133,6 +134,10 @@ function cancel_all(){
     document.getElementById("help_auden").style.backgroundColor = "#000c11";
     document.getElementById("navi").style.backgroundColor = "#000c11";
     document.getElementById("fact").style.backgroundColor = "#000c11";
+    document.getElementById("otbor").disabled = false;
+    document.getElementById("start_otbor").disabled = true;
+    document.getElementById("answer_otbor").disabled = true;
+    document.getElementById('result_otbor').disabled = true;
    ch1();
    ch2();
    ch3();
@@ -822,6 +827,12 @@ function invite_to_game()
     document.getElementById("fixed_script").disabled = false;
     stop_sounds();
     audio_invite.play();
+    document.getElementById('question').innerText = " "
+    document.getElementById('question').value = " "
+    document.getElementById("otbor").disabled = true;
+    document.getElementById("start_otbor").disabled = true;
+    document.getElementById("answer_otbor").disabled = true;
+    document.getElementById('result_otbor').disabled = true;
 })
 .catch(error => {
 console.error('Ошибка:', error);
@@ -868,6 +879,8 @@ function gen_task()
         true;
     var input = document.getElementById("user_id").value;
     round = document.getElementById("status-round").value;
+    if (document.getElementById("status-round").value == "Отборочный тур")
+        round = "0";
     round = parseInt(round)
     console.log(round)
     if (round == "Отборочный тур" )
@@ -892,6 +905,17 @@ function gen_task()
 
 .then(data => {
     console.log(data)
+    if (data == "fail")
+    {
+        document.getElementById('question').innerText = "Ошибка БД"
+        return
+    }
+    if (data[0]==0)
+    {
+         document.getElementById('question').innerText= "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];
+         document.getElementById("warning_otbor").disabled = false;
+         return;
+    }
     document.getElementById('question').innerText = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
     status_btn (false,"o");
     status_btn (false,"btn");
@@ -2512,6 +2536,8 @@ function stop_sounds()
     audio_final.pause();
     audio_help_auden.currentTime = 0;
     audio_help_auden.pause();
+    audio_wait_1min.currentTime = 0;
+    audio_wait_1min.pause();
 
     //console.log(currentUrl);
 }
@@ -2835,6 +2861,182 @@ function wait_answer(){
     }
 
 
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+
+
+function otbor(){
+    
+    fetch('/otbor', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/data'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    
+
+    console.log(data);
+    if (data == 'fail')
+        return;
+    select.value = "Отборочный тур"
+    ch3();
+    stop_sounds();
+    audio_otbor_rules.loop = true;
+    audio_otbor_rules.play();
+    document.getElementById("get_task").disabled = false;
+    document.getElementById("start_otbor").disabled = true;
+    document.getElementById("answer_otbor").disabled = true;
+    document.getElementById('result_otbor').disabled = true;
+ 
+
+
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+}
+
+function warning_otbor(){
+    
+    fetch('/warning_otbor', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/data'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    
+
+    console.log(data);
+    if (data == 'fail')
+        return;
+    stop_sounds();
+    audio_otbor_warning.play();
+    document.getElementById("au").value = "10";
+    document.getElementById("start_otbor").disabled = false;
+    
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+}
+
+function start_otbor(){
+     fetch('/start_otbor', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/data'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+     if (data == 'fail')
+        return;
+    stop_sounds();
+    audio_otbor_play.play();
+    setTimeout(() => {
+  timer_otbor(); 
+}, 2000);
+    
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+    
+}
+
+function timer_otbor(){
+    if (document.getElementById("au").value == "0")
+    {
+        document.getElementById("answer_otbor").disabled = false;
+        return;
+    }
+    document.getElementById("au").value = (parseInt(document.getElementById("au").value)-1).toString();
+    setTimeout(() => { timer_otbor(); 
+}, 1000);
+
+}
+
+function show_answer_otbor(){
+     fetch('/show_answer_otbor', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/data'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    
+
+    console.log(data);
+    if (data == 'fail')
+        return;
+    stop_sounds();
+    audio_navigator.play();
+    document.getElementById("au").value =" ";
+    document.getElementById('question').innerText= "Правильный ответ: " + data[3];
+    document.getElementById('result_otbor').disabled = false;
+   
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+
+
+
+}
+
+function show_result_otbor(){
+    fetch('/show_result_otbor', {
+        method: 'POST',
+        body: JSON.stringify({ "":""}),
+        headers: {
+            'Content-Type': 'application/data'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    
+
+    console.log(data);
+    if (data == 'fail')
+        return;
+    document.getElementById("user_id").value = data[0];
+    stop_sounds()
+    audio_otbor_resullt.play()
+
+   
 
 })
 .catch(error => {

@@ -327,6 +327,21 @@
 }
 
 
+.result_otbor{
+    position: relative;
+    top: -5rem;
+    left: 0rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    font-size: medium;
+    width: 50rem;
+    height: 4rem;
+    font-size: x-large;
+    text-wrap:inherit
+}
+
+
 
 *:disabled
 {

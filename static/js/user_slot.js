@@ -33,6 +33,8 @@ function get_status(){
             document.getElementById("question").hidden = true;
             document.getElementById("question").value = "";
             document.getElementById("ex2").value ="0"
+            document.getElementById("otbor_input").hidden = true;
+            document.getElementById("otbor_submit").hidden = true;
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
             document.getElementById("o3").hidden = true;
@@ -61,7 +63,9 @@ function get_status(){
              document.getElementById("pfact").hidden = true;
               document.getElementById("pfact").disabled = true;
             document.getElementById("question").value = "";
+            document.getElementById("au").hidden = true;
             document.getElementById("ans").value = "";
+            document.getElementById("question").innerText = " ";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -77,6 +81,7 @@ function get_status(){
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
+            document.getElementById("otbor_input").value = " ";
             clearInterval(timerHelps);
             clearInterval(timeWainAnswerFromMain);
             clearInterval(timeWainAnswerFromMain);
@@ -92,6 +97,7 @@ function get_status(){
             document.getElementById('welcome3').innerHTML = "Интерактивная игра";
             document.getElementById("question").hidden = false;
             document.getElementById("question").value = "";
+            document.getElementById("question").innerText = " ";
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -107,6 +113,9 @@ function get_status(){
             document.getElementById("o13").hidden = false;
             document.getElementById("o14").hidden = false;
             document.getElementById("o15").hidden = false;
+             document.getElementById("otbor_input").hidden = true;
+            document.getElementById("otbor_submit").hidden = true;
+            document.getElementById("au").hidden = true;
             status_btn(true);
            
             //clearInterval(timerToGame);
@@ -120,6 +129,7 @@ function get_status(){
             document.getElementById('welcome3').innerHTML = "Основная игра";
             document.getElementById("question").hidden = false;
             document.getElementById("question").value = "";
+            document.getElementById("question").innerText = " ";
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -135,6 +145,9 @@ function get_status(){
             document.getElementById("o13").hidden = false;
             document.getElementById("o14").hidden = false;
             document.getElementById("o15").hidden = false;
+            document.getElementById("otbor_input").hidden = true;
+            document.getElementById("otbor_submit").hidden = true;
+            document.getElementById("au").hidden = true;
             timerHelps = setInterval(() => get_helps(), 5000);
             status_btn(true);
             //clearInterval(timerToGame);
@@ -147,6 +160,7 @@ function get_status(){
         {
             document.getElementById("ans").value = "";
             document.getElementById("question").value = "";
+            document.getElementById("question").innerText = " ";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -171,6 +185,7 @@ function get_status(){
         {
             document.getElementById("ans").value = "";
             document.getElementById("question").value = " ";
+            document.getElementById("question").innerText = " ";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -213,6 +228,97 @@ function get_status(){
         {
             show_right_user();
         }
+        if (data == "otbor")
+        {
+             document.getElementById('welcome').innerHTML = "";
+            document.getElementById('welcome2').innerHTML = "";
+            document.getElementById('welcome3').innerHTML = "Отборочный тур!";
+            document.getElementById("question").hidden = false;
+            document.getElementById("otbor_input").hidden = false;
+            document.getElementById("otbor_submit").hidden = false;
+            document.getElementById("au").hidden = false;
+            document.getElementById("question").value = "";
+            document.getElementById("ex2").value ="0"
+            document.getElementById("o1").hidden = true;
+            document.getElementById("o2").hidden = true;
+            document.getElementById("o3").hidden = true;
+            document.getElementById("o4").hidden = true;
+            document.getElementById("o5").hidden = true;
+            document.getElementById("o6").hidden = true;
+            document.getElementById("o7").hidden = true;
+            document.getElementById("o8").hidden = true;
+            document.getElementById("o9").hidden = true;
+            document.getElementById("o10").hidden = true;
+            document.getElementById("o11").hidden = true;
+            document.getElementById("o12").hidden = true;
+            document.getElementById("o13").hidden = true;
+            document.getElementById("o14").hidden = true;
+            document.getElementById("o15").hidden = true;
+            document.getElementById("p50_50").disabled = true;
+            document.getElementById("palter").disabled = true;
+            document.getElementById("pnavi").disabled = true;
+            document.getElementById("px2").disabled = true;
+            document.getElementById("pauden").disabled = true;
+            document.getElementById("p50_50").hidden = true;
+            document.getElementById("palter").hidden = true;
+            document.getElementById("pnavi").hidden = true;
+            document.getElementById("px2").hidden = true;
+            document.getElementById("pauden").hidden = true;
+             document.getElementById("pfact").hidden = true;
+              document.getElementById("pfact").disabled = true;
+            document.getElementById("question").value = "";
+            document.getElementById("ans").value = "";
+            document.getElementById("question").innerText = " ";
+            document.getElementById("o1").style.backgroundColor = "#000c11";
+            document.getElementById("o2").style.backgroundColor = "#000c11";
+            document.getElementById("o3").style.backgroundColor = "#000c11";
+            document.getElementById("o4").style.backgroundColor = "#000c11";
+            document.getElementById("o5").style.backgroundColor = "#000c11";
+            document.getElementById("o6").style.backgroundColor = "#000c11";
+            document.getElementById("o7").style.backgroundColor = "#000c11";
+            document.getElementById("o8").style.backgroundColor = "#000c11";
+            document.getElementById("o9").style.backgroundColor = "#000c11";
+            document.getElementById("o10").style.backgroundColor = "#000c11";
+            document.getElementById("o11").style.backgroundColor = "#000c11";
+            document.getElementById("o12").style.backgroundColor = "#000c11";
+            document.getElementById("o13").style.backgroundColor = "#000c11";
+            document.getElementById("o14").style.backgroundColor = "#000c11";
+            document.getElementById("o15").style.backgroundColor = "#000c11";
+            clearInterval(timerHelps);
+            clearInterval(timeWainAnswerFromMain);
+            clearInterval(timeWainAnswerFromMain);
+            clearInterval(timeWainAnswerFromMain);
+            clearInterval(timeWainAnswerFromMain);
+            clearInterval(timeWainAnswerFromMain);clearInterval(timeWainAnswerFromMain);
+            document.getElementById("otbor_input").value = " ";
+            get_task_otbor();
+        }
+        if (data == "warning otbor")
+        {
+            document.getElementById("au").value = "10";
+        }
+        if (data == "start otbor")
+        {
+
+            
+            if (document.getElementById("ex2").value == "start otbor")
+                return;
+            document.getElementById("ex2").value = "start otbor";
+            document.getElementById("otbor_submit").disabled = false;
+            document.getElementById("time-start").value = Date.now().toString();
+            setTimeout(() => {timer_otbor(); }, 2000);
+            
+        }
+        if (data == "otbor end")
+        {
+            document.getElementById("otbor_input").hidden = true;
+            document.getElementById("otbor_submit").hidden = true;
+            document.getElementById("au").hidden = true;
+            document.getElementById("ex2").value = "0";
+            get_answer_otbor();
+        }
+        
+
 
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
@@ -221,6 +327,110 @@ function get_status(){
 console.error('Ошибка:', error);
 });
 
+}
+
+function timer_otbor(){
+    if (document.getElementById("au").value == "0")
+    {
+        //document.getElementById("answer_otbor").disabled = false;
+        document.getElementById("otbor_submit").disabled = true;
+        return;
+    }
+    document.getElementById("au").value = (parseInt(document.getElementById("au").value)-1).toString();
+    setTimeout(() => { timer_otbor(); 
+}, 1000);
+
+}
+
+
+
+function get_task_otbor(){
+    var user_name = document.getElementById("user_name").value;
+        fetch('/get_task_otbor', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data=="fail")
+    {
+       return; 
+    }
+    document.getElementById('question').innerText= "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];  
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+
+function get_answer_otbor(){
+    var user_name = document.getElementById("user_name").value;
+        fetch('/get_task_otbor', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data=="fail")
+    {
+       return; 
+    }
+    document.getElementById('question').innerText= "Правильный ответ: " + data[3];  
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+
+
+function send_answer_otbor(){
+     var user_name = document.getElementById("user_name").value;
+     var ans_otbor = document.getElementById("otbor_input").value;
+     try
+     {
+        var tmp = parseInt(ans_otbor);
+     }
+     catch (error)
+     {
+        document.getElementById("otbor_input").value = "";
+     }
+     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
+        fetch('/send_answer_otbor', {
+        method: 'POST',
+        body: JSON.stringify({ user:user_name, ans_otbor:ans_otbor,time_answer:time_answer}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+
+    if (data=="fail")
+    {
+       return; 
+    }
+    document.getElementById("otbor_submit").disabled = true;
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
 }
 
 

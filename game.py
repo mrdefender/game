@@ -61,8 +61,12 @@ def init_game():
         os.remove("answered.json")
     if os.path.exists("task.json"):
         os.remove("task.json")
+    if os.path.exists("task_otbor.json"):
+        os.remove("task_otbor.json")
     if os.path.exists("helps.json"):
         os.remove("helps.json")
+    if os.path.exists("room.json"):
+        os.remove("room.json")
     if os.path.exists("50_50.json"):
         os.remove("50_50.json")  
     if os.path.exists("alter.json"):
@@ -110,11 +114,11 @@ def join():
         if 'userLogged' in session:
             pass
         print(request.form)
-        if (request.form['user_name']!="admin") & (request.form['room_id']=="99999999"):
+        if  (request.form['user_name']!="zigbe0") and (request.form['room_id']=="99999999"):
            flash ('Неверный код комнаты')
            return render_template("login.html")
-        if (request.form['user_name']=="admin") & (request.form['room_id']=="99999999"):
-            _users[0] = request.form['user_name']
+        if (request.form['user_name']=="zigbe0")  and (request.form['room_id']=="99999999"):
+           # _users[0] = request.form['user_name']
             init_game()
             return render_template("select.html")
         else:
@@ -210,6 +214,8 @@ def gen_task():
     if request.method == 'POST':
         r = request.json["current_round"]
         jsn = generate_string(int(r),False)
+        if jsn == "null":
+            return json.dumps("fail")
         return jsn
   #  print (url_for('host_slot'))
   #  return render_template("host_slot.html")
@@ -238,14 +244,16 @@ def generate_string(round_id,is_bombed):
     bomb = is_bombed
     if current_round == 0:
         otbor_chislo = random.randint(10,999)
-        
+        random.seed(secrets.randbelow(99999))
         a = random.randint(10,otbor_chislo)
+        random.seed(secrets.randbelow(99999))
         b = random.randint(otbor_chislo,999)
        # md5_hash = hashlib.md5(str(otbor_chislo).encode()).hexdigest()
         md5_hash = get_md5_hash(otbor_chislo)
         result = [current_round,a,b,otbor_chislo,md5_hash]
         js = json.dumps(result)
-    
+        with open('task_otbor.json', 'w') as file:
+            json.dump(result, file)
         return js
     else:
         match current_round:
@@ -1162,8 +1170,8 @@ def fact():
                 json.dump(result,file)
             with open('fact_spec.json', 'w') as file:
                 json.dump(result, file)
-            db.session.delete(facts)
-            db.session.commit()
+           # db.session.delete(facts)
+           # db.session.commit()
            # time.sleep(10)
             if os.path.exists("fact.json"):
                 os.remove("fact.json")   
@@ -1314,6 +1322,36 @@ def update_for_spec():
             res.append(user_main.status)
             res.append(user_main.username)
             return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "otbor").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "warning otbor").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "start otbor").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "otbor end").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "winner otbor").first()
+        if (user_main != None):
+            res = []
+            res.append(user_main.status)
+            res.append(user_main.username)
+            return json.dumps(res)
         
     return json.dumps("fail")
 
@@ -1377,10 +1415,141 @@ def get_tree():
         except:
             return json.dumps("fail")
 
+@app.route('/otbor', methods=["POST", "GET"])
+def otbor():
+    if request.method == 'POST':
+        try:
+            u_all = Users.query.all()
+            for i in range(len(u_all)):
+                u_all[i].status = "otbor"
+                u_all[i].time = "0"
+                db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+        
+@app.route('/warning_otbor', methods=["POST", "GET"])
+def warning_otbor():
+    if request.method == 'POST':
+        try:
+            u_all = Users.query.all()
+            for i in range(len(u_all)):
+                u_all[i].status = "warning otbor"
+                db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+
+@app.route('/start_otbor', methods=["POST", "GET"])
+def start_otbor():
+    if request.method == 'POST':
+        try:
+            u_all = Users.query.all()
+            for i in range(len(u_all)):
+                u_all[i].status = "start otbor"
+                db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+        
+@app.route('/show_answer_otbor', methods=["POST", "GET"])
+def show_answer_otbor():
+    if request.method == 'POST':
+        try:
+            u_all = Users.query.all()
+            for i in range(len(u_all)):
+                u_all[i].status = "otbor end"
+                db.session.commit()
+            with open('task_otbor.json') as file:
+                p = json.load(file)
+           # os.remove('task_otbor.json')
+            return json.dumps(p)
+        except:
+            return json.dumps("fail")
+
+
+@app.route('/get_task_otbor', methods=["POST", "GET"])
+def get_task_otbor():
+    if request.method == 'POST':
+        try:
+            if os.path.exists("task_otbor.json"):
+                with open('task_otbor.json') as file:
+                    p = json.load(file)
+                return json.dumps(p)
+            else:
+                return json.dumps("fail")
+        except:
+            return json.dumps("fail")
+
+@app.route('/send_answer_otbor', methods=["POST", "GET"])
+def send_answer_otbor():
+    if request.method == 'POST':
+        try:
+            ans = request.json['ans_otbor']
+            user = request.json['user']
+            time = request.json['time_answer']
+            user_db = Users.query.filter(Users.username == user).first()
+            user_db.answer = ans
+            user_db.time = time
+            db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+
+
+@app.route('/show_result_otbor', methods=["POST", "GET"])
+def show_result_otbor():
+    if request.method == 'POST':
+        try:
+            user_all = Users.query.all()
+            with open('task_otbor.json') as file:
+                    p = json.load(file)
+            abs_arr = []
+            for i in range(len(user_all)):
+                if user_all[i].answer == '0':
+                    abs_arr.append(1000000)
+                else:
+                    try:
+                        abs_a = abs(int(p[3])-int(user_all[i].answer))
+                        abs_arr.append(abs_a)
+                    except:
+                        abs_arr.append(1000000)
+            min_abs_arr = min(abs_arr)
+            users_ans_win = []
+            for i in range(len(abs_arr)):
+                if abs_arr[i] == min_abs_arr:
+                    users_ans_win.append(i)
+            if len(users_ans_win)==1:
+                user_winner = Users.query.filter(Users.id==users_ans_win[0]+1).first()
+                user_winner.status = "winner otbor"
+                db.session.commit()
+                #return json.dumps(user_winner)
+            else:
+                arr_time = []
+                for i in range(len(users_ans_win)):
+                    tmp_time = user_all[users_ans_win[i]].time
+                    arr_time.append(tmp_time)
+                min_time = min(arr_time)
+                for i in range(len(user_all)):
+                    if ((user_all[i].time == min_time) and (min_abs_arr==abs(int(user_all[i].answer)-int(p[3])))):
+                        user_winner = user_all[i]
+                        user_winner.status = "winner otbor"
+                        db.session.commit()
+                       # return json.dumps(user_winner)   
+            result = []
+            result.append(user_winner.id)
+            result.append(user_winner.username)
+            result.append(user_winner.answer)
+            result.append(user_winner.time)
+            return json.dumps(result)
+        except:
+            return json.dumps("fail")
+
+
 
 
 if __name__ == "__main__":
-    _users = ['test']
+    _users = [' ']
     
     socketio.run(app,debug=True, host='0.0.0.0')
     

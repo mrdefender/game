@@ -94,7 +94,7 @@
             <div>
              <select class="select_round" id="select_round">   
                 <option value="Раунд" selected disabled></option> 
-                <option id="0" value="Отборочный тур" disabled >Отборочный тур</option>>
+                <option id="0" value="Отборочный тур">Отборочный тур</option>>
                 <option id="1" value="Раунд 1" >Раунд 1</option>
                 <option id="2" value="Раунд 2" >Раунд 2</option>
                 <option id="3" value="Раунд 3" >Раунд 3</option>
@@ -164,15 +164,13 @@
                 <input class="user_id" id="user_id", name="user_id" type="text" maxlength="4" placeholder="User_id" required>
             </div>
                 
+                
                 <input type="submit" class="start_game" id ="start_game" onclick="start_to_game()" value="Начать игру"  disabled>
 
                 <input type="submit" class="invite" id="invite" onclick="invite_to_game()" value="Пригласить в игру">
                 <input type="submit" class="invite" id="get_task" onclick="gen_task()" value="Получить задание" disabled >
                 <input type="submit" class="take_money" id="take_money" onclick="take_money()" value="Забрать деньги" disabled>  
                 <input type="submit" class="take_money" id="total_money" onclick="total_money()" value="Выигрыш" disabled>
-                </p>
-                <p>
-
                 </p>
                 <p>
                  <input type="submit" class="cancel-answer" onclick="cancel_answer()" value="Отменить ответ" disabled>
@@ -184,9 +182,23 @@
                <input type="submit" class="cancel_all" onclick="cancel_all()" value="Сброс"> 
                
                 <input type="submit" class="stop_sounds"  onclick="stop_sounds()" value="Остановить звуки"> 
+                
+             </p>
+             <p>
+                <input type="submit" class="otbor" id="otbor" onclick="otbor()" value="Отборочный тур">
+                <input type="submit" class="warning_otbor" id="warning_otbor"  onclick="warning_otbor()" value="Показать таймер" disabled>
+                <input type="submit" class="start_otbor" id="start_otbor"  onclick="start_otbor()" value="Запуска таймера отб. тура" disabled>
+                <input type="submit" class="answer_otbor" id="answer_otbor" onclick="show_answer_otbor()" value="Показать правильный ответ отборочного тура" disabled>
+                <input type="submit" class="result_otbor" id="result_otbor"  onclick="show_result_otbor()" value="Показать победителя отборочного тура" disabled>
+                
+             </p>
+             <p>
+                
+                
              </p>
              <p>
                 <input type="submit" class="clear_table"  onclick="clear_table()" value="Очистить бд"> 
+                
              </p>
              <p>
                  <input type="submit" class="music"  onclick="start_sound_begin1()" value="Заставка"> 

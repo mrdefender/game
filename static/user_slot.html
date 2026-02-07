@@ -28,6 +28,7 @@
                 <p>  
 
                 <input type="submit" class="message" id="user_name" value={{value}}>
+                <input type="submit" class="message" id="au" value="" hidden>
                 <div class = "questions" id="question" value ="" hidden></div>
                 </p>
                 <p>
@@ -62,7 +63,7 @@
                 </p>
                 <p>
              <input class="otbor_input" id="otbor_input", name="otbor_input" type="text" placeholder="Ответ" required hidden>
-             <input type="submit" class="send_answer_otbor" id="otbor_submit" value="Ответить" disabled hidden>
+             <input type="submit" class="send_answer_otbor" id="otbor_submit" onclick="send_answer_otbor()" value="Ответить" disabled hidden>
              <input type="submit" id="time-start" value="" disabled hidden >
              <input type="submit" id="count_fatal" value="" disabled hidden >
              <input type="submit" id="ex2" value="0" disabled hidden >
