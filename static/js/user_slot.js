@@ -668,7 +668,7 @@ function check_answered_main(){
         status_btn(true);
         clearInterval(timeWainAnswerFromMain);
         timeWainAnswerFromMain = undefined;
-        console.log(timeWainAnswerFromMain)
+       
        // timeWainAnswerFromMain = undefined;
     }
     

@@ -755,7 +755,7 @@
 .clear_table{
     position: relative;
     top: -20.5rem;
-    left: -29rem;
+    left: -20rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -813,7 +813,7 @@
 .music{
     position: relative;
     top: -20rem;
-    left: -14rem;
+    left: -9.5rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -896,7 +896,19 @@
     text-wrap:inherit  
     
 }
-
+.result_interactive{
+    position: relative;
+    top: -20.5rem;
+    left: -20rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    color: rgb(7, 173, 224);
+    font-size: medium;
+    width: auto;
+    height: 2rem;
+    text-wrap:inherit
+}
 
 *:disabled
 {

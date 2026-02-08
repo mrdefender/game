@@ -20,7 +20,7 @@ function update_list_user()
 .then(response => response.json())
 
 .then(data => {
-    console.log("update " + data);
+    
 
     if (data == "fail")
     {
@@ -30,13 +30,27 @@ function update_list_user()
     
     if (data == "wait")
         {
+            try
+            {
+                var ind = 0;
+                while (true)
+                {
+                    let result_button = document.getElementById('r'+ind.toString())
+                    result_button.remove();
+                    ind++;
+                }
+            }
+            catch (error)
+            {
+
+            }
             document.getElementById("in_game").value = "В игре: "
             document.getElementById("user").value = ""
             document.getElementById("au").value = ""
             document.getElementById("ans").value = ""
             document.getElementById("question").hidden = true;
             document.getElementById("question").value = " ";
-            document.getElementById("question").innerText = " ";
+            document.getElementById('question').innerText = " ";
             document.getElementById("ex2").value = "0"
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
@@ -92,7 +106,7 @@ function update_list_user()
             document.getElementById("user").value = data[1]
             document.getElementById("question").hidden = false;
             document.getElementById("question").value = " ";
-            document.getElementById("question").innerText = " ";
+            document.getElementById('question').innerText = "";
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -123,7 +137,7 @@ function update_list_user()
              document.getElementById("pfact").hidden = false;
               document.getElementById("pfact").disabled = false;
             document.getElementById("question").value = " ";
-            document.getElementById("question").innerText = " ";
+          //  document.getElementById("question").innerText = " ";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -153,6 +167,7 @@ function update_list_user()
        // document.getElementById("au").value = "";
         document.getElementById("ex2").value = "0";
         document.getElementById("ans").value = "";
+        document.getElementById('question').innerText = "";
         document.getElementById("o1").style.backgroundColor = "#000c11";
         document.getElementById("o2").style.backgroundColor = "#000c11";
         document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -181,7 +196,6 @@ function update_list_user()
         if ((document.getElementById("ex2").value != "auden") && (document.getElementById("ex2").value != "fact"))
             document.getElementById("au").value = "";
         document.getElementById("question").value = "";
-        document.getElementById("question").innerText = " ";
         get_task();
         get_helps();
         get_fact();
@@ -191,7 +205,7 @@ function update_list_user()
 
     if ((data[0] == "answered main") || (data[0] == "answered main x2"))
     {
-        console.log(data[0]);
+        
         answered_main();
         return;
 
@@ -202,7 +216,6 @@ function update_list_user()
         check_answered();
         //document.getElementById("au").value = " ";
         document.getElementById("question").value = " ";
-        document.getElementById("question").innerText = " ";
         return;
     }
 
@@ -210,14 +223,14 @@ function update_list_user()
     {
         document.getElementById("au").value ="Выигрыш:" +'\n'+ document.getElementById("fix").value;
         document.getElementById("question").value = "";
-        document.getElementById("question").innerText = " ";
+       // document.getElementById("question").innerText = " ";
         return;
     }
     if (data[0] == "game over")
     {
         document.getElementById("au").value ="Выигрыш:" +'\n'+ document.getElementById("current").value;
         document.getElementById("question").value = "";
-        document.getElementById("question").innerText = " ";
+        //document.getElementById("question").innerText = " ";
         return;
     }
 
@@ -265,7 +278,7 @@ function update_list_user()
             document.getElementById("au").value = ""
             document.getElementById("ans").value = ""
             document.getElementById("question").value = " ";
-            document.getElementById("question").innerText = " ";
+            document.getElementById('question').innerText = "";
             document.getElementById("ex2").value = "0"
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
@@ -336,7 +349,24 @@ function update_list_user()
         {
             show_winner_otbor();
         }
+    if (data[0][0] == "show result")
+    {
+       if (document.getElementById("ex2").value == "show_result")
+            return;
+        for (var i = 0; i< data.length;i++)
+        {
+            inputName = document.createElement('input');
+            inputName.setAttribute('type', 'submit');
+            inputName.setAttribute('class', 'result_otbor');
+            inputName.setAttribute('id', 'r'+i.toString());
+            inputName.setAttribute('innerText', data[i][1]+"                         "+ data[i][2]);
+            inputName.setAttribute('value', data[i][1]+"                         "+ data[i][2]);
+            document.body.appendChild(inputName);
+            console.log(inputName)
+        }
+        document.getElementById("ex2").value = "show_result";
 
+    }
 
     
 
@@ -465,7 +495,7 @@ function answered_main(){
 
 .then(data => {
 
-    console.log(data)
+    
 
     if (data == "fail")
     {
@@ -500,7 +530,7 @@ function check_answered(){
 .then(response => response.json())
 
 .then(data => {
-    console.log(document.getElementById("ex2").value)
+    
 
    if (data == "fail")
     {
@@ -622,7 +652,7 @@ function get_task(){
 .then(response => response.json())
 
 .then(data => {
-    console.log(data);
+    
 
     if (data == "fail")
     {
@@ -1055,7 +1085,7 @@ function get_helps(){
         var user_name = document.getElementById("user").value;
         if ((document.getElementById("ex2").value=="x2") || (document.getElementById("ex2").value=="x2-2"))
             return;
-        console.log(user_name)
+       
         fetch('/get_helps', {
         method: 'POST',
         body: JSON.stringify({ user:user_name}),
@@ -1067,7 +1097,7 @@ function get_helps(){
 .then(response => response.json())
 
 .then(data => {
-    console.log("help " + data)
+    
 
     if (data=="fail")
     {
@@ -1172,7 +1202,7 @@ function get_alter(){
 
 .then(data => {
 
-    console.log(data)
+    
     if (data == "fail")
     {
         return;
@@ -1293,7 +1323,7 @@ function get_fact(){
 .then(response => response.json())
 
 .then(data => {
-    console.log("fact "+ data[1])
+   
 
     if (data == "fail")
     {

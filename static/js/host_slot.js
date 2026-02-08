@@ -3026,9 +3026,7 @@ function show_result_otbor(){
 )
 .then(response => response.json())
 
-.then(data => {
-    
-
+.then(data => {  
     console.log(data);
     if (data == 'fail')
         return;
@@ -3042,4 +3040,62 @@ function show_result_otbor(){
 .catch(error => {
 console.error('Ошибка:', error);
 });
+}
+
+
+function show_result_interactive(){
+     var action
+    
+        action = "show"
+    fetch('/show_result_interactive', {
+        method: 'POST',
+        body: JSON.stringify({ action:action}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    console.log(data);
+    if (data == 'fail')
+        return;
+  
+
+   
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+var time = 0;
+function wait_1min(){
+    time = 60;
+    document.getElementById("au").value = "1:00";
+    stop_sounds();
+    audio_wait_1min.play();
+    setTimeout(() => {
+  timer_wait(time); 
+}, 2000);
+}
+
+function timer_wait(time_w){
+    if (time_w<=0)
+    {
+        return;
+    }
+    time_w=time_w-1;
+    if (time_w<10)
+    {
+        document.getElementById("au").value = '0:'+'0'+time_w.toString();
+        setTimeout(() => { timer_wait(time_w); }, 1000);
+        return;
+    }
+    if (time_w<60)
+        document.getElementById("au").value = "0:"+time_w.toString();
+
+    setTimeout(() => { timer_wait(time_w); }, 1000);
+
 }

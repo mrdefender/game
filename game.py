@@ -4,6 +4,7 @@ import random
 import hashlib
 import os
 import json
+from sqlalchemy import desc
 from werkzeug.utils import secure_filename  
 import mimetypes  
 import string
@@ -65,8 +66,8 @@ def init_game():
         os.remove("task_otbor.json")
     if os.path.exists("helps.json"):
         os.remove("helps.json")
-    if os.path.exists("room.json"):
-        os.remove("room.json")
+    #if os.path.exists("room.json"):
+     #   os.remove("room.json")
     if os.path.exists("50_50.json"):
         os.remove("50_50.json")  
     if os.path.exists("alter.json"):
@@ -1352,11 +1353,23 @@ def update_for_spec():
             res.append(user_main.status)
             res.append(user_main.username)
             return json.dumps(res)
-        
+        user_main = Users.query.filter(Users.status == "show result").first()
+        if (user_main != None):
+            res = get_result()
+            return json.dumps(res)
     return json.dumps("fail")
 
 
-
+def get_result():
+    result = []
+    tmp = Users.query.order_by(desc(Users.money)).all()
+    for i in range(len(tmp)):
+        status = tmp[i].status
+        username = tmp[i].username
+        money = tmp[i].money
+        t = [status, username, money]
+        result.append(t)
+    return result
 
 @app.route('/send_script', methods=["POST", "GET"])
 def send_script():
@@ -1544,6 +1557,23 @@ def show_result_otbor():
             return json.dumps(result)
         except:
             return json.dumps("fail")
+
+@app.route('/show_result_interactive', methods=["POST", "GET"])
+def show_result_interactive():
+    if request.method == 'POST':
+        try:
+            action = request.json['action']
+            user_all = Users.query.all()
+            for i in range(len(user_all)):
+                if action == "show":
+                    user_all[i].status = "show result"
+                if action == "hide":
+                    user_all[i].status = "wait"
+            db.session.commit()
+            return json.dumps("ok")
+        except:
+            return json.dumps("fail")
+
 
 
 
