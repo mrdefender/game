@@ -178,8 +178,8 @@ def spec_slot():
 def host_slot():
     if request.method == 'POST':
         print (url_for('host_slot'))
-        for i in _users:
-            flash (i)
+        #for i in _users:
+          #  flash (i)
         return render_template("host_slot.html")
     print (url_for('host_slot'))
     return render_template("host_slot.html")
