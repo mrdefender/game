@@ -208,6 +208,10 @@ function get_status(){
     if (data == "given task interactive")
         {
             get_task();
+            p50_50();
+            palter();
+            pnavi();
+           // pauden();
             //clearInterval(timerToGame);
            // check_answered_main();
             timeWainAnswerFromMain = setInterval(() => check_answered_main(), 5000);
@@ -215,6 +219,10 @@ function get_status(){
     if (data == "given task main")
         {
             get_task();
+            p50_50();
+            palter();
+            pnavi();
+           // pauden();
         }
     if (data == "check main")
         {
@@ -1442,10 +1450,9 @@ function get_o(answer)
 
 
 function p50_50(){
-
      var user_name = document.getElementById("user_name").value;
-     document.getElementById("p50_50").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "50:50"
+     //document.getElementById("p50_50").style.backgroundColor = "orange";
+     //document.getElementById("ex2").value = "50:50"
     fetch('/get_50_50', {
         method: 'POST',
         body: JSON.stringify({ user:user_name}),
@@ -1481,8 +1488,8 @@ console.error('Ошибка:', error);
 
 function palter(){
      var user_name = document.getElementById("user_name").value;
-     document.getElementById("palter").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "alter"
+   //  document.getElementById("palter").style.backgroundColor = "orange";
+    // document.getElementById("ex2").value = "alter"
     fetch('/get_alter', {
         method: 'POST',
         body: JSON.stringify({ user:user_name}),
@@ -1519,8 +1526,8 @@ console.error('Ошибка:', error);
 
 function pnavi(){
     var user_name = document.getElementById("user_name").value;
-     document.getElementById("pnavi").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "navi"
+    // document.getElementById("pnavi").style.backgroundColor = "orange";
+    // document.getElementById("ex2").value = "navi"
     fetch('/get_navi', {
         method: 'POST',
         body: JSON.stringify({ user:user_name}),
@@ -1615,6 +1622,7 @@ console.error('Ошибка:', error);
 }
 
 function pfact(){
+    
     document.getElementById("pfact").style.backgroundColor = "orange";
     var user_name = document.getElementById("user_name").value;
      fetch('/get_fact', {

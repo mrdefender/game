@@ -48,6 +48,8 @@ function update_list_user()
             document.getElementById("user").value = ""
             document.getElementById("au").value = ""
             document.getElementById("ans").value = ""
+            document.getElementById("current").value = "0";
+            document.getElementById("fix").value = "0"
             document.getElementById("question").hidden = true;
             document.getElementById("question").value = " ";
             document.getElementById('question').innerText = " ";
@@ -194,12 +196,15 @@ function update_list_user()
         if ((data[0] == "given task main") || (data[0] == "x2" ))
     {
         if ((document.getElementById("ex2").value != "auden") && (document.getElementById("ex2").value != "fact"))
-            document.getElementById("au").value = "";
+            //document.getElementById("au").value = "";
         document.getElementById("question").value = "";
         get_task();
         get_helps();
         get_fact();
         get_auden();
+        get_50_50();
+        get_alter();
+        get_navi();
        
     }
 
@@ -1152,7 +1157,7 @@ console.error('Ошибка:', error);
 
 
 function get_50_50(){
-     document.getElementById("p50_50").style.backgroundColor = "orange";
+    // document.getElementById("p50_50").style.backgroundColor = "orange";
      document.getElementById("ex2").value = "50:50"
     fetch('/get_50_50_spec', {
         method: 'POST',
@@ -1188,7 +1193,7 @@ console.error('Ошибка:', error);
 
 }
 function get_alter(){
-     document.getElementById("palter").style.backgroundColor = "orange";
+     //document.getElementById("palter").style.backgroundColor = "orange";
      document.getElementById("ex2").value = "alter"
     fetch('/get_alter_spec', {
         method: 'POST',
@@ -1225,7 +1230,7 @@ console.error('Ошибка:', error);
 
 }
 function get_navi(){
-     document.getElementById("pnavi").style.backgroundColor = "orange";
+     //document.getElementById("pnavi").style.backgroundColor = "orange";
      document.getElementById("ex2").value = "navi"
     fetch('/get_navi_spec', {
         method: 'POST',
@@ -1266,8 +1271,8 @@ function get_x2(){
 }
 function get_auden(){
 
-     document.getElementById("pauden").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "auden"
+     
+     //document.getElementById("ex2").value = "auden"
     fetch('/get_auden_spec', {
         method: 'POST',
         body: JSON.stringify({ " ":" "}),
@@ -1284,7 +1289,7 @@ function get_auden(){
     {
         return;
     }
-    
+    //document.getElementById("pauden").style.backgroundColor = "orange";
      document.getElementById("au").value = ""
     for (var i = 0; i<15;i++)
     {

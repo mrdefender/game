@@ -1970,6 +1970,9 @@ function next_round()
     status_btn(true,"o");
     document.getElementById("alter").style.backgroundColor = "#1a1b02";
     document.getElementById("x2").style.backgroundColor =  "#1a1b02";
+    document.getElementById("navi").style.backgroundColor = "#000c11";
+    document.getElementById("alter").style.backgroundColor = "#000c11";
+    document.getElementById("h50_50").style.backgroundColor = "#000c11";
     fetch('/next_round', {
         method: 'POST',
         body: JSON.stringify({ round:document.getElementById("status-round").value}),
