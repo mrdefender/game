@@ -108,3 +108,8 @@ h1 {
     color: black;
     font-size: medium;
 }
+
+input[disabled], input[readOnly] {
+  background-color: #575757; // Серый цвет, символизирующий "отдых" поля
+  color: #ffffff; // Текст в более тёмном оттенке, для его лучшей читабельности
+}

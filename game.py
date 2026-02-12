@@ -20,8 +20,8 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 
 app = Flask(__name__, template_folder="static/")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
-app.config["SECRET_KEY"] = "ce07970d34c80634ce4ab5ef66270f64" #"000001C9E687F6E0" #os.urandom(32).hex
-app.secret_key = "ce07970d34c80634ce4ab5ef66270f64" #"000001C9E687F6E0" #os.urandom(32).hex
+app.config["SECRET_KEY"] = ""  #os.urandom(32).hex
+app.secret_key = ""  #os.urandom(32).hex
 socketio = SocketIO(app)
 accepted_user = ""
 db = SQLAlchemy(app)
@@ -178,8 +178,8 @@ def spec_slot():
 def host_slot():
     if request.method == 'POST':
         print (url_for('host_slot'))
-        for i in _users:
-            flash (i)
+        #for i in _users:
+          #  flash (i)
         return render_template("host_slot.html")
     print (url_for('host_slot'))
     return render_template("host_slot.html")
@@ -196,12 +196,14 @@ def invite_user():
         if tmp == None:
             return json.dumps("fail")
         tmp.status = 'main'
+        tmp.answer = '0'
         db.session.commit()
         js = Users.query.all()
         if len(js)!=1:
             for i in range(len(js)):
                 if js[i].status !="main":
                     js[i].status = 'interactive'
+                    js[i].answer = '0'
             db.session.commit()
         return json.dumps(u)
     print (url_for('host_slot'))
@@ -546,7 +548,12 @@ def show_rights():
             with open('answered.json') as file:
                 jsn = json.load(file)
             os.remove("answered.json")
-            
+            if os.path.exists("50_50.json"):
+                os.remove("50_50.json")
+            if os.path.exists("alter.json"):
+                os.remove("alter.json")
+            if os.path.exists("navi.json"):
+                os.remove("navi.json")
             return jsn
            ## answered interactive
             
@@ -901,16 +908,13 @@ def get_50_50():
             tmp_u = request.json['user']
             user = Users.query.filter(Users.username==tmp_u).first()
             find = False
-            user.status = "50:50"
-            db.session.commit()
-            while not find:
-                if os.path.exists("50_50.json"):
-                    with open('50_50.json') as file:
-                        p = json.load(file)
-                        find = True
-                        user.status = "given task main"
-            db.session.commit()
-            os.remove("50_50.json")
+           # user.status = "50:50"
+           # db.session.commit()
+            #while not find:
+            if os.path.exists("50_50.json"):
+                with open('50_50.json') as file:
+                    p = json.load(file)
+               # os.remove("50_50.json")
             return json.dumps(p)
         except:
             return json.dumps("fail")
@@ -919,13 +923,13 @@ def get_50_50():
 def get_50_50_spec():
     if request.method == 'POST':
         try:
-            find = False
-            while not find:
-                if os.path.exists("50_50_spec.json"):
-                    with open('50_50_spec.json') as file:
-                        p = json.load(file)
-                        find = True
-            os.remove("50_50_spec.json")
+            #find = False
+           # while not find:
+            if os.path.exists("50_50_spec.json"):
+                with open('50_50_spec.json') as file:
+                    p = json.load(file)
+                        #find = True
+                os.remove("50_50_spec.json")
             return json.dumps(p)
         except:
             return json.dumps("fail")        
@@ -936,17 +940,17 @@ def get_alter():
         try:
             tmp_u = request.json['user']
             user = Users.query.filter(Users.username==tmp_u).first()
-            find = False
-            user.status = "alter"
-            db.session.commit()
-            while not find:
-                if os.path.exists("alter.json"):
-                    with open('alter.json') as file:
-                        p = json.load(file)
-                        find = True
-                        user.status = "given task main"
-            db.session.commit()
-            os.remove("alter.json")
+            #find = False
+           # user.status = "alter"
+           # db.session.commit()
+            #while not find:
+            if os.path.exists("alter.json"):
+                with open('alter.json') as file:
+                    p = json.load(file)
+                        #find = True
+                       # user.status = "given task main"
+            #db.session.commit()
+               # os.remove("alter.json")
             return json.dumps(p)
         except:
             return json.dumps("fail")
@@ -955,13 +959,13 @@ def get_alter():
 def get_alter_spec():
     if request.method == 'POST':
         try:
-            find = False
-            while not find:
-                if os.path.exists("alter_spec.json"):
-                    with open('alter_spec.json') as file:
-                        p = json.load(file)
-                        find = True
-            os.remove("alter_spec.json")
+            #find = False
+            #while not find:
+            if os.path.exists("alter_spec.json"):
+                with open('alter_spec.json') as file:
+                    p = json.load(file)
+                        #find = True
+                os.remove("alter_spec.json")
             return json.dumps(p)
         except:
             return json.dumps("fail")
@@ -974,17 +978,17 @@ def get_navi():
         try:
             tmp_u = request.json['user']
             user = Users.query.filter(Users.username==tmp_u).first()
-            find = False
-            user.status = "navi"
-            db.session.commit()
-            while not find:
-                if os.path.exists("navi.json"):
-                    with open('navi.json') as file:
-                        p = json.load(file)
-                        find = True
-                        user.status = "given task main"
-            db.session.commit()
-            os.remove("navi.json")
+           # find = False
+            #user.status = "navi"
+           # db.session.commit()
+            #while not find:
+            if os.path.exists("navi.json"):
+                with open('navi.json') as file:
+                    p = json.load(file)
+                        #find = True
+                        #user.status = "given task main"
+            #db.session.commit()
+                #os.remove("navi.json")
             return json.dumps(p)
         except:
             return json.dumps("fail")
@@ -994,13 +998,13 @@ def get_navi():
 def get_navi_spec():
     if request.method == 'POST':
         try:
-            find = False
-            while not find:
-                if os.path.exists("navi_spec.json"):
-                    with open('navi_spec.json') as file:
-                        p = json.load(file)
-                        find = True
-            os.remove("navi_spec.json")
+            #find = False
+            #while not find:
+            if os.path.exists("navi_spec.json"):
+                with open('navi_spec.json') as file:
+                    p = json.load(file)
+                        #find = True
+                os.remove("navi_spec.json")
             return json.dumps(p)
         except:
             return json.dumps("fail")
@@ -1119,13 +1123,14 @@ def get_auden():
         try:
             uu = request.json['user']
             user = Users.query.filter(Users.username==uu).first()
-            user.status = "auden"
-            db.session.commit()
-            while (True):
-                if os.path.exists("auden.json"):
-                    break
-            user.status = "given task main"
-            db.session.commit()
+            #user.status = "auden"
+            #db.session.commit()
+            #while (True):
+            if os.path.exists("auden.json"):
+                    #break
+                pass
+            #user.status = "given task main"
+            #db.session.commit()
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -1171,8 +1176,8 @@ def fact():
                 json.dump(result,file)
             with open('fact_spec.json', 'w') as file:
                 json.dump(result, file)
-           # db.session.delete(facts)
-           # db.session.commit()
+            db.session.delete(facts)
+            db.session.commit()
            # time.sleep(10)
             if os.path.exists("fact.json"):
                 os.remove("fact.json")   
@@ -1187,13 +1192,14 @@ def get_fact():
         try:
             uu = request.json['user']
             user = Users.query.filter(Users.username==uu).first()
-            user.status = "fact"
-            db.session.commit()
-            while (True):
-                if os.path.exists("fact.json"):
-                    break
-            user.status = "given task main"
-            db.session.commit()
+           # user.status = "fact"
+           # db.session.commit()
+           # while (True):
+            if os.path.exists("fact.json"):
+                #break
+                pass
+           # user.status = "given task main"
+           # db.session.commit()
             return json.dumps("ok")
         except:
             return json.dumps("fail")
