@@ -12,9 +12,9 @@
     font-weight: 300;
     font-size: larger;
     background: linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
-    background-image: url(/static/img/slot.jpg);
-    background-size: cover;
-    background-repeat: no-repeat;
+    background-image: url(/static/img/slot1.jpg);
+    background-size: a;
+    background-repeat:auto;
     width: 100%;
     height: 100%;
     max-height: 100%;
@@ -31,7 +31,7 @@ main {
     min-width: 320px;
     max-width: 480px;
     margin: auto auto;
-    height: 100vh;
+    height: 96vh;
     background: #8312834f;
     overflow:auto;
     grid-area: span;
@@ -148,7 +148,7 @@ h1 {
 .message{
     position: relative;
     left: 0rem;
-    top: -25rem;
+    top: 25px;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
