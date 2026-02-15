@@ -31,8 +31,6 @@ login_manager.login_view = "login"
 login_manager.login_message_category = "info"
 app.config['TELEGRAM_BOT_TOKEN'] = ''
 
-
-
 @login_manager.user_loader
 def load_user(user_id):
     return Users.query.get(user_id)
@@ -111,6 +109,7 @@ def check_id_room(room_id):
 
 @app.route('/join', methods=["POST", "GET"])
 def join():
+    _code[0] = '0'
     if request.method == 'POST':
         if 'userLogged' in session:
             pass
@@ -119,7 +118,7 @@ def join():
            flash ('Неверный код комнаты')
            return render_template("login.html")
         if (request.form['user_name']=="zigbe0")  and (request.form['room_id']=="99999999"):
-           # _users[0] = request.form['user_name']
+            _code[0] = request.form['room_id']
             init_game()
             return render_template("select.html")
         else:
@@ -180,9 +179,14 @@ def host_slot():
         print (url_for('host_slot'))
         #for i in _users:
           #  flash (i)
-        return render_template("host_slot.html")
-    print (url_for('host_slot'))
-    return render_template("host_slot.html")
+        if _code[0] == '99999999':
+            return render_template("host_slot.html")
+        else:
+            return render_template("login.html")
+    return render_template("login.html")
+
+
+    
 
 @app.route('/invite_user', methods=["POST", "GET"])
 def invite_user():
@@ -1585,7 +1589,7 @@ def show_result_interactive():
 
 
 if __name__ == "__main__":
-    _users = [' ']
+    _code = ['0']
     
     socketio.run(app,debug=True, host='0.0.0.0')
     
