@@ -109,7 +109,6 @@ def check_id_room(room_id):
 
 @app.route('/join', methods=["POST", "GET"])
 def join():
-    _code[0] = '0'
     if request.method == 'POST':
         if 'userLogged' in session:
             pass
@@ -118,7 +117,6 @@ def join():
            flash ('Неверный код комнаты')
            return render_template("login.html")
         if (request.form['user_name']=="zigbe0")  and (request.form['room_id']=="99999999"):
-            _code[0] = request.form['room_id']
             init_game()
             return render_template("select.html")
         else:
@@ -179,10 +177,9 @@ def host_slot():
         print (url_for('host_slot'))
         #for i in _users:
           #  flash (i)
-        if _code[0] == '99999999':
-            return render_template("host_slot.html")
-        else:
-            return render_template("login.html")
+        return render_template("host_slot.html")
+        #return render_template("login.html")
+    print (url_for('join'))
     return render_template("login.html")
 
 
