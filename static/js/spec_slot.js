@@ -169,6 +169,7 @@ function update_list_user()
        // document.getElementById("au").value = "";
         document.getElementById("ex2").value = "0";
         document.getElementById("ans").value = "";
+        document.getElementById("au").value = " "
         document.getElementById('question').innerText = "";
         document.getElementById("o1").style.backgroundColor = "#000c11";
         document.getElementById("o2").style.backgroundColor = "#000c11";
@@ -226,7 +227,8 @@ function update_list_user()
 
     if (data[0] == "game over lose")
     {
-        document.getElementById("au").value ="Выигрыш:" +'\n'+ document.getElementById("fix").value;
+       // calc_total();
+        document.getElementById("au").value ="Выигрыш:" +'\n'+ calc_total();// document.getElementById("fix").value;
         document.getElementById("question").value = "";
        // document.getElementById("question").innerText = " ";
         return;
@@ -382,6 +384,54 @@ console.error('Ошибка:', error);
 });
 }
 
+
+function calc_total()
+{
+    var calc_fix = 0;
+    var calc_cur = 0;
+    if (document.getElementById("fix").value == "0" )
+        calc_fix = 0;
+    if (document.getElementById("fix").value == "1 000" )
+        calc_fix = 1000;
+    if (document.getElementById("fix").value == "3 000" )
+        calc_fix = 3000;
+    if (document.getElementById("fix").value == "5 000" )
+        calc_fix = 5000;
+    if (document.getElementById("fix").value == "10 000" )
+        calc_fix = 10000;
+    if (document.getElementById("fix").value == "25 000" )
+        calc_fix = 25000;
+    if (document.getElementById("fix").value == "50 000" )
+        calc_fix = 50000;
+    if (document.getElementById("fix").value == "150 000" )
+        calc_fix = 150000;
+    if (document.getElementById("fix").value == "500 000" )
+        calc_fix = 500000;
+    if (document.getElementById("current").value == "0" )
+        calc_cur = 0;
+    if (document.getElementById("current").value == "1 000" )
+        calc_cur = 1000;
+    if (document.getElementById("current").value == "3 000" )
+        calc_cur = 3000;
+    if (document.getElementById("current").value == "5 000" )
+        calc_cur = 5000;
+    if (document.getElementById("current").value == "10 000" )
+        calc_cur = 10000;
+    if (document.getElementById("current").value == "25 000" )
+        calc_cur = 25000;
+    if (document.getElementById("current").value == "50 000" )
+        calc_cur = 50000;
+    if (document.getElementById("current").value == "150 000" )
+        calc_cur = 150000;
+    if (document.getElementById("current").value == "500 000" )
+        calc_cur = 500000;
+    if (calc_cur<calc_fix)
+        return "0"
+    if (calc_cur>=calc_fix)
+        return document.getElementById("fix").value
+
+
+}
 
 function get_task_otbor(){
         fetch('/get_task_otbor', {
@@ -561,6 +611,8 @@ function check_answered(){
        
     }
     }
+    if (data[0] == 1)
+        document.getElementById(get_o(data[1])).style.backgroundColor = "red";
 
     for (var i = 0; i< fa.length;i++)
     {
