@@ -562,7 +562,7 @@ function answered_main(){
     document.getElementById("ans").value = ans;
     document.getElementById(ans).style.backgroundColor = "orange";
     if (document.getElementById("ex2").value=="x2-2")
-        document.getElementById("ex2").value=="0";
+        document.getElementById("ex2").value="0";
  
     
 })
@@ -593,8 +593,11 @@ function check_answered(){
     }
 
     fa = data[1]
+	
+	console.log(document.getElementById("ex2").value)
 
-    
+    if (document.getElementById("ex2").value=="x2-2")
+	return;
 
     if (document.getElementById("ex2").value=="x2")
     {
