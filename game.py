@@ -20,8 +20,8 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 
 app = Flask(__name__, template_folder="static/")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
-app.config["SECRET_KEY"] = ""  #os.urandom(32).hex
-app.secret_key = ""  #os.urandom(32).hex
+app.config["SECRET_KEY"] = "" #"000001C9E687F6E0" #os.urandom(32).hex
+app.secret_key = "" #"000001C9E687F6E0" #os.urandom(32).hex
 socketio = SocketIO(app)
 accepted_user = ""
 db = SQLAlchemy(app)
@@ -30,6 +30,8 @@ login_manager.session_protection = "strong"
 login_manager.login_view = "login"
 login_manager.login_message_category = "info"
 app.config['TELEGRAM_BOT_TOKEN'] = ''
+
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -90,8 +92,8 @@ def init_game():
 
 @app.route('/')
 def index(): 
-    print (url_for('index'))
-    return render_template("index.html")
+    print (url_for('join'))
+    return render_template("login.html")
 
 
 def check_id_room(room_id):
@@ -117,6 +119,7 @@ def join():
            flash ('Неверный код комнаты')
            return render_template("login.html")
         if (request.form['user_name']=="zigbe0")  and (request.form['room_id']=="99999999"):
+           # _users[0] = request.form['user_name']
             init_game()
             return render_template("select.html")
         else:
@@ -178,12 +181,8 @@ def host_slot():
         #for i in _users:
           #  flash (i)
         return render_template("host_slot.html")
-        #return render_template("login.html")
     print (url_for('join'))
     return render_template("login.html")
-
-
-    
 
 @app.route('/invite_user', methods=["POST", "GET"])
 def invite_user():
@@ -761,8 +760,9 @@ def check_answered_main():
                 return json.dumps("fail")
             user2 = Users.query.filter((Users.status == "answered main")|(Users.status == "answered main x2")).first_or_404()
             user = Users.query.filter(Users.username == u_tmp).first()
-            user.status = "interactive no answer"
-            db.session.commit()
+            if user.status != "answered interactive":
+               user.status = "interactive no answer"
+               db.session.commit()
             return json.dumps("ok")
             
         except:
@@ -1586,7 +1586,7 @@ def show_result_interactive():
 
 
 if __name__ == "__main__":
-    _code = ['0']
+    _users = [' ']
     
     socketio.run(app,debug=True, host='0.0.0.0')
     

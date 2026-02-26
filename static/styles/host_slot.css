@@ -928,7 +928,7 @@
 th {
     background: #496791; /* Цвет фона ячеек */
     color: #fff; /* Цвет текста */
-    width: 2rem;
+    width: 5rem;
    }
    td, th {
    padding: 10px; /* Поля в ячейках */

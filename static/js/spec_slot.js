@@ -44,6 +44,21 @@ function update_list_user()
             {
 
             }
+            document.getElementById("o1").disabled = false;
+            document.getElementById("o2").disabled = false;
+            document.getElementById("o3").disabled = false;
+            document.getElementById("o4").disabled = false;
+            document.getElementById("o5").disabled = false;
+            document.getElementById("o6").disabled = false;
+            document.getElementById("o7").disabled = false;
+            document.getElementById("o8").disabled = false;
+            document.getElementById("o9").disabled = false;
+            document.getElementById("o10").disabled = false;
+            document.getElementById("o11").disabled = false;
+            document.getElementById("o12").disabled = false;
+            document.getElementById("o13").disabled = false;
+            document.getElementById("o14").disabled = false;
+            document.getElementById("o15").disabled = false;
             document.getElementById("in_game").value = "В игре: "
             document.getElementById("user").value = ""
             document.getElementById("au").value = ""
@@ -171,6 +186,22 @@ function update_list_user()
         document.getElementById("ans").value = "";
         document.getElementById("au").value = " "
         document.getElementById('question').innerText = "";
+	document.getElementById('question').value = "";
+        document.getElementById("o1").disabled = false;
+        document.getElementById("o2").disabled = false;
+        document.getElementById("o3").disabled = false;
+        document.getElementById("o4").disabled = false;
+        document.getElementById("o5").disabled = false;
+        document.getElementById("o6").disabled = false;
+        document.getElementById("o7").disabled = false;
+        document.getElementById("o8").disabled = false;
+        document.getElementById("o9").disabled = false;
+        document.getElementById("o10").disabled = false;
+        document.getElementById("o11").disabled = false;
+        document.getElementById("o12").disabled = false;
+        document.getElementById("o13").disabled = false;
+        document.getElementById("o14").disabled = false;
+        document.getElementById("o15").disabled = false;
         document.getElementById("o1").style.backgroundColor = "#000c11";
         document.getElementById("o2").style.backgroundColor = "#000c11";
         document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -640,7 +671,7 @@ function check_answered(){
         if (data[0]==7)
             document.getElementById("au").value = "150 000";
         if (data[0]==8)
-            document.getElementById("au").value = "150 000";
+            document.getElementById("au").value = "500 000";
         if (data[0]==9)
             document.getElementById("au").value = "1 000 000";
     
@@ -721,6 +752,7 @@ function get_task(){
     if (document.getElementById("ex2").value !="0")
         return;
     document.getElementById('question').innerText = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
+    document.getElementById('question').value = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
     document.getElementById("o1").disabled = false;
     document.getElementById("o2").disabled = false;
     document.getElementById("o3").disabled = false;
