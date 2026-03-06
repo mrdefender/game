@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Веселые игры</title>
+    <title>Свободный слот</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/user_slot.css') }}">
      <link rel="stylesheet" href='styles/user_slot.css'>
      <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -60,7 +60,7 @@
                 <div>      
                     <input type="button" class="p50_50" id="p50_50" value="50:50" onclick="" disabled hidden ></button> 
                     <input type="button" class="palter" id="palter" value="⇆" onclick=""  disabled hidden ></button> 
-                    <input type="button" class="pnavi" id="pnavi" value="𖤂" onclick="" disabled hidden ></button> 
+                    <input type="button" class="pnavi" id="pnavi" value="➤" onclick="" disabled hidden ></button> 
                     <input type="button" class="px2" id="px2" value="x2" onclick="px2()"  disabled  hidden></button> 
                     <input type="button" class="pauden" id="pauden" value="👪" onclick=""  disabled hidden ></button> 
                     <input type="button" class="pfact" id="pfact" value="📚" onclick=""  disabled hidden ></button> 
@@ -68,7 +68,7 @@
 
                 </p>
                 <p>
-             <input class="otbor_input" id="otbor_input", name="otbor_input" type="text" placeholder="Ответ" required hidden>
+             <input class="otbor_input" id="otbor_input", name="otbor_input" type="number" placeholder="Ответ" required hidden>
              <input type="submit" class="send_answer_otbor" id="otbor_submit" onclick="send_answer_otbor()" value="Ответить" disabled hidden>
              <input type="submit" id="time-start" value="" disabled hidden >
              <input type="submit" id="count_fatal" value="" disabled hidden >

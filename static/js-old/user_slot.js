@@ -35,7 +35,6 @@ function get_status(){
             document.getElementById("ex2").value ="0"
             document.getElementById("otbor_input").hidden = true;
             document.getElementById("otbor_submit").hidden = true;
-	    document.getElementById("time-start").value = "0";
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
             document.getElementById("o3").hidden = true;
@@ -99,7 +98,6 @@ function get_status(){
             document.getElementById("question").hidden = false;
             document.getElementById("question").value = "";
             document.getElementById("question").innerText = " ";
-	    document.getElementById("time-start").value = "0";
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -132,7 +130,6 @@ function get_status(){
             document.getElementById("question").hidden = false;
             document.getElementById("question").value = "";
             document.getElementById("question").innerText = " ";
-            document.getElementById("time-start").value = "0";
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -164,7 +161,6 @@ function get_status(){
             document.getElementById("ans").value = "";
             document.getElementById("question").value = "";
             document.getElementById("question").innerText = " ";
-            document.getElementById("time-start").value = "0";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -190,7 +186,6 @@ function get_status(){
             document.getElementById("ans").value = "";
             document.getElementById("question").value = " ";
             document.getElementById("question").innerText = " ";
-            document.getElementById("time-start").value = "0";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -542,10 +537,7 @@ function get_task(){
     }
     if (document.getElementById("ex2").value !="0")
         return;
-    if (document.getElementById("time-start").value == "0")
-	{
-    	document.getElementById("time-start").value = Date.now().toString();
-	}
+    document.getElementById("time-start").value = Date.now().toString();
     document.getElementById('question').innerText = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
     document.getElementById("o1").disabled = false;
     document.getElementById("o2").disabled = false;
@@ -736,7 +728,7 @@ function a1(){
     var user_name = document.getElementById("user_name").value;
     document.getElementById("ans").value = "o1";
     document.getElementById("o1").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"1",time_answer:time_answer}),
@@ -775,7 +767,7 @@ function a2(){
     document.getElementById("ans").value = "o2";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o2").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"2",time_answer:time_answer}),
@@ -814,7 +806,7 @@ function a3(){
     document.getElementById("ans").value = "o3";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o3").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"3",time_answer:time_answer}),
@@ -853,7 +845,7 @@ function a4(){
     document.getElementById("ans").value = "o4";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o4").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"4",time_answer:time_answer}),
@@ -892,7 +884,7 @@ function a5(){
     document.getElementById("ans").value = "o5";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o5").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"5",time_answer:time_answer}),
@@ -931,7 +923,7 @@ function a6(){
     document.getElementById("ans").value = "o6";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o6").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"6",time_answer:time_answer}),
@@ -970,7 +962,7 @@ function a7(){
     document.getElementById("ans").value = "o7";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o7").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"7",time_answer:time_answer}),
@@ -1009,7 +1001,7 @@ function a8(){
     document.getElementById("ans").value = "o8";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o8").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"8",time_answer:time_answer}),
@@ -1047,7 +1039,7 @@ function a9(){
     document.getElementById("ans").value = "o9";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o9").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"9",time_answer:time_answer}),
@@ -1086,7 +1078,7 @@ function a10(){
     document.getElementById("ans").value = "o10";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o10").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"10",time_answer:time_answer}),
@@ -1125,7 +1117,7 @@ function a11(){
     document.getElementById("ans").value = "o11";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o11").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"11",time_answer:time_answer}),
@@ -1164,7 +1156,7 @@ function a12(){
     document.getElementById("ans").value = "o12";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o12").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"12",time_answer:time_answer}),
@@ -1203,7 +1195,7 @@ function a13(){
     document.getElementById("ans").value = "o13";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o13").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"13",time_answer:time_answer}),
@@ -1242,7 +1234,7 @@ function a14(){
     document.getElementById("ans").value = "o14";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o14").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"14",time_answer:time_answer}),
@@ -1281,7 +1273,7 @@ function a15(){
     document.getElementById("ans").value = "o15";
      var user_name = document.getElementById("user_name").value;
     document.getElementById("o15").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
+    var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
     fetch('/send_answer', {
         method: 'POST',
         body: JSON.stringify({ user:user_name,answer_user:"15",time_answer:time_answer}),

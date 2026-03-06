@@ -59,7 +59,7 @@ function update_list_user()
             document.getElementById("o13").disabled = false;
             document.getElementById("o14").disabled = false;
             document.getElementById("o15").disabled = false;
-            document.getElementById("in_game").value = " "
+            document.getElementById("in_game").value = "В игре: "
             document.getElementById("user").value = ""
             document.getElementById("au").value = ""
             document.getElementById("ans").value = ""
@@ -227,9 +227,9 @@ function update_list_user()
     }
         if ((data[0] == "given task main") || (data[0] == "x2" ))
     {
-       // if ((document.getElementById("ex2").value != "auden") && (document.getElementById("ex2").value != "fact"))
-         //   document.getElementById("au").value = "";
-        //document.getElementById("question").value = "";
+        if ((document.getElementById("ex2").value != "auden") && (document.getElementById("ex2").value != "fact"))
+            //document.getElementById("au").value = "";
+        document.getElementById("question").value = "";
         get_task();
         get_helps();
         get_fact();
@@ -248,11 +248,11 @@ function update_list_user()
 
         
     }
-    if ((data[0] == "check main") || (data[0] == "check main x2") || (data[0] == "wait next round main"))
+    if ((data[0] == "check main") || (data[0] == "check main x2"))
     {
         check_answered();
         //document.getElementById("au").value = " ";
-        //document.getElementById("question").value = " ";
+        document.getElementById("question").value = " ";
         return;
     }
 
@@ -260,14 +260,14 @@ function update_list_user()
     {
        // calc_total();
         document.getElementById("au").value ="Выигрыш:" +'\n'+ calc_total();// document.getElementById("fix").value;
-        //document.getElementById("question").value = "";
+        document.getElementById("question").value = "";
        // document.getElementById("question").innerText = " ";
         return;
     }
     if (data[0] == "game over")
     {
         document.getElementById("au").value ="Выигрыш:" +'\n'+ document.getElementById("current").value;
-    //    document.getElementById("question").value = "";
+        document.getElementById("question").value = "";
         //document.getElementById("question").innerText = " ";
         return;
     }
@@ -311,7 +311,7 @@ function update_list_user()
     if (data[0] == "otbor")
     {
 
-        document.getElementById("in_game").value = "Отборочный тур";
+        document.getElementById("in_game").value = "В игре: "
             document.getElementById("user").value = ""
             document.getElementById("au").value = ""
             document.getElementById("ans").value = ""
@@ -679,7 +679,7 @@ function check_answered(){
     }
     
 
-    document.getElementById("ex2").value="0";
+    document.getElementById("ex2").value=="0";
 
 
  
@@ -1243,7 +1243,7 @@ console.error('Ошибка:', error);
 
 function get_50_50(){
     // document.getElementById("p50_50").style.backgroundColor = "orange";
-     //document.getElementById("ex2").value = "50:50"
+     document.getElementById("ex2").value = "50:50"
     fetch('/get_50_50_spec', {
         method: 'POST',
         body: JSON.stringify({ " ":" "}),
@@ -1265,7 +1265,7 @@ function get_50_50(){
         ff = data[i].toString();
         document.getElementById(get_o(ff)).disabled = true;
     }
-   document.getElementById("ex2").value = "50:50";
+   
 
 
 
@@ -1279,7 +1279,7 @@ console.error('Ошибка:', error);
 }
 function get_alter(){
      //document.getElementById("palter").style.backgroundColor = "orange";
-     //document.getElementById("ex2").value = "alter"
+     document.getElementById("ex2").value = "alter"
     fetch('/get_alter_spec', {
         method: 'POST',
         body: JSON.stringify({ " ":" "}),
@@ -1304,7 +1304,7 @@ function get_alter(){
 
     document.getElementById(get_o(b1)).disabled = false;
     document.getElementById(get_o(b2)).disabled = false;
-    document.getElementById("ex2").value = "alter";
+
 
 
 })
@@ -1316,7 +1316,7 @@ console.error('Ошибка:', error);
 }
 function get_navi(){
      //document.getElementById("pnavi").style.backgroundColor = "orange";
-     //document.getElementById("ex2").value = "navi"
+     document.getElementById("ex2").value = "navi"
     fetch('/get_navi_spec', {
         method: 'POST',
         body: JSON.stringify({ " ":" "}),
@@ -1339,7 +1339,7 @@ function get_navi(){
         n = data[i];
         document.getElementById(get_o(n)).style.backgroundColor = "#d905ec"
     }
-    document.getElementById("ex2").value = "navi";
+    
 
 
 })
@@ -1351,7 +1351,7 @@ console.error('Ошибка:', error);
 }
 function get_x2(){
      document.getElementById("px2").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "x2";
+     document.getElementById("ex2").value = "x2"
 
 }
 function get_auden(){
@@ -1383,7 +1383,7 @@ function get_auden(){
     }
     document.getElementById("au").value = document.getElementById("au").value + " Фатал- "+ data[15] +"%" + " " + " Cвободный слот - "+data[16]+ "%";
     document.getElementById("help_auden").style.backgroundColor = "#000c11";
-    document.getElementById("ex2").value = "auden";
+    
 
 
 })
@@ -1401,7 +1401,7 @@ console.error('Ошибка:', error);
 function get_fact(){
 
    // document.getElementById("pfact").style.backgroundColor = "orange";
-    // document.getElementById("ex2").value = "fact"
+     document.getElementById("ex2").value = "fact"
     fetch('/get_fact_spec', {
         method: 'POST',
         body: JSON.stringify({ " ":" "}),
@@ -1424,7 +1424,7 @@ function get_fact(){
      
     document.getElementById("au").value = data[1];
     document.getElementById("pfact").style.backgroundColor = "#000c11";
-    document.getElementById("ex2").value = "fact";
+    
 
 
 })

@@ -115,6 +115,9 @@ def join():
         if 'userLogged' in session:
             pass
         print(request.form)
+        if request.form['user_name']== "":
+           flash ('Требуется авторизация')
+           return render_template("login.html")
         if  (request.form['user_name']!="zigbe0") and (request.form['room_id']=="99999999"):
            flash ('Неверный код комнаты')
            return render_template("login.html")
@@ -154,24 +157,24 @@ def select():
         if request.form.values == "Свободный слот":
          print (url_for('slot'))
          return render_template("slot.html")
-    print (url_for('select'))
-    return render_template("select.html")
+    print (url_for('join'))
+    return render_template("login.html")
 
 @app.route('/slot', methods=["POST", "GET"])
 def slot():
     if request.method == 'POST':
         print (url_for('slot'))
         return render_template("slot.html")
-    print (url_for('slot'))
-    return render_template("slot.html")
+    print (url_for('join'))
+    return render_template("login.html")
 
 @app.route('/spec_slot', methods=["POST", "GET"])
 def spec_slot():
     if request.method == 'POST':
         print (url_for('slot'))
         return render_template("spec_slot.html")
-    print (url_for('spec_slot'))
-    return render_template("spec_slot.html")
+    print (url_for('join'))
+    return render_template("login.html")
 
 
 @app.route('/host_slot', methods=["POST", "GET"])
