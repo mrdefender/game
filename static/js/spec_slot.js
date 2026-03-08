@@ -278,7 +278,7 @@ function update_list_user()
     {
        // calc_total();
         an = document.getElementById("ans").value;
-        if ((document.getElementById(an).value == "💣") || (document.getElementById(an).value == "💣"))
+        if ((document.getElementById(an).value == "💣") || (document.getElementById(an).value == "🧨"))
         {
             document.getElementById("au").value ="Выигрыш:" +'\n'+ "0";
             return;
