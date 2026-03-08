@@ -79,7 +79,9 @@ var timerWaitAnswer;
 var timerHelps;
 
 function cancel_all(){
+    btn_default();
     clearInterval(timerHelps);
+    document.getElementById("rb").value = "false";
     document.getElementById("user_id").disabled = false;
     document.getElementById("user_id").value = "";
     document.getElementById("in_game").value = "В игре: ";
@@ -146,6 +148,7 @@ function cancel_all(){
 
 function reset_user_to_wait()
 {
+    
      fetch('/reset_user_to_wait', {
         method: 'POST',
         body: JSON.stringify({ "":""}),
@@ -699,6 +702,24 @@ console.error('Ошибка:', error);
 
 }
 
+function btn_default(){
+    btn1.value = "1";
+    btn2.value = "2";
+    btn3.value = "3";
+    btn4.value = "4";
+    btn5.value = "5";
+    btn6.value = "6";
+    btn7.value = "7";
+    btn8.value = "8";
+    btn9.value = "9";
+    btn10.value = "10";
+    btn11.value = "11";
+    btn12.value= "12";
+    btn13.value = "13";
+    btn14.value = "14";
+    btn15.value = "15";
+}
+
 
 function start_to_game()
 {
@@ -821,6 +842,13 @@ function invite_to_game()
 .then(response => response.json())
 
 .then(data => {
+    if (data == 'fail')
+        return;
+    if (data == 'red bomb')
+    {
+       document.getElementById('au').value ="Игрок в предыдущих играх нашел красную бомбу и невозможно пригласить в основную игру";
+        return;
+    }
         document.getElementById('au').value = "В игру вступает " + data;
         document.getElementById('in_game').value = "В игре:    " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
@@ -879,6 +907,9 @@ function gen_task()
         true;
     var input = document.getElementById("user_id").value;
     round = document.getElementById("status-round").value;
+    var bombs = "false"
+    if (document.getElementById("bomb").checked)
+        bombs = "true";
     if (document.getElementById("status-round").value == "Отборочный тур")
         round = "0";
     round = parseInt(round)
@@ -895,7 +926,7 @@ function gen_task()
     console.log(round);
         fetch('/gen_task', {
         method: 'POST',
-        body: JSON.stringify({user_name: input, current_round: t}),
+        body: JSON.stringify({user_name: input, current_round: t,bombs,bombs}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -1103,10 +1134,11 @@ function get_o(answer)
 }
 
 
-function show_fatal_to_host_panel(n_r,fatal)
+function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
 {
         document.getElementById("show-right").disabled = false;
         document.getElementById("take_money").disabled = true;
+        console.log(b_bomb,r_bomb);
         
         if (n_r == 1)
     {
@@ -1133,9 +1165,15 @@ function show_fatal_to_host_panel(n_r,fatal)
     {
         for (i=0;i<5;i++)
         {
-            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             stop_sounds();
             audio_a4_9.play();
+            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
+            if ((b_bomb != "false") && (r_bomb!=false))
+            {
+                document.getElementById(get_btn(b_bomb)).value = "💣";
+                document.getElementById(get_btn(r_bomb)).value = "🧨";
+            }
+            
         }
 
     }
@@ -1143,9 +1181,15 @@ function show_fatal_to_host_panel(n_r,fatal)
     {
         for (i=0;i<6;i++)
         {
-            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             stop_sounds();
             audio_a4_9.play();
+            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
+            if ((b_bomb != "false") && (r_bomb!=false))
+            {
+                document.getElementById(get_btn(b_bomb)).value = "💣";
+                document.getElementById(get_btn(r_bomb)).value = "🧨";
+            }
+            
         }
 
     }
@@ -1153,9 +1197,15 @@ function show_fatal_to_host_panel(n_r,fatal)
     {
         for (i=0;i<8;i++)
         {
-            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             stop_sounds();
             audio_a4_9.play();
+            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
+            if ((b_bomb != "false") && (r_bomb!=false))
+            {
+                document.getElementById(get_btn(b_bomb)).value = "💣";
+                document.getElementById(get_btn(r_bomb)).value = "🧨";
+            }
+            
         }
 
     }
@@ -1163,9 +1213,15 @@ function show_fatal_to_host_panel(n_r,fatal)
     {
         for (i=0;i<10;i++)
         {
-            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             stop_sounds();
             audio_a4_9.play();
+            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
+            if ((b_bomb != "false") && (r_bomb!=false))
+            {
+                document.getElementById(get_btn(b_bomb)).value = "💣";
+                document.getElementById(get_btn(r_bomb)).value = "🧨";
+            }
+            
         }
 
     }
@@ -1173,9 +1229,15 @@ function show_fatal_to_host_panel(n_r,fatal)
     {
         for (i=0;i<12;i++)
         {
-            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             stop_sounds();
             audio_a4_9.play();
+            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
+            if ((b_bomb != "false") && (r_bomb!=false))
+            {
+                document.getElementById(get_btn(b_bomb)).value = "💣";
+                document.getElementById(get_btn(r_bomb)).value = "🧨";
+            }
+            
         }
 
     }
@@ -1183,9 +1245,15 @@ function show_fatal_to_host_panel(n_r,fatal)
     {
         for (i=0;i<14;i++)
         {
-            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             stop_sounds();
             audio_a4_9.play();
+            document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
+            if ((b_bomb != "false") && (r_bomb!=false))
+            {
+                document.getElementById(get_btn(b_bomb)).value = "💣";
+                document.getElementById(get_btn(r_bomb)).value = "🧨";
+            }
+            
         }
 
     }
@@ -1239,7 +1307,9 @@ function a1(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1266,7 +1336,9 @@ function a2(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1292,7 +1364,9 @@ function a3(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1319,7 +1393,9 @@ function a4(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1345,7 +1421,9 @@ function a5(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1371,7 +1449,9 @@ function a6(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1397,7 +1477,9 @@ function a7(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1423,7 +1505,9 @@ function a8(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1450,7 +1534,9 @@ function a9(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1477,7 +1563,9 @@ function a10(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1504,7 +1592,9 @@ function a11(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1531,7 +1621,9 @@ function a12(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1558,7 +1650,9 @@ function a13(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1585,7 +1679,9 @@ function a14(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1612,7 +1708,9 @@ function a15(){
 
 .then(data => {
     var c_r = parseInt(data[0]);
-    show_fatal_to_host_panel(c_r, data[1]);
+    b_bomb = data[4]
+    r_bomb = data[5]
+    show_fatal_to_host_panel(c_r, data[1],b_bomb,r_bomb);
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
 })
@@ -1621,6 +1719,7 @@ console.error('Ошибка:', error);
 });
 
 }
+
 
 function show_right(){
     if (check_answered)
@@ -1643,7 +1742,7 @@ function show_right(){
     {
         stop_sounds();
         audio_x2_2.play();
-        document.getElementById("x2").style.backgroundColor ==  "#1a1b02"
+        document.getElementById("x2").style.backgroundColor =  "#1a1b02"
         if(document.getElementById(o_to_btn(data[0])).style.backgroundColor == "red")
         {
             document.getElementById(data[0]).style.backgroundColor ="red"
@@ -1848,9 +1947,19 @@ function show_right(){
     }
         else 
     {
+        
         document.getElementById("au").value = fix_money.value;
         document.getElementById("next-round").disabled = true;
         document.getElementById("total_money").disabled = false;
+        if (document.getElementById(o_to_btn(data[0])).value=="💣")
+        {
+            document.getElementById("au").value = "0";
+        }
+        if (document.getElementById(o_to_btn(data[0])).value=="🧨")
+        {
+            document.getElementById("au").value = "0";
+            document.getElementById("rb").value = "true";
+        }
         stop_sounds();
         if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
         {
@@ -1899,8 +2008,9 @@ console.error('Ошибка:', error);
 
 
 function next_round()
-{
-
+{   
+    btn_default();
+    document.getElementById("rb").value = "false";
     ch3();
     if (select.value == "Раунд 4")
     {
@@ -2077,7 +2187,8 @@ function take_money()
         return;
     if (document.getElementById("alter").style.backgroundColor == "orange")
         return;
-    document.getElementById("au").value = "Выигрыш: " + '\n' + current_money.value;
+    //document.getElementById("au").value = "Выигрыш: " + '\n' + current_money.value;
+    document.getElementById("au").value = current_money.value;
    var tm = document.getElementById("take_money");
     tm.style.backgroundColor = "lime";
      console.log(tm.style.backgroundColor);
@@ -2584,16 +2695,20 @@ function start_final()
 function total_money()
 {
     var lose = "false";
+    var result_money;
     var tm = document.getElementById("take_money");
-   if (tm.style.backgroundColor != "lime")
-   {
+    var input = document.getElementById("user_id").value;
+    var rb = document.getElementById("rb").value;
+  // if (tm.style.backgroundColor != "lime")
+   //{
     var tmp_money = document.getElementById("au").value;
+    result_money = tmp_money;
     document.getElementById("au").value = "Выигрыш:" +'\n' + tmp_money;
     lose = "true"
-   }
+ //  }
     fetch('/game_over', {
         method: 'POST',
-        body: JSON.stringify({ lose:lose}),
+        body: JSON.stringify({ lose:lose,money:result_money,user_name:input,rb:rb}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -2645,7 +2760,7 @@ function update_list_user()
      }
    }
 
-   if (data[6]=="true")
+   if (data[8]=="true")
    {
     var tr = document.createElement("tr")
     var cell1 = document.createElement("td")
@@ -2660,12 +2775,18 @@ function update_list_user()
     cell5.innerHTML = data[4];
     var cell6 = document.createElement("td")
     cell6.innerHTML = data[5];
+    var cell7 = document.createElement("td")
+    cell7.innerHTML = data[6];
+    var cell8 = document.createElement("td")
+    cell8.innerHTML = data[7];
     tr.appendChild(cell1);
     tr.appendChild(cell2);
     tr.appendChild(cell3);
     tr.appendChild(cell4);
     tr.appendChild(cell5);
     tr.appendChild(cell6);
+    tr.appendChild(cell7);
+    tr.appendChild(cell8);
     table.appendChild(tr);
     return;
    }
@@ -2685,6 +2806,10 @@ function update_list_user()
     cell5.innerHTML = data[i][4];
     var cell6 = document.createElement("td")
     cell6.innerHTML = data[i][5];
+    var cell7 = document.createElement("td")
+    cell7.innerHTML = data[i][6];
+    var cell8 = document.createElement("td")
+    cell8.innerHTML = data[i][7];
     if (data[i][5]=="answered interactive")
         interactive_col++;
     if (data[i][5]=="50:50")
@@ -2719,6 +2844,8 @@ function update_list_user()
     tr.appendChild(cell4);
     tr.appendChild(cell5);
     tr.appendChild(cell6);
+    tr.appendChild(cell7);
+    tr.appendChild(cell8);
     table.appendChild(tr);
     }
     
@@ -3073,6 +3200,34 @@ function show_result_interactive(){
 console.error('Ошибка:', error);
 });
 }
+function show_result_total(){
+     var action
+    
+        action = "show total"
+    fetch('/show_result_interactive', {
+        method: 'POST',
+        body: JSON.stringify({ action:action}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+)
+.then(response => response.json())
+
+.then(data => {
+    console.log(data);
+    if (data == 'fail')
+        return;
+  
+
+   
+
+})
+.catch(error => {
+console.error('Ошибка:', error);
+});
+}
+
 var time = 0;
 function wait_1min(){
     time = 60;

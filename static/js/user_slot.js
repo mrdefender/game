@@ -7,6 +7,24 @@ var timerStatus = setInterval(() => get_status(), 5000);
 var timerHelps;
 var timeWainAnswerFromMain;
 
+function btn_default(){
+    document.getElementById("o1").value = "1";
+    document.getElementById("o2").value = "2";
+    document.getElementById("o3").value = "3";
+    document.getElementById("o4").value = "4";
+    document.getElementById("o5").value = "5";
+    document.getElementById("o6").value = "6";
+    document.getElementById("o7").value = "7";
+    document.getElementById("o8").value = "8";
+    document.getElementById("o9").value = "9";
+    document.getElementById("o10").value = "10";
+    document.getElementById("o11").value = "11";
+    document.getElementById("o12").value = "12";
+    document.getElementById("o13").value = "13";
+    document.getElementById("o14").value = "14";
+    document.getElementById("o15").value = "15";
+}
+
 function get_status(){
 
     var user_name = document.getElementById("user_name").value;
@@ -35,7 +53,8 @@ function get_status(){
             document.getElementById("ex2").value ="0"
             document.getElementById("otbor_input").hidden = true;
             document.getElementById("otbor_submit").hidden = true;
-	    document.getElementById("time-start").value = "0";
+	        document.getElementById("time-start").value = "0";
+            btn_default();
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
             document.getElementById("o3").hidden = true;
@@ -93,6 +112,7 @@ function get_status(){
     if (data == "interactive")
         {
             document.getElementById("ans").value = "";
+            btn_default();
             document.getElementById('welcome').innerHTML = "";
             document.getElementById('welcome2').innerHTML = "";
             document.getElementById('welcome3').innerHTML = "Интерактивная игра";
@@ -133,6 +153,7 @@ function get_status(){
             document.getElementById("question").value = "";
             document.getElementById("question").innerText = " ";
             document.getElementById("time-start").value = "0";
+            btn_default();
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -180,6 +201,7 @@ function get_status(){
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
+            btn_default();
             document.getElementById("question").value = " ";
             get_task();
             //clearInterval(timerToGame);
@@ -191,6 +213,7 @@ function get_status(){
             document.getElementById("question").value = " ";
             document.getElementById("question").innerText = " ";
             document.getElementById("time-start").value = "0";
+            btn_default();
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -1354,6 +1377,8 @@ function show_right_user(){
     {
         if (document.getElementById("ex2").value == "x2-2")
             return;
+        b_bomb = data[4]
+        r_bomb = data[5]
 
 
         if (document.getElementById("ex2").value == "x2")
@@ -1369,6 +1394,18 @@ function show_right_user(){
                 if (document.getElementById("ans").value == get_o(ff[i].toString()))
                 {
                     document.getElementById(get_o(ff[i].toString())).style.backgroundColor = "red";
+                    if ((data[4]!="false") && (data[5]!="false"))
+                    {
+                        if (ff[i] == data[4])
+                        {
+                        document.getElementById(get_o(ff[i].toString())).value = "💣";
+                        }
+                        if (ff[i] == data[5])
+                        {
+                        document.getElementById(get_o(ff[i].toString())).value = "🧨";
+                        }
+                    }
+
                     break;
                 }
 
@@ -1390,6 +1427,18 @@ function show_right_user(){
         {
             var a = get_o(f[i])
             document.getElementById(a).style.backgroundColor = "red"
+            if ((data[4]!="false") && (data[5]!="false"))
+            {
+                if (f[i]==data[4])
+                {
+                    document.getElementById(a).value = "💣";
+                }
+                if (f[i]==data[5])
+                {
+                    document.getElementById(a).value = "🧨";
+                }
+            }
+            
         }
         for (var i = 1; i<16;i++)
         {

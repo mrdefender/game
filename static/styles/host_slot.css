@@ -515,7 +515,7 @@
     position: relative;
     font-size:large;
     top: -30.4rem;
-    left: -29.5%;
+    left: -27%;
     border-radius: 2px;
     background-color: #1a1b02;
     color: rgb(7, 173, 224);
@@ -523,7 +523,6 @@
     height: 1rem;
     text-wrap: inherit;
 }
-
 
 .invite{
     position: relative;
@@ -755,7 +754,7 @@
 .clear_table{
     position: relative;
     top: -20.5rem;
-    left: -20rem;
+    left: -13rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -828,7 +827,7 @@
 
     position: relative;
     top: -20.7rem;
-    left: -7rem;
+    left: -9rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -843,7 +842,7 @@
     
     position: relative;
     top: -20.7rem;
-    left: -7rem;
+    left: -9rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -857,7 +856,7 @@
 .start_otbor{
      position: relative;
     top: -20.7rem;
-    left: -7rem;
+    left: -9rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -871,13 +870,13 @@
 .answer_otbor{
      position: relative;
     top: -20.7rem;
-    left: -7rem;
+    left: -9rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
-    width: 220px;
+    width: 180px;
     height: auto;
     text-wrap:inherit  
     
@@ -885,13 +884,13 @@
 .result_otbor{
      position: relative;
     top: -20.7rem;
-   left: -7rem;
+   left: -9rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size: medium;
-    width: 220px;
+    width: 180px;
     height: 10%;
     text-wrap:inherit  
     
@@ -899,7 +898,7 @@
 .result_interactive{
     position: relative;
     top: -20.5rem;
-    left: -20rem;
+    left: -13rem;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
@@ -920,7 +919,7 @@
     font-size: smaller;
     border-spacing: 0;
     position: relative;
-    left: 68%;
+    left: 63%;
     top: -50rem;
     text-wrap:initial;
     text-align: center;

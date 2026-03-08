@@ -45,27 +45,27 @@
                 </p>   
             </div> 
                 <p>  
-                <input type="submit" class="message" id="au" ></button>
+                <input type="submit" class="message" id="au" >
                 <div class = "questions" id="question" value =""></div>
 
-                <button class="btn1" id=btn1 disabled>1</button> 
-                <button class="btn2" id=btn2 disabled>2</button>
-                <button class="btn3" id=btn3 disabled>3</button>
-                <button class="btn4" id=btn4 disabled>4</button>
-                <button class="btn5" id=btn5 disabled>5</button>
+                <input type="submit" class="btn1" id=btn1 value="1" disabled>
+                <input type="submit" class="btn2" id=btn2 value="2" disabled>
+                <input type="submit" class="btn3" id=btn3 value="3" disabled>
+                <input type="submit"n class="btn4" id=btn4 value="4" disabled>
+                <input type="submit" class="btn5" id=btn5 value="5" disabled>
                 <div> 
-                 <button class="btn6" id=btn6 disabled>6</button>
-                    <button class="btn7" id=btn7 disabled>7</button>
-                    <button class="btn8" id=btn8 disabled>8</button>
-                    <button class="btn9" id=btn9 disabled>9</button>
-                    <button class="btn10"id=btn10 disabled>10</button>
+                 <input type="submit" class="btn6" id=btn6 value="6" disabled>
+                    <input type="submit" class="btn7" id=btn7 value="7" disabled>
+                    <input type="submit" class="btn8" id=btn8 value="8" disabled>
+                    <input type="submit" class="btn9" id=btn9 value="9" disabled>
+                    <input type="submit" class="btn10"id=btn10 value="10" disabled>
                 </div>
                 <div>      
-                    <button class="btn11" id=btn11 disabled>11</button>
-                    <button class="btn12" id=btn12 disabled>12</button>
-                    <button class="btn13" id=btn13 disabled>13</button>
-                    <button class="btn14" id=btn14 disabled>14</button>
-                    <button class="btn15" id=btn15 disabled>15</button>
+                    <input type="submit" class="btn11" id=btn11 value="11" disabled>
+                    <input type="submit" class="btn12" id=btn12 value="12" disabled>
+                    <input type="submit" class="btn13" id=btn13 value="13" disabled>
+                    <input type="submit" class="btn14" id=btn14 value="14" disabled>
+                    <input type="submit" class="btn15" id=btn15 value="15" disabled>
                 </div>
                 </p>
                 <p>
@@ -148,6 +148,8 @@
              <p>
                  <input type="checkbox" id="pfact" class= "helps6"> 
               <label for="checkbox" class="helps6">Факт</label>
+              <input type="checkbox" id="bomb" class= "helps6"> 
+              <label for="checkbox" class="helps6">Бомбы</label>
              </p>
              <p>
              <input type="submit" class="p50_50" id ="h50_50" onclick="h50_50()" value="50:50" disabled>
@@ -188,8 +190,8 @@
                 <input type="submit" class="otbor" id="otbor" onclick="otbor()" value="Отборочный тур">
                 <input type="submit" class="warning_otbor" id="warning_otbor"  onclick="warning_otbor()" value="Показать таймер" disabled>
                 <input type="submit" class="start_otbor" id="start_otbor"  onclick="start_otbor()" value="Запуска таймера отб. тура" disabled>
-                <input type="submit" class="answer_otbor" id="answer_otbor" onclick="show_answer_otbor()" value="Показать правильный ответ отборочного тура" disabled>
-                <input type="submit" class="result_otbor" id="result_otbor"  onclick="show_result_otbor()" value="Показать победителя отборочного тура" disabled>
+                <input type="submit" class="answer_otbor" id="answer_otbor" onclick="show_answer_otbor()" value="Правильный ответ отборочного тура" disabled>
+                <input type="submit" class="result_otbor" id="result_otbor"  onclick="show_result_otbor()" value="Победитель отборочного тура" disabled>
                 
              </p>
              <p>
@@ -198,7 +200,8 @@
              </p>
              <p>
                 <input type="submit" class="clear_table"  onclick="clear_table()" value="Очистить бд"> 
-                 <input type="submit" class="result_interactive" id="result_interactive"  onclick="show_result_interactive()" value="Показать резульататы интерактива"> 
+                 <input type="submit" class="result_interactive" id="result_interactive"  onclick="show_result_interactive()" value="Показать результаты интерактива"> 
+                  <input type="submit" class="result_interactive" id="result_interactive"  onclick="show_result_total()" value="Показать общий результат"> 
              </p>
              <p>
                  <input type="submit" class="music"  onclick="start_sound_begin1()" value="Заставка"> 
@@ -221,9 +224,11 @@
                         <th>№</th>
                         <th>Игрок</th>
                         <th>Ответ</th>
-                        <th>Количество очков</th>
+                        <th>Интерактив</th>
                         <th>Время</th>
                         <th>Статус</th>
+                        <th>Основная игра</th>
+                        <th>Наличие красной бомбы</th>
                     </tr>
                     <tr id="row1"> 
                         <td></td>
@@ -240,6 +245,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>   
      <script type="text/javascript" src="/static/jquery-1.7.1.min.js"></script>
+      <input type="submit" class="rb" id="rb" value="false" hidden> 
      </body>
     <footer class="copyrights">
         Здесь могло бы быть ваше имя и ваша реклама.

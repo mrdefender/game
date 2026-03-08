@@ -3,7 +3,23 @@ var timerHelps;
 var timeWainAnswerFromMain;
 var timerTreeStatus = setInterval(() => update_tree(), 3000);
 
-
+function btn_default(){
+    document.getElementById("o1").value = "1";
+    document.getElementById("o2").value = "2";
+    document.getElementById("o3").value = "3";
+    document.getElementById("o4").value = "4";
+    document.getElementById("o5").value = "5";
+    document.getElementById("o6").value = "6";
+    document.getElementById("o7").value = "7";
+    document.getElementById("o8").value = "8";
+    document.getElementById("o9").value = "9";
+    document.getElementById("o10").value = "10";
+    document.getElementById("o11").value = "11";
+    document.getElementById("o12").value = "12";
+    document.getElementById("o13").value = "13";
+    document.getElementById("o14").value = "14";
+    document.getElementById("o15").value = "15";
+}
 
 
 
@@ -44,6 +60,7 @@ function update_list_user()
             {
 
             }
+            btn_default();
             document.getElementById("o1").disabled = false;
             document.getElementById("o2").disabled = false;
             document.getElementById("o3").disabled = false;
@@ -139,6 +156,7 @@ function update_list_user()
             document.getElementById("o13").hidden = false;
             document.getElementById("o14").hidden = false;
             document.getElementById("o15").hidden = false;
+            btn_default();
             document.getElementById("ans").value = ""
             document.getElementById("ex2").value = "0"
             document.getElementById("p50_50").disabled = false;
@@ -259,6 +277,12 @@ function update_list_user()
     if (data[0] == "game over lose")
     {
        // calc_total();
+        an = document.getElementById("ans").value;
+        if ((document.getElementById(an).value == "💣") || (document.getElementById(an).value == "💣"))
+        {
+            document.getElementById("au").value ="Выигрыш:" +'\n'+ "0";
+            return;
+        }
         document.getElementById("au").value ="Выигрыш:" +'\n'+ calc_total();// document.getElementById("fix").value;
         //document.getElementById("question").value = "";
        // document.getElementById("question").innerText = " ";
@@ -387,7 +411,7 @@ function update_list_user()
         {
             show_winner_otbor();
         }
-    if (data[0][0] == "show result")
+    if ((data[0][0] == "show result") || (data[0][0] == "show total result"))
     {
        if (document.getElementById("ex2").value == "show_result")
             return;
@@ -397,8 +421,8 @@ function update_list_user()
             inputName.setAttribute('type', 'submit');
             inputName.setAttribute('class', 'result_otbor');
             inputName.setAttribute('id', 'r'+i.toString());
-            inputName.setAttribute('innerText', data[i][1]+"                         "+ data[i][2]);
-            inputName.setAttribute('value', data[i][1]+"                         "+ data[i][2]);
+            inputName.setAttribute('innerText', (i+1).toString()+". " + data[i][1]+"                         "+ data[i][2]);
+            inputName.setAttribute('value',(i+1).toString()+". " +  data[i][1]+"                         "+ data[i][2]);
             document.body.appendChild(inputName);
             console.log(inputName)
         }
@@ -639,6 +663,13 @@ function check_answered(){
         {
            document.getElementById(id).style.backgroundColor = "red";
            document.getElementById("ex2").value="x2-2"
+           if ((data[4]!="false") && (data[5]!="false"))
+           {
+                if (fa[i]==data[4])
+                    document.getElementById(id).value = "💣";
+                if (fa[i]==data[5])
+                    document.getElementById(id).value = "🧨";
+           }
             return;
         }
         
@@ -652,6 +683,13 @@ function check_answered(){
     {
         id = get_o(fa[i].toString());
         document.getElementById(id).style.backgroundColor = "red";
+        if ((data[4]!="false") && (data[5]!="false"))
+           {
+                if (fa[i]==data[4])
+                    document.getElementById(id).value = "💣";
+                if (fa[i]==data[5])
+                    document.getElementById(id).value = "🧨";
+           }
     }
     if (document.getElementById(ans).style.backgroundColor == "orange")
     {

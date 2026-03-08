@@ -20,8 +20,8 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 
 app = Flask(__name__, template_folder="static/")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
-app.config["SECRET_KEY"] = "" #"000001C9E687F6E0" #os.urandom(32).hex
-app.secret_key = "" #"000001C9E687F6E0" #os.urandom(32).hex
+app.config["SECRET_KEY"] = "1231312132" #"000001C9E687F6E0" #os.urandom(32).hex
+app.secret_key = "1231424" #"000001C9E687F6E0" #os.urandom(32).hex
 socketio = SocketIO(app)
 accepted_user = ""
 db = SQLAlchemy(app)
@@ -45,6 +45,8 @@ class Users(db.Model, UserMixin):
     money = db.Column(db.Integer)
     time = db.Column(db.Text)
     status = db.Column(db.Text)
+    main_money = db.Column(db.Integer)
+    red_bomb = db.Column(db.Text)
     def __repr__(self):
         return '<Users %r>' %self.id
 
@@ -134,7 +136,9 @@ def join():
             u.answer = "0"
             u.money = 0
             u.time = datetime.now()
-            u.status = status="wait"
+            u.status = "wait"
+            u.main_money = 0
+            u.red_bomb = "false"
             tmp = Users.query.filter(Users.username==u.username).first()
             if tmp!=None:
                 if tmp.username == u.username:
@@ -194,6 +198,8 @@ def invite_user():
             u = request.json['user_name']
             tmp = Users.query.filter(Users.id==int(u)).first()
             u = str(tmp.username)
+            if tmp.red_bomb == 'true':
+                return json.dumps("red bomb")
         except:
             return json.dumps("fail")
         if tmp == None:
@@ -219,7 +225,11 @@ def invite_user():
 def gen_task():
     if request.method == 'POST':
         r = request.json["current_round"]
-        jsn = generate_string(int(r),False)
+        tmp_bomb = request.json["bombs"]
+        bomb = False
+        if tmp_bomb == "true":
+            bomb = True
+        jsn = generate_string(int(r),bomb)
         if jsn == "null":
             return json.dumps("fail")
         return jsn
@@ -284,9 +294,16 @@ def generate_string(round_id,is_bombed):
         return js
     else:
         fatal = random.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
+        b_bomb = 'false'
+        r_bomb = 'false'
+        if bomb and (current_round >= 4):
+            random.seed(secrets.randbelow(99999))
+            tmp_bombs = random.sample(fatal,2)
+            b_bomb = tmp_bombs[0]
+            r_bomb = tmp_bombs[1]
         #md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
         md5_hash = get_md5_hash(fatal)
-        result = [current_round,fatal,md5_hash,count_fatal]
+        result = [current_round,fatal,md5_hash,count_fatal,b_bomb,r_bomb]
         js = json.dumps(result)
         with open('task.json','w') as file:
             json.dump(result,file)
@@ -594,7 +611,9 @@ def update_list_users():
             money = js[0].money
             time = js[0].time
             status = js[0].status
-            jsn = [id,username,answer,money,time, status,"true"]
+            main_money = js[0].main_money
+            red_bomb = js[0].red_bomb
+            jsn = [id,username,answer,money,time, status,main_money,red_bomb,"true"]
             result = json.dumps(jsn)
             return result
         else:
@@ -606,7 +625,9 @@ def update_list_users():
                 money = js[i].money
                 time = js[i].time
                 status = js[i].status
-                tmp = [id,username,answer,money,time, status,"false"]
+                main_money = js[i].main_money
+                red_bomb = js[i].red_bomb
+                tmp = [id,username,answer,money,time, status,main_money,red_bomb,"false"]
                 jsn.append(tmp)
             result = json.dumps(jsn)
             return result
@@ -628,6 +649,24 @@ def game_over():
     if request.method == 'POST':
         try:
             lose = request.json['lose']
+            main_money = request.json['money']
+            u = request.json['user_name']
+            rb = request.json['rb']
+            user_u = Users.query.filter(Users.id==u).first()
+            match main_money:
+                case '0': user_u.main_money = user_u.main_money + 0
+                case '1 000': user_u.main_money = user_u.main_money + 1000
+                case '3 000': user_u.main_money = user_u.main_money + 3000
+                case '5 000': user_u.main_money = user_u.main_money + 5000
+                case '10 000': user_u.main_money = user_u.main_money + 10000
+                case '25 000': user_u.main_money = user_u.main_money + 25000
+                case '50 000': user_u.main_money = user_u.main_money + 50000
+                case '150 000': user_u.main_money = user_u.main_money + 150000
+                case '500 000': user_u.main_money = user_u.main_money + 500000
+                case '1 000 000': user_u.main_money = user_u.main_money + 1000000
+            if rb == "true":
+                user_u.red_bomb = "true"
+            db.session.commit()
             jh = Users.query.all()
             for i in range(len(jh)):
                 if lose == "true":
@@ -831,6 +870,15 @@ def send_answer():
                         user.money = user.money - 50
                         wrong = True
                 if r>1:
+                    if (jsn[4]!="false") and (jsn[5]!="false"):
+                        if int(user.answer)==jsn[4]:
+                            user.money = 0
+                            db.session.commit()
+                            return json.dumps("ok")
+                        if int(user.answer)==jsn[5]:
+                           user.money = user.money - 3000*c_fatals
+                           db.session.commit()
+                           return json.dumps("ok")
                     for i in range(c_fatals):
                         if int(user.answer)==fatals[i]:
                             user.money = user.money - 50*c_fatals
@@ -1367,6 +1415,10 @@ def update_for_spec():
         if (user_main != None):
             res = get_result()
             return json.dumps(res)
+        user_main = Users.query.filter(Users.status == "show total result").first()
+        if (user_main != None):
+            res = get_total_result()
+            return json.dumps(res)
     return json.dumps("fail")
 
 
@@ -1380,6 +1432,18 @@ def get_result():
         t = [status, username, money]
         result.append(t)
     return result
+
+def get_total_result():
+    result = []
+    tmp = Users.query.order_by(desc(Users.money+Users.main_money)).all()
+    for i in range(len(tmp)):
+        status = tmp[i].status
+        username = tmp[i].username
+        money = tmp[i].money + tmp[i].main_money
+        t = [status, username, money]
+        result.append(t)
+    return result
+
 
 @app.route('/send_script', methods=["POST", "GET"])
 def send_script():
@@ -1444,6 +1508,8 @@ def otbor():
         try:
             u_all = Users.query.all()
             for i in range(len(u_all)):
+                if u_all[i].red_bomb == 'true':
+                    continue
                 u_all[i].status = "otbor"
                 u_all[i].time = "0"
                 db.session.commit()
@@ -1457,6 +1523,8 @@ def warning_otbor():
         try:
             u_all = Users.query.all()
             for i in range(len(u_all)):
+                if u_all[i].red_bomb == 'true':
+                    continue
                 u_all[i].status = "warning otbor"
                 db.session.commit()
             return json.dumps("ok")
@@ -1469,6 +1537,8 @@ def start_otbor():
         try:
             u_all = Users.query.all()
             for i in range(len(u_all)):
+                if u_all[i].red_bomb == 'true':
+                    continue
                 u_all[i].status = "start otbor"
                 db.session.commit()
             return json.dumps("ok")
@@ -1481,6 +1551,8 @@ def show_answer_otbor():
         try:
             u_all = Users.query.all()
             for i in range(len(u_all)):
+                if u_all[i].red_bomb == 'true':
+                    continue
                 u_all[i].status = "otbor end"
                 db.session.commit()
             with open('task_otbor.json') as file:
@@ -1577,6 +1649,8 @@ def show_result_interactive():
             for i in range(len(user_all)):
                 if action == "show":
                     user_all[i].status = "show result"
+                if action == "show total":
+                    user_all[i].status = "show total result"
                 if action == "hide":
                     user_all[i].status = "wait"
             db.session.commit()
