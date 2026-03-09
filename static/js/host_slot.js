@@ -2704,8 +2704,9 @@ function total_money()
     var tmp_money = document.getElementById("au").value;
     result_money = tmp_money;
     document.getElementById("au").value = "Выигрыш:" +'\n' + tmp_money;
-    lose = "true"
- //  }
+     if (tm.style.backgroundColor != "lime") {
+             lose = "true";
+         }
     fetch('/game_over', {
         method: 'POST',
         body: JSON.stringify({ lose:lose,money:result_money,user_name:input,rb:rb}),
