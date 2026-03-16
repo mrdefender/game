@@ -2802,13 +2802,13 @@ function update_list_user()
     var cell3 = document.createElement("td")
     cell3.innerHTML = data[i][2];
     var cell4 = document.createElement("td")
-    cell4.innerHTML = data[i][3];
+    cell4.innerHTML = data[i][3].toLocaleString("ru");
     var cell5 = document.createElement("td")
     cell5.innerHTML = data[i][4];
     var cell6 = document.createElement("td")
     cell6.innerHTML = data[i][5];
     var cell7 = document.createElement("td")
-    cell7.innerHTML = data[i][6];
+    cell7.innerHTML = data[i][6].toLocaleString("ru");
     var cell8 = document.createElement("td")
     cell8.innerHTML = data[i][7];
     if (data[i][5]=="answered interactive")

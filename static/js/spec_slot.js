@@ -5,20 +5,51 @@ var timerTreeStatus = setInterval(() => update_tree(), 3000);
 
 function btn_default(){
     document.getElementById("o1").value = "1";
+    document.getElementById("o1").classList.remove("wrong");
+    document.getElementById("o1").classList.remove("right");
     document.getElementById("o2").value = "2";
+    document.getElementById("o2").classList.remove("wrong");
+    document.getElementById("o2").classList.remove("right");
     document.getElementById("o3").value = "3";
+    document.getElementById("o3").classList.remove("wrong");
+    document.getElementById("o3").classList.remove("right");
     document.getElementById("o4").value = "4";
+    document.getElementById("o4").classList.remove("wrong");
+    document.getElementById("o4").classList.remove("right");
     document.getElementById("o5").value = "5";
+    document.getElementById("o5").classList.remove("wrong");
+    document.getElementById("o5").classList.remove("right");
     document.getElementById("o6").value = "6";
+    document.getElementById("o6").classList.remove("wrong");
+    document.getElementById("o6").classList.remove("right");
     document.getElementById("o7").value = "7";
+    document.getElementById("o7").classList.remove("wrong");
+    document.getElementById("o7").classList.remove("right");
     document.getElementById("o8").value = "8";
+    document.getElementById("o8").classList.remove("wrong");
+    document.getElementById("o8").classList.remove("right");
     document.getElementById("o9").value = "9";
+    document.getElementById("o9").classList.remove("wrong");
+    document.getElementById("o9").classList.remove("right");
     document.getElementById("o10").value = "10";
+    document.getElementById("o10").classList.remove("wrong");
+    document.getElementById("o10").classList.remove("right");
     document.getElementById("o11").value = "11";
+    document.getElementById("o11").classList.remove("wrong");
+    document.getElementById("o11").classList.remove("right");
     document.getElementById("o12").value = "12";
+    document.getElementById("o12").classList.remove("wrong");
+    document.getElementById("o12").classList.remove("right");
     document.getElementById("o13").value = "13";
+    document.getElementById("o13").classList.remove("wrong");
+    document.getElementById("o13").classList.remove("right");
     document.getElementById("o14").value = "14";
+    document.getElementById("o14").classList.remove("wrong");
+    document.getElementById("o14").classList.remove("right");
     document.getElementById("o15").value = "15";
+    document.getElementById("o15").classList.remove("wrong");
+    document.getElementById("o15").classList.remove("right");
+
 }
 
 
@@ -49,6 +80,7 @@ function update_list_user()
             try
             {
                 var ind = 0;
+		document.getElementById('r').remove()
                 while (true)
                 {
                     let result_button = document.getElementById('r'+ind.toString())
@@ -135,6 +167,21 @@ function update_list_user()
     }
      if (data[0] == "main")
         {
+             try
+            {
+                var ind = 0;
+		        document.getElementById('r').remove();
+                while (true)
+                {
+                    let result_button = document.getElementById('r'+ind.toString())
+                    result_button.remove();
+                    ind++;
+                }
+            }
+            catch (error)
+            {
+
+            }
             document.getElementById("in_game").value = "В игре: " + data[1]
             document.getElementById("au").value = "В игру вступает:" +'\n'+ data[1];
             document.getElementById("user").value = data[1]
@@ -199,6 +246,7 @@ function update_list_user()
     
     if (data[0] == "wait task main")
     {
+        btn_default()
        // document.getElementById("au").value = "";
         document.getElementById("ex2").value = "0";
         document.getElementById("ans").value = "";
@@ -402,27 +450,49 @@ function update_list_user()
     }
     if (data[0] == "otbor end")
         {
+            console.log(data[0])
             //document.getElementById("au").hidden = true;
             document.getElementById("ex2").value = "0";
             get_answer_otbor();
-            show_winner_otbor();
+         // show_winner_otbor();
         }
     if (data[0] == "winner otbor")
         {
+            console.log(data[0])
             show_winner_otbor();
         }
     if ((data[0][0] == "show result") || (data[0][0] == "show total result"))
     {
        if (document.getElementById("ex2").value == "show_result")
             return;
+      if (data[0][0] == "show result")
+	{
+	    inputName = document.createElement('input');
+            inputName.setAttribute('type', 'submit');
+            inputName.setAttribute('class', 'result_otbor');
+            inputName.setAttribute('id', 'r');
+            inputName.setAttribute('innerText', 'Результаты интерактивной игры');
+            inputName.setAttribute('value','Результаты интерактивной игры');
+            document.body.appendChild(inputName);
+	}
+      if (data[0][0] == "show total result")
+        {
+            inputName = document.createElement('input');
+            inputName.setAttribute('type', 'submit');
+            inputName.setAttribute('class', 'result_otbor');
+            inputName.setAttribute('id', 'r');
+            inputName.setAttribute('innerText', 'Общий результат игры');
+            inputName.setAttribute('value','Общий результат игры');
+            document.body.appendChild(inputName);
+        }
         for (var i = 0; i< data.length;i++)
         {
             inputName = document.createElement('input');
             inputName.setAttribute('type', 'submit');
             inputName.setAttribute('class', 'result_otbor');
             inputName.setAttribute('id', 'r'+i.toString());
-            inputName.setAttribute('innerText', (i+1).toString()+". " + data[i][1]+"                         "+ data[i][2]);
-            inputName.setAttribute('value',(i+1).toString()+". " +  data[i][1]+"                         "+ data[i][2]);
+            inputName.setAttribute('innerText', (i+1).toString()+". " + data[i][1]+"                         "+ data[i][2].toLocaleString("ru"));
+            inputName.setAttribute('value',(i+1).toString()+". " +  data[i][1]+"                         "+ data[i][2].toLocaleString("ru"));
             document.body.appendChild(inputName);
             console.log(inputName)
         }
@@ -570,15 +640,45 @@ function show_winner_otbor(){
     {
        return; 
     }
-    for (var i =0 ;data.length;i++)
-    {
-        if (data[i][5]=="winner otbor")
+    console.log(document.getElementById("ex2").value);
+        if (document.getElementById("ex2").value == "show_result")
         {
-            
-            document.getElementById("au").value ="Игрок: " + data[i][1]+ "      " +"Ответ: " + data[i][2]+ "      "+"Время: "+data[i][4];
-            break;
+            return;
         }
-    }
+       
+            inputName = document.createElement('input');
+            inputName.setAttribute('type', 'submit');
+            inputName.setAttribute('class', 'result_otbor');
+            inputName.setAttribute('id', 'r');
+            inputName.setAttribute('innerText', 'Результаты отборочного тура');
+            inputName.setAttribute('value','Результаты отборочного тура');
+            document.body.appendChild(inputName);
+             
+        for (var i = 0; i< data.length;i++)
+        {
+            inputName = document.createElement('input');
+            inputName.setAttribute('type', 'submit');
+            inputName.setAttribute('class', 'result_otbor');
+            inputName.setAttribute('id', 'r'+i.toString());
+            inputName.setAttribute('innerText', "Игрок: " + data[i][1]+ "      " +"Ответ: " + data[i][2]+ "      "+"Время: "+data[i][4]);
+            inputName.setAttribute('value',"Игрок: " + data[i][1]+ "      " +"Ответ: " + data[i][2]+ "      "+"Время: "+data[i][4]);
+            document.body.appendChild(inputName);
+            if (data[i][5]=="winner otbor")
+            {
+                document.getElementById('r'+i.toString()).classList.add("accepted")
+            }
+            console.log(inputName)
+        }
+        document.getElementById("ex2").value = "show_result";
+
+    //for (var i =0 ;data.length;i++)
+   // {
+     //   if (data[i][5]=="winner otbor")
+      //  {            
+      //      document.getElementById("au").value ="Игрок: " + data[i][1]+ "      " +"Ответ: " + data[i][2]+ "      "+"Время: "+data[i][4];
+      //      break;
+      //  }
+    //}
 
 
 
@@ -690,10 +790,19 @@ function check_answered(){
                 if (fa[i]==data[5])
                     document.getElementById(id).value = "🧨";
            }
+           
     }
+    if (document.getElementById(ans).style.backgroundColor == "red")
+    {
+         document.getElementById(ans).classList.add("wrong");
+         document.getElementById("ex2").value="0";
+         return;
+    }
+
     if (document.getElementById(ans).style.backgroundColor == "orange")
     {
-        document.getElementById(ans).style.backgroundColor = "green";
+        //document.getElementById(ans).style.backgroundColor = "green";
+        document.getElementById(ans).classList.add("right");
         if (data[0]==1)
             document.getElementById("au").value = "1 000";
         if (data[0]==2)
@@ -715,6 +824,8 @@ function check_answered(){
     
 
     }
+    
+    
     
 
     document.getElementById("ex2").value="0";

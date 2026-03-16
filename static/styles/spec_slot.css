@@ -206,7 +206,7 @@
 
 .message{
     position: relative;
-    top: 20rem;
+    top: 15rem;
     left: -1%;
     color: #fff;
     border-radius: 100px;
@@ -246,6 +246,39 @@
     width: 50%;
 
 }
+
+@keyframes color-blink {
+
+  0%, 100% { background-color: #000c11;} 
+   50% { background-color: green; } 
+}
+
+.accepted {
+  animation: color-blink 1s linear infinite; 
+}
+
+@keyframes color-blink-wrong {
+
+  0%, 100% { background-color: orange;} 
+   50% { background-color: red; } 
+}
+
+.wrong {
+  animation: color-blink-wrong 1s linear infinite; 
+}
+
+
+@keyframes color-blink-right {
+
+  0%, 100% { background-color: orange;} 
+   50% { background-color: green; } 
+}
+
+.right {
+  animation: color-blink-right 1s linear infinite; 
+}
+
+
 
 .o1 {
     position: relative;
