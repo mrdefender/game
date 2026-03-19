@@ -41,7 +41,7 @@
     color: beige;
     font-size: medium;
     text-align: center;
-    width: 150px;
+    width: 180px;
     height: 50%;
 }
 
@@ -417,7 +417,7 @@
     background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size:small;
-    width: 8rem;
+    width: 9rem;
     height: 1.5rem;
     text-wrap: inherit;
 
@@ -431,7 +431,7 @@
     background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size:small;
-    width: 8rem;
+    width: 9rem;
     height: 1.5rem;
     text-wrap: inherit;
 
@@ -446,7 +446,7 @@
     background-color: #000c11;
     color: rgb(7, 173, 224);
     font-size:small;
-    width: 8rem;
+    width: 9rem;
     height: 1.5rem;
     text-wrap: inherit;
 }

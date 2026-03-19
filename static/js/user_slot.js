@@ -442,7 +442,7 @@ function send_answer_otbor(){
      }
      catch (error)
      {
-        document.getElementById("otbor_input").value = "";
+        document.getElementById("otbor_input").value = "0";
      }
      var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
         fetch('/send_answer_otbor', {

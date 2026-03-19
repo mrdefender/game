@@ -700,7 +700,7 @@ def get_user_status():
          jsn = user.status
          return json.dumps(jsn)
         except:
-            json.dumps("fail")
+            return json.dumps("fail")
         
 @app.route('/reset_user_to_wait', methods=["POST", "GET"])
 def reset_user_to_wait():

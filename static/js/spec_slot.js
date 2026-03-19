@@ -54,6 +54,34 @@ function btn_default(){
 
 
 
+function start_timer_1min(){
+   var time = 60;
+    document.getElementById("au").value = "1:00";
+    setTimeout(() => {
+  timer_wait(time); 
+}, 2000);
+}
+
+function timer_wait(time_w){
+    if (time_w<=0)
+    {
+        return;
+    }
+    time_w=time_w-1;
+    if (time_w<10)
+    {
+        document.getElementById("au").value = '0:'+'0'+time_w.toString();
+        setTimeout(() => { timer_wait(time_w); }, 1000);
+        return;
+    }
+    if (time_w<60)
+        document.getElementById("au").value = "0:"+time_w.toString();
+
+    setTimeout(() => { timer_wait(time_w); }, 1000);
+
+}
+
+
 function update_list_user()
 {
     fetch('/update_for_spec', {
@@ -108,16 +136,16 @@ function update_list_user()
             document.getElementById("o13").disabled = false;
             document.getElementById("o14").disabled = false;
             document.getElementById("o15").disabled = false;
-            document.getElementById("in_game").value = " "
-            document.getElementById("user").value = ""
-            document.getElementById("au").value = ""
-            document.getElementById("ans").value = ""
+            document.getElementById("in_game").value = " ";
+            document.getElementById("user").value = "";
+            document.getElementById("au").value = "";
+            document.getElementById("ans").value = "";
             document.getElementById("current").value = "0";
-            document.getElementById("fix").value = "0"
+            document.getElementById("fix").value = "0";
             document.getElementById("question").hidden = true;
             document.getElementById("question").value = " ";
             document.getElementById('question').innerText = " ";
-            document.getElementById("ex2").value = "0"
+            document.getElementById("ex2").value = "0";
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
             document.getElementById("o3").hidden = true;
@@ -139,7 +167,6 @@ function update_list_user()
             document.getElementById("px2").hidden = true;
             document.getElementById("pauden").hidden = true;
              document.getElementById("pfact").hidden = true;
-            document.getElementById("question").value = "";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -160,9 +187,7 @@ function update_list_user()
             document.getElementById("pnavi").style.backgroundColor = "#000c11";
             document.getElementById("px2").style.backgroundColor = "#000c11";
             document.getElementById("pauden").style.backgroundColor = "#000c11";
-             document.getElementById("pfact").style.backgroundColor = "#000c11";
-            
-            
+             document.getElementById("pfact").style.backgroundColor = "#000c11";           
             return;
     }
      if (data[0] == "main")
@@ -219,7 +244,7 @@ function update_list_user()
              document.getElementById("pfact").hidden = false;
               document.getElementById("pfact").disabled = false;
             document.getElementById("question").value = " ";
-          //  document.getElementById("question").innerText = " ";
+            document.getElementById("question").innerText = " ";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -663,6 +688,10 @@ function show_winner_otbor(){
             inputName.setAttribute('innerText', "Игрок: " + data[i][1]+ "      " +"Ответ: " + data[i][2]+ "      "+"Время: "+data[i][4]);
             inputName.setAttribute('value',"Игрок: " + data[i][1]+ "      " +"Ответ: " + data[i][2]+ "      "+"Время: "+data[i][4]);
             document.body.appendChild(inputName);
+            if (data[i][2]=='0')
+            {
+                 document.getElementById('r'+i.toString()).disabled = true;
+            }
             if (data[i][5]=="winner otbor")
             {
                 document.getElementById('r'+i.toString()).classList.add("accepted")

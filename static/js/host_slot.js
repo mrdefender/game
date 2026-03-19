@@ -853,6 +853,8 @@ function invite_to_game()
         document.getElementById('in_game').value = "В игре:    " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
     document.getElementById("fixed_script").disabled = false;
+    select.value = "Раунд 1";
+    ch3();
     stop_sounds();
     audio_invite.play();
     document.getElementById('question').innerText = " "
@@ -866,38 +868,6 @@ function invite_to_game()
 console.error('Ошибка:', error);
 });
 
-}
-
-function start_sounds_for_questions(){
-
-
-    
-       audio.currentTime = 0;
-       audio.pause();
-       audio.play();
-        
-       /*
-       fetch('/sounds/q1-3.ogg', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'audio/ogg'
-        }
-    }
-)
-.then(response =>  {
-        console.log(response);
-     //   player = document.getElementById('audioPlayer');  
-       //  player.src = `/sounds/${encodeURIComponent(response)}`
-         
-         //player.play().catch(error => console.error("Playback failed:", error));  
-      
-        
-     
-       
-}
-)
-
-*/
 }
 
 function gen_task()
@@ -2185,12 +2155,12 @@ function take_money()
 {
     if(document.getElementById("x2").style.backgroundColor == "orange")
         return;
-    if (document.getElementById("alter").style.backgroundColor == "orange")
-        return;
+   // if (document.getElementById("alter").style.backgroundColor == "orange")
+       // return;
     //document.getElementById("au").value = "Выигрыш: " + '\n' + current_money.value;
-    document.getElementById("au").value = current_money.value;
-   var tm = document.getElementById("take_money");
-    tm.style.backgroundColor = "lime";
+     document.getElementById("au").value = current_money.value;
+     var tm = document.getElementById("take_money");
+     tm.style.backgroundColor = "lime";
      console.log(tm.style.backgroundColor);
      document.getElementById("total_money").disabled = false;
      stop_sounds();
