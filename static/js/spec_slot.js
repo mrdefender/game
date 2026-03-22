@@ -600,7 +600,7 @@ function get_task_otbor(){
     {
        return; 
     }
-    document.getElementById('question').innerText= "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];  
+    document.getElementById('question').innerText="Отборочный тур"+'\n'+ "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];  
 
 })
 .catch(error => {
@@ -929,8 +929,8 @@ function get_task(){
     }
     if (document.getElementById("ex2").value !="0")
         return;
-    document.getElementById('question').innerText = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
-    document.getElementById('question').value = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
+    document.getElementById('question').innerText ="Раунд "+data[0]+'\n'+ "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
+    document.getElementById('question').value = "Раунд "+data[0]+'\n'+"md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
     document.getElementById("o1").disabled = false;
     document.getElementById("o2").disabled = false;
     document.getElementById("o3").disabled = false;

@@ -206,7 +206,7 @@
 
 .message{
     position: relative;
-    top: 15rem;
+    top: 16rem;
     left: -1%;
     color: #fff;
     border-radius: 100px;
@@ -214,35 +214,32 @@
     color: rgb(241, 243, 245);
     font-size: xx-large;
     width: 45%;
-    height: 4rem;
+    height: 5rem;
     text-wrap: pretty;
 }
 .in_game{
     position: relative;
-    font-size:x-large;
+    font-size:medium;
     padding: 20px 30px;
     top: -18rem;
     left: -39.9%;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
-    font-size: medium;
     width: 16rem;
     height: 2rem;
 }
 .questions{
     position: relative;
     font-size:x-large;
-    padding: 10px 30px;
-    height: 30%;
+    height: 6rem;
     top: -22rem;
-     padding: 25px 70px 40px;
+     padding: 5px 10px 10px;
     left: 22%;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
     color: beige;
-    font-size: medium;
     width: 50%;
 
 }
@@ -264,7 +261,7 @@
 }
 
 .wrong {
-  animation: color-blink-wrong 1s linear infinite; 
+  animation: color-blink-wrong 1s infinite; 
 }
 
 
@@ -275,7 +272,7 @@
 }
 
 .right {
-  animation: color-blink-right 1s linear infinite; 
+  animation: color-blink-right 1s infinite; 
 }
 
 
@@ -284,11 +281,11 @@
     position: relative;
     top: -18rem;
     left: -5%;
-    padding: 25px 70px 40px;
+    padding: 15px 72px 55px;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
-    font-size: medium;
+    font-size: x-large;
     width: 3rem;
     height: 2rem;
 }
@@ -296,11 +293,11 @@
     position: relative;
     top: -17rem;
     left: -5%;
-    padding: 25px 70px 40px;
+    padding: 15px 72px 55px;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
-    font-size: medium;
+    font-size: x-large;
     width: 3rem;
     height: 2rem;
 }
@@ -308,11 +305,11 @@
     position: relative;
     top: -16rem;
     left: -5%;
-    padding: 25px 70px 40px;
+    padding: 15px 72px 55px;
     color: #fff;
     border-radius: 100px;
     background-color: #000c11;
-    font-size: medium;
+    font-size: x-large;
     width: 3rem;
     height: 2rem;
 }
@@ -326,7 +323,7 @@
     border-radius: 100px;
     background-color: #000c11;
     color: beige;
-    font-size: medium;
+    font-size: x-large;
     height: 3rem;
     width: 10%;
     z-index: 10;
@@ -362,7 +359,7 @@
 
 .result_otbor{
     position: relative;
-    top: -50%;
+    top: -20%;
     left: 0rem;
     color: #fff;
     border-radius: 100px;

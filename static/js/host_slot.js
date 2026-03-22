@@ -913,11 +913,11 @@ function gen_task()
     }
     if (data[0]==0)
     {
-         document.getElementById('question').innerText= "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];
+         document.getElementById('question').innerText="Отборочный тур"+'\n'+ "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];
          document.getElementById("warning_otbor").disabled = false;
          return;
     }
-    document.getElementById('question').innerText = "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
+    document.getElementById('question').innerText ="Раунд " + data[0] +'\n'+ "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
     status_btn (false,"o");
     status_btn (false,"btn");
     document.getElementById('take_money').disabled = false;
