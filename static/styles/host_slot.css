@@ -296,7 +296,7 @@
     font-size: large;
     width: 45%;
     height: 4rem;
-    text-wrap: pretty;
+    text-wrap: inherit;
 }
 .in_game{
     position: relative;
