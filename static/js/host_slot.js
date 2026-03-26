@@ -78,6 +78,7 @@ var audio_pre_final= new Audio(audioUrl+"pre-final.ogg");
 var audio_final= new Audio(audioUrl+"final.ogg");
 var audio_help_auden= new Audio(audioUrl+"help_auden.ogg");
 var audio_wait_1min= new Audio(audioUrl+"wait_1min.ogg");
+var audio_4_20= new Audio(audioUrl+"4_20.ogg");
 var timerWaitAnswer;
 var timerHelps;
 
@@ -2631,6 +2632,8 @@ function stop_sounds()
     audio_help_auden.pause();
     audio_wait_1min.currentTime = 0;
     audio_wait_1min.pause();
+    audio_4_20.currentTime = 0;
+    audio_4_20.pause();
 
     //console.log(currentUrl);
 }

@@ -206,6 +206,7 @@ def invite_user():
             return json.dumps("fail")
         tmp.status = 'main'
         tmp.answer = '0'
+        tmp.time = 0
         db.session.commit()
         js = Users.query.all()
         if len(js)!=1:
