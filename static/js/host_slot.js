@@ -36,6 +36,9 @@ var audio_r7 = new Audio(audioUrl+"r7.ogg");
 var audio_r8 = new Audio(audioUrl+"r8.ogg");
 var audio_r9 = new Audio(audioUrl+"r9.ogg");
 var audio_a4_9 = new Audio(audioUrl+"a4-9.ogg");
+var audio_a5 = new Audio(audioUrl+"a5.ogg");
+var audio_a6 = new Audio(audioUrl+"a6.ogg");
+var audio_a9 = new Audio(audioUrl+"a9.ogg");
 var audio_w1_3 = new Audio(audioUrl+"w1-3.ogg");
 var audio_w4 = new Audio(audioUrl+"w4.ogg");
 var audio_w5 = new Audio(audioUrl+"w5.ogg");
@@ -1152,7 +1155,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<6;i++)
         {
             stop_sounds();
-            audio_a4_9.play();
+            audio_a5.play();
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
@@ -1168,7 +1171,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<8;i++)
         {
             stop_sounds();
-            audio_a4_9.play();
+            audio_a6.play();
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
@@ -1184,7 +1187,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<10;i++)
         {
             stop_sounds();
-            audio_a4_9.play();
+            audio_a6.play();
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
@@ -1200,7 +1203,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<12;i++)
         {
             stop_sounds();
-            audio_a4_9.play();
+            audio_a6.play();
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
@@ -1216,7 +1219,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<14;i++)
         {
             stop_sounds();
-            audio_a4_9.play();
+            audio_a9.play();
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
@@ -2544,6 +2547,12 @@ function stop_sounds()
     audio_r9.pause();
     audio_a4_9.currentTime = 0;
     audio_a4_9.pause();
+    audio_a5.currentTime = 0;
+    audio_a5.pause();
+    audio_a6.currentTime = 0;
+    audio_a6.pause();
+    audio_a9.currentTime = 0;
+    audio_a9.pause();
     audio_w1_3.currentTime = 0;
     audio_w1_3.pause();
     audio_w4.currentTime = 0;
