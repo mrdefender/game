@@ -207,6 +207,7 @@ def invite_user():
         tmp.status = 'main'
         tmp.answer = '0'
         tmp.time = 0
+	#tmp.time = 0
         db.session.commit()
         js = Users.query.all()
         if len(js)!=1:
@@ -214,6 +215,7 @@ def invite_user():
                 if js[i].status !="main":
                     js[i].status = 'interactive'
                     js[i].answer = '0'
+                    js[i].time = 0
             db.session.commit()
         return json.dumps(u)
     print (url_for('host_slot'))
@@ -716,6 +718,7 @@ def reset_user_to_wait():
          for i in range(0,len(js)):
             js[i].status = "wait"
             js[i].answer = "0"
+            js[i].time = 0
             db.session.commit()
          init_game()
          return json.dumps(" ")
@@ -761,6 +764,7 @@ def start_game():
                         js[i].status = "wait task main"
                     if js[i].status =="interactive":
                         js[i].status = "wait task interactive"
+                    js[i].time = 0
                 db.session.commit()
             else: 
                 return json.dumps("fail")
@@ -946,6 +950,7 @@ def next_round():
                     if (user[i].status == "wait next round interactive") | (user[i].status == "interactive no answer"):
                         user[i].status = "wait task interactive"
                         user[i].answer = "0"
+                    user[i].time = 0
             if os.path.exists('task.json'):
                 os.remove('task.json')
             db.session.commit()
@@ -1289,6 +1294,8 @@ def update_for_spec():
     if request.method == 'POST':
         user_waits = Users.query.filter(Users.status == "wait").count()
         user_all = Users.query.all()
+        if len(user_all)==0:
+            return json.dumps("fail")
         if (len(user_all)==user_waits):
             return json.dumps("wait")
         user_main = Users.query.filter(Users.status == "main").first()

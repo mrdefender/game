@@ -370,7 +370,18 @@
     font-size: x-large;
     text-wrap:inherit
 }
-
+.timer{
+    position: relative;
+    top: -60%;
+    left: 0rem;
+    color: #fff;
+    border-radius: 100px;
+    background-color: #000c11;
+    width: 100%;
+    height: 100%;
+    font-size: xx-large;
+    text-wrap:inherit
+}
 
 
 *:disabled

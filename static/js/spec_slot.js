@@ -3,6 +3,42 @@ var timerHelps;
 var timeWainAnswerFromMain;
 var timerTreeStatus = setInterval(() => update_tree(), 3000);
 
+
+function wait_4min(){
+    time = 252;
+    inputName = document.createElement('input');
+    inputName.setAttribute('type', 'submit');
+    inputName.setAttribute('class', 'timer');
+    inputName.setAttribute('id', 'r0');
+    inputName.setAttribute('value', "4:12");
+    document.body.appendChild(inputName);
+    setTimeout(() => {
+  timer_wait(time); 
+}, 1000);
+}
+
+function timer_wait(time_all){
+    if (time_all<=0)
+    {
+        let result_button = document.getElementById('r0')
+        result_button.remove();
+        return;
+    }
+    time_all = time_all -1
+    min = parseInt(time_all/60)
+    second = time_all%60;
+    if (second<10)
+    {
+        document.getElementById("r0").value = min.toString()+':'+'0'+second.toString();
+        setTimeout(() => { timer_wait(time_all); }, 1000);
+        return;
+    }
+    document.getElementById("r0").value = min.toString()+':'+second.toString();
+
+    setTimeout(() => { timer_wait(time_all); }, 1000);
+
+}
+
 function btn_default(){
     document.getElementById("o1").value = "1";
     document.getElementById("o1").classList.remove("wrong");
@@ -54,32 +90,7 @@ function btn_default(){
 
 
 
-function start_timer_1min(){
-   var time = 60;
-    document.getElementById("au").value = "1:00";
-    setTimeout(() => {
-  timer_wait(time); 
-}, 2000);
-}
 
-function timer_wait(time_w){
-    if (time_w<=0)
-    {
-        return;
-    }
-    time_w=time_w-1;
-    if (time_w<10)
-    {
-        document.getElementById("au").value = '0:'+'0'+time_w.toString();
-        setTimeout(() => { timer_wait(time_w); }, 1000);
-        return;
-    }
-    if (time_w<60)
-        document.getElementById("au").value = "0:"+time_w.toString();
-
-    setTimeout(() => { timer_wait(time_w); }, 1000);
-
-}
 
 
 function update_list_user()
@@ -95,10 +106,27 @@ function update_list_user()
 .then(response => response.json())
 
 .then(data => {
+    console.log(data)
     
 
     if (data == "fail")
     {
+        document.getElementById("o1").hidden = true;
+        document.getElementById("o2").hidden = true;
+        document.getElementById("o3").hidden = true;
+        document.getElementById("o4").hidden = true;
+        document.getElementById("o5").hidden = true;
+        document.getElementById("o6").hidden = true;
+        document.getElementById("o7").hidden = true;
+        document.getElementById("o8").hidden = true;
+        document.getElementById("o9").hidden = true;
+        document.getElementById("o10").hidden = true;
+        document.getElementById("o11").hidden = true;
+        document.getElementById("o12").hidden = true;
+        document.getElementById("o13").hidden = true;
+        document.getElementById("o14").hidden = true;
+        document.getElementById("o15").hidden = true;
+        document.getElementById("question").hidden = true;
         return;
     }
 
