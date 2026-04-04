@@ -1,253 +1,317 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Свободный слот</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/host_slot.css') }}">
-    <link rel="stylesheet" href="/static/styles/host_slot.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Свободный слот — пульт ведущего</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="host_slot_navi_results.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/host_slot_stage_keyboard.css') }}">
 </head>
 <body>
-        <div class="game_box">
-            <h1>Свободный слот. Пульт ведущего.</h1>
-            <div class="game_box_container">
-            <div class="form_group">
-             <input type="submit" id="status-round" class="status-round" value="1"> 
-             <input type="submit" id="away" class="away" value="Осталось раундов: 9" > 
-             <input type="submit" id="current-money" class ="current-money" value="0"> 
-             <input type="submit" id="next-money" class ="next-money" value="1 000" > 
-             <input type="submit" id="lost-money" class ="lost-money" value="0" > 
-             <input type="submit" id="fix-money" class ="fix-money" value="0" > 
-             <p>
-             <div class="tree-container-c1" id="c9"> 9. 1 000 000 </div>
-             <div class="tree-container-c2" id="c8"> 8.  500 000 </div>
-             <div class="tree-container-c3" id="c7"> 7.  150 000</div>
-             <div class="tree-container-c4" id="c6"> 6.   50 000</div>
-             <div class="tree-container-c5" id="c5"> 5.   25 000</div>
-             <div class="tree-container-c6" id="c4"> 4.   10 000</div>
-             <div class="tree-container-c7" id="c3"> 3.    5 000</div>
-             <div class="tree-container-c8" id="c2"> 2.    3 000</div>
-             <div class="tree-container-c9" id="c1"> 1.    1 000</div>
-             </p>
-             <p>
-                <input class="in_game" id="in_game" value="В игре:">
-             </p>
-             
+  <div class="show-shell">
+    <header class="show-header panel-glow">
+      <div>
+        <div class="eyebrow">ТВ-режим</div>
+        <h1>Свободный слот — пульт ведущего</h1>
+      </div>
+      <div class="state-legend">
+        <div class="legend-item"><span class="legend-dot legend-player"></span>Ответ игрока</div>
+        <div class="legend-item"><span class="legend-dot legend-fatal"></span>Фатал</div>
+        <div class="legend-item"><span class="legend-dot legend-right"></span>Верный ответ</div>
+        <div class="legend-item"><span class="legend-dot legend-action"></span>Денежное действие</div>
+      </div>
+    </header>
 
-                
-                <p>
-                    <!--input type="radio" class="tree-container-button" id="users" name="user_name" value=bbb disabled --->
-                    <label for=bbb class="tree-container">Количество ответов в интерактиве:</label>
-                    <input type="text" class="tree-container" id="count_interactive" ></label>
-                </p>   
-            </div> 
-                <p>  
-                <input type="submit" class="message" id="au" >
-                <div class = "questions" id="question" value =""></div>
+    <main class="main-grid">
+      <aside class="left-rail">
+        <section class="panel-glow status-panel">
+          <div class="section-title">Статус игры</div>
+          <div class="status-grid">
+            <input type="submit" id="status-round" class="status-round metric metric-round" value="1">
+            <input type="submit" id="away" class="away metric metric-away" value="Осталось раундов: 9">
+            <input type="submit" id="current-money" class="current-money metric metric-current" value="0">
+            <input type="submit" id="next-money" class="next-money metric metric-next" value="1 000">
+            <input type="submit" id="lost-money" class="lost-money metric metric-lost" value="0">
+            <input type="submit" id="fix-money" class="fix-money metric metric-fix" value="0">
+          </div>
+        </section>
 
-                <input type="submit" class="btn1" id=btn1 value="1" disabled>
-                <input type="submit" class="btn2" id=btn2 value="2" disabled>
-                <input type="submit" class="btn3" id=btn3 value="3" disabled>
-                <input type="submit"n class="btn4" id=btn4 value="4" disabled>
-                <input type="submit" class="btn5" id=btn5 value="5" disabled>
-                <div> 
-                 <input type="submit" class="btn6" id=btn6 value="6" disabled>
-                    <input type="submit" class="btn7" id=btn7 value="7" disabled>
-                    <input type="submit" class="btn8" id=btn8 value="8" disabled>
-                    <input type="submit" class="btn9" id=btn9 value="9" disabled>
-                    <input type="submit" class="btn10"id=btn10 value="10" disabled>
-                </div>
-                <div>      
-                    <input type="submit" class="btn11" id=btn11 value="11" disabled>
-                    <input type="submit" class="btn12" id=btn12 value="12" disabled>
-                    <input type="submit" class="btn13" id=btn13 value="13" disabled>
-                    <input type="submit" class="btn14" id=btn14 value="14" disabled>
-                    <input type="submit" class="btn15" id=btn15 value="15" disabled>
-                </div>
-                </p>
-                <p>
-                    <div>
-                    <input type="submit" class="o1" id="o1" onclick="a1()" value="1" disabled>
-                    <input type="submit" class="o1" id="o2" onclick="a2()" value="2" disabled>
-                    <input type="submit" class="o1" id="o3" onclick="a3()" value="3" disabled>
-                    <input type="submit" class="o1" id="o4" onclick="a4()" value="4" disabled>
-                    <input type="submit" class="o1" id="o5" onclick="a5()" value="5" disabled>
-                </p>
-                <p>
-                    <input type="submit" class="o2" id="o6" onclick="a6()" value="6" disabled>
-                    <input type="submit" class="o2" id="o7" onclick="a7()" value="7" disabled>
-                    <input type="submit" class="o2" id="o8" onclick="a8()" value="8" disabled>
-                    <input type="submit" class="o2" id="o9" onclick="a9()" value="9" disabled>
-                    <input type="submit" class="o2" id="o10" onclick="a10()" value="10" disabled>
-                </p>
-                <p>
-                    <input type="submit" class="o3" id="o11" onclick="a11()" value="11" disabled>
-                    <input type="submit" class="o3" id="o12" onclick="a12()" value="12" disabled>
-                    <input type="submit" class="o3" id="o13" onclick="a13()" value="13" disabled>
-                    <input type="submit" class="o3" id="o14" onclick="a14()" value="14" disabled>
-                    <input type="submit" class="o3" id="o15" onclick="a15()" value="15" disabled> 
-                </p>
-            </div>
-            <div>
-             <select class="select_round" id="select_round">   
-                <option value="Раунд" selected disabled></option> 
-                <option id="0" value="Отборочный тур">Отборочный тур</option>>
-                <option id="1" value="Раунд 1" >Раунд 1</option>
-                <option id="2" value="Раунд 2" >Раунд 2</option>
-                <option id="3" value="Раунд 3" >Раунд 3</option>
-                <option id="4" value="Раунд 4" >Раунд 4</option>
-                <option id="5" value="Раунд 5" >Раунд 5</option>
-                <option id="6" value="Раунд 6" >Раунд 6</option>
-                <option id="7" value="Раунд 7" >Раунд 7</option>
-                <option id="8" value="Раунд 8" >Раунд 8</option>
-                <option id="9" value="Раунд 9" >Раунд 9</option>
-                <option id="10" value="Победа" >Победа</option>
-             </select>
-            </div>
-            <div>
-                <select class="select_fix" id="select_fix" disabled>
-                <option id="1" value="0" >0</option>
-                <option id="1" value="1 000" >1 000</option>
-                <option id="2" value="3 000" >3 000</option>
-                <option id="3" value="5 000" selected >5 000</option>
-                <option id="4" value="10 000" >10 000</option>
-                <option id="5" value="25 000" >25 000</option>
-                <option id="6" value="50 000" >50 000</option>
-                <option id="7" value="150 000" >150 000</option>
-                <option id="8" value="500 000" >500 000</option>
-             </select>
-            </div>
-            <div>
-                <select class="select_script" id="select_script">
-                <option id="0" value="Сценарий" selected disabled></option>ы
-                <option id="1" value="Классика" >Классика</option>
-                <option id="1" value="Рискованный" >Рискованный</option>
-                <option id="2" value="Экстрим" >Экстрим</option>
-             </select>
-            </div>
-            <div>
-             <p>
-             <input type="checkbox" id="p50_50" class = "helps1"> 
-             <label for="checkbox"  class="helps1">50:50 </label>
-             <input type="checkbox" id="palter" class= "helps2"> 
-             <label for="checkbox" class="helps2">Альтернатива </label>
-             </p>
-             <p>
-             <input type="checkbox" id="pnavi" class = "helps3"> 
-             <label for="checkbox" class="helps3">Навигатор </label>
-             <input type="checkbox" id="px2" class= "helps4">
-             <label for="checkbox" class="helps4">x2 </label>
-             </p>
-             <p>
-             <input type="checkbox" id="phelp_auden" class= "helps5"> 
-              <label for="checkbox" class="helps5">Помощь интерактива</label>
-             </p>
-             <p>
-                 <input type="checkbox" id="pfact" class= "helps6"> 
-              <label for="checkbox" class="helps6">Факт</label>
-              <input type="checkbox" id="bomb" class= "helps6"> 
-              <label for="checkbox" class="helps6">Бомбы</label>
-             </p>
-             <p>
-             <input type="submit" class="p50_50" id ="h50_50" onclick="h50_50()" value="50:50" disabled>
-             <input type="submit" class="alter" id ="alter" onclick="alter()" value="Альтернатива" disabled>
-             <input type="submit" class="navi" id ="navi"  onclick="navi()" value="Навигатор" disabled>
+        <section class="panel-glow player-panel">
+          <div class="section-title">Игрок</div>
+          <div class="field-stack">
+            <input class="user_id control-input" id="user_id" name="user_id" type="text" maxlength="4" placeholder="User_id" required>
+            <input class="in_game info-display" id="in_game" value="В игре:">
+            <input type="submit" class="message info-display info-message" id="au" value="">
+          </div>
+          <div class="button-grid button-grid-2 compact-top">
+            <input type="submit" class="invite btn-role-warning" id="invite" onclick="invite_to_game()" value="Пригласить в игру">
+            <input type="submit" class="start_game btn-role-primary" id="start_game" onclick="start_to_game()" value="Начать игру" disabled>
+          </div>
+        </section>
 
-             </p>
-             <p>
-                             <input type="submit" class="x2" id ="x2" onclick="x2()" value="x2" disabled>
-             <input type="submit" class="help_auden" id ="help_auden" onclick="help_auden()" value="Помощь интерактива" disabled>
-             <input type="submit" class="fact" id ="fact" onclick="fact()" value="Факт" disabled>
-                </p>
-             
-                <input class="user_id" id="user_id", name="user_id" type="text" maxlength="4" placeholder="User_id" required>
-            </div>
-                
-                
-                <input type="submit" class="start_game" id ="start_game" onclick="start_to_game()" value="Начать игру"  disabled>
+        <section class="panel-glow config-panel">
+          <div class="section-title">Сценарий и настройки</div>
+          <div class="control-stack">
+            <select class="select_round control-select" id="select_round">
+              <option value="Раунд" selected disabled>Раунд</option>
+              <option id="0" value="Отборочный тур">Отборочный тур</option>
+              <option id="1" value="Раунд 1">Раунд 1</option>
+              <option id="2" value="Раунд 2">Раунд 2</option>
+              <option id="3" value="Раунд 3">Раунд 3</option>
+              <option id="4" value="Раунд 4">Раунд 4</option>
+              <option id="5" value="Раунд 5">Раунд 5</option>
+              <option id="6" value="Раунд 6">Раунд 6</option>
+              <option id="7" value="Раунд 7">Раунд 7</option>
+              <option id="8" value="Раунд 8">Раунд 8</option>
+              <option id="9" value="Раунд 9">Раунд 9</option>
+              <option id="10" value="Победа">Победа</option>
+            </select>
 
-                <input type="submit" class="invite" id="invite" onclick="invite_to_game()" value="Пригласить в игру">
-                <input type="submit" class="invite" id="get_task" onclick="gen_task()" value="Получить задание" disabled >
-                <input type="submit" class="take_money" id="take_money" onclick="take_money()" value="Забрать деньги" disabled>  
-                <input type="submit" class="take_money" id="total_money" onclick="total_money()" value="Выигрыш" disabled>
-                </p>
-                <p>
-                 <input type="submit" class="cancel-answer" id="cancel-answer" value="N/A" disabled>
-                 <input type="submit" class="show-right" id="show-right" onclick="show_right()" value="Показать верный ответ" disabled>
-                </p>
-                <p>
-                <input type="submit" class="next-round" id="next-round" onclick="next_round()" value="Следующий раунд" disabled>
-                <input type="submit" class="fixed_script" id="fixed_script" onclick="fixed_script()" value="Зафиксировать сценарий игры" disabled>  
-               <input type="submit" class="cancel_all" onclick="cancel_all()" value="Сброс"> 
-               
-                <input type="submit" class="stop_sounds"  onclick="stop_sounds()" value="Остановить звуки"> 
-                
-             </p>
-             <p>
-                <input type="submit" class="otbor" id="otbor" onclick="otbor()" value="Отборочный тур">
-                <input type="submit" class="warning_otbor" id="warning_otbor"  onclick="warning_otbor()" value="Показать таймер" disabled>
-                <input type="submit" class="start_otbor" id="start_otbor"  onclick="start_otbor()" value="Запуска таймера отб. тура" disabled>
-                <input type="submit" class="answer_otbor" id="answer_otbor" onclick="show_answer_otbor()" value="Правильный ответ отборочного тура" disabled>
-                <input type="submit" class="result_otbor" id="result_otbor"  onclick="show_result_otbor()" value="Победитель отборочного тура" disabled>
-                
-             </p>
-             <p>
-                
-                
-             </p>
-             <p>
-                <input type="submit" class="clear_table"  onclick="clear_table()" value="Очистить бд"> 
-                 <input type="submit" class="result_interactive" id="result_interactive"  onclick="show_result_interactive()" value="Показать результаты интерактива"> 
-                  <input type="submit" class="result_interactive" id="result_interactive"  onclick="show_result_total()" value="Показать общий результат"> 
-             </p>
-             <p>
-                 <input type="submit" class="music"  onclick="start_sound_begin1()" value="Заставка"> 
-                 <input type="submit" class="music"  onclick="start_sound_begin2()" value="Выход ведущего">
-                 <input type="submit" class="music"  onclick="start_background()" value="Фон">
-                 <input type="submit" class="music"  onclick="start_rules_game()" value="Правила основной игры">
-                 <input type="submit" class="music"  onclick="start_pre_final()" value="Окончание">
-                 <input type="submit" class="music"  onclick="start_final()" value="Титры"> 
-                <input type="submit" class="music"  onclick="wait_1min()" value="Таймер на 1 мин.">    
-             </p>
-             <p>
-             <input class="room_id" id="room", name="room_id" type="text" maxlength="4" placeholder="Room_id" required>
-             <input type="submit" class="open_room" id="open_room" onclick="open_room()" value="Открыть комнату">
-             <input type="submit" class="open_room" id="close_room" onclick="close_room()" value="Закрыть комнату"disabled>
-             </p>
-        </div>
-        <div>
-                <table class="status_users" id="status_users">
-                    <tr id="row0"> 
-                        <th>№</th>
-                        <th>Игрок</th>
-                        <th>Ответ</th>
-                        <th>Интерактив</th>
-                        <th>Время</th>
-                        <th>Статус</th>
-                        <th>Основная игра</th>
-                        <th>Наличие красной бомбы</th>
-                    </tr>
-                    <tr id="row1"> 
-                        <td></td>
-                        <td></th>
-                        <td></th>
-                        <td></th>
-                        <td></th>
-                    </tr>
-                </table>
+            <select class="select_fix control-select" id="select_fix" disabled>
+              <option id="1" value="0">0</option>
+              <option id="1" value="1 000">1 000</option>
+              <option id="2" value="3 000">3 000</option>
+              <option id="3" value="5 000" selected>5 000</option>
+              <option id="4" value="10 000">10 000</option>
+              <option id="5" value="25 000">25 000</option>
+              <option id="6" value="50 000">50 000</option>
+              <option id="7" value="150 000">150 000</option>
+              <option id="8" value="500 000">500 000</option>
+            </select>
+
+            <select class="select_script control-select" id="select_script">
+              <option id="0" value="Сценарий" selected disabled>Сценарий</option>
+              <option id="1" value="Классика">Классика</option>
+              <option id="1" value="Рискованный">Рискованный</option>
+              <option id="2" value="Экстрим">Экстрим</option>
+            </select>
+
+            <div class="interactive-count">
+              <label for="count_interactive" class="label-text">Количество ответов в интерактиве</label>
+              <input type="text" class="tree-container control-input" id="count_interactive">
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="center-stage">
+        <section class="panel-glow question-stage">
+          <div class="section-row">
+            <div class="section-title">Игровой экран</div>
+            <div class="state-badges">
+              <span class="badge badge-player">Ответ игрока</span>
+              <span class="badge badge-fatal">Фаталы</span>
+              <span class="badge badge-right">Правильный ответ</span>
+            </div>
+          </div>
+          <div class="questions screen-question" id="question"></div>
+
+          <div class="answer-zone">
+            <div class="answers-title">Панель фаталов / вариантов</div>
+            <div class="answers-grid host-answers-grid">
+              <input type="submit" class="btn1 answer-btn answer-btn-main" id="btn1" value="1" disabled>
+              <input type="submit" class="btn2 answer-btn answer-btn-main" id="btn2" value="2" disabled>
+              <input type="submit" class="btn3 answer-btn answer-btn-main" id="btn3" value="3" disabled>
+              <input type="submit" class="btn4 answer-btn answer-btn-main" id="btn4" value="4" disabled>
+              <input type="submit" class="btn5 answer-btn answer-btn-main" id="btn5" value="5" disabled>
+              <input type="submit" class="btn6 answer-btn answer-btn-main" id="btn6" value="6" disabled>
+              <input type="submit" class="btn7 answer-btn answer-btn-main" id="btn7" value="7" disabled>
+              <input type="submit" class="btn8 answer-btn answer-btn-main" id="btn8" value="8" disabled>
+              <input type="submit" class="btn9 answer-btn answer-btn-main" id="btn9" value="9" disabled>
+              <input type="submit" class="btn10 answer-btn answer-btn-main" id="btn10" value="10" disabled>
+              <input type="submit" class="btn11 answer-btn answer-btn-main" id="btn11" value="11" disabled>
+              <input type="submit" class="btn12 answer-btn answer-btn-main" id="btn12" value="12" disabled>
+              <input type="submit" class="btn13 answer-btn answer-btn-main" id="btn13" value="13" disabled>
+              <input type="submit" class="btn14 answer-btn answer-btn-main" id="btn14" value="14" disabled>
+              <input type="submit" class="btn15 answer-btn answer-btn-main" id="btn15" value="15" disabled>
+            </div>
+          </div>
+
+          <div class="answer-zone alt-zone">
+            <div class="answers-title">Ответ игрока / выбор ведущего</div>
+            <div class="answers-grid player-answers-grid">
+              <input type="submit" class="o1 answer-btn answer-btn-pick" id="o1" onclick="a1()" value="1" disabled>
+              <input type="submit" class="o1 answer-btn answer-btn-pick" id="o2" onclick="a2()" value="2" disabled>
+              <input type="submit" class="o1 answer-btn answer-btn-pick" id="o3" onclick="a3()" value="3" disabled>
+              <input type="submit" class="o1 answer-btn answer-btn-pick" id="o4" onclick="a4()" value="4" disabled>
+              <input type="submit" class="o1 answer-btn answer-btn-pick" id="o5" onclick="a5()" value="5" disabled>
+              <input type="submit" class="o2 answer-btn answer-btn-pick" id="o6" onclick="a6()" value="6" disabled>
+              <input type="submit" class="o2 answer-btn answer-btn-pick" id="o7" onclick="a7()" value="7" disabled>
+              <input type="submit" class="o2 answer-btn answer-btn-pick" id="o8" onclick="a8()" value="8" disabled>
+              <input type="submit" class="o2 answer-btn answer-btn-pick" id="o9" onclick="a9()" value="9" disabled>
+              <input type="submit" class="o2 answer-btn answer-btn-pick" id="o10" onclick="a10()" value="10" disabled>
+              <input type="submit" class="o3 answer-btn answer-btn-pick" id="o11" onclick="a11()" value="11" disabled>
+              <input type="submit" class="o3 answer-btn answer-btn-pick" id="o12" onclick="a12()" value="12" disabled>
+              <input type="submit" class="o3 answer-btn answer-btn-pick" id="o13" onclick="a13()" value="13" disabled>
+              <input type="submit" class="o3 answer-btn answer-btn-pick" id="o14" onclick="a14()" value="14" disabled>
+              <input type="submit" class="o3 answer-btn answer-btn-pick" id="o15" onclick="a15()" value="15" disabled>
+            </div>
+          </div>
+        </section>
+
+        
+        <section class="panel-glow navigator-result-panel">
+          <div class="section-row">
+            <div class="section-title">Результат навигатора</div>
+            <div class="table-note">Автоопределение по подсветке</div>
+          </div>
+          <div class="navigator-result-grid">
+            <div class="navigator-result-card">
+              <div class="navigator-result-title">Пульт ведущего</div>
+              <div class="navigator-result-value" id="ui-host-navi-result">—</div>
+            </div>
+            <div class="navigator-result-card">
+              <div class="navigator-result-title">Пульт игрока</div>
+              <div class="navigator-result-value" id="ui-host-player-navi-result">—</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-glow controls-panel">
+          <div class="section-title">Умная группировка управления</div>
+
+          <div class="controls-groups">
+            <div class="control-group">
+              <div class="group-title">Подсказки</div>
+              <div class="checks-grid">
+                <label class="check-chip"><input type="checkbox" id="p50_50" class="helps1"> <span>50:50</span></label>
+                <label class="check-chip"><input type="checkbox" id="palter" class="helps2"> <span>Альтернатива</span></label>
+                <label class="check-chip"><input type="checkbox" id="pnavi" class="helps3"> <span>Навигатор</span></label>
+                <label class="check-chip"><input type="checkbox" id="px2" class="helps4"> <span>x2</span></label>
+                <label class="check-chip"><input type="checkbox" id="phelp_auden" class="helps5"> <span>Помощь интерактива</span></label>
+                <label class="check-chip"><input type="checkbox" id="pfact" class="helps6"> <span>Факт</span></label>
+                <label class="check-chip"><input type="checkbox" id="bomb" class="helps6"> <span>Бомбы</span></label>
+              </div>
+              <div class="button-grid button-grid-3">
+                <input type="submit" class="p50_50 btn-role-help" id="h50_50" onclick="h50_50()" value="50:50" disabled>
+                <input type="submit" class="alter btn-role-help" id="alter" onclick="alter()" value="Альтернатива" disabled>
+                <input type="submit" class="navi btn-role-help" id="navi" onclick="navi()" value="Навигатор" disabled>
+                <input type="submit" class="x2 btn-role-help" id="x2" onclick="x2()" value="x2" disabled>
+                <input type="submit" class="help_auden btn-role-help" id="help_auden" onclick="help_auden()" value="Помощь интерактива" disabled>
+                <input type="submit" class="fact btn-role-help" id="fact" onclick="fact()" value="Факт" disabled>
+              </div>
             </div>
 
+            <div class="control-group">
+              <div class="group-title">Основная игра</div>
+              <div class="button-grid button-grid-3">
+                <input type="submit" class="invite btn-role-primary" id="get_task" onclick="gen_task()" value="Получить задание" disabled>
+                <input type="submit" class="take_money btn-role-money" id="take_money" onclick="take_money()" value="Забрать деньги" disabled>
+                <input type="submit" class="take_money btn-role-money" id="total_money" onclick="total_money()" value="Выигрыш" disabled>
+                <input type="submit" class="cancel-answer btn-role-neutral" id="cancel-answer" value="N/A" disabled>
+                <input type="submit" class="show-right btn-role-success" id="show-right" onclick="show_right()" value="Показать верный ответ" disabled>
+                <input type="submit" class="next-round btn-role-primary" id="next-round" onclick="next_round()" value="Следующий раунд" disabled>
+                <input type="submit" class="fixed_script btn-role-warning" id="fixed_script" onclick="fixed_script()" value="Зафиксировать сценарий игры" disabled>
+              </div>
+            </div>
 
-    <script src="/static/js/host_slot.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>   
-     <script type="text/javascript" src="/static/jquery-1.7.1.min.js"></script>
-      <input type="submit" class="rb" id="rb" value="false" hidden> 
-     </body>
-    <footer class="copyrights">
-        Здесь могло бы быть ваше имя и ваша реклама.
-    </footer>
+            <div class="control-group">
+              <div class="group-title">Отборочный тур</div>
+              <div class="button-grid button-grid-3">
+                <input type="submit" class="otbor btn-role-warning" id="otbor" onclick="otbor()" value="Отборочный тур">
+                <input type="submit" class="warning_otbor btn-role-warning" id="warning_otbor" onclick="warning_otbor()" value="Показать таймер" disabled>
+                <input type="submit" class="start_otbor btn-role-warning" id="start_otbor" onclick="start_otbor()" value="Запуск таймера отб. тура" disabled>
+                <input type="submit" class="answer_otbor btn-role-success" id="answer_otbor" onclick="show_answer_otbor()" value="Правильный ответ отборочного тура" disabled>
+                <input type="submit" class="result_otbor btn-role-success" id="result_otbor" onclick="show_result_otbor()" value="Победитель отборочного тура" disabled>
+                <input type="submit" class="result_interactive btn-role-info" id="result_interactive" onclick="show_result_interactive()" value="Показать результаты интерактива">
+                <input type="submit" class="result_interactive btn-role-info" id="result_total" onclick="show_result_total()" value="Показать общий результат">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <div class="group-title">Звук и сервис</div>
+              <div class="button-grid button-grid-4">
+                <input type="submit" class="music btn-role-sound" onclick="start_sound_begin1()" value="Заставка">
+                <input type="submit" class="music btn-role-sound" onclick="start_sound_begin2()" value="Выход ведущего">
+                <input type="submit" class="music btn-role-sound" onclick="start_background()" value="Фон">
+                <input type="submit" class="music btn-role-sound" onclick="start_rules_game()" value="Правила основной игры">
+                <input type="submit" class="music btn-role-sound" onclick="start_pre_final()" value="Окончание">
+                <input type="submit" class="music btn-role-sound" onclick="start_final()" value="Титры">
+                <input type="submit" class="music btn-role-sound" onclick="wait_1min()" value="Таймер на 1 мин.">
+                <input type="submit" class="stop_sounds btn-role-danger" onclick="stop_sounds()" value="Остановить звуки">
+                <input type="submit" class="cancel_all btn-role-danger" onclick="cancel_all()" value="Сброс">
+                <input type="submit" class="clear_table btn-role-danger" onclick="clear_table()" value="Очистить бд">
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="right-rail">
+        <section class="panel-glow money-tree-panel">
+          <div class="section-row">
+            <div class="section-title">Дерево выигрыша</div>
+            <div class="tree-note">Активный уровень подсвечивается JS</div>
+          </div>
+          <div class="money-tree">
+            <div class="tree-step tree-container-c1" id="c9">9. 1 000 000</div>
+            <div class="tree-step tree-container-c2" id="c8">8. 500 000</div>
+            <div class="tree-step tree-container-c3" id="c7">7. 150 000</div>
+            <div class="tree-step tree-container-c4" id="c6">6. 50 000</div>
+            <div class="tree-step tree-container-c5" id="c5">5. 25 000</div>
+            <div class="tree-step tree-container-c6" id="c4">4. 10 000</div>
+            <div class="tree-step tree-container-c7" id="c3">3. 5 000</div>
+            <div class="tree-step tree-container-c8" id="c2">2. 3 000</div>
+            <div class="tree-step tree-container-c9" id="c1">1. 1 000</div>
+          </div>
+        </section>
+
+        <section class="panel-glow room-panel">
+          <div class="section-title">Комната</div>
+          <div class="room-stack">
+            <input class="room_id control-input" id="room" name="room_id" type="text" maxlength="4" placeholder="Room_id" required>
+            <div class="button-grid button-grid-2">
+              <input type="submit" class="open_room btn-role-info" id="open_room" onclick="open_room()" value="Открыть комнату">
+              <input type="submit" class="open_room btn-role-danger" id="close_room" onclick="close_room()" value="Закрыть комнату" disabled>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <section class="panel-glow table-panel">
+      <div class="section-row table-head-row">
+        <div class="section-title">Статус участников</div>
+        <div class="table-note">Планшетный режим: горизонтальный скролл включён</div>
+      </div>
+      <div class="table-wrap">
+        <table class="status_users" id="status_users">
+          <tr id="row0">
+            <th>№</th>
+            <th>Игрок</th>
+            <th>Ответ</th>
+            <th>Интерактив</th>
+            <th>Время</th>
+            <th>Статус</th>
+            <th>Основная игра</th>
+            <th>Наличие красной бомбы</th>
+          </tr>
+          <tr id="row1">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <input type="submit" class="rb" id="rb" value="false" hidden>
+
+  <script src="/static/js/host_slot.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/static/jquery-1.7.1.min.js"></script>
+  <script src="/static/js/host_slot_keyboard_nav.js"></script>
+  <script src="/static/js/host_slot_keyboard_nav.js"></script>
+  <script src="/static/js/host_slot_navi_result_addon.js"></script>
+</body>
 </html>

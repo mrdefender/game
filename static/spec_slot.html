@@ -3,95 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Свободный слот</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/spec_slot.css') }}">
-    <link rel="stylesheet" href="/static/styles/spec_slot.css">
+    <title>Свободный слот — зрительский экран</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="spec_slot_stage_results.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/spec_slot_stage_results.css') }}">
 </head>
 <body>
-        <div class="game_box">
-            <h1></h1>
-            <div class="game_box_container">
-            <div class="form_group"> 
-             <p>
-             <div class="tree-container-c1" id="c9"> 9. 1 000 000 </div>
-             <div class="tree-container-c2" id="c8"> 8.  500 000 </div>
-             <div class="tree-container-c3" id="c7"> 7.  150 000</div>
-             <div class="tree-container-c4" id="c6"> 6.   50 000</div>
-             <div class="tree-container-c5" id="c5"> 5.   25 000</div>
-             <div class="tree-container-c6" id="c4"> 4.   10 000</div>
-             <div class="tree-container-c7" id="c3"> 3.    5 000</div>
-             <div class="tree-container-c8" id="c2"> 2.    3 000</div>
-             <div class="tree-container-c9" id="c1"> 1.    1 000</div>
-             </p>
-             <p>
-                <input class="in_game" id="in_game" value="">
-             </p>
-                <p>
-                    <input type="radio" class="tree-container-button" id="users" name="user_name" value=bbb disabled >
-                    <!--label for=bbb class="tree-container" hidden>Количество ответов в интерактиве:</label>
-                    <input type="text" class="tree-container" id="count_interactive" hidden></label-->
-                </p>   
-            </div> 
-                <p>  
-                <input type="submit" class="message" id="au" value="" onclick="wait_4min()">
-                <div class = "questions" id="question" value =""></div>
-                </p>
-                <p>
-                    <div>
-                    <input type="submit" class="o1" id="o1" value="1" disabled>
-                    <input type="submit" class="o1" id="o2" value="2" disabled>
-                    <input type="submit" class="o1" id="o3" value="3" disabled>
-                    <input type="submit" class="o1" id="o4" value="4" disabled>
-                    <input type="submit" class="o1" id="o5" value="5" disabled>
-                </p>
-                <p>
-                    <input type="submit" class="o2" id="o6" value="6" disabled>
-                    <input type="submit" class="o2" id="o7" value="7" disabled>
-                    <input type="submit" class="o2" id="o8" value="8" disabled>
-                    <input type="submit" class="o2" id="o9" value="9" disabled>
-                    <input type="submit" class="o2" id="o10" value="10" disabled>
-                </p>
-                <p>
-                    <input type="submit" class="o3" id="o11" value="11" disabled>
-                    <input type="submit" class="o3" id="o12" value="12" disabled>
-                    <input type="submit" class="o3" id="o13" value="13" disabled>
-                    <input type="submit" class="o3" id="o14" value="14" disabled>
-                    <input type="submit" class="o3" id="o15" value="15" disabled> 
-                </p>
-            </div>
-            <div>      
-                    <input type="button" class="p50_50" id="p50_50" value="50:50") disabled hidden></button> 
-                    <input type="button" class="palter" id="palter" value="⇆"   disabled hidden>
-                
-                    <input type="button" class="pnavi" id="pnavi" value="➤" disabled hidden >
-                    <input type="button" class="px2" id="px2" value="x2"   disabled hidden> 
-                    <input type="button" class="pauden" id="pauden" value="👪"   disabled hidden>
-                    <input type="button" class="pfact" id="pfact" value="📚"  disabled hidden >
-                </div>                              
-           <!--input type="button" class="result_otbor" id="r1" value=""  disabled hidden -->
-        </div>      
-        
+    <div class="spec-stage-bg"></div>
 
+    <main class="spec-shell">
+        <header class="spec-header panel-glow">
+            <div class="brand-block">
+                <div class="eyebrow">TV STUDIO EDITION</div>
+                <h1>Свободный слот — зрительский экран</h1>
+                <div class="subline">Единый стиль с пультами ведущего и игрока</div>
+            </div>
+            <div class="spec-legend">
+                <span class="legend-chip legend-player">Ответ игрока</span>
+                <span class="legend-chip legend-fatal">Фатал</span>
+                <span class="legend-chip legend-right">Верный ответ</span>
+                <span class="legend-chip legend-navi">Навигатор</span>
+            </div>
+        </header>
+
+        <section class="spec-main">
+            <aside class="spec-left panel-glow">
+                <div class="section-row">
+                    <div class="section-title">Статус игры</div>
+                    <div class="section-note">Зрительский режим</div>
+                </div>
+
+                <input class="in_game display-field" id="in_game" value="">
+                <input type="submit" class="message display-field message-field" id="au" value="" onclick="wait_4min()">
+                <input type="submit" class="tree-status display-field" id="users" name="user_name" value="" disabled>
+
+                <section class="state-panel">
+                    <div class="state-card state-card-player">
+                        <div class="state-title">Ответ игрока</div>
+                        <div class="state-value" id="ui-spec-player">—</div>
+                    </div>
+                    <div class="state-card state-card-right">
+                        <div class="state-title">Правильный ответ</div>
+                        <div class="state-value" id="ui-spec-right">—</div>
+                    </div>
+                    <div class="state-card state-card-fatal">
+                        <div class="state-title">Фаталы</div>
+                        <div class="state-value" id="ui-spec-fatal">—</div>
+                    </div>
+                    <div class="state-card state-card-navi">
+                        <div class="state-title">Навигатор</div>
+                        <div class="state-value" id="ui-spec-navi">—</div>
+                    </div>
+                </section>
+
+                <section class="helps-panel">
+                    <div class="section-row">
+                        <div class="section-title">Подсказки</div>
+                        <div class="section-note">Активные инструменты</div>
+                    </div>
+                    <div class="helps-grid">
+                        <input type="button" class="help-btn" id="p50_50" value="50:50" disabled hidden>
+                        <input type="button" class="help-btn" id="palter" value="⇆" disabled hidden>
+                        <input type="button" class="help-btn" id="pnavi" value="➤" disabled hidden>
+                        <input type="button" class="help-btn" id="px2" value="x2" disabled hidden>
+                        <input type="button" class="help-btn" id="pauden" value="👪" disabled hidden>
+                        <input type="button" class="help-btn" id="pfact" value="📚" disabled hidden>
+                    </div>
+                </section>
+            </aside>
+
+            <section class="spec-center panel-glow">
+                <div class="section-row">
+                    <div class="section-title">Игровой экран</div>
+                    <div class="section-note">Текущий вопрос и варианты ответа</div>
+                </div>
+
+                <div class="questions screen-question" id="question" value=""></div>
+
+                <div class="answers-zone">
+                    <div class="answers-title">Варианты ответа</div>
+                    <div class="answers-grid">
+                        <input type="submit" class="answer-btn" id="o1" value="1" disabled>
+                        <input type="submit" class="answer-btn" id="o2" value="2" disabled>
+                        <input type="submit" class="answer-btn" id="o3" value="3" disabled>
+                        <input type="submit" class="answer-btn" id="o4" value="4" disabled>
+                        <input type="submit" class="answer-btn" id="o5" value="5" disabled>
+                        <input type="submit" class="answer-btn" id="o6" value="6" disabled>
+                        <input type="submit" class="answer-btn" id="o7" value="7" disabled>
+                        <input type="submit" class="answer-btn" id="o8" value="8" disabled>
+                        <input type="submit" class="answer-btn" id="o9" value="9" disabled>
+                        <input type="submit" class="answer-btn" id="o10" value="10" disabled>
+                        <input type="submit" class="answer-btn" id="o11" value="11" disabled>
+                        <input type="submit" class="answer-btn" id="o12" value="12" disabled>
+                        <input type="submit" class="answer-btn" id="o13" value="13" disabled>
+                        <input type="submit" class="answer-btn" id="o14" value="14" disabled>
+                        <input type="submit" class="answer-btn" id="o15" value="15" disabled>
+                    </div>
+                </div>
+
+                <section class="results-panel">
+                    <div class="section-row">
+                        <div class="section-title">Результаты</div>
+                        <div class="section-note">Отборочный тур / интерактив / общий итог</div>
+                    </div>
+                    <div class="results-stack" id="spec-results-stack"></div>
+                </section>
+            </section>
+
+            <aside class="spec-right panel-glow">
+                <div class="section-row">
+                    <div class="section-title">Денежное дерево</div>
+                    <div class="section-note">Прогресс игры</div>
+                </div>
+
+                <div class="money-tree">
+                    <div class="tree-step" id="c9">9. 1 000 000</div>
+                    <div class="tree-step" id="c8">8. 500 000</div>
+                    <div class="tree-step" id="c7">7. 150 000</div>
+                    <div class="tree-step" id="c6">6. 50 000</div>
+                    <div class="tree-step" id="c5">5. 25 000</div>
+                    <div class="tree-step" id="c4">4. 10 000</div>
+                    <div class="tree-step" id="c3">3. 5 000</div>
+                    <div class="tree-step" id="c2">2. 3 000</div>
+                    <div class="tree-step" id="c1">1. 1 000</div>
+                </div>
+
+                <div class="tree-legend">
+                    <div><span class="dot dot-current"></span> Текущий уровень</div>
+                    <div><span class="dot dot-safe"></span> Несгораемая сумма</div>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <footer class="copyrights"></footer>
 
     <script src="/static/js/spec_slot.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>   
-     <script type="text/javascript" src="/static/jquery-1.7.1.min.js"></script>
-            <input type="submit" id="script" value="" disabled hidden >
-             <input type="submit" id="round" value="" disabled hidden >
-             <input type="submit" id="ex2" value="0" disabled hidden >
-             <input type="submit" id="ans" value="0" disabled hidden>
-             <input type="submit" id="fix" value="0" disabled hidden>
-             <input type="submit" id="current" value="0" disabled hidden>
-             <input type="submit" id="user" value="" disabled hidden>
-             <input type="submit" id="count_fatal" value="" disabled hidden>
+    <script src="/static/js/spec_slot_stage_results_addon.js"></script>
 
-
-     </body>
-    <footer class="copyrights">
-
-    </footer>
+    <input type="submit" id="script" value="" disabled hidden>
+    <input type="submit" id="round" value="" disabled hidden>
+    <input type="submit" id="ex2" value="0" disabled hidden>
+    <input type="submit" id="ans" value="0" disabled hidden>
+    <input type="submit" id="fix" value="0" disabled hidden>
+    <input type="submit" id="current" value="0" disabled hidden>
+    <input type="submit" id="user" value="" disabled hidden>
+    <input type="submit" id="count_fatal" value="" disabled hidden>
+</body>
 </html>

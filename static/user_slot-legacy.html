@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Свободный слот</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/user_slot.css') }}">
+     <link rel="stylesheet" href='styles/user_slot.css'>
+     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="game_auth_body">
+        <div class="game_auth">
+            <h1>Свободный слот. Пульт игрока. </h1>
+            <div class="game_auth_container">
+                <div class="form_group">
+                    <label class="form_label" id ="welcome">Добро пожаловать на игру </label>
+                    <label class="form_label" id="welcome2">Свободный слот! </label> 
+                  <p>  
+                   <label class="form_label1" id="welcome3" > Ожидайте дальнейших указаний!</label> 
+                  </p>
+                  <p>
+                    <input type="submit" class="message" id="user_name" value="{{value}}">
+                  </p>
+			<p>
+                        <input type="submit" class="message" id="au" value="" hidden>
+                        </p> 
+                </div>
+                 
+
+               
+                <!--button class="host" onclick="to_host()"> Режим ведущего</button-->
+                            </div> 
+                <p>  
+
+                
+                
+                <div class = "questions" id="question" value ="" hidden></div>
+                </p>
+                <p>
+                <input type="button" class="btn1" id="o1" value="1" onclick="a1()" disabled hidden></button> 
+                <input type="button" class="btn2" id="o2" value="2" onclick="a2()" disabled hidden></button> 
+                <input type="button" class="btn3" id="o3" value="3" onclick="a3()" disabled hidden></button> 
+                <input type="button" class="btn4" id="o4" value="4" onclick="a4()" disabled hidden></button> 
+                <input type="button" class="btn5" id="o5" value="5" onclick="a5()" disabled hidden></button> 
+                <div> 
+                    <input type="button" class="btn6" id="o6" value="6" onclick="a6()" disabled hidden></button> 
+                    <input type="button" class="btn7" id="o7" value="7" onclick="a7()" disabled hidden></button> 
+                    <input type="button" class="btn8" id="o8" value="8" onclick="a8()" disabled hidden></button> 
+                    <input type="button" class="btn9" id="o9" value="9" onclick="a9()" disabled hidden></button> 
+                    <input type="button" class="btn10" id="o10" value="10" onclick="a10()" disabled hidden></button> 
+                </div>
+                <div>      
+                    <input type="button" class="btn11" id="o11" value="11" onclick="a11()" disabled hidden></button> 
+                    <input type="button" class="btn12" id="o12" value="12" onclick="a12()" disabled hidden></button> 
+                    <input type="button" class="btn13" id="o13" value="13" onclick="a13()" disabled hidden></button> 
+                    <input type="button" class="btn14" id="o14" value="14" onclick="a14()" disabled hidden></button> 
+                    <input type="button" class="btn15" id="o15" value="15" onclick="a15()" disabled hidden></button> 
+                </div>
+                <div>      
+                    <input type="button" class="p50_50" id="p50_50" value="50:50" onclick="" disabled hidden ></button> 
+                    <input type="button" class="palter" id="palter" value="⇆" onclick=""  disabled hidden ></button> 
+                    <input type="button" class="pnavi" id="pnavi" value="➤" onclick="" disabled hidden ></button> 
+                    <input type="button" class="px2" id="px2" value="x2" onclick="px2()"  disabled  hidden></button> 
+                    <input type="button" class="pauden" id="pauden" value="👪" onclick=""  disabled hidden ></button> 
+                    <input type="button" class="pfact" id="pfact" value="📚" onclick=""  disabled hidden ></button> 
+                </div>
+
+                </p>
+                <p>
+             <input class="otbor_input" id="otbor_input", name="otbor_input" type="number" placeholder="Ответ" required hidden>
+             <input type="submit" class="send_answer_otbor" id="otbor_submit" onclick="send_answer_otbor()" value="Ответить" disabled hidden>
+             <input type="submit" id="time-start" value="" disabled hidden >
+             <input type="submit" id="count_fatal" value="" disabled hidden >
+             <input type="submit" id="ex2" value="0" disabled hidden >
+             <input type="submit" id="ans" value="0" disabled hidden>
+             </p>
+
+
+            </div>
+
+
+
+
+
+
+
+                
+        </div>
+
+
+    </main>
+   
+    <script src="/static/js/user_slot.js"></script>
+    <footer class="copyrights">
+        Здесь могло бы быть ваше имя и ваша реклама.
+    </footer>
+</body>
+</html>
