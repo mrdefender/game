@@ -20,8 +20,8 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 
 app = Flask(__name__, template_folder="static/")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
-app.config["SECRET_KEY"] = "" #"000001C9E687F6E0" #os.urandom(32).hex
-app.secret_key = "" #"000001C9E687F6E0" #os.urandom(32).hex
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY","sdasdads") #"000001C9E687F6E0" #os.urandom(32).hex
+app.secret_key = app.config["SECRET_KEY"] #"000001C9E687F6E0" #os.urandom(32).hex
 socketio = SocketIO(app)
 accepted_user = ""
 db = SQLAlchemy(app)
@@ -30,6 +30,8 @@ login_manager.session_protection = "strong"
 login_manager.login_view = "login"
 login_manager.login_message_category = "info"
 app.config['TELEGRAM_BOT_TOKEN'] = ''
+DEFAULT_ROOM_CODE = os.environ.get("DEFAULT_ROOM_CODE", "99999999")
+HOST_USERNAME = os.environ.get("HOST_USERNAME", "admin")
 
 
 
@@ -105,7 +107,7 @@ def check_id_room(room_id):
         with open('room.json') as file:
            jsn = json.load(file)
         if jsn == room_id:
-            True
+            return True
         else:
             return False
 
@@ -120,10 +122,10 @@ def join():
         if request.form['user_name']== "":
            flash ('Требуется авторизация')
            return render_template("login.html")
-        if  (request.form['user_name']!="zigbe0") and (request.form['room_id']=="99999999"):
+        if  (request.form['user_name']!=HOST_USERNAME) and (request.form['room_id']==DEFAULT_ROOM_CODE):
            flash ('Неверный код комнаты')
            return render_template("login.html")
-        if (request.form['user_name']=="zigbe0")  and (request.form['room_id']=="99999999"):
+        if (request.form['user_name']==HOST_USERNAME)  and (request.form['room_id']==DEFAULT_ROOM_CODE):
            # _users[0] = request.form['user_name']
             init_game()
             return render_template("select.html")
@@ -553,7 +555,7 @@ def show_rights():
     if request.method == 'POST':
         js = Users.query.all()
         if len(js)==1:
-            js.status = "check main"
+            js[0].status = "check main"
         else:
             jjj = Users.query.all()
             for i in range(0,len(jjj)):
@@ -941,7 +943,9 @@ def next_round():
         try:
             user = Users.query.all()
             if len(user)==1:
-                user.status = "wait task main"
+                user[0].status = "wait task main"
+                user[0].answer = "0"
+                user[0].time = 0
             else:
                 for i in range(len(user)):
                     if (user[i].status == "wait next round main") | (user[i].status == "check main x2"):
@@ -1137,6 +1141,8 @@ def help_auden():
             col_find_fatal = 0
             col_find_free = 0
             col_ans = Users.query.filter(Users.status == "answered interactive").count()
+            if col_ans == 0:
+                return jsonify("fail")
             result.append(round(a1/col_ans*100,2))
             result.append(round(a2/col_ans*100,2))
             result.append(round(a3/col_ans*100,2))
@@ -1283,7 +1289,7 @@ def clear_table():
     if request.method == 'POST':
         user_all = Users.query.delete()
         db.session.commit()
-        
+        return json.dumps("ok")
         
     return json.dumps("fail")
 
@@ -1520,7 +1526,7 @@ def otbor():
                     continue
                 u_all[i].status = "otbor"
                 u_all[i].time = "0"
-                db.session.commit()
+            db.session.commit()
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -1673,7 +1679,7 @@ def show_result_interactive():
 if __name__ == "__main__":
     _users = [' ']
     
-    socketio.run(app,debug=True, host='0.0.0.0')
+    socketio.run(app,debug=False, host='0.0.0.0')
     
     ##app.run(debug=True)
     

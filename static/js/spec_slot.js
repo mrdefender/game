@@ -111,22 +111,6 @@ function update_list_user()
 
     if (data == "fail")
     {
-        document.getElementById("o1").hidden = true;
-        document.getElementById("o2").hidden = true;
-        document.getElementById("o3").hidden = true;
-        document.getElementById("o4").hidden = true;
-        document.getElementById("o5").hidden = true;
-        document.getElementById("o6").hidden = true;
-        document.getElementById("o7").hidden = true;
-        document.getElementById("o8").hidden = true;
-        document.getElementById("o9").hidden = true;
-        document.getElementById("o10").hidden = true;
-        document.getElementById("o11").hidden = true;
-        document.getElementById("o12").hidden = true;
-        document.getElementById("o13").hidden = true;
-        document.getElementById("o14").hidden = true;
-        document.getElementById("o15").hidden = true;
-        document.getElementById("question").hidden = true;
         return;
     }
 
