@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="host_slot_navi_results.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/host_slot_stage_keyboard.css') }}">
+  <link rel="stylesheet" href="/static/style/host_slot.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/host_slot.css') }}">
 </head>
 <body>
   <div class="show-shell">
@@ -160,17 +160,17 @@
           </div>
           <div class="navigator-result-grid">
             <div class="navigator-result-card">
-              <div class="navigator-result-title">Пульт ведущего</div>
+              <div class="navigator-result-title">Навигатор рекомендует (ведущий)</div>
               <div class="navigator-result-value" id="ui-host-navi-result">—</div>
             </div>
             <div class="navigator-result-card">
-              <div class="navigator-result-title">Пульт игрока</div>
+              <div class="navigator-result-title">Навигатор рекомендует (игрок)</div>
               <div class="navigator-result-value" id="ui-host-player-navi-result">—</div>
             </div>
           </div>
         </section>
 
-        <section class="panel-glow controls-panel">
+<section class="panel-glow controls-panel">
           <div class="section-title">Умная группировка управления</div>
 
           <div class="controls-groups">
@@ -310,7 +310,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="/static/jquery-1.7.1.min.js"></script>
-  <script src="/static/js/host_slot_keyboard_nav.js"></script>
   <script src="/static/js/host_slot_keyboard_nav.js"></script>
   <script src="/static/js/host_slot_navi_result_addon.js"></script>
 </body>

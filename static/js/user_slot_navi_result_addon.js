@@ -1,7 +1,10 @@
 
+/**
+ * Показывает результат применения подсказки Навигатор на пульте игрока.
+ * Ничего не меняет в основной логике: только считывает magenta-подсветку ответов.
+ */
 (function () {
   const ids = Array.from({ length: 15 }, (_, i) => 'o' + (i + 1));
-  let lastSignature = '';
 
   function normalizeColor(color) {
     return String(color || '').replace(/\s+/g, '').toLowerCase();
@@ -14,28 +17,21 @@
 
   function setText(id, value) {
     const el = document.getElementById(id);
-    if (el) el.textContent = value;
+    if (el) { el.textContent = value; el.classList.toggle('has-result', value !== '—'); }
   }
 
   function update() {
     const values = [];
-    const sigParts = [];
-    for (const id of ids) {
+    ids.forEach((id) => {
       const el = document.getElementById(id);
-      if (!el) continue;
+      if (!el) return;
       const color = el.style.backgroundColor || getComputedStyle(el).backgroundColor;
       const active = isNavigatorColor(color);
       el.classList.toggle('is-navi-result', active);
-      sigParts.push(id + ':' + active + ':' + (el.value || ''));
       if (active) values.push(el.value || id.replace('o', ''));
-    }
-    const sig = sigParts.join('|');
-    if (sig === lastSignature) return;
-    lastSignature = sig;
-    setText('ui-player-navi-result', values.length ? values.join(', ') : '—');
+    });
 
-    const pnavi = document.getElementById('pnavi');
-    if (pnavi) pnavi.classList.toggle('is-navi-result', values.length > 0);
+    setText('ui-player-navi-result', values.length ? values.join(', ') : '—');
   }
 
   function start() {

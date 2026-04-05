@@ -1,9 +1,33 @@
+/**
+ * SPECTATOR SLOT SCRIPT
+ *
+ * SAFE REFACTOR / COMMENTED VERSION
+ * ---------------------------------
+ * Этот файл сохраняет исходную логику максимально близко к оригиналу.
+ * Основная цель:
+ * - ничего не сломать;
+ * - оставить те же глобальные функции;
+ * - сохранить совместимость с текущим HTML и backend;
+ * - добавить понятные комментарии по блокам и функциям.
+ *
+ * Важно:
+ * - имена функций не меняются;
+ * - работа через document.getElementById(...) сохранена;
+ * - сетевые роуты fetch(...) сохранены;
+ * - цветовая логика и id элементов сохранены.
+ */
+/** 
+ * === ГЛОБАЛЬНОЕ СОСТОЯНИЕ И POLLING SPECTATOR ===
+ * Spectator обновляется через таймеры и backend-состояния.
+ * Здесь важно не менять имена функций и id элементов.
+ */
 var timerStatus = setInterval(() => update_list_user(), 1500);
 var timerHelps;
 var timeWainAnswerFromMain;
 var timerTreeStatus = setInterval(() => update_tree(), 3000);
 
 
+/** Показывает большой таймер ожидания 4:12. */
 function wait_4min(){
     time = 252;
     inputName = document.createElement('input');
@@ -17,6 +41,7 @@ function wait_4min(){
 }, 1000);
 }
 
+/** Сервисный обратный отсчёт для spectator. */
 function timer_wait(time_all){
     if (time_all<=0)
     {
@@ -39,6 +64,7 @@ function timer_wait(time_all){
 
 }
 
+/** Возвращает кнопки ответов зрительского экрана в базовое состояние. */
 function btn_default(){
     document.getElementById("o1").value = "1";
     document.getElementById("o1").classList.remove("wrong");
@@ -93,6 +119,7 @@ function btn_default(){
 
 
 
+/** Основной polling spectator UI через backend. */
 function update_list_user()
 {
     fetch('/update_for_spec', {
@@ -1013,6 +1040,7 @@ console.error('Ошибка:', error);
 }
 
 
+/** Обновляет денежное дерево на зрительском экране. */
 function update_tree(){
 
     fetch('/get_tree', {
@@ -1431,6 +1459,7 @@ console.error('Ошибка:', error);
     }
 
 
+/** Отображает подсказку 50:50 на spectator. */
 function get_50_50(){
     // document.getElementById("p50_50").style.backgroundColor = "orange";
      //document.getElementById("ex2").value = "50:50"
@@ -1467,6 +1496,7 @@ console.error('Ошибка:', error);
 
 
 }
+/** Отображает подсказку Альтернатива на spectator. */
 function get_alter(){
      //document.getElementById("palter").style.backgroundColor = "orange";
      //document.getElementById("ex2").value = "alter"
@@ -1504,6 +1534,7 @@ console.error('Ошибка:', error);
 });
 
 }
+/** Отображает подсказку Навигатор на spectator. */
 function get_navi(){
      //document.getElementById("pnavi").style.backgroundColor = "orange";
      //document.getElementById("ex2").value = "navi"

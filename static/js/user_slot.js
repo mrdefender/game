@@ -1,1713 +1,723 @@
-var welcome = document.getElementById("welcome");
-welcome.innerText = "Добро пожаловать на игру";
-var welcome2 = document.getElementById("welcome2");
-welcome2.innerText = "Свободный слот!";
+/**
+ * USER SLOT SCRIPT
+ *
+ * DEEP SAFE REFACTOR
+ * ------------------
+ * Этот файл переписан структурно, но поведение сохраняется максимально близко
+ * к исходному user_slot.js:
+ *
+ * - сохранены те же id элементов;
+ * - сохранены те же backend routes;
+ * - сохранены те же глобальные функции a1..a15, p50_50, palter, pnavi, px2, pauden, pfact;
+ * - сохранён polling через get_status();
+ * - сохранены основные значения цветов:
+ *   orange = ответ игрока / активированная подсказка,
+ *   green  = правильный ответ,
+ *   red    = фатал,
+ *   #d905ec = навигатор.
+ *
+ * Рекомендация:
+ * Не менять id, цветовую семантику и названия публичных функций без синхронного
+ * изменения backend и HTML.
+ */
 
+// === БАЗОВЫЕ DOM HELPERS ===
+const ANSWER_IDS = Array.from({ length: 15 }, (_, i) => `o${i + 1}`);
+const HELP_IDS = ['p50_50', 'palter', 'pnavi', 'px2', 'pauden', 'pfact'];
+const DARK_BUTTON_COLOR = '#000c11';
+
+const $ = (id) => document.getElementById(id);
+
+function setText(id, value) {
+    const el = $(id);
+    if (el) el.innerText = value;
+}
+
+function setHtml(id, value) {
+    const el = $(id);
+    if (el) el.innerHTML = value;
+}
+
+function setValue(id, value) {
+    const el = $(id);
+    if (el) el.value = value;
+}
+
+function setHidden(id, hidden) {
+    const el = $(id);
+    if (el) el.hidden = hidden;
+}
+
+function setDisabled(id, disabled) {
+    const el = $(id);
+    if (el) el.disabled = disabled;
+}
+
+function setBg(id, color) {
+    const el = $(id);
+    if (el) el.style.backgroundColor = color;
+}
+
+function currentUserName() {
+    return $('user_name')?.value || '';
+}
+
+function fetchJson(url, payload) {
+    return fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+    }).then(response => response.json());
+}
+
+// === ИНИЦИАЛИЗАЦИЯ ===
+setText("welcome", "Добро пожаловать на игру");
+setText("welcome2", "Свободный слот!");
+
+/**
+ * Главный polling статуса игрока.
+ * Именно backend говорит, в каком состоянии сейчас должен быть UI игрока.
+ */
 var timerStatus = setInterval(() => get_status(), 5000);
+
+/** Таймер periodic polling доступных подсказок. */
 var timerHelps;
+
+/** Таймер проверки, зафиксирован ли ответ игрока в активной задаче. */
 var timeWainAnswerFromMain;
 
-function btn_default(){
-    document.getElementById("o1").value = "1";
-    document.getElementById("o2").value = "2";
-    document.getElementById("o3").value = "3";
-    document.getElementById("o4").value = "4";
-    document.getElementById("o5").value = "5";
-    document.getElementById("o6").value = "6";
-    document.getElementById("o7").value = "7";
-    document.getElementById("o8").value = "8";
-    document.getElementById("o9").value = "9";
-    document.getElementById("o10").value = "10";
-    document.getElementById("o11").value = "11";
-    document.getElementById("o12").value = "12";
-    document.getElementById("o13").value = "13";
-    document.getElementById("o14").value = "14";
-    document.getElementById("o15").value = "15";
+// === УТИЛИТЫ ДЛЯ UI ===
+
+/** Возвращает 15 кнопок ответов к значениям 1..15. */
+function btn_default() {
+    ANSWER_IDS.forEach((id, idx) => setValue(id, String(idx + 1)));
 }
 
-function get_status(){
-
-    var user_name = document.getElementById("user_name").value;
-    fetch('/get_user_status', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-   
-    if (data=="fail")
-        return;
-    if (data == "wait")
-    {
-         document.getElementById('welcome').innerHTML = "";
-            document.getElementById('welcome2').innerHTML = "";
-            document.getElementById('welcome3').innerHTML = "Ожидайте дальнейших указаний!";
-            document.getElementById("question").hidden = true;
-            document.getElementById("question").value = "";
-            document.getElementById("ex2").value ="0"
-            document.getElementById("otbor_input").hidden = true;
-            document.getElementById("otbor_submit").hidden = true;
-	        document.getElementById("time-start").value = "0";
-            btn_default();
-            document.getElementById("o1").hidden = true;
-            document.getElementById("o2").hidden = true;
-            document.getElementById("o3").hidden = true;
-            document.getElementById("o4").hidden = true;
-            document.getElementById("o5").hidden = true;
-            document.getElementById("o6").hidden = true;
-            document.getElementById("o7").hidden = true;
-            document.getElementById("o8").hidden = true;
-            document.getElementById("o9").hidden = true;
-            document.getElementById("o10").hidden = true;
-            document.getElementById("o11").hidden = true;
-            document.getElementById("o12").hidden = true;
-            document.getElementById("o13").hidden = true;
-            document.getElementById("o14").hidden = true;
-            document.getElementById("o15").hidden = true;
-            document.getElementById("p50_50").disabled = true;
-            document.getElementById("palter").disabled = true;
-            document.getElementById("pnavi").disabled = true;
-            document.getElementById("px2").disabled = true;
-            document.getElementById("pauden").disabled = true;
-            document.getElementById("p50_50").hidden = true;
-            document.getElementById("palter").hidden = true;
-            document.getElementById("pnavi").hidden = true;
-            document.getElementById("px2").hidden = true;
-            document.getElementById("pauden").hidden = true;
-             document.getElementById("pfact").hidden = true;
-              document.getElementById("pfact").disabled = true;
-            document.getElementById("question").value = "";
-            document.getElementById("au").hidden = true;
-            document.getElementById("ans").value = "";
-            document.getElementById("question").innerText = " ";
-            document.getElementById("o1").style.backgroundColor = "#000c11";
-            document.getElementById("o2").style.backgroundColor = "#000c11";
-            document.getElementById("o3").style.backgroundColor = "#000c11";
-            document.getElementById("o4").style.backgroundColor = "#000c11";
-            document.getElementById("o5").style.backgroundColor = "#000c11";
-            document.getElementById("o6").style.backgroundColor = "#000c11";
-            document.getElementById("o7").style.backgroundColor = "#000c11";
-            document.getElementById("o8").style.backgroundColor = "#000c11";
-            document.getElementById("o9").style.backgroundColor = "#000c11";
-            document.getElementById("o10").style.backgroundColor = "#000c11";
-            document.getElementById("o11").style.backgroundColor = "#000c11";
-            document.getElementById("o12").style.backgroundColor = "#000c11";
-            document.getElementById("o13").style.backgroundColor = "#000c11";
-            document.getElementById("o14").style.backgroundColor = "#000c11";
-            document.getElementById("o15").style.backgroundColor = "#000c11";
-            document.getElementById("otbor_input").value = " ";
-            clearInterval(timerHelps);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);clearInterval(timeWainAnswerFromMain);
-    }
-    if (data == "interactive")
-        {
-            document.getElementById("ans").value = "";
-            btn_default();
-            document.getElementById('welcome').innerHTML = "";
-            document.getElementById('welcome2').innerHTML = "";
-            document.getElementById('welcome3').innerHTML = "Интерактивная игра";
-            document.getElementById("question").hidden = false;
-            document.getElementById("question").value = "";
-            document.getElementById("question").innerText = " ";
-	    document.getElementById("time-start").value = "0";
-            document.getElementById("o1").hidden = false;
-            document.getElementById("o2").hidden = false;
-            document.getElementById("o3").hidden = false;
-            document.getElementById("o4").hidden = false;
-            document.getElementById("o5").hidden = false;
-            document.getElementById("o6").hidden = false;
-            document.getElementById("o7").hidden = false;
-            document.getElementById("o8").hidden = false;
-            document.getElementById("o9").hidden = false;
-            document.getElementById("o10").hidden = false;
-            document.getElementById("o11").hidden = false;
-            document.getElementById("o12").hidden = false;
-            document.getElementById("o13").hidden = false;
-            document.getElementById("o14").hidden = false;
-            document.getElementById("o15").hidden = false;
-             document.getElementById("otbor_input").hidden = true;
-            document.getElementById("otbor_submit").hidden = true;
-            document.getElementById("au").hidden = true;
-            status_btn(true);
-           
-            //clearInterval(timerToGame);
-
-        }
-    if (data== "main")
-        {
-            document.getElementById("ans").value = "";
-            document.getElementById('welcome').innerHTML = " ";
-            document.getElementById('welcome2').innerHTML = " ";
-            document.getElementById('welcome3').innerHTML = "Основная игра";
-            document.getElementById("question").hidden = false;
-            document.getElementById("question").value = "";
-            document.getElementById("question").innerText = " ";
-            document.getElementById("time-start").value = "0";
-            btn_default();
-            document.getElementById("o1").hidden = false;
-            document.getElementById("o2").hidden = false;
-            document.getElementById("o3").hidden = false;
-            document.getElementById("o4").hidden = false;
-            document.getElementById("o5").hidden = false;
-            document.getElementById("o6").hidden = false;
-            document.getElementById("o7").hidden = false;
-            document.getElementById("o8").hidden = false;
-            document.getElementById("o9").hidden = false;
-            document.getElementById("o10").hidden = false;
-            document.getElementById("o11").hidden = false;
-            document.getElementById("o12").hidden = false;
-            document.getElementById("o13").hidden = false;
-            document.getElementById("o14").hidden = false;
-            document.getElementById("o15").hidden = false;
-            document.getElementById("otbor_input").hidden = true;
-            document.getElementById("otbor_submit").hidden = true;
-            document.getElementById("au").hidden = true;
-            timerHelps = setInterval(() => get_helps(), 5000);
-            status_btn(true);
-            //clearInterval(timerToGame);
-        }
-    if ((data == "take money") || (data =="end interactive"))
-    {
-            status_btn(true);
-    }
-    if (data == "wait task interactive")
-        {
-            document.getElementById("ans").value = "";
-            document.getElementById("question").value = "";
-            document.getElementById("question").innerText = " ";
-            document.getElementById("time-start").value = "0";
-            document.getElementById("o1").style.backgroundColor = "#000c11";
-            document.getElementById("o2").style.backgroundColor = "#000c11";
-            document.getElementById("o3").style.backgroundColor = "#000c11";
-            document.getElementById("o4").style.backgroundColor = "#000c11";
-            document.getElementById("o5").style.backgroundColor = "#000c11";
-            document.getElementById("o6").style.backgroundColor = "#000c11";
-            document.getElementById("o7").style.backgroundColor = "#000c11";
-            document.getElementById("o8").style.backgroundColor = "#000c11";
-            document.getElementById("o9").style.backgroundColor = "#000c11";
-            document.getElementById("o10").style.backgroundColor = "#000c11";
-            document.getElementById("o11").style.backgroundColor = "#000c11";
-            document.getElementById("o12").style.backgroundColor = "#000c11";
-            document.getElementById("o13").style.backgroundColor = "#000c11";
-            document.getElementById("o14").style.backgroundColor = "#000c11";
-            document.getElementById("o15").style.backgroundColor = "#000c11";
-            btn_default();
-            document.getElementById("question").value = " ";
-            get_task();
-            //clearInterval(timerToGame);
-            
-        }
-    if (data == "wait task main")
-        {
-            document.getElementById("ans").value = "";
-            document.getElementById("question").value = " ";
-            document.getElementById("question").innerText = " ";
-            document.getElementById("time-start").value = "0";
-            btn_default();
-            document.getElementById("o1").style.backgroundColor = "#000c11";
-            document.getElementById("o2").style.backgroundColor = "#000c11";
-            document.getElementById("o3").style.backgroundColor = "#000c11";
-            document.getElementById("o4").style.backgroundColor = "#000c11";
-            document.getElementById("o5").style.backgroundColor = "#000c11";
-            document.getElementById("o6").style.backgroundColor = "#000c11";
-            document.getElementById("o7").style.backgroundColor = "#000c11";
-            document.getElementById("o8").style.backgroundColor = "#000c11";
-            document.getElementById("o9").style.backgroundColor = "#000c11";
-            document.getElementById("o10").style.backgroundColor = "#000c11";
-            document.getElementById("o11").style.backgroundColor = "#000c11";
-            document.getElementById("o12").style.backgroundColor = "#000c11";
-            document.getElementById("o13").style.backgroundColor = "#000c11";
-            document.getElementById("o14").style.backgroundColor = "#000c11";
-            document.getElementById("o15").style.backgroundColor = "#000c11";
-            document.getElementById("question").value = " ";
-            get_task();
-            //clearInterval(timerToGame);
-        }
-    if (data == "given task interactive")
-        {
-            get_task();
-            p50_50();
-            palter();
-            pnavi();
-           // pauden();
-            //clearInterval(timerToGame);
-           // check_answered_main();
-            timeWainAnswerFromMain = setInterval(() => check_answered_main(), 5000);
-        }
-    if (data == "given task main")
-        {
-            get_task();
-            p50_50();
-            palter();
-            pnavi();
-           // pauden();
-        }
-    if (data == "check main")
-        {
-            show_right_user();
-        }
-    if (data == "check main x2")
-        {
-            show_right_user();
-        }
-    if (data == "check interactive")
-        {
-            show_right_user();
-        }
-        if (data == "otbor")
-        {
-             document.getElementById('welcome').innerHTML = "";
-            document.getElementById('welcome2').innerHTML = "";
-            document.getElementById('welcome3').innerHTML = "Отборочный тур!";
-            document.getElementById("question").hidden = false;
-            document.getElementById("otbor_input").hidden = false;
-            document.getElementById("otbor_submit").hidden = false;
-            document.getElementById("au").hidden = false;
-            document.getElementById("question").value = "";
-            document.getElementById("ex2").value ="0"
-            document.getElementById("o1").hidden = true;
-            document.getElementById("o2").hidden = true;
-            document.getElementById("o3").hidden = true;
-            document.getElementById("o4").hidden = true;
-            document.getElementById("o5").hidden = true;
-            document.getElementById("o6").hidden = true;
-            document.getElementById("o7").hidden = true;
-            document.getElementById("o8").hidden = true;
-            document.getElementById("o9").hidden = true;
-            document.getElementById("o10").hidden = true;
-            document.getElementById("o11").hidden = true;
-            document.getElementById("o12").hidden = true;
-            document.getElementById("o13").hidden = true;
-            document.getElementById("o14").hidden = true;
-            document.getElementById("o15").hidden = true;
-            document.getElementById("p50_50").disabled = true;
-            document.getElementById("palter").disabled = true;
-            document.getElementById("pnavi").disabled = true;
-            document.getElementById("px2").disabled = true;
-            document.getElementById("pauden").disabled = true;
-            document.getElementById("p50_50").hidden = true;
-            document.getElementById("palter").hidden = true;
-            document.getElementById("pnavi").hidden = true;
-            document.getElementById("px2").hidden = true;
-            document.getElementById("pauden").hidden = true;
-             document.getElementById("pfact").hidden = true;
-              document.getElementById("pfact").disabled = true;
-            document.getElementById("question").value = "";
-            document.getElementById("ans").value = "";
-            document.getElementById("question").innerText = " ";
-            document.getElementById("o1").style.backgroundColor = "#000c11";
-            document.getElementById("o2").style.backgroundColor = "#000c11";
-            document.getElementById("o3").style.backgroundColor = "#000c11";
-            document.getElementById("o4").style.backgroundColor = "#000c11";
-            document.getElementById("o5").style.backgroundColor = "#000c11";
-            document.getElementById("o6").style.backgroundColor = "#000c11";
-            document.getElementById("o7").style.backgroundColor = "#000c11";
-            document.getElementById("o8").style.backgroundColor = "#000c11";
-            document.getElementById("o9").style.backgroundColor = "#000c11";
-            document.getElementById("o10").style.backgroundColor = "#000c11";
-            document.getElementById("o11").style.backgroundColor = "#000c11";
-            document.getElementById("o12").style.backgroundColor = "#000c11";
-            document.getElementById("o13").style.backgroundColor = "#000c11";
-            document.getElementById("o14").style.backgroundColor = "#000c11";
-            document.getElementById("o15").style.backgroundColor = "#000c11";
-            clearInterval(timerHelps);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);clearInterval(timeWainAnswerFromMain);
-            document.getElementById("otbor_input").value = "";
-            get_task_otbor();
-        }
-        if (data == "warning otbor")
-        {
-            document.getElementById("au").value = "10";
-        }
-        if (data == "start otbor")
-        {
-
-            
-            if (document.getElementById("ex2").value == "start otbor")
-                return;
-            document.getElementById("ex2").value = "start otbor";
-            document.getElementById("otbor_submit").disabled = false;
-            document.getElementById("time-start").value = Date.now().toString();
-            setTimeout(() => {timer_otbor(); }, 2000);
-            
-        }
-        if (data == "otbor end")
-        {
-            document.getElementById("otbor_input").hidden = true;
-            document.getElementById("otbor_submit").hidden = true;
-            document.getElementById("au").hidden = true;
-            document.getElementById("ex2").value = "0";
-            get_answer_otbor();
-        }
-        
-
-
-        //document.getElementById('au').textContent = "В игру вступает " + data;
-    //document.getElementById('au').innerText = "В игру вступает " + data;
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
+/** Окрашивает все 15 кнопок в базовый тёмный цвет. */
+function reset_answer_colors() {
+    ANSWER_IDS.forEach((id) => setBg(id, DARK_BUTTON_COLOR));
 }
 
-function timer_otbor(){
-    if (document.getElementById("au").value == "0")
-    {
-        //document.getElementById("answer_otbor").disabled = false;
-        document.getElementById("otbor_submit").disabled = true;
-        return;
-    }
-    document.getElementById("au").value = (parseInt(document.getElementById("au").value)-1).toString();
-    setTimeout(() => { timer_otbor(); 
-}, 1000);
-
+/** Прячет все 15 ответов. */
+function hide_answers() {
+    ANSWER_IDS.forEach((id) => setHidden(id, true));
 }
 
-
-
-function get_task_otbor(){
-    var user_name = document.getElementById("user_name").value;
-        fetch('/get_task_otbor', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data=="fail")
-    {
-       return; 
-    }
-    document.getElementById('question').innerText="Отборочный тур" +'\n'+ "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];  
-
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+/** Показывает все 15 ответов. */
+function show_answers() {
+    ANSWER_IDS.forEach((id) => setHidden(id, false));
 }
 
-function get_answer_otbor(){
-    var user_name = document.getElementById("user_name").value;
-        fetch('/get_task_otbor', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data=="fail")
-    {
-       return; 
-    }
-    document.getElementById('question').innerText= "Правильный ответ: " + data[3];  
-
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+/** Массово включает/выключает все 15 кнопок ответов. */
+function status_btn(it_disable) {
+    ANSWER_IDS.forEach((id) => setDisabled(id, it_disable));
 }
 
-
-function send_answer_otbor(){
-     var user_name = document.getElementById("user_name").value;
-     var ans_otbor = document.getElementById("otbor_input").value;
-     try
-     {
-        var tmp = parseInt(ans_otbor);
-     }
-     catch (error)
-     {
-        document.getElementById("otbor_input").value = "0";
-     }
-     var time_answer = (Date.now() - parseInt(document.getElementById("time-start").value))/1000;
-        fetch('/send_answer_otbor', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name, ans_otbor:ans_otbor,time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data=="fail")
-    {
-       return; 
-    }
-    document.getElementById("otbor_submit").disabled = true;
-
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+/** Прячет и выключает все подсказки. */
+function hide_all_helps() {
+    HELP_IDS.forEach((id) => {
+        setHidden(id, true);
+        setDisabled(id, true);
+        setBg(id, DARK_BUTTON_COLOR);
+    });
 }
 
-
-function get_helps(){
-        var user_name = document.getElementById("user_name").value;
-        fetch('/get_helps', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data=="fail")
-    {
-        document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-       return;
-    
-    }
-
-    if ((document.getElementById("ex2").value == "alter") || (document.getElementById("ex2").value == "x2"))
-    {
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    return;
-    }
-
-    document.getElementById("p50_50").hidden = true;
-    document.getElementById("palter").hidden = true;
-    document.getElementById("pnavi").hidden = true;
-    document.getElementById("px2").hidden = true;
-    document.getElementById("pauden").hidden = true;
-     document.getElementById("pfact").hidden = true;
-
-    for (var i = 0; i<data.length;i++)
-    {
-        if (data[i]=="50:50")
-            document.getElementById("p50_50").hidden = false;
-        if (data[i]=="alter")
-            document.getElementById("palter").hidden = false;
-        if (data[i]=="navi")
-            document.getElementById("pnavi").hidden = false;
-        if (data[i]=="x2")
-            document.getElementById("px2").hidden = false;
-        if (data[i]=="help_auden")
-            document.getElementById("pauden").hidden = false;
-        if (data[i]=="fact")
-            document.getElementById("pfact").hidden = false;
-    }
-    document.getElementById("p50_50").style.backgroundColor = "#000c11";
-    document.getElementById("palter").style.backgroundColor = "#000c11"
-    document.getElementById("pnavi").style.backgroundColor = "#000c11"
-    document.getElementById("px2").style.backgroundColor = "#000c11"
-    document.getElementById("pauden").style.backgroundColor = "#000c11"
-    document.getElementById("pfact").style.backgroundColor = "#000c11"
-    
-
-
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
-    }
-
-function get_task(){
-    var user_name = document.getElementById("user_name").value;
-    fetch('/get_task_user', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-    
-
-    if (data == "fail")
-    {
-        return;
-    }
-    if (document.getElementById("ex2").value !="0")
-        return;
-    if (document.getElementById("time-start").value == "0")
-	{
-    	document.getElementById("time-start").value = Date.now().toString();
-	}
-    document.getElementById('question').innerText ="Раунд "+data[0]+'\n'+"md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
-    document.getElementById("o1").disabled = false;
-    document.getElementById("o2").disabled = false;
-    document.getElementById("o3").disabled = false;
-    document.getElementById("o4").disabled = false;
-    document.getElementById("o5").disabled = false;
-    document.getElementById("o6").disabled = false;
-    document.getElementById("o7").disabled = false;
-    document.getElementById("o8").disabled = false;
-    document.getElementById("o9").disabled = false;
-    document.getElementById("o10").disabled = false;
-    document.getElementById("o11").disabled = false;
-    document.getElementById("o12").disabled = false;
-    document.getElementById("o13").disabled = false;
-    document.getElementById("o14").disabled = false;
-    document.getElementById("o15").disabled = false;
-    if (data[0]<=3)
-    {
-            
-        if (document.getElementById("p50_50").hidden == false)
-            document.getElementById("p50_50").disabled = true;
-        if (document.getElementById("palter").hidden == false)
-            document.getElementById("palter").disabled = true;
-        if (document.getElementById("pnavi").hidden == false)
-            document.getElementById("pnavi").disabled = true;
-        if (document.getElementById("px2").hidden == false)
-            document.getElementById("px2").disabled = true;
-        if (document.getElementById("pauden").hidden == false)
-            document.getElementById("pauden").disabled = true;
-        if (document.getElementById("p50_50").hidden == false)
-            document.getElementById("p50_50").disabled = true;
-        if (document.getElementById("pfact").hidden == false)
-            document.getElementById("pfact").disabled = true;
-    }
-    if (data[0]>3)
-    {
-        if (document.getElementById("p50_50").hidden == false)
-            document.getElementById("p50_50").disabled = false;
-        if (document.getElementById("palter").hidden == false)
-            document.getElementById("palter").disabled = false;
-        if (document.getElementById("pnavi").hidden == false)
-            document.getElementById("pnavi").disabled = false;
-        if (document.getElementById("px2").hidden == false)
-            document.getElementById("px2").disabled = false;
-        if (document.getElementById("pauden").hidden == false)
-            document.getElementById("pauden").disabled = false;
-        if (document.getElementById("pfact").hidden == false)
-            document.getElementById("pfact").disabled = false;
-        
-
-    }
-    
-
-    if (document.getElementById("o1").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o2").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o3").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o4").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o5").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o6").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o7").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o8").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o9").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o10").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o11").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o12").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o13").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o14").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("o15").style.backgroundColor == "orange")
-        return;
-    if (document.getElementById("p50_50").style.backgroundColor == "orange")
-        return
-    if (document.getElementById("palter").style.backgroundColor == "orange")
-        return
-    if (document.getElementById("pnavi").style.backgroundColor == "orange")
-        return
-    if (document.getElementById("pfact").style.backgroundColor == "orange")
-        return
-    if (document.getElementById("pauden").style.backgroundColor == "orange")
-        return
-
-     
-
-    status_btn (false);
-    document.getElementById("count_fatal").value = data[3].toString();
-    
-
-        //document.getElementById('au').textContent = "В игру вступает " + data;
-    //document.getElementById('au').innerText = "В игру вступает " + data;
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function check_answered_main(){
-    var user_name = document.getElementById("user_name").value;
-    var inter = false;
+/** Сбрасывает интервалы, связанные с активной игрой. */
+function clear_game_intervals() {
+    clearInterval(timerHelps);
     clearInterval(timeWainAnswerFromMain);
-    if (timeWainAnswerFromMain == undefined)
-        return;
-    if (document.getElementById("welcome3").innerHTML=="Интерактивная игра")
-        inter = true;
-    fetch('/check_answered_main', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name, inter:inter}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    if (data == "ok")
-    {
-        status_btn(true);
-        clearInterval(timeWainAnswerFromMain);
-        timeWainAnswerFromMain = undefined;
-       
-       // timeWainAnswerFromMain = undefined;
-    }
-    
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
+    timeWainAnswerFromMain = undefined;
 }
 
-function status_btn(it_disable)
-{
-    
-    btn1 = document.getElementById("o1");
-    btn1.disabled = it_disable;
-    btn2 = document.getElementById("o2");
-    btn2.disabled = it_disable;
-    btn3 = document.getElementById("o3");
-    btn3.disabled = it_disable;
-    btn4 = document.getElementById("o4");
-    btn4.disabled = it_disable;
-    btn5 = document.getElementById("o5");
-    btn5.disabled = it_disable;
-    btn6 = document.getElementById("o6");
-    btn6.disabled = it_disable;
-    btn7 = document.getElementById("o7");
-    btn7.disabled = it_disable;
-    btn8 = document.getElementById("o8");
-    btn8.disabled = it_disable;
-    btn9 = document.getElementById("o9");
-    btn9.disabled = it_disable;
-    btn10 = document.getElementById("o10");
-    btn10.disabled = it_disable;
-    btn11 = document.getElementById("o11");
-    btn11.disabled = it_disable;
-    btn12 = document.getElementById("o12");
-    btn12.disabled = it_disable;
-    btn13 = document.getElementById("o13");
-    btn13.disabled = it_disable;
-    btn14 = document.getElementById("o14");
-    btn14.disabled = it_disable;
-    btn15 = document.getElementById("o15");
-    btn15.disabled = it_disable;
+/** Возвращает id кнопки ответа по номеру 1..15. */
+function get_o(answer) {
+    return `o${answer}`;
 }
 
-function a1(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    var user_name = document.getElementById("user_name").value;
-    document.getElementById("ans").value = "o1";
-    document.getElementById("o1").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"1",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+/** Показывает/скрывает элементы отборочного тура. */
+function set_otbor_controls(visible) {
+    setHidden('otbor_input', !visible);
+    setHidden('otbor_submit', !visible);
+    if (visible) setDisabled('otbor_submit', false);
+}
 
-.then(data => {
+/**
+ * Полный перевод player UI в режим ожидания.
+ * Это самый жёсткий reset, который вызывается при статусе "wait".
+ */
+function reset_to_wait_mode() {
+    setHtml('welcome', "");
+    setHtml('welcome2', "");
+    setHtml('welcome3', "Ожидайте дальнейших указаний!");
 
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
+    setHidden('question', true);
+    setValue('question', "");
+    setText('question', " ");
+    setValue('ex2', "0");
+    setValue('time-start', "0");
+    setValue('ans', "");
+    setValue('otbor_input', " ");
+
+    set_otbor_controls(false);
+    hide_answers();
+    hide_all_helps();
+
+    btn_default();
+    reset_answer_colors();
+
+    setHidden('au', true);
+
+    clear_game_intervals();
+}
+
+/** Переводит UI в режим интерактивной игры. */
+function set_interactive_mode() {
+    setValue('ans', "");
+    btn_default();
+    setHtml('welcome', "");
+    setHtml('welcome2', "");
+    setHtml('welcome3', "Интерактивная игра");
+    setHidden('question', false);
+    setValue('question', "");
+    setText('question', " ");
+    setValue('time-start', "0");
+
+    show_answers();
+    set_otbor_controls(false);
+    setHidden('au', true);
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
 }
 
-function a2(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o2";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o2").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"2",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+/** Переводит UI в режим основной игры. */
+function set_main_mode() {
+    setValue('ans', "");
+    setHtml('welcome', " ");
+    setHtml('welcome2', " ");
+    setHtml('welcome3', "Основная игра");
+    setHidden('question', false);
+    setValue('question', "");
+    setText('question', " ");
+    setValue('time-start', "0");
 
-.then(data => {
+    btn_default();
+    show_answers();
+    set_otbor_controls(false);
+    setHidden('au', true);
 
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
+    timerHelps = setInterval(() => get_helps(), 5000);
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
 }
 
-function a3(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o3";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o3").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"3",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+/** Переводит UI в режим отборочного тура. */
+function set_otbor_mode() {
+    setHtml('welcome', "");
+    setHtml('welcome2', "");
+    setHtml('welcome3', "Отборочный тур!");
+    setHidden('question', false);
+    set_otbor_controls(true);
+    setHidden('au', false);
 
-.then(data => {
+    setValue('question', "");
+    setValue('ex2', "0");
+    setValue('ans', "");
+    setText('question', " ");
+    setValue('otbor_input', "");
 
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
+    hide_answers();
+    hide_all_helps();
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+    reset_answer_colors();
+    clear_game_intervals();
 
+    get_task_otbor();
 }
 
-function a4(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o4";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o4").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"4",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
+/** Проверяет, выбрал ли игрок уже ответ / подсказку, чтобы не перетирать состояние новым polling. */
+function has_active_selection() {
+    const selectedIds = [...ANSWER_IDS, 'p50_50', 'palter', 'pnavi', 'pfact', 'pauden'];
+    return selectedIds.some((id) => $(id)?.style.backgroundColor === 'orange');
 }
 
-function a5(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o5";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o5").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"5",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
+/** Выключает все подсказки — используется после ответа игрока. */
+function disable_all_helps() {
+    HELP_IDS.forEach((id) => setDisabled(id, true));
 }
 
-function a6(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o6";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o6").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"6",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+// === ОСНОВНОЙ POLLING СТАТУСА ===
 
-.then(data => {
+function get_status() {
+    const user_name = currentUserName();
 
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
+    fetchJson('/get_user_status', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function a7(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o7";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o7").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"7",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function a8(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o8";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o8").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"8",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-function a9(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o9";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o9").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"9",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function a10(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o10";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o10").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"10",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function a11(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o11";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o11").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"11",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function a12(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o12";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o12").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"12",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function a13(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o13";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o13").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"13",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function a14(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o14";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o14").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"14",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-    document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function a15(){
-    if (document.getElementById("ex2").value == "x2-2")
-        document.getElementById("ex2").value = ""
-    document.getElementById("ans").value = "o15";
-     var user_name = document.getElementById("user_name").value;
-    document.getElementById("o15").style.backgroundColor = "orange";
-    var time_answer = (Date.now() - parseFloat(document.getElementById("time-start").value))/1000;
-    fetch('/send_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name,answer_user:"15",time_answer:time_answer}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-    document.getElementById("pfact").disabled = true;
-    status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-
-function show_right_user(){
-    
-    var user_name = document.getElementById("user_name").value;
-    fetch('/check_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name, double: "0"}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    if (data[0] == 1)
-    {
-        f = data[1].toString()
-        a = get_o(f)
-        document.getElementById(a).style.backgroundColor = "red";
-        for (var i = 1; i<16;i++)
-        {
-            b = i.toString();
-            bb = get_o(b)
-            if (document.getElementById(bb).style.backgroundColor == 'orange')
-            {
-                document.getElementById(bb).style.backgroundColor = 'green';
-            break;
+            if (data === "wait") {
+                reset_to_wait_mode();
             }
-        }
+
+            if (data === "interactive") {
+                set_interactive_mode();
+            }
+
+            if (data === "main") {
+                set_main_mode();
+            }
+
+            if (data === "take money" || data === "end interactive") {
+                status_btn(true);
+            }
+
+            if (data === "wait task interactive" || data === "wait task main") {
+                setValue("ans", "");
+                setValue("question", " ");
+                setText("question", " ");
+                setValue("time-start", "0");
+                btn_default();
+                reset_answer_colors();
+                get_task();
+            }
+
+            if (data === "given task interactive") {
+                get_task();
+                p50_50();
+                palter();
+                pnavi();
+                timeWainAnswerFromMain = setInterval(() => check_answered_main(), 5000);
+            }
+
+            if (data === "given task main") {
+                get_task();
+                p50_50();
+                palter();
+                pnavi();
+            }
+
+            if (data === "check main" || data === "check main x2" || data === "check interactive") {
+                show_right_user();
+            }
+
+            if (data === "otbor") {
+                set_otbor_mode();
+            }
+
+            if (data === "warning otbor") {
+                setValue("au", "10");
+            }
+
+            if (data === "start otbor") {
+                if ($("ex2")?.value === "start otbor") return;
+                setValue("ex2", "start otbor");
+                setDisabled("otbor_submit", false);
+                setValue("time-start", Date.now().toString());
+                setTimeout(() => { timer_otbor(); }, 2000);
+            }
+
+            if (data === "otbor end") {
+                setHidden("otbor_input", true);
+                setHidden("otbor_submit", true);
+                setHidden("au", true);
+                setValue("ex2", "0");
+                get_answer_otbor();
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
+// === ОТБОРОЧНЫЙ ТУР ===
+
+function timer_otbor() {
+    if ($("au")?.value === "0") {
+        setDisabled("otbor_submit", true);
+        return;
     }
-    if (data[0]>1)
-    {
-        if (document.getElementById("ex2").value == "x2-2")
-            return;
-        b_bomb = data[4]
-        r_bomb = data[5]
+    setValue("au", (parseInt($("au").value) - 1).toString());
+    setTimeout(() => { timer_otbor(); }, 1000);
+}
 
+function get_task_otbor() {
+    const user_name = currentUserName();
+    fetchJson('/get_task_otbor', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
+            setText('question', "Отборочный тур\nДиапазон: " + data[1] + " - " + data[2] + "\nmd5: " + data[4]);
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
 
-        if (document.getElementById("ex2").value == "x2")
-        {
-            document.getElementById("ex2").value ="x2-2";
-            if (data[0]<4)
+function get_answer_otbor() {
+    const user_name = currentUserName();
+    fetchJson('/get_task_otbor', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
+            setText('question', "Правильный ответ: " + data[3]);
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
+function send_answer_otbor() {
+    const user_name = currentUserName();
+    let ans_otbor = $("otbor_input")?.value || "";
+    try {
+        parseInt(ans_otbor);
+    } catch (error) {
+        ans_otbor = "0";
+        setValue("otbor_input", "0");
+    }
+
+    const time_answer = (Date.now() - parseInt($("time-start")?.value || "0")) / 1000;
+
+    fetchJson('/send_answer_otbor', {
+        user: user_name,
+        ans_otbor: ans_otbor,
+        time_answer: time_answer
+    })
+        .then(data => {
+            if (data === "fail") return;
+            setDisabled("otbor_submit", true);
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
+// === ПОДСКАЗКИ ===
+
+function get_helps() {
+    const user_name = currentUserName();
+
+    fetchJson('/get_helps', { user: user_name })
+        .then(data => {
+            if (data === "fail") {
+                disable_all_helps();
                 return;
-            ff = data[1];
-            c_ff = data[3];
-            ans_u = document.getElementById("ans").value;
-            for (var i = 0; i<c_ff;i++)
-            {
-                if (document.getElementById("ans").value == get_o(ff[i].toString()))
-                {
-                    document.getElementById(get_o(ff[i].toString())).style.backgroundColor = "red";
-                    if ((data[4]!="false") && (data[5]!="false"))
-                    {
-                        if (ff[i] == data[4])
-                        {
-                        document.getElementById(get_o(ff[i].toString())).value = "💣";
-                        }
-                        if (ff[i] == data[5])
-                        {
-                        document.getElementById(get_o(ff[i].toString())).value = "🧨";
+            }
+
+            if ($("ex2")?.value === "alter" || $("ex2")?.value === "x2") {
+                disable_all_helps();
+                return;
+            }
+
+            hide_all_helps();
+
+            for (let i = 0; i < data.length; i++) {
+                if (data[i] === "50:50") setHidden("p50_50", false);
+                if (data[i] === "alter") setHidden("palter", false);
+                if (data[i] === "navi") setHidden("pnavi", false);
+                if (data[i] === "x2") setHidden("px2", false);
+                if (data[i] === "help_auden") setHidden("pauden", false);
+                if (data[i] === "fact") setHidden("pfact", false);
+            }
+
+            HELP_IDS.forEach((id) => setBg(id, DARK_BUTTON_COLOR));
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
+// === ПОЛУЧЕНИЕ ЗАДАНИЯ ===
+
+function get_task() {
+    const user_name = currentUserName();
+
+    fetchJson('/get_task_user', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
+            if ($("ex2")?.value !== "0") return;
+
+            if ($("time-start")?.value === "0") {
+                setValue("time-start", Date.now().toString());
+            }
+
+            setText('question', "Раунд " + data[0] + "\nmd5: " + data[2] + "\nКоличество фаталов: " + data[3]);
+
+            status_btn(false);
+
+            if (data[0] <= 3) {
+                HELP_IDS.forEach((id) => {
+                    if (!$(id)?.hidden) setDisabled(id, true);
+                });
+            }
+
+            if (data[0] > 3) {
+                HELP_IDS.forEach((id) => {
+                    if (!$(id)?.hidden) setDisabled(id, false);
+                });
+            }
+
+            if (has_active_selection()) return;
+
+            status_btn(false);
+            setValue("count_fatal", data[3].toString());
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
+// === ПРОВЕРКА, ЗАФИКСИРОВАН ЛИ ОТВЕТ ===
+
+function check_answered_main() {
+    const user_name = currentUserName();
+    let inter = false;
+
+    clearInterval(timeWainAnswerFromMain);
+    if (timeWainAnswerFromMain === undefined) return;
+    if ($("welcome3")?.innerHTML === "Интерактивная игра") inter = true;
+
+    fetchJson('/check_answered_main', { user: user_name, inter: inter })
+        .then(data => {
+            if (data === "fail") return;
+            if (data === "ok") {
+                status_btn(true);
+                clearInterval(timeWainAnswerFromMain);
+                timeWainAnswerFromMain = undefined;
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
+// === ОТПРАВКА ОТВЕТА ИГРОКА ===
+
+function send_answer_main(answerNumber, answerId) {
+    if ($("ex2")?.value === "x2-2") setValue("ex2", "");
+
+    const user_name = currentUserName();
+    setValue("ans", answerId);
+    setBg(answerId, "orange");
+
+    const time_answer = (Date.now() - parseFloat($("time-start")?.value || "0")) / 1000;
+
+    fetchJson('/send_answer', {
+        user: user_name,
+        answer_user: String(answerNumber),
+        time_answer: time_answer
+    })
+        .then(data => {
+            if (data === "fail") return;
+            disable_all_helps();
+            status_btn(true);
+            clearInterval(timeWainAnswerFromMain);
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
+/**
+ * Ниже сохраняем глобальные функции a1..a15,
+ * потому что текущий HTML вызывает их напрямую через onclick.
+ */
+function a1(){ send_answer_main(1, "o1"); }
+function a2(){ send_answer_main(2, "o2"); }
+function a3(){ send_answer_main(3, "o3"); }
+function a4(){ send_answer_main(4, "o4"); }
+function a5(){ send_answer_main(5, "o5"); }
+function a6(){ send_answer_main(6, "o6"); }
+function a7(){ send_answer_main(7, "o7"); }
+function a8(){ send_answer_main(8, "o8"); }
+function a9(){ send_answer_main(9, "o9"); }
+function a10(){ send_answer_main(10, "o10"); }
+function a11(){ send_answer_main(11, "o11"); }
+function a12(){ send_answer_main(12, "o12"); }
+function a13(){ send_answer_main(13, "o13"); }
+function a14(){ send_answer_main(14, "o14"); }
+function a15(){ send_answer_main(15, "o15"); }
+
+// === ПРОВЕРКА РЕЗУЛЬТАТА ОТВЕТА ===
+
+function show_right_user() {
+    const user_name = currentUserName();
+
+    fetchJson('/check_answer', { user: user_name, double: "0" })
+        .then(data => {
+            if (data === "fail") return;
+
+            // Один фатал.
+            if (data[0] === 1) {
+                const fatalId = get_o(data[1].toString());
+                setBg(fatalId, "red");
+
+                for (let i = 1; i < 16; i++) {
+                    const answerId = get_o(i.toString());
+                    if ($(answerId)?.style.backgroundColor === 'orange') {
+                        setBg(answerId, 'green');
+                        break;
+                    }
+                }
+            }
+
+            // Несколько фаталов / x2 / бомбы.
+            if (data[0] > 1) {
+                if ($("ex2")?.value === "x2-2") return;
+
+                const blackBomb = data[4];
+                const redBomb = data[5];
+
+                if ($("ex2")?.value === "x2") {
+                    setValue("ex2", "x2-2");
+
+                    if (data[0] < 4) return;
+
+                    const fatals = data[1];
+                    const fatalCount = data[3];
+                    const currentAnswer = $("ans")?.value || "";
+
+                    for (let i = 0; i < fatalCount; i++) {
+                        if (currentAnswer === get_o(fatals[i].toString())) {
+                            setBg(get_o(fatals[i].toString()), "red");
+
+                            if (blackBomb !== "false" && redBomb !== "false") {
+                                if (fatals[i] === blackBomb) setValue(get_o(fatals[i].toString()), "💣");
+                                if (fatals[i] === redBomb) setValue(get_o(fatals[i].toString()), "🧨");
+                            }
+                            break;
                         }
                     }
 
-                    break;
+                    if ($(currentAnswer)?.style.backgroundColor === "red") {
+                        for (let i = 1; i < 16; i++) {
+                            const id = get_o(i.toString());
+                            if (id !== currentAnswer) setDisabled(id, false);
+                        }
+                        return;
+                    }
                 }
 
-            }
-            
-            if (document.getElementById(ans_u).style.backgroundColor == "red")
-            {
-                for (var i =1; i<16;i++)
-                {
-                    if (get_o(i.toString())!=ans_u)
-                    document.getElementById(get_o(i.toString())).disabled = false;
+                const fatals = data[1];
+                for (let i = 0; i < data[3]; i++) {
+                    const answerId = get_o(fatals[i]);
+                    setBg(answerId, "red");
+
+                    if (blackBomb !== "false" && redBomb !== "false") {
+                        if (fatals[i] === blackBomb) setValue(answerId, "💣");
+                        if (fatals[i] === redBomb) setValue(answerId, "🧨");
+                    }
                 }
-                return;
-            }
-        }
 
-        f = data[1]
-        for (var i = 0; i<data[3];i++)
-        {
-            var a = get_o(f[i])
-            document.getElementById(a).style.backgroundColor = "red"
-            if ((data[4]!="false") && (data[5]!="false"))
-            {
-                if (f[i]==data[4])
-                {
-                    document.getElementById(a).value = "💣";
+                for (let i = 1; i < 16; i++) {
+                    const answerId = get_o(i.toString());
+                    if ($(answerId)?.style.backgroundColor === 'orange') {
+                        setBg(answerId, 'green');
+                        break;
+                    }
                 }
-                if (f[i]==data[5])
-                {
-                    document.getElementById(a).value = "🧨";
-                }
+
+                setValue("ex2", "0");
             }
-            
-        }
-        for (var i = 1; i<16;i++)
-        {
-            b = i.toString();
-            bb = get_o(b);
-            if (document.getElementById(bb).style.backgroundColor == 'orange')
-            {
-                document.getElementById(bb).style.backgroundColor = 'green';
-            break;
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
+// === ПРИМЕНЕНИЕ ПОДСКАЗОК ===
+
+function p50_50() {
+    const user_name = currentUserName();
+
+    fetchJson('/get_50_50', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
+
+            for (let i = 0; i < data.length; i++) {
+                setDisabled(get_o(data[i].toString()), true);
             }
-        }
-        
-        document.getElementById("ex2").value ="0"
-    }
 
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-
+            setBg("p50_50", "orange");
+            setValue("ex2", "50:50");
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
 }
 
+function palter() {
+    const user_name = currentUserName();
 
+    fetchJson('/get_alter', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
 
+            status_btn(true);
 
+            const b1 = data[0].toString();
+            const b2 = data[1].toString();
 
-
-function get_o(answer)
-{
-    if (answer == "1")
-        return "o1";
-    if (answer == "2")
-        return "o2";
-    if (answer == "3")
-        return "o3";
-    if (answer == "4")
-        return "o4";
-    if (answer == "5")
-        return "o5";
-    if (answer == "6")
-        return "o6";
-    if (answer == "7")
-        return "o7";
-    if (answer == "8")
-        return "o8";
-    if (answer == "9")
-        return "o9";
-    if (answer == "10")
-        return "o10";
-    if (answer == "11")
-        return "o11";
-    if (answer == "12")
-        return "o12";
-    if (answer == "13")
-        return "o13";
-    if (answer == "14")
-        return "o14";
-    if (answer == "15")
-        return "o15";
-    
+            setDisabled(get_o(b1), false);
+            setDisabled(get_o(b2), false);
+            setBg("palter", "orange");
+            setValue("ex2", "alter");
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
 }
 
+function pnavi() {
+    const user_name = currentUserName();
 
-function p50_50(){
-     var user_name = document.getElementById("user_name").value;
-     //document.getElementById("p50_50").style.backgroundColor = "orange";
-     //document.getElementById("ex2").value = "50:50"
-    fetch('/get_50_50', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+    fetchJson('/get_navi', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
 
-.then(data => {
+            for (let i = 0; i < data.length; i++) {
+                setBg(get_o(data[i]), "#d905ec");
+            }
 
-    if (data == "fail")
-    {
-        return;
-    }
-    for (var i=0;i<data.length;i++)
-    {
-        ff = data[i].toString();
-        document.getElementById(get_o(ff)).disabled = true;
-    }
-     document.getElementById("p50_50").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "50:50"
-   
-
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
+            setBg("pnavi", "orange");
+            setValue("ex2", "navi");
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
 }
 
-function palter(){
-     var user_name = document.getElementById("user_name").value;
-   //  document.getElementById("palter").style.backgroundColor = "orange";
-    // document.getElementById("ex2").value = "alter"
-    fetch('/get_alter', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+function px2() {
+    const user_name = currentUserName();
+    setBg("px2", "orange");
+    setValue("ex2", "x2");
 
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    status_btn(true);
-    
-    b1 = data[0].toString();
-    b2 = data[1].toString();
-
-    document.getElementById(get_o(b1)).disabled = false;
-    document.getElementById(get_o(b2)).disabled = false;
-    document.getElementById("palter").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "alter"
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
+    fetchJson('/get_x2', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
 }
 
-function pnavi(){
-    var user_name = document.getElementById("user_name").value;
-    // document.getElementById("pnavi").style.backgroundColor = "orange";
-    // document.getElementById("ex2").value = "navi"
-    fetch('/get_navi', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+function pauden() {
+    const user_name = currentUserName();
+    setBg("pauden", "orange");
 
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-    
-    for (var i = 0;i<data.length;i++)
-    {
-        n = data[i];
-        document.getElementById(get_o(n)).style.backgroundColor = "#d905ec"
-    }
-    document.getElementById("pnavi").style.backgroundColor = "orange";
-    document.getElementById("ex2").value = "navi"
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-function px2(){
-
-    var user_name = document.getElementById("user_name").value;
-     document.getElementById("px2").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "x2"
-    fetch('/get_x2', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-
+    fetchJson('/get_auden', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
 }
 
-function pauden(){
-    document.getElementById("pauden").style.backgroundColor = "orange";
-    var user_name = document.getElementById("user_name").value;
-     fetch('/get_auden', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+function pfact() {
+    const user_name = currentUserName();
+    setBg("pfact", "orange");
 
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-}
-
-function pfact(){
-    
-    document.getElementById("pfact").style.backgroundColor = "orange";
-    var user_name = document.getElementById("user_name").value;
-     fetch('/get_fact', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
+    fetchJson('/get_fact', { user: user_name })
+        .then(data => {
+            if (data === "fail") return;
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
 }

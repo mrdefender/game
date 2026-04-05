@@ -1,8 +1,11 @@
 
+/**
+ * Показывает результат применения подсказки Навигатор на пульте ведущего.
+ * Логика не трогает основной host_slot.js: только считывает текущую magenta-подсветку.
+ */
 (function () {
   const hostIds = Array.from({ length: 15 }, (_, i) => 'btn' + (i + 1));
   const playerIds = Array.from({ length: 15 }, (_, i) => 'o' + (i + 1));
-  let lastSignature = '';
 
   function normalizeColor(color) {
     return String(color || '').replace(/\s+/g, '').toLowerCase();
@@ -14,31 +17,28 @@
   }
 
   function collect(ids) {
-    const arr = [];
-    for (const id of ids) {
+    const result = [];
+    ids.forEach((id) => {
       const el = document.getElementById(id);
-      if (!el) continue;
+      if (!el) return;
       const color = el.style.backgroundColor || getComputedStyle(el).backgroundColor;
-      const isNavi = isNavigatorColor(color);
-      el.classList.toggle('is-navi', isNavi);
-      if (isNavi) arr.push(el.value || id.replace(/[^\d]/g, ''));
-    }
-    return arr;
+      const active = isNavigatorColor(color);
+      el.classList.toggle('is-navi-result', active);
+      if (active) result.push(el.value || id.replace(/[^\d]/g, ''));
+    });
+    return result;
   }
 
   function setText(id, value) {
     const el = document.getElementById(id);
-    if (el) el.textContent = value;
+    if (el) { el.textContent = value; el.classList.toggle('has-result', value !== '—'); }
   }
 
   function update() {
-    const host = collect(hostIds);
-    const player = collect(playerIds);
-    const sig = host.join(',') + '|' + player.join(',');
-    if (sig === lastSignature) return;
-    lastSignature = sig;
-    setText('ui-host-navi-result', host.length ? host.join(', ') : '—');
-    setText('ui-host-player-navi-result', player.length ? player.join(', ') : '—');
+    const hostValues = collect(hostIds);
+    const playerValues = collect(playerIds);
+    setText('ui-host-navi-result', hostValues.length ? hostValues.join(', ') : '—');
+    setText('ui-host-player-navi-result', playerValues.length ? playerValues.join(', ') : '—');
   }
 
   function start() {

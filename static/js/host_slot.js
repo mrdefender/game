@@ -1,3 +1,26 @@
+/**
+ * HOST SLOT SCRIPT
+ *
+ * SAFE REFACTOR / COMMENTED VERSION
+ * ---------------------------------
+ * Этот файл сохраняет исходную логику максимально близко к оригиналу.
+ * Основная цель:
+ * - ничего не сломать;
+ * - оставить те же глобальные функции;
+ * - сохранить совместимость с текущим HTML и backend;
+ * - добавить понятные комментарии по блокам и функциям.
+ *
+ * Важно:
+ * - имена функций не меняются;
+ * - работа через document.getElementById(...) сохранена;
+ * - сетевые роуты fetch(...) сохранены;
+ * - цветовая логика и id элементов сохранены.
+ */
+/** 
+ * === ГЛОБАЛЬНЫЕ DOM-ССЫЛКИ, СЧЁТЧИКИ, ЗВУК ===
+ * Сохраняем старую модель с глобальными переменными, потому что
+ * основной интерфейс и onclick-привязки уже завязаны на такой формат.
+ */
 var round = document.getElementById("status-round");
 var away = document.getElementById("away");
 var current_money = document.getElementById("current-money");
@@ -82,6 +105,7 @@ var audio_4_20= new Audio(audioUrl+"4_20.ogg");
 var timerWaitAnswer;
 var timerHelps;
 
+/** Сбрасывает состояние пульта ведущего к начальному состоянию. */
 function cancel_all(){
     btn_default();
     clearInterval(timerHelps);
@@ -150,6 +174,7 @@ function cancel_all(){
   //  location.reload();
 }
 
+/** Переводит игроков обратно в режим ожидания на backend. */
 function reset_user_to_wait()
 {
     
@@ -180,6 +205,7 @@ select_script.addEventListener('change', function(){
 )
 
 
+/** Меняет сценарий игры: классика / экстрим / рискованный. */
 function ch1()
 {
     if (select_script.value == "Классика")
@@ -240,6 +266,7 @@ select_fix.addEventListener('change', function(){
 
 
 
+/** Меняет несгораемую сумму в рискованном сценарии. */
 function ch2(){
     if (select_fix.value =="0")
     {
@@ -382,6 +409,7 @@ select.addEventListener('change', function(){
 }
 );
 
+/** Ручное переключение раунда и обновление дерева денег. */
 function ch3(){
     round = document.getElementById("status-round");
     console.log (select.value);
@@ -829,6 +857,7 @@ console.error('Ошибка:', error);
 });
 }
 
+/** Приглашает выбранного игрока в игру. */
 function invite_to_game()
 {
 
@@ -874,6 +903,7 @@ console.error('Ошибка:', error);
 
 }
 
+/** Получает новое задание для текущего раунда. */
 function gen_task()
 {
     
@@ -1695,6 +1725,7 @@ console.error('Ошибка:', error);
 }
 
 
+/** Показывает правильный ответ на пульте ведущего. */
 function show_right(){
     if (check_answered)
         fetch('/show_rights', {
@@ -1981,6 +2012,7 @@ console.error('Ошибка:', error);
 }
 
 
+/** Готовит UI к следующему раунду. */
 function next_round()
 {   
     btn_default();
@@ -2155,6 +2187,7 @@ function calc_fix(id_round, id_fix)
     
 }
 
+/** Фиксирует решение забрать деньги. */
 function take_money()
 {
     if(document.getElementById("x2").style.backgroundColor == "orange")
@@ -2172,6 +2205,7 @@ function take_money()
 }
 
 
+/** Активирует подсказку 50:50. */
 function h50_50(){
     if(document.getElementById("x2").style.backgroundColor == "orange")
         return;
@@ -2213,6 +2247,7 @@ console.error('Ошибка:', error);
 
 
 }
+/** Активирует подсказку Альтернатива. */
 function alter(){
     if(document.getElementById("x2").style.backgroundColor == "orange")
         return;
@@ -2256,6 +2291,7 @@ console.error('Ошибка:', error);
 
 
 }
+/** Активирует подсказку Навигатор. */
 function navi(){
     if(document.getElementById("x2").style.backgroundColor == "orange")
         return;
@@ -2299,6 +2335,7 @@ console.error('Ошибка:', error);
 });
 
 }
+/** Активирует подсказку x2. */
 function x2(){
     if(check_answered())
         return;
@@ -2316,6 +2353,7 @@ function x2(){
 }
 
 
+/** Активирует подсказку помощи интерактива. */
 function help_auden(){
      if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
         return;
@@ -2362,6 +2400,7 @@ console.error('Ошибка:', error);
 
 }
 
+/** Активирует подсказку Факт. */
 function fact(){
      if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
         return;
@@ -2438,6 +2477,7 @@ function o_to_btn(o)
         return "btn15"
 }
 
+/** Открывает комнату для игроков. */
 function open_room(){
 
     if (document.getElementById("room").value=="")
@@ -2474,6 +2514,7 @@ console.error('Ошибка:', error);
 });
 }
 
+/** Закрывает комнату. */
 function close_room(){
 
     if (document.getElementById("room").value=="")
@@ -2674,6 +2715,7 @@ function start_final()
 }
 
 
+/** Показывает общий выигрыш / итог. */
 function total_money()
 {
     var lose = "false";
@@ -2718,6 +2760,7 @@ console.error('Ошибка:', error);
 
 let timerId = setInterval(() => update_list_user(), 5000);
 
+/** Обновляет таблицу игроков и их статусы. */
 function update_list_user()
 {
     fetch('/update_list_users', {
@@ -2865,6 +2908,7 @@ console.error('Ошибка:', error);
 }
 
 
+/** Периодически проверяет, пришёл ли ответ игрока. */
 function wait_answer(){
     fetch('/wait_answer_for_host', {
         method: 'POST',
@@ -2982,6 +3026,7 @@ console.error('Ошибка:', error);
 }
 
 
+/** Запускает режим отборочного тура. */
 function otbor(){
     
     fetch('/otbor', {
@@ -3021,6 +3066,7 @@ console.error('Ошибка:', error);
 
 }
 
+/** Показывает предупреждение перед стартом отборочного тура. */
 function warning_otbor(){
     
     fetch('/warning_otbor', {
@@ -3053,6 +3099,7 @@ console.error('Ошибка:', error);
 
 }
 
+/** Запускает таймер отборочного тура. */
 function start_otbor(){
      fetch('/start_otbor', {
         method: 'POST',
@@ -3095,6 +3142,7 @@ function timer_otbor(){
 
 }
 
+/** Показывает правильный ответ отборочного тура. */
 function show_answer_otbor(){
      fetch('/show_answer_otbor', {
         method: 'POST',
@@ -3128,6 +3176,7 @@ console.error('Ошибка:', error);
 
 }
 
+/** Показывает победителя отборочного тура. */
 function show_result_otbor(){
     fetch('/show_result_otbor', {
         method: 'POST',
@@ -3156,6 +3205,7 @@ console.error('Ошибка:', error);
 }
 
 
+/** Показывает результаты интерактива. */
 function show_result_interactive(){
      var action
     
@@ -3183,6 +3233,7 @@ function show_result_interactive(){
 console.error('Ошибка:', error);
 });
 }
+/** Показывает общий итог игры. */
 function show_result_total(){
      var action
     

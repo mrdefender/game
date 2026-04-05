@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="user_slot_navi_results.css">
-	 <link rel="stylesheet" href="{{ url_for('static', filename='styles/user_slot_navi_results.css') }}">
+    <link rel="stylesheet" href="/static/style/user_slot.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/user_slot.css') }}">
 </head>
 <body>
     <div class="player-stage-bg"></div>
@@ -63,6 +63,10 @@
                             <div class="state-box-title">Фаталы</div>
                             <div class="state-box-value" id="ui-fatal-answer">—</div>
                         </div>
+                        <div class="state-box state-box-navi">
+                            <div class="state-box-title">Навигатор рекомендует</div>
+                            <div class="state-box-value" id="ui-player-navi-result">—</div>
+                        </div>
                     </div>
                 </section>
 
@@ -91,19 +95,7 @@
                     </div>
                 </section>
 
-                
-                <section class="navigator-panel panel-inner">
-                    <div class="section-row">
-                        <div class="section-title">Результат навигатора</div>
-                        <div class="answers-note">Автоопределение по подсветке</div>
-                    </div>
-                    <div class="navigator-player-card">
-                        <div class="navigator-player-title">Навигатор показывает</div>
-                        <div class="navigator-player-value" id="ui-player-navi-result">—</div>
-                    </div>
-                </section>
-
-<section class="helps-panel panel-inner">
+                <section class="helps-panel panel-inner">
                     <div class="section-row">
                         <div class="section-title">Подсказки</div>
                     </div>
@@ -139,7 +131,6 @@
     </footer>
 
     <script src="/static/js/user_slot.js"></script>
-    <script src="/static/js/user_slot_stage_addon_light.js"></script>
     <script src="/static/js/user_slot_stage_addon_light.js"></script>
     <script src="/static/js/user_slot_navi_result_addon.js"></script>
 </body>
