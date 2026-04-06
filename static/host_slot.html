@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style/host_slot.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/host_slot.css') }}">
+  <link rel="stylesheet" href="/static/style/host_slot_inline_table.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/host_slot_inline_table.css') }}">
 </head>
 <body>
   <div class="show-shell">
@@ -170,6 +170,8 @@
           </div>
         </section>
 
+
+        <div class="bottom-workspace">
 <section class="panel-glow controls-panel">
           <div class="section-title">Умная группировка управления</div>
 
@@ -238,6 +240,38 @@
             </div>
           </div>
         </section>
+
+          <section class="panel-glow table-panel table-panel-inline">
+            <div class="section-row table-head-row">
+              <div class="section-title">Статус участников</div>
+              <div class="table-note">Таблица сжата и стоит рядом с управлением</div>
+            </div>
+            <div class="table-wrap compact-table-wrap">
+              <table class="status_users compact-status_users" id="status_users">
+                <tr id="row0">
+                  <th>№</th>
+                  <th>Игрок</th>
+                  <th>Ответ</th>
+                  <th>Инт.</th>
+                  <th>Время</th>
+                  <th>Статус</th>
+                  <th>Осн. игра</th>
+                  <th>Красн. бомба</th>
+                </tr>
+                <tr id="row1">
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </table>
+            </div>
+          </section>
+        </div>
       </section>
 
       <aside class="right-rail">
@@ -272,37 +306,7 @@
       </aside>
     </main>
 
-    <section class="panel-glow table-panel">
-      <div class="section-row table-head-row">
-        <div class="section-title">Статус участников</div>
-        <div class="table-note">Планшетный режим: горизонтальный скролл включён</div>
       </div>
-      <div class="table-wrap">
-        <table class="status_users" id="status_users">
-          <tr id="row0">
-            <th>№</th>
-            <th>Игрок</th>
-            <th>Ответ</th>
-            <th>Интерактив</th>
-            <th>Время</th>
-            <th>Статус</th>
-            <th>Основная игра</th>
-            <th>Наличие красной бомбы</th>
-          </tr>
-          <tr id="row1">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </table>
-      </div>
-    </section>
-  </div>
 
   <input type="submit" class="rb" id="rb" value="false" hidden>
 

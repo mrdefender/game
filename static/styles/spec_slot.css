@@ -202,7 +202,7 @@ body{
   color:#ffffff!important;outline:2px solid rgba(255,255,255,.72);outline-offset:1px;
   box-shadow:0 0 18px rgba(255,255,255,.16), inset 0 0 0 1px rgba(255,255,255,.06)!important
 }
-#c9::after{content:" ● несгораемая";color:#ffffff;opacity:.92;font-size:.78em;font-weight:800;margin-left:.35rem}
+#c9::after{content:"";color:#ffffff;opacity:.92;font-size:.78em;font-weight:800;margin-left:.35rem}
 .tree-legend{display:grid;gap:6px;margin-top:2px;font-size:.8rem;color:#dce8ff}
 .dot{width:12px;height:12px;display:inline-block;border-radius:50%;margin-right:8px}
 .dot-current{background:#ffd000;box-shadow:0 0 14px rgba(255,208,0,.4)}

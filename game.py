@@ -733,13 +733,13 @@ def get_helps():
             if os.path.exists("helps.json"):
                 user = Users()
                 user = Users.query.filter(Users.username==tmp_u).first()
-                if (user.status == "main") | (user.status == "wait task main") | (user.status == "given task main"):
+                if (user.status == "main") or (user.status == "wait task main") or (user.status == "given task main"):
                     db.session.commit()
                     with open('helps.json') as file:
                         jsn = json.load(file)
                     return jsn
                 else:
-                    return json.dumps("fail")
+                    return json.dumps("no change")
             else:
                  return json.dumps("fail")   
         except:
