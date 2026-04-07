@@ -259,3 +259,723 @@ input:disabled,button:disabled,select:disabled{opacity:1!important;color:#dae1eb
   .state-value{font-size:1rem}
   .screen-question{min-height:120px;padding:14px}
 }
+
+
+
+/* =========================================================
+   FINAL spectator tree CSS
+   host-like + neon + active pulse + guaranteed sums safe
+   ========================================================= */
+
+/* -----------------------------
+   Tree base
+   ----------------------------- */
+.money-tree .tree-step{
+  min-height:48px;
+  padding:12px 14px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:linear-gradient(180deg,#091017,#00070c);
+  border:1px solid rgba(255,174,0,.20);
+  color:#ffc969;
+  font-weight:800;
+  letter-spacing:.01em;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(255,255,255,.02);
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    color .18s ease,
+    transform .18s ease,
+    filter .18s ease;
+}
+
+/* Subtle animated glow for whole tree */
+.spec-right .money-tree{
+  filter: drop-shadow(0 0 14px rgba(255,174,0,.10));
+  animation: specTreeAmbientGlow 3.6s ease-in-out infinite;
+}
+
+@keyframes specTreeAmbientGlow{
+  0%,100%{
+    filter: drop-shadow(0 0 10px rgba(255,174,0,.08));
+  }
+  50%{
+    filter: drop-shadow(0 0 18px rgba(255,174,0,.16));
+  }
+}
+
+/* -----------------------------
+   Default inactive step
+   JS often paints inactive levels black
+   ----------------------------- */
+.money-tree .tree-step[style*="black"]{
+  background:linear-gradient(180deg,#091017,#00070c) !important;
+  border-color:rgba(255,174,0,.18) !important;
+  color:#ffc969 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(255,255,255,.02) !important;
+  transform:none !important;
+  animation:none !important;
+}
+
+/* -----------------------------
+   Active level
+   JS paints active level orange
+   ----------------------------- */
+.money-tree .tree-step[style*="orange"]{
+  background:linear-gradient(180deg,#ffd35b,#ff9f0a) !important;
+  color:#241400 !important;
+  border-color:#ffe08d !important;
+  box-shadow:
+    0 0 0 2px rgba(255,180,0,.28),
+    0 0 18px rgba(255,174,0,.40),
+    0 0 38px rgba(255,174,0,.38),
+    0 0 70px rgba(255,174,0,.20),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+  transform:translateY(-1px) scale(1.03) !important;
+}
+
+/* Pulse active level while waiting for answer */
+.money-tree .tree-step[style*="orange"]{
+  animation: specTreeActivePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes specTreeActivePulse{
+  0%,100%{
+    box-shadow:
+      0 0 0 2px rgba(255,180,0,.24),
+      0 0 14px rgba(255,174,0,.30),
+      0 0 26px rgba(255,174,0,.26),
+      0 0 52px rgba(255,174,0,.14),
+      inset 0 1px 0 rgba(255,255,255,.18);
+    transform:translateY(-1px) scale(1.02);
+    filter:brightness(1);
+  }
+  50%{
+    box-shadow:
+      0 0 0 2px rgba(255,180,0,.34),
+      0 0 24px rgba(255,174,0,.52),
+      0 0 46px rgba(255,174,0,.44),
+      0 0 88px rgba(255,174,0,.28),
+      inset 0 1px 0 rgba(255,255,255,.24);
+    transform:translateY(-2px) scale(1.045);
+    filter:brightness(1.04);
+  }
+}
+
+/* -----------------------------
+   Guaranteed sums
+   IMPORTANT:
+   The current JS marks guaranteed sums by setting inline white text.
+   These selectors preserve that state.
+   ----------------------------- */
+.money-tree .tree-step[style*="color: white"],
+.money-tree .tree-step[style*="color:white"],
+.money-tree .tree-step[style*="color: rgb(255, 255, 255)"],
+.money-tree .tree-step[style*="color:rgb(255, 255, 255)"]{
+  color:#fff8df !important;
+  border-color:rgba(255,248,223,.72) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,248,223,.16),
+    0 0 12px rgba(255,248,223,.16),
+    0 0 24px rgba(255,210,120,.12),
+    inset 0 1px 0 rgba(255,255,255,.14) !important;
+}
+
+/* Guaranteed + active: keep guaranteed text visible */
+.money-tree .tree-step[style*="color: white"][style*="orange"],
+.money-tree .tree-step[style*="color:white"][style*="orange"],
+.money-tree .tree-step[style*="color: rgb(255, 255, 255)"][style*="orange"],
+.money-tree .tree-step[style*="color:rgb(255, 255, 255)"][style*="orange"]{
+  background:linear-gradient(180deg,#fff2bf,#ffbf47) !important;
+  color:#fff8df !important;
+  border-color:rgba(255,248,223,.96) !important;
+  text-shadow:
+    0 0 10px rgba(255,248,223,.55),
+    0 0 22px rgba(255,220,160,.28) !important;
+  animation: specTreeGuaranteedPulse 1.8s ease-in-out infinite !important;
+}
+
+@keyframes specTreeGuaranteedPulse{
+  0%,100%{
+    box-shadow:
+      0 0 0 2px rgba(255,248,223,.24),
+      0 0 16px rgba(255,240,200,.20),
+      0 0 30px rgba(255,210,120,.22),
+      0 0 58px rgba(255,174,0,.16),
+      inset 0 1px 0 rgba(255,255,255,.22);
+    transform:translateY(-1px) scale(1.02);
+  }
+  50%{
+    box-shadow:
+      0 0 0 2px rgba(255,248,223,.34),
+      0 0 24px rgba(255,240,200,.32),
+      0 0 42px rgba(255,210,120,.30),
+      0 0 84px rgba(255,174,0,.22),
+      inset 0 1px 0 rgba(255,255,255,.28);
+    transform:translateY(-2px) scale(1.04);
+  }
+}
+
+/* -----------------------------
+   Top prize is always guaranteed
+   ----------------------------- */
+.money-tree #c9{
+  color:#fff8df !important;
+  border-color:rgba(255,248,223,.78) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,248,223,.14),
+    0 0 14px rgba(255,248,223,.14),
+    0 0 28px rgba(255,210,120,.12),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+
+/* If c9 is active, keep it especially bright */
+.money-tree #c9[style*="orange"]{
+  background:linear-gradient(180deg,#fff8df,#ffd35b) !important;
+  color:#fff8df !important;
+  border-color:rgba(255,248,223,.98) !important;
+  text-shadow:
+    0 0 10px rgba(255,248,223,.60),
+    0 0 22px rgba(255,220,160,.30) !important;
+  animation: specTreeJackpotPulse 1.9s ease-in-out infinite !important;
+}
+
+@keyframes specTreeJackpotPulse{
+  0%,100%{
+    box-shadow:
+      0 0 0 2px rgba(255,248,223,.28),
+      0 0 18px rgba(255,240,200,.24),
+      0 0 40px rgba(255,210,120,.28),
+      0 0 76px rgba(255,174,0,.18),
+      inset 0 1px 0 rgba(255,255,255,.28);
+    transform:translateY(-1px) scale(1.025);
+  }
+  50%{
+    box-shadow:
+      0 0 0 2px rgba(255,248,223,.38),
+      0 0 30px rgba(255,240,200,.36),
+      0 0 54px rgba(255,210,120,.34),
+      0 0 98px rgba(255,174,0,.26),
+      inset 0 1px 0 rgba(255,255,255,.34);
+    transform:translateY(-2px) scale(1.05);
+  }
+}
+/* =========================================================
+   FULL SHOW EFFECT — Millionaire-style help icons
+   Safe patch: does not replace interface structure.
+   ========================================================= */
+
+.help-btn.help-icon,
+input.help-icon[type="button"],
+input.help-icon[type="submit"]{
+  width:74px;
+  min-width:74px;
+  height:74px;
+  min-height:74px;
+  padding:0 !important;
+  border-radius:50% !important;
+  border:2px solid rgba(255,255,255,.14);
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,.12), transparent 32%),
+    radial-gradient(circle at 50% 100%, rgba(40,95,255,.18), transparent 45%),
+    linear-gradient(180deg,#13285d 0%, #0a1535 52%, #050b1b 100%);
+  background-repeat:no-repeat,no-repeat,no-repeat;
+  background-position:center,center,center;
+  background-size:84% 84%,100% 100%,100% 100%;
+  color:transparent !important;
+  text-indent:-9999px;
+  overflow:hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 0 0 1px rgba(255,211,91,.16),
+    0 10px 20px rgba(0,0,0,.32),
+    0 0 22px rgba(44,102,255,.10);
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    filter .18s ease,
+    opacity .18s ease;
+  position:relative;
+}
+
+.help-btn.help-icon::after,
+input.help-icon[type="button"]::after,
+input.help-icon[type="submit"]::after{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border-radius:50%;
+  border:1px solid rgba(255,211,91,.20);
+  pointer-events:none;
+}
+
+.help-btn.help-icon:hover:not(:disabled),
+input.help-icon[type="button"]:hover:not(:disabled),
+input.help-icon[type="submit"]:hover:not(:disabled){
+  transform:translateY(-1px) scale(1.035);
+  filter:brightness(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 0 0 1px rgba(255,211,91,.20),
+    0 12px 22px rgba(0,0,0,.34),
+    0 0 30px rgba(255,174,0,.18),
+    0 0 44px rgba(44,102,255,.16);
+}
+
+
+
+/* SHOW activation pulse */
+.help-icon.is-active{
+  animation: millionairePulse 1.55s ease-in-out infinite, millionaireFlash 2.4s linear infinite;
+}
+
+@keyframes millionairePulse{
+  0%,100%{
+    transform:scale(1);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.08),
+      0 0 0 1px rgba(255,211,91,.18),
+      0 10px 20px rgba(0,0,0,.34),
+      0 0 22px rgba(255,174,0,.20),
+      0 0 40px rgba(44,102,255,.14);
+    filter:brightness(1);
+  }
+  50%{
+    transform:scale(1.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.12),
+      0 0 0 2px rgba(255,211,91,.32),
+      0 12px 22px rgba(0,0,0,.36),
+      0 0 34px rgba(255,174,0,.42),
+      0 0 60px rgba(255,174,0,.20),
+      0 0 54px rgba(44,102,255,.22);
+    filter:brightness(1.08);
+  }
+}
+
+@keyframes millionaireFlash{
+  0%,82%,100%{ }
+  86%{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.18),
+      0 0 0 2px rgba(255,244,185,.48),
+      0 0 26px rgba(255,244,185,.38),
+      0 0 50px rgba(255,174,0,.32),
+      0 0 70px rgba(44,102,255,.28);
+  }
+}
+
+.help-icon:active{
+  transform:scale(.96);
+  filter:brightness(1.14);
+}
+
+/* Role-specific active colors remain supported */
+.help-btn.spec-5050-active,
+.help-5050.is-active{
+  box-shadow:
+    0 0 0 2px rgba(25,184,255,.22),
+    0 0 24px rgba(25,184,255,.34),
+    0 0 46px rgba(25,184,255,.16),
+    inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+
+.help-btn.spec-alter-active,
+.help-alter.is-active{
+  box-shadow:
+    0 0 0 2px rgba(59,91,255,.22),
+    0 0 24px rgba(59,91,255,.34),
+    0 0 46px rgba(59,91,255,.16),
+    inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+
+.help-btn.spec-navi-active,
+.help-navi.is-active{
+  box-shadow:
+    0 0 0 2px rgba(217,5,236,.24),
+    0 0 28px rgba(217,5,236,.44),
+    0 0 52px rgba(217,5,236,.18),
+    inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+
+/* =========================================================
+   ULTRA REALISTIC MILLIONAIRE HELP ICONS
+   ========================================================= */
+
+.help-icon{
+  position:relative;
+  width:76px !important;
+  height:76px !important;
+  min-width:76px !important;
+  min-height:76px !important;
+  border-radius:50% !important;
+  padding:0 !important;
+  overflow:hidden !important;
+
+  color:transparent !important;
+  text-indent:-9999px !important;
+  appearance:none !important;
+  -webkit-appearance:none !important;
+
+  border:2px solid rgba(255,225,150,.20) !important;
+
+  background-color:#091633 !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:72% 72% !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -10px 18px rgba(0,0,0,.28),
+    0 0 0 1px rgba(255,211,91,.10),
+    0 10px 20px rgba(0,0,0,.34),
+    0 0 18px rgba(37,84,188,.14) !important;
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .22s ease,
+    border-color .22s ease;
+}
+
+/* внешний золотой ореол */
+.help-icon::before{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  border:1px solid rgba(255,211,91,.20);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    0 0 10px rgba(255,174,0,.08);
+  pointer-events:none;
+}
+
+/* стеклянный блик */
+.help-icon::after{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  top:7px;
+  height:18px;
+  border-radius:50%;
+  background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0));
+  pointer-events:none;
+}
+
+/* hover */
+.help-icon:hover:not(:disabled){
+  transform:translateY(-1px) scale(1.03);
+  filter:brightness(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -10px 18px rgba(0,0,0,.24),
+    0 0 0 1px rgba(255,211,91,.16),
+    0 12px 22px rgba(0,0,0,.36),
+    0 0 26px rgba(255,174,0,.14),
+    0 0 34px rgba(37,84,188,.18) !important;
+}
+
+/* active click */
+.help-icon:active{
+  transform:scale(.97);
+  filter:brightness(1.12);
+}
+
+/* ---------------------------------------------------------
+   DATA-URI ICONS
+   --------------------------------------------------------- */
+
+/* ===== ЕДИНАЯ ИКОНКА 50:50 ДЛЯ ВСЕХ ===== */
+/* ===== 50:50 SHOW ICON ===== */
+.help-5050{
+  position:relative;
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>\
+<defs>\
+<linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>\
+<stop offset='0%' stop-color='%23fff4b9'/>\
+<stop offset='55%' stop-color='%23ffd35b'/>\
+<stop offset='100%' stop-color='%23ff9f0a'/>\
+</linearGradient>\
+</defs>\
+<text x='50' y='42' text-anchor='middle' font-family='Arial Black, Arial' font-size='26' font-weight='900' fill='url(%23g)'>50</text>\
+<line x1='28' y1='52' x2='72' y2='52' stroke='url(%23g)' stroke-width='4' stroke-linecap='round'/>\
+<text x='50' y='82' text-anchor='middle' font-family='Arial Black, Arial' font-size='26' font-weight='900' fill='url(%23g)'>50</text>\
+</svg>") !important;
+}
+
+/* золотая вспышка */
+.help-5050.show5050-flash::before{
+  content:"";
+  position:absolute;
+  inset:-8%;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,245,200,.85) 0%, rgba(255,210,110,.48) 22%, rgba(255,174,0,.20) 42%, rgba(255,174,0,0) 65%);
+  pointer-events:none;
+  animation: show5050Flash .55s ease-out 1 forwards;
+}
+
+/* разделение по горизонтали внутри медальона */
+.help-5050.show5050-split::after{
+  content:"";
+  position:absolute;
+  left:18%;
+  right:18%;
+  top:50%;
+  height:4px;
+  margin-top:-2px;
+  border-radius:4px;
+  background:linear-gradient(90deg, rgba(255,244,185,.0), rgba(255,244,185,.95), rgba(255,244,185,.0));
+  box-shadow:
+    0 0 10px rgba(255,244,185,.45),
+    0 0 22px rgba(255,174,0,.30);
+  pointer-events:none;
+  animation: show5050Split .7s ease-out 1 forwards;
+}
+
+/* мягкий пульс в момент использования */
+.help-5050.show5050-pulse{
+  animation: show5050Pulse .8s ease-out 1;
+}
+
+@keyframes show5050Flash{
+  0%{
+    opacity:0;
+    transform:scale(.72);
+  }
+  25%{
+    opacity:1;
+    transform:scale(1.06);
+  }
+  100%{
+    opacity:0;
+    transform:scale(1.18);
+  }
+}
+
+@keyframes show5050Split{
+  0%{
+    opacity:0;
+    transform:scaleX(.15);
+  }
+  35%{
+    opacity:1;
+    transform:scaleX(1.08);
+  }
+  100%{
+    opacity:0;
+    transform:scaleX(1);
+  }
+}
+
+@keyframes show5050Pulse{
+  0%{
+    transform:scale(1);
+    box-shadow:
+      0 0 0 2px rgba(255,180,0,.14),
+      0 0 16px rgba(255,174,0,.18);
+  }
+  40%{
+    transform:scale(1.12);
+    box-shadow:
+      0 0 0 2px rgba(255,211,91,.34),
+      0 0 28px rgba(255,174,0,.42),
+      0 0 46px rgba(255,174,0,.18);
+  }
+  100%{
+    transform:scale(1);
+    box-shadow:
+      0 0 0 2px rgba(255,180,0,.14),
+      0 0 16px rgba(255,174,0,.18);
+  }
+}
+
+.help-alter{
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>\
+<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>\
+<stop offset='0%' stop-color='%23fff4b9'/>\
+<stop offset='55%' stop-color='%23ffd35b'/>\
+<stop offset='100%' stop-color='%23ff9f0a'/>\
+</linearGradient></defs>\
+<path d='M28 38c9-11 22-16 38-16h8l-8-8 6-6 20 20-20 20-6-6 8-8h-8c-10 0-17 2-22 8z' fill='url(%23g)'/>\
+<path d='M72 62c-9 11-22 16-38 16h-8l8 8-6 6-20-20 20-20 6 6-8 8h8c10 0 17-2 22-8z' fill='url(%23g)'/>\
+</svg>") !important;
+}
+
+.help-navi{
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>\
+<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>\
+<stop offset='0%' stop-color='%23fff4b9'/>\
+<stop offset='55%' stop-color='%23ffd35b'/>\
+<stop offset='100%' stop-color='%23ff9f0a'/>\
+</linearGradient></defs>\
+<circle cx='50' cy='50' r='24' fill='none' stroke='url(%23g)' stroke-width='4'/>\
+<circle cx='50' cy='50' r='6' fill='%23fff3c4'/>\
+<path d='M60 18l16 16-30 44-6-17-17-6z' fill='url(%23g)'/>\
+</svg>") !important;
+}
+
+.help-auden{
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>\
+<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>\
+<stop offset='0%' stop-color='%23fff4b9'/>\
+<stop offset='55%' stop-color='%23ffd35b'/>\
+<stop offset='100%' stop-color='%23ff9f0a'/>\
+</linearGradient></defs>\
+<rect x='24' y='52' width='12' height='22' rx='2' fill='url(%23g)'/>\
+<rect x='44' y='40' width='12' height='34' rx='2' fill='url(%23g)'/>\
+<rect x='64' y='47' width='12' height='27' rx='2' fill='url(%23g)'/>\
+<path d='M24 78h52' stroke='%23fff4b9' stroke-width='4' stroke-linecap='round'/>\
+</svg>") !important;
+}
+
+.help-fact{
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>\
+<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>\
+<stop offset='0%' stop-color='%23fff4b9'/>\
+<stop offset='55%' stop-color='%23ffd35b'/>\
+<stop offset='100%' stop-color='%23ff9f0a'/>\
+</linearGradient></defs>\
+<path d='M50 24c-11 0-20 9-20 20 0 8 4 13 9 18 2 2 3 4 3 7h16c0-3 1-5 3-7 5-5 9-10 9-18 0-11-9-20-20-20z' fill='url(%23g)'/>\
+<rect x='43' y='71' width='14' height='6' rx='3' fill='%23fff4b9'/>\
+<rect x='44' y='80' width='12' height='5' rx='2.5' fill='%23ffd35b'/>\
+<path d='M50 12v-8M77 23l6-6M23 23l-6-6M86 50h8M6 50h8' stroke='%23fff4b9' stroke-width='3.5' stroke-linecap='round'/>\
+</svg>") !important;
+}
+
+.help-x2{
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>\
+<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>\
+<stop offset='0%' stop-color='%23fff4b9'/>\
+<stop offset='55%' stop-color='%23ffd35b'/>\
+<stop offset='100%' stop-color='%23ff9f0a'/>\
+</linearGradient></defs>\
+<text x='50' y='62' text-anchor='middle' font-family='Arial' font-size='34' font-weight='800' fill='url(%23g)'>x2</text>\
+</svg>") !important;
+}
+
+/* ---------------------------------------------------------
+   SHOW ACTIVATION
+   --------------------------------------------------------- */
+
+.help-icon.is-active{
+  animation: millionairePulse 1.55s ease-in-out infinite, millionaireFlash 2.2s linear infinite !important;
+}
+
+@keyframes millionairePulse{
+  0%,100%{
+    transform:scale(1);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.08),
+      inset 0 -10px 18px rgba(0,0,0,.24),
+      0 0 0 1px rgba(255,211,91,.16),
+      0 10px 20px rgba(0,0,0,.36),
+      0 0 18px rgba(255,174,0,.20),
+      0 0 28px rgba(37,84,188,.16) !important;
+    filter:brightness(1);
+  }
+  50%{
+    transform:scale(1.085);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.12),
+      inset 0 -10px 18px rgba(0,0,0,.20),
+      0 0 0 2px rgba(255,211,91,.28),
+      0 12px 22px rgba(0,0,0,.38),
+      0 0 30px rgba(255,174,0,.42),
+      0 0 54px rgba(255,174,0,.18),
+      0 0 42px rgba(37,84,188,.24) !important;
+    filter:brightness(1.08);
+  }
+}
+
+@keyframes millionaireFlash{
+  0%,84%,100%{}
+  88%{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.18),
+      0 0 0 2px rgba(255,244,185,.42),
+      0 0 24px rgba(255,244,185,.26),
+      0 0 44px rgba(255,174,0,.24),
+      0 0 68px rgba(37,84,188,.28) !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   DISABLED — readable, premium "off" state
+   --------------------------------------------------------- */
+
+.help-icon:disabled{
+  opacity:1 !important;
+  filter:grayscale(34%) brightness(.72) contrast(.90) !important;
+  border-color:rgba(145,155,178,.26) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    inset 0 -8px 16px rgba(0,0,0,.26),
+    0 0 0 1px rgba(145,155,178,.10),
+    0 6px 14px rgba(0,0,0,.42),
+    0 0 14px rgba(37,84,188,.06) !important;
+}
+
+/* ---------------------------------------------------------
+   USED — burned out, but icon still visible
+   --------------------------------------------------------- */
+
+.help-icon.used{
+  opacity:1 !important;
+  filter:grayscale(64%) brightness(.56) contrast(.84) !important;
+  border-color:rgba(118,126,145,.26) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.03),
+    inset 0 -8px 16px rgba(0,0,0,.32),
+    0 0 0 1px rgba(118,126,145,.08),
+    0 4px 10px rgba(0,0,0,.44) !important;
+}
+.help-btn.help-icon{
+  width:76px !important;
+  height:76px !important;
+  min-width:76px !important;
+  min-height:76px !important;
+  padding:0 !important;
+  border-radius:50% !important;
+  border:2px solid rgba(255,225,150,.20) !important;
+  background-color:#091633 !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:72% 72% !important;
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  outline:none !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -10px 18px rgba(0,0,0,.28),
+    0 0 0 1px rgba(255,211,91,.10),
+    0 10px 20px rgba(0,0,0,.34),
+    0 0 18px rgba(37,84,188,.14) !important;
+  color:transparent !important;
+  font-size:0 !important;
+  line-height:0 !important;
+  overflow:hidden !important;
+  cursor:pointer;
+}
+
+.help-btn.help-icon:disabled{
+  opacity:1 !important;
+  filter:grayscale(34%) brightness(.72) contrast(.90) !important;
+  cursor:default;
+}

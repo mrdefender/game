@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style/spec_slot.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/spec_slot.css') }}">
+
 </head>
 <body>
   <div class="spec-stage-bg"></div>
@@ -64,12 +65,12 @@
             <div class="section-note">Активные инструменты</div>
           </div>
           <div class="helps-grid">
-            <input type="button" class="help-btn" id="p50_50" value="50:50" disabled hidden>
-            <input type="button" class="help-btn" id="palter" value="⇆" disabled hidden>
-            <input type="button" class="help-btn" id="pnavi" value="➤" disabled hidden>
-            <input type="button" class="help-btn" id="px2" value="x2" disabled hidden>
-            <input type="button" class="help-btn" id="pauden" value="👪" disabled hidden>
-            <input type="button" class="help-btn" id="pfact" value="📚" disabled hidden>
+            <input type="button" class="help-btn help-icon help-5050" id="p50_50" value="" disabled hidden>
+            <input type="button" class="help-btn help-icon help-alter" id="palter" value="" disabled hidden>
+            <input type="button" class="help-btn help-icon help-navi" id="pnavi" value="" disabled hidden>
+            <input type="button" class="help-btn help-icon help-x2" id="px2" value="" disabled hidden>
+            <input type="button" class="help-btn help-icon help-auden" id="pauden" value="" disabled hidden>
+            <input type="button" class="help-btn help-icon help-fact" id="pfact" value="" disabled hidden>
           </div>
 
           <div class="help-results">
@@ -155,6 +156,8 @@
 
   <script src="/static/js/spec_slot.js"></script>
   <script src="/static/js/spec_slot_stage_addon.js"></script>
+  <script src="/static/js/help_icons_show_patch.js"></script>
+  <script src="/static/js/help_disabled_states.js"></script>
 
   <input type="submit" id="script" value="" disabled hidden>
   <input type="submit" id="round" value="" disabled hidden>

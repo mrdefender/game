@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style/user_slot.css">
 	<link rel="stylesheet" href="{{ url_for('static', filename='styles/user_slot.css') }}">
+	
 </head>
 <body>
     <div class="player-stage-bg"></div>
@@ -101,12 +102,12 @@
                     </div>
 
                     <div class="helps-grid">
-                        <input type="button" class="help-btn" id="p50_50" value="50:50" onclick="" disabled hidden>
-                        <input type="button" class="help-btn" id="palter" value="⇆" onclick="" disabled hidden>
-                        <input type="button" class="help-btn" id="pnavi" value="➤" onclick="" disabled hidden>
-                        <input type="button" class="help-btn" id="px2" value="x2" onclick="px2()" disabled hidden>
-                        <input type="button" class="help-btn" id="pauden" value="👪" onclick="" disabled hidden>
-                        <input type="button" class="help-btn" id="pfact" value="📚" onclick="" disabled hidden>
+                        <button type="button" class="help-btn help-icon help-5050" id="p50_50" value="" onclick="" disabled hidden> </button>
+                        <button type="button" class="help-btn help-icon help-alter" id="palter" value="" onclick="" disabled hidden></button>
+                        <button type="button" class="help-btn help-icon help-navi" id="pnavi" value="" onclick="" disabled hidden></button>
+                        <button type="button" class="help-btn help-icon help-x2" id="px2" value="" onclick="px2()" disabled hidden></button>
+                        <button type="button" class="help-btn help-icon help-auden" id="pauden" value="" onclick="" disabled hidden></button>
+                        <button type="button" class="help-btn help-icon help-fact" id="pfact" value="" onclick="" disabled hidden></button>
                     </div>
                 </section>
 
@@ -133,5 +134,7 @@
     <script src="/static/js/user_slot.js"></script>
     <script src="/static/js/user_slot_stage_addon_light.js"></script>
     <script src="/static/js/user_slot_navi_result_addon.js"></script>
+	<script src="/static/js/help_icons_show_patch.js"></script>
+	<script src="/static/js/help_disabled_states.js"></script>
 </body>
 </html>

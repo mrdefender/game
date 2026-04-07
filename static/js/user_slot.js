@@ -101,7 +101,7 @@ function get_status(){
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
-            document.getElementById("otbor_input").value = " ";
+            document.getElementById("otbor_input").value = "";
             clearInterval(timerHelps);
             clearInterval(timeWainAnswerFromMain);
             clearInterval(timeWainAnswerFromMain);
@@ -1383,6 +1383,8 @@ function show_right_user(){
 
         if (document.getElementById("ex2").value == "x2")
         {
+			document.getElementById("px2")?.classList.remove("is-active");
+			document.getElementById("px2")?.classList.add("used");
             document.getElementById("ex2").value ="x2-2";
             if (data[0]<4)
                 return;
@@ -1452,6 +1454,14 @@ function show_right_user(){
         }
         
         document.getElementById("ex2").value ="0"
+		try
+		{
+			document.getElementById("px2")?.classList.remove("used");
+		}
+		catch (error)
+		{
+			
+		}
     }
 
 
@@ -1519,11 +1529,30 @@ function can_activate_help(helpName) {
     return true;
 }
 
+function play5050ShowEffect(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.classList.remove("show5050-flash", "show5050-split", "show5050-pulse");
+
+  // перезапуск анимации
+  void el.offsetWidth;
+
+  el.classList.add("show5050-flash");
+  el.classList.add("show5050-split");
+  el.classList.add("show5050-pulse");
+
+  setTimeout(() => el.classList.remove("show5050-flash"), 560);
+  setTimeout(() => el.classList.remove("show5050-split"), 720);
+  setTimeout(() => el.classList.remove("show5050-pulse"), 820);
+}
+
 function p50_50(){
          if (!can_activate_help("50:50"))
         return;
 
 var user_name = document.getElementById("user_name").value;
+	play5050ShowEffect("p50_50");
      //document.getElementById("p50_50").style.backgroundColor = "orange";
      //document.getElementById("ex2").value = "50:50"
     fetch('/get_50_50', {
@@ -1647,6 +1676,7 @@ function px2(){
 
         if (!can_activate_help("x2"))
         return;
+	
 
 var user_name = document.getElementById("user_name").value;
      document.getElementById("px2").style.backgroundColor = "orange";
@@ -1667,6 +1697,7 @@ var user_name = document.getElementById("user_name").value;
     {
         return;
     }
+	document.getElementById("px2")?.classList.add("is-active");
 
 
 })
