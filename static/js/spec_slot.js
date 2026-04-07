@@ -514,7 +514,7 @@ function update_list_user()
     }
     if (data[0] == "otbor end")
         {
-            console.log(data[0])
+            
             //document.getElementById("au").hidden = true;
             document.getElementById("ex2").value = "0";
             get_answer_otbor();
@@ -522,7 +522,7 @@ function update_list_user()
         }
     if (data[0] == "winner otbor")
         {
-            console.log(data[0])
+           
             show_winner_otbor();
         }
     if ((data[0][0] == "show result") || (data[0][0] == "show total result"))
@@ -558,7 +558,7 @@ function update_list_user()
             inputName.setAttribute('innerText', (i+1).toString()+". " + data[i][1]+"                         "+ data[i][2].toLocaleString("ru"));
             inputName.setAttribute('value',(i+1).toString()+". " +  data[i][1]+"                         "+ data[i][2].toLocaleString("ru"));
             document.body.appendChild(inputName);
-            console.log(inputName)
+            
         }
         document.getElementById("ex2").value = "show_result";
 
@@ -704,7 +704,7 @@ function show_winner_otbor(){
     {
        return; 
     }
-    console.log(document.getElementById("ex2").value);
+    
         if (document.getElementById("ex2").value == "show_result")
         {
             return;
@@ -735,7 +735,7 @@ function show_winner_otbor(){
             {
                 document.getElementById('r'+i.toString()).classList.add("accepted")
             }
-            console.log(inputName)
+           
         }
         document.getElementById("ex2").value = "show_result";
 
@@ -817,7 +817,7 @@ function check_answered(){
 
     fa = data[1]
 	
-	console.log(document.getElementById("ex2").value)
+	
 
     if (document.getElementById("ex2").value=="x2-2")
 	return;

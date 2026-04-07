@@ -312,7 +312,7 @@ select:disabled {
   cursor: not-allowed;
 }
 
-send_answer_otbor:disabled
+.send_answer_otbor:disabled
 {
   background: linear-gradient(180deg, #727b89, #4c5665) !important;
   color: var(--disabled-text) !important;
