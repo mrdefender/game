@@ -1552,7 +1552,7 @@ function p50_50(){
         return;
 
 var user_name = document.getElementById("user_name").value;
-	play5050ShowEffect("p50_50");
+	
      //document.getElementById("p50_50").style.backgroundColor = "orange";
      //document.getElementById("ex2").value = "50:50"
     fetch('/get_50_50', {
@@ -1577,6 +1577,7 @@ var user_name = document.getElementById("user_name").value;
         document.getElementById(get_o(ff)).disabled = true;
     }
      document.getElementById("p50_50").style.backgroundColor = "orange";
+     play5050ShowEffect("p50_50");
      document.getElementById("ex2").value = "50:50"
    
 
@@ -1622,6 +1623,7 @@ var user_name = document.getElementById("user_name").value;
     document.getElementById(get_o(b2)).disabled = false;
     document.getElementById("palter").style.backgroundColor = "orange";
      document.getElementById("ex2").value = "alter"
+     play5050ShowEffect("palter");
 
 
 })
@@ -1662,7 +1664,8 @@ var user_name = document.getElementById("user_name").value;
         document.getElementById(get_o(n)).style.backgroundColor = "#d905ec"
     }
     document.getElementById("pnavi").style.backgroundColor = "orange";
-    document.getElementById("ex2").value = "navi"
+    document.getElementById("ex2").value = "navi";
+    play5050ShowEffect("pnavi");
 
 
 })
@@ -1698,6 +1701,7 @@ var user_name = document.getElementById("user_name").value;
         return;
     }
 	document.getElementById("px2")?.classList.add("is-active");
+    play5050ShowEffect("px2");
 
 
 })
@@ -1731,6 +1735,7 @@ document.getElementById("pauden").style.backgroundColor = "orange";
     {
         return;
     }
+    play5050ShowEffect("pauden");
 
 
 })
@@ -1764,6 +1769,7 @@ document.getElementById("pfact").style.backgroundColor = "orange";
     {
         return;
     }
+    play5050ShowEffect("pfact");
 
 
 })

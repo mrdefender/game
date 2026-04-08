@@ -37,8 +37,7 @@
         </div>
 
         <input class="in_game display-field" id="in_game" value="">
-        <input type="submit" class="message display-field message-field" id="au" value="" onclick="wait_4min()">
-        <input type="submit" class="tree-status display-field" id="users" name="user_name" value="Зрительский экран" disabled>
+<input type="submit" class="tree-status display-field" id="users" name="user_name" value="" disabled>
 
         <section class="state-panel">
           <div class="state-card state-card-player">
@@ -117,6 +116,10 @@
           </div>
         </div>
 
+        <div class="au-wrap panel-glow-soft">
+          <input type="submit" class="message display-field message-field au-inline" id="au" value="" onclick="wait_4min()">
+        </div>
+
         <section class="results-panel">
           <div class="section-row">
             <div class="section-title">Результаты</div>
@@ -167,5 +170,52 @@
   <input type="submit" id="current" value="0" disabled hidden>
   <input type="submit" id="user" value="" disabled hidden>
   <input type="submit" id="count_fatal" value="" disabled hidden>
+
+  <script>
+    (function () {
+      const au = document.getElementById("au");
+      if (!au) return;
+
+      let lastValue = "";
+
+      function norm(v) {
+        return String(v || "").replace(/\s+/g, " ").trim();
+      }
+
+      function applyState(forceAnnounce) {
+        const current = norm(au.value);
+        au.classList.remove("is-waiting", "is-announce", "is-reveal");
+
+        if (!current) return;
+
+        const waitLike = /внимание|ожидание|подождите|готовьтесь|сейчас|идет|загрузка|выбор|думает/i.test(current);
+
+        if (waitLike && !forceAnnounce) {
+          au.classList.add("is-waiting");
+          return;
+        }
+
+        au.classList.add("is-announce");
+        setTimeout(() => {
+          au.classList.remove("is-announce");
+          au.classList.add("is-reveal");
+        }, 1400);
+      }
+
+      setInterval(() => {
+        const current = norm(au.value);
+        if (current !== lastValue) {
+          lastValue = current;
+          applyState(true);
+        } else {
+          applyState(false);
+        }
+      }, 150);
+
+      lastValue = norm(au.value);
+      applyState(false);
+    })();
+  </script>
 </body>
+
 </html>
