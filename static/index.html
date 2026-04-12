@@ -2,32 +2,60 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Веселые старты</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-    <div class="wrapper">
-    <header class="container">
-        <span class="logo"></span>
-    </header>
-    <div class="hero-container">
-        <div class="hero">
-            <h2>Добро пожаловать в Веселые игры!!!!</h2>
-            <div class="hero-down"></div>
-                <p>Будет весело.</p>
-            <h2>
-                <div>
-                   <a href="{{ url_for('join') }}" class = "hero-button"> В игру!!!</a>
-                 </div> 
-            
-             </h2>
-        </div>
-    </div>
+    <div class="landing-bg"></div>
 
-    </div>
-    <img src="/static/img/screen1.jpg" alt="">
+    <main class="landing-shell">
+        <section class="hero-card panel-glow">
+            <header class="hero-header">
+                <div class="eyebrow">TV-режим</div>
+                <h1>Веселые игры</h1>
+                <div class="hero-subline">Интерактивная игровая платформа</div>
+            </header>
+
+            <section class="hero-main panel-inner">
+                <div class="hero-copy">
+                    <div class="hero-kicker">Добро пожаловать</div>
+                    <h2>Готовы начать игру?</h2>
+                    <p>
+                        Подключайтесь к комнате, выбирайте режим и запускайте игровой экран
+                        в едином стиле шоу.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a href="{{ url_for('join') }}" class="hero-button">В игру</a>
+                    </div>
+                </div>
+
+                <div class="hero-preview">
+                    <div class="preview-frame">
+                        <img src="/static/img/screen1.jpg" alt="Экран игры">
+                    </div>
+                </div>
+            </section>
+
+            <section class="hero-features panel-inner">
+                <div class="feature-card">
+                    <div class="feature-title">Быстрый вход</div>
+                    <div class="feature-text">Подключение к комнате за несколько секунд.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Шоу-стиль</div>
+                    <div class="feature-text">Темная сцена, неоновые акценты и читаемый UI.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Мобильный экран</div>
+                    <div class="feature-text">Адаптация под телефон без отдельной логики.</div>
+                </div>
+            </section>
+        </section>
+    </main>
+
     <footer class="copyrights">
         Здесь могло бы быть ваше имя и ваша реклама.
     </footer>

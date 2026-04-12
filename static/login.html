@@ -2,56 +2,97 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Веселые игры</title>
-    <link rel="stylesheet"  href="{{ url_for('static', filename='styles/login.css') }}">
-    <link rel="stylesheet" href='styles/login.css'>
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+    <link rel="stylesheet" href="styles/login.css">
 </head>
 <body>
-    <main class="game_auth_body">
-        <div class="game_auth">
-            <h1>Веселые игры. Пульт игрока.</h1>
-            <div class="game_auth_container">
-                <form action="/join" method="post" class="auth">
-                <div class="form_group">
-                    <label class="form_label">Имя игрока</label>
-                    <div>
-		<!--
+    <div class="login-stage-bg"></div>
+
+    <main class="login-shell">
+        <section class="login-card panel-glow">
+            <header class="login-header">
+                <div class="eyebrow">TV-режим</div>
+                <h1>Веселые игры</h1>
+                <div class="subline">Подключение к игровой комнате</div>
+            </header>
+
+            <section class="login-intro panel-inner">
+                <div class="intro-title">Пульт игрока</div>
+                <div class="intro-text">
+                    Введите имя и код комнаты, чтобы присоединиться к текущей игре.
+                </div>
+            </section>
+
+            <section class="login-form-wrap panel-inner">
+                <form action="/join" method="post" class="auth" id="loginForm">
+                    <div class="form_group">
+                        <label class="form_label" for="name">Имя игрока</label>
+                        <div class="field-wrap">
+
+                        <!-- TELEGRAM AUTH (disabled)
                         <p>
-                           <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="mokaque_bot" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+                           <script async src="https://telegram.org/js/telegram-widget.js?22"
+                                   data-telegram-login="mokaque_bot"
+                                   data-size="large"
+                                   data-onauth="onTelegramAuth(user)"
+                                   data-request-access="write"></script>
                             <script type="text/javascript">
                             function onTelegramAuth(user) {
-                        if (user.username!=undefined) {
-                            document.getElementById("name").value = user.username;
-			    return;}
-                        if (user.last_name!=undefined)
-                                document.getElementById("name").value = user.first_name+' ' + user.last_name;
-                        else
-                                document.getElementById("name").value = user.first_name
-                        }
-</script>
-                        </p> -->
-                        <input class="form_control" type="text" id="name" name="user_name" placeholder="user" required>
-                    </div>  
-                </div>
-                <div class="form_group">
-                    <label class="form_label">Код игровой комнаты</label>
-                    <div>
-                        <input class="form_control" id="room", name="room_id" type="number" maxlength="8" placeholder="1234" required>
+                                if (user.username != undefined) {
+                                    document.getElementById("name").value = user.username;
+                                    return;
+                                }
+                                if (user.last_name != undefined)
+                                    document.getElementById("name").value = user.first_name + ' ' + user.last_name;
+                                else
+                                    document.getElementById("name").value = user.first_name;
+                            }
+                            </script>
+                        </p>
+                        -->
+
+                            <input class="form_control" type="text" id="name" name="user_name" placeholder="Введите имя" required autofocus autocomplete="name">
+                        </div>
                     </div>
-                </div>
-                <input type="submit" class="submit" value="Войти"/>
+
+                    <div class="form_group">
+                        <label class="form_label" for="room">Код игровой комнаты</label>
+                        <div class="field-wrap field-wrap-room">
+                            <input class="form_control" id="room" name="room_id" type="text" maxlength="8" inputmode="numeric" placeholder="12345678" required autocomplete="one-time-code">
+                        </div>
+                    </div>
+
+                    <div class="hint-box">
+                        Для входа используйте код комнаты, который сообщил ведущий.
+                    </div>
+
+                    <input type="submit" class="submit" id="submitBtn" value="Войти в игру"/>
                 </form>
+
                 {%for msg in get_flashed_messages()%}
                 <div class="flash">{{msg}}</div>
                 {%endfor%}
-            </div>
-        </div>
-
-
+            </section>
+        </section>
     </main>
-    <!--script src="/static/login/join.js"></script-->
 
+    <script>
+    (function(){
+        const form = document.getElementById("loginForm");
+        const submitBtn = document.getElementById("submitBtn");
+        const room = document.getElementById("room");
+
+        room.addEventListener("input", () => {
+            room.value = room.value.replace(/\D/g, "").slice(0, 8);
+        });
+
+        form.addEventListener("submit", () => {
+            submitBtn.value = "Подключение...";
+            submitBtn.disabled = true;
+        });
+    })();
+    </script>
 </body>
 </html>

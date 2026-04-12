@@ -96,8 +96,8 @@ def init_game():
 
 @app.route('/')
 def index(): 
-    print (url_for('join'))
-    return render_template("login.html")
+    #print (url_for('join'))
+    return render_template("index.html")
 
 
 def check_id_room(room_id):

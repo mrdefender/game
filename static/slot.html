@@ -5,42 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Веселые игры</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/slot.css') }}">
-    <link rel="stylesheet" href="'/static/styles/slot.css'">
+    <link rel="stylesheet" href="/static/styles/slot.css">
 </head>
 <body>
-    <main class="game_auth_body">
-        <div class="game_auth">
-            <h1>Веселые игры. Режим администратора.</h1>
-            <div class="game_auth_container">
-                <div class="form_group">
-                    <label class="form_label">Добро пожаловать на игру </label>
-                    <p>
-                    <label class="form_label">Свободный слот! </label> </p>
-                   
-                </div>
-                 <div class="form_group">
-                    <label class="form_label_down">Выберите режим игры</label>
-                   
-                </div>
-                <div class="form_group">
-                    
-                </div>
-                <!--button class="host" onclick="to_host()"> Режим ведущего</button-->
-                <form action="/host_slot", method="post", class="select_game">
-                <input type="submit" class="submit_host" value="Режим ведущего">
+    <div class="stage-bg stage-bg-slot"></div>
+
+    <main class="screen-shell">
+        <section class="screen-card panel-glow">
+            <header class="screen-header">
+                <div class="eyebrow">ADMIN MODE</div>
+                <h1>Веселые игры</h1>
+                <div class="subline">Свободный слот</div>
+            </header>
+
+            <section class="screen-intro panel-inner">
+                <div class="intro-title">Добро пожаловать на игру</div>
+                <div class="intro-text">Выберите режим запуска для текущей комнаты.</div>
+            </section>
+
+            <section class="screen-actions panel-inner">
+                <div class="section-title">Режимы</div>
+
+                <form action="/host_slot" method="post" class="select_game">
+                    <input type="submit" class="action-btn action-host" value="Режим ведущего">
                 </form>
-                <!--button class="user"> Режим игрока</button-->
-                <form action="/spec_slot", method="post", class="select_game">
-                 <input type="submit" class="spec" value="Режим зрителя">
+
+                <form action="/spec_slot" method="post" class="select_game">
+                    <input type="submit" class="action-btn action-spec" value="Режим зрителя">
                 </form>
-            </div>
-
-        </div>
-
-
+            </section>
+        </section>
     </main>
-   
-    <!--script src="slot.js"></script-->
+
     <footer class="copyrights">
         Здесь могло бы быть ваше имя и ваша реклама.
     </footer>

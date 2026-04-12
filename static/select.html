@@ -7,30 +7,30 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/select.css') }}">
 </head>
 <body>
-    <main class="game_auth_body">
-        <div class="game_auth">
-            <h1>Веселые игры. Режим администратора.</h1>
-            <div class="game_auth_container">
-                <div class="form_group">
-                    <label class="form_label">Добро пожаловать,</label>
-                   
-                </div>
-                 <div class="form_group">
-                    <label class="form_label">Выберите игру!!!</label>
-                   
-                </div>
-                <div class="form_group">
-                    
-                </div>
-                <form action="/slot", method="post", class="select_game">
-                <input type="submit" class="slot" value="Свободный слот">
+    <div class="stage-bg"></div>
+
+    <main class="screen-shell">
+        <section class="screen-card panel-glow">
+            <header class="screen-header">
+                <div class="eyebrow">ADMIN MODE</div>
+                <h1>Веселые игры</h1>
+                <div class="subline">Режим администратора</div>
+            </header>
+
+            <section class="screen-intro panel-inner">
+                <div class="intro-title">Добро пожаловать</div>
+                <div class="intro-text">Выберите игру для запуска административного сценария.</div>
+            </section>
+
+            <section class="screen-actions panel-inner">
+                <div class="section-title">Доступные игры</div>
+                <form action="/slot" method="post" class="select_game">
+                    <input type="submit" class="action-btn action-primary" value="Свободный слот">
                 </form>
-            </div>
-        </div>
-
-
+            </section>
+        </section>
     </main>
-    <script src="/static/js/select.js"></script>
 
+    <script src="/static/js/select.js"></script>
 </body>
 </html>
