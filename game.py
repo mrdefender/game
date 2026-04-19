@@ -654,16 +654,16 @@ def update_list_users():
 @app.route('/open_room', methods=["POST", "GET"])
 def open_room():
     if request.method == 'POST':
-        id_room = request.json["room_id"]
         Room.query.delete()
         db.session.commit()
         try:
             room_code = Room()
-            room_code.id = int(id_room)
+            random.seed(secrets.randbelow(9999999))
+            room_code.id = random.randint(1000,9999)
             db.session.add(room_code)
             db.session.flush()
             db.session.commit()
-            return id_room
+            return json.dumps(room_code.id)
         except:
             return json.dumps("fail")
     else:

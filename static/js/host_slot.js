@@ -2505,17 +2505,10 @@ function o_to_btn(o)
 /** Открывает комнату для игроков. */
 function open_room(){
 
-    if (document.getElementById("room").value=="")
-    {
-        return;
-    }
-       console.log(document.getElementById("room").value);
-
-    
 
      fetch('/open_room', {
         method: 'POST',
-        body: JSON.stringify({ room_id:document.getElementById("room").value}),
+        body: JSON.stringify({ "":""}),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -2529,10 +2522,10 @@ function open_room(){
     {
         return;
     }
-    
+
+        document.getElementById("room").value = data;
         document.getElementById("open_room").disabled = true;
         document.getElementById("close_room").disabled = false;
-        document.getElementById("room").disabled = true;
     
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
@@ -2545,10 +2538,6 @@ console.error('Ошибка:', error);
 /** Закрывает комнату. */
 function close_room(){
 
-    if (document.getElementById("room").value=="")
-    {
-        return;
-    }
        console.log(document.getElementById("room").value);
 
     
