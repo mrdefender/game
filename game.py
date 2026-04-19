@@ -587,23 +587,27 @@ def show_rights():
 
     
  
-@app.route('/sounds/<filename>')  
+@app.route('/sounds/<filename>')
 def serve_audio(filename):
     CUSTOM_AUDIO_DIR = "sounds/"
-    if request.method == 'GET':
-        sanitized_filename = secure_filename(filename)  
+    sanitized_filename = secure_filename(filename)
 
-    # Check if the sanitized file exists in the custom directory  
-        #if not os.path.isfile(sanitized_filename):  
-        #    abort(404, description="File not found.")    
-        mime_type, _ = mimetypes.guess_type(sanitized_filename) 
-        if not mime_type or not mime_type.startswith('audio/'):  
-         abort(400, description="Unsupported audio format.") 
-        result = send_from_directory(CUSTOM_AUDIO_DIR, sanitized_filename,  mimetype=mime_type, as_attachment=False)
-               
-        return result
-      ##  result = CUSTOM_AUDIO_DIR + filename;         
-    ##return result;    
+    mime_type, _ = mimetypes.guess_type(sanitized_filename)
+    if not mime_type or not mime_type.startswith('audio/'):
+        abort(400, description="Unsupported audio format.")
+
+    result = send_from_directory(
+        CUSTOM_AUDIO_DIR,
+        sanitized_filename,
+        mimetype=mime_type,
+        as_attachment=False
+    )
+
+    result.cache_control.public = True
+    result.cache_control.max_age = 31536000  # 1 год
+    result.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+
+    return result  
     
 @app.route('/update_list_users', methods=["POST", "GET"])
 def update_list_users():
