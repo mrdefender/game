@@ -2525,7 +2525,10 @@ function open_room(){
 
 .then(data => {
    console.log(data);
-    
+    if (data == "fail")
+    {
+        return;
+    }
     
         document.getElementById("open_room").disabled = true;
         document.getElementById("close_room").disabled = false;
@@ -2562,7 +2565,10 @@ function close_room(){
 
 .then(data => {
    console.log(data);
-    
+   if (data=="fail")
+   {
+        return;
+   }
     
         document.getElementById("open_room").disabled = false;
         document.getElementById("close_room").disabled = true;

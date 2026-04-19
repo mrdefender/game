@@ -39,6 +39,11 @@ HOST_USERNAME = os.environ.get("HOST_USERNAME", "admin")
 def load_user(user_id):
     return Users.query.get(user_id)
 
+class Room(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    def __repr__(self):
+        return '<Room %r>' %self.id
+
 
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -70,8 +75,6 @@ def init_game():
         os.remove("task_otbor.json")
     if os.path.exists("helps.json"):
         os.remove("helps.json")
-    #if os.path.exists("room.json"):
-     #   os.remove("room.json")
     if os.path.exists("50_50.json"):
         os.remove("50_50.json")  
     if os.path.exists("alter.json"):
@@ -101,14 +104,20 @@ def index():
 
 
 def check_id_room(room_id):
-    if not os.path.exists("room.json"):
-        return False
+   # if not os.path.exists("room.json"):
+    room = Room.query.first()
+    if room == None:
+            return False
     else:
-        with open('room.json') as file:
-           jsn = json.load(file)
-        if jsn == room_id:
-            return True
-        else:
+       # with open('room.json') as file:
+        #   jsn = json.load(file)
+        #if jsn == room_id:
+        try:
+            if room.id == int(room_id) :
+                return True
+            else:
+                return False
+        except:
             return False
 
 
@@ -646,11 +655,19 @@ def update_list_users():
 def open_room():
     if request.method == 'POST':
         id_room = request.json["room_id"]
-        with open('room.json','w') as file:
-            json.dump(id_room,file)
-        return id_room
+        Room.query.delete()
+        db.session.commit()
+        try:
+            room_code = Room()
+            room_code.id = int(id_room)
+            db.session.add(room_code)
+            db.session.flush()
+            db.session.commit()
+            return id_room
+        except:
+            return json.dumps("fail")
     else:
-        return id_room
+        return json.dumps("fail")
   
  
 @app.route('/game_over', methods=["POST", "GET"])
@@ -691,13 +708,11 @@ def game_over():
 @app.route('/close_room', methods=["POST", "GET"])
 def close_room():
     if request.method == 'POST':
-        id_room = request.json["room_id"]
-        if os.path.exists("room.json"):
-            os.remove("room.json")
-        return id_room
+        Room.query.delete()
+        db.session.commit()
+        return json.dumps("ok")
     else:
-        return id_room
-        
+        return json.dumps("fail")
 
 @app.route('/get_user_status', methods=["POST", "GET"])
 def get_user_status():
