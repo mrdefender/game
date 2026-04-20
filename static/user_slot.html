@@ -19,11 +19,27 @@
             <header class="player-header">
                 <div class="eyebrow">ТВ-режим</div>
                 <h1>Свободный слот — пульт игрока</h1>
-                <div class="player-legend">
-                    <span class="legend-chip legend-answer">Ответ</span>
-                    <span class="legend-chip legend-help">Подсказки</span>
-                    <span class="legend-chip legend-status">Статус</span>
-                </div>
+                <div class="player-legend player-legend-states">
+    <div class="legend-chip legend-state legend-state-player">
+        <span class="legend-label">Ответ игрока</span>
+        <span class="legend-value" id="ui-player-answer">—</span>
+    </div>
+
+    <div class="legend-chip legend-state legend-state-right">
+        <span class="legend-label">Правильный</span>
+        <span class="legend-value" id="ui-right-answer">—</span>
+    </div>
+
+    <div class="legend-chip legend-state legend-state-fatal">
+        <span class="legend-label">Фаталы</span>
+        <span class="legend-value legend-value-fatal" id="ui-fatal-answer">—</span>
+    </div>
+
+    <div class="legend-chip legend-state legend-state-navi">
+        <span class="legend-label">Навигатор</span>
+        <span class="legend-value" id="ui-player-navi-result">—</span>
+    </div>
+</div>
             </header>
 
             <div class="player-body">
@@ -45,7 +61,7 @@
                     <div class="questions screen-question" id="question" value="" hidden></div>
                 </section>
 
-                
+                <!---
                 <section class="state-panel panel-inner">
                     <div class="section-row">
                         <div class="section-title">Игровые состояния</div>
@@ -69,7 +85,7 @@
                             <div class="state-box-value" id="ui-player-navi-result">—</div>
                         </div>
                     </div>
-                </section>
+                </section>-->
 
 <section class="answers-panel panel-inner">
                     <div class="section-row">

@@ -45,9 +45,10 @@ var audioCache = {};
 var currentAudio = [];
 var currentUrl = document.URL;
 var ffffff = currentUrl.split('/host_slot');//адресная строка пользователя без /host_slot http://ip:5000
+var audioUrl = ffffff[0]+'/sounds/';
 function getAudio(name) {
     if (!audioCache[name]) {
-        var a = new Audio(audioUrl + name);
+        var a = new Audio(audioUrl+ name);
         a.preload = "metadata"; // или "none"
         audioCache[name] = a;
     }

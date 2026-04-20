@@ -84,34 +84,98 @@ body {
   line-height: 1.15;
 }
 
-.player-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.player-legend-states {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.legend-chip {
-  display: inline-flex;
+.legend-state {
+  min-height: 58px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  display: grid;
+  gap: 4px;
   align-items: center;
-  min-height: 34px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 800;
-  border: 1px solid rgba(255,255,255,0.08);
+  text-align: center;
 }
 
-.legend-answer {
-  background: linear-gradient(180deg, #72b3ff, #3d8dff);
-  color: #04162b;
+.legend-label {
+  font-size: 0.64rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  opacity: 0.88;
 }
-.legend-help {
-  background: linear-gradient(180deg, #c59cff, #9c5cff);
-  color: #19072c;
+
+.legend-value {
+  font-size: 0.95rem;
+  line-height: 1.15;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.legend-status {
-  background: linear-gradient(180deg, #7cffb7, #1ee082);
-  color: #032313;
+.legend-value-fatal {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.2;
+  word-break: break-word;
+  font-size: 0.82rem;
+}
+
+.legend-state-player {
+  background: linear-gradient(180deg, #ffd35b, #ff9f0a);
+  color: #241400;
+}
+
+.legend-state-right {
+  background: linear-gradient(180deg, #70ffad, #15e06f);
+  color: #04210f;
+}
+
+.legend-state-fatal {
+  background: linear-gradient(180deg, #ff7a8e, #ff2345);
+  color: #fff;
+}
+
+.legend-state-navi {
+  background: linear-gradient(180deg, #f26cff, #d905ec);
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+  .player-legend-states {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 460px) {
+  .legend-state {
+    min-height: 52px;
+    padding: 8px 10px;
+    border-radius: 14px;
+  }
+
+  .legend-label {
+    font-size: 0.58rem;
+  }
+
+  .legend-value {
+    font-size: 0.84rem;
+  }
+  
+}
+@media (max-width: 460px) {
+  .legend-value-fatal {
+    font-size: 0.74rem;
+  }
+
+  .legend-state-fatal {
+    min-height: 68px;
+  }
 }
 
 .player-body {
