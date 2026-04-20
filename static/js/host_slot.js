@@ -42,10 +42,9 @@ var select_script = document.querySelector('#select_script');
 document.getElementById("show-right").disabled = true;
 //var audio = new Audio("http://10.73.12.4:5000/sounds/q1-3.ogg");//добавить все звуки
 var audioCache = {};
-var currentAudio = null;
+var currentAudio = [];
 var currentUrl = document.URL;
 var ffffff = currentUrl.split('/host_slot');//адресная строка пользователя без /host_slot http://ip:5000
-var audioUrl = ffffff[0]+'/sounds/';
 function getAudio(name) {
     if (!audioCache[name]) {
         var a = new Audio(audioUrl + name);
@@ -65,14 +64,17 @@ function playAudio(name, loop) {
         p.catch(err => console.log("audio play blocked:", err));
     }
 
-    currentAudio = a;
+    currentAudio.push(a);
 }
 function stop_current_sound() {
-    if (!currentAudio) return;
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio.loop = false;
-    currentAudio = null;
+    if (currentAudio.length==0) return;
+   for (var i =0; i<currentAudio.length; i++)
+   {
+    currentAudio[i].pause();
+    currentAudio[i].currentTime = 0;
+    currentAudio[i].loop = false;
+   }
+    currentAudio = [];
 }
 /** 
 var audio_q1_3 = new Audio(audioUrl+"q1-3.ogg");//добавить все звуки
@@ -133,9 +135,9 @@ var audio_final= new Audio(audioUrl+"final.ogg");
 var audio_help_auden= new Audio(audioUrl+"help_auden.ogg");
 var audio_wait_1min= new Audio(audioUrl+"wait_1min.ogg");
 var audio_4_20= new Audio(audioUrl+"4_20.ogg");
+**/
 var timerWaitAnswer;
 var timerHelps;
-**/
 /** Сбрасывает состояние пульта ведущего к начальному состоянию. */
 function cancel_all(){
     btn_default();
@@ -989,11 +991,11 @@ function gen_task()
     stop_current_sound();
     if ((data[0]==1) || (data[0]==2) || (data[0]==3))
     {
-        playAudio("q1_3.ogg",true);
+        playAudio("q1-3.ogg",true);
     }
     if ((data[0]==4) || (data[0]==5))
     {
-        playAudio("q4_6.ogg",true);
+        playAudio("q4-5.ogg",true);
     }
     if (data[0]==6)
     {
@@ -1195,7 +1197,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<5;i++)
         {
             stop_current_sound();
-            playAudio("a4_9.ogg",false);
+            playAudio("a4-9.ogg",false);
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
@@ -1811,7 +1813,7 @@ function show_right(){
         {
             select.value = "Раунд 2";
             document.getElementById("status-round").value = "2";
-            playAudio("r1_2.ogg",false);
+            playAudio("r1-2.ogg",false);
            if(select_script.value == "Классика")
            {
             document.getElementById("lost-money").value = "1 000";
@@ -1827,7 +1829,7 @@ function show_right(){
         if (data[1] == "2")
         {
             select.value = "Раунд 3";
-            playAudio("r1_2.ogg",false);
+            playAudio("r1-2.ogg",false);
             document.getElementById("status-round").value = "3";
            if(select_script.value == "Классика")
            {
@@ -1993,7 +1995,7 @@ function show_right(){
         stop_current_sound();
         if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
         {
-            playAudio("w1_3.ogg",false);
+            playAudio("w1-3.ogg",false);
         }
         if (select.value == "Раунд 4")
         {
