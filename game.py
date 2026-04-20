@@ -105,20 +105,11 @@ def index():
 
 def check_id_room(room_id):
    # if not os.path.exists("room.json"):
-    room = Room.query.first()
+    room = Room.query.filter(Room.id == int(room_id)).first()
     if room == None:
             return False
     else:
-       # with open('room.json') as file:
-        #   jsn = json.load(file)
-        #if jsn == room_id:
-        try:
-            if room.id == int(room_id) :
-                return True
-            else:
-                return False
-        except:
-            return False
+        return True
 
 
 
