@@ -25,6 +25,54 @@ function btn_default(){
     document.getElementById("o15").value = "15";
 }
 
+function sync_otbor_timer_ui() {
+    const au = document.getElementById("au");
+    const strip = document.getElementById("otborTimerStrip");
+    const valueNode = document.getElementById("otborTimerValue");
+    const fill = document.getElementById("otborTimerBarFill");
+    const status = document.getElementById("otborTimerStatus");
+   const otbor_timer_title = document.getElementById("otbor-timer-title");
+
+    if (!au || !strip || !valueNode || !fill || !status) return;
+
+    const isHidden = au.hidden;
+    // Полностью повторяем поведение au
+    strip.hidden = isHidden;
+    valueNode.hidden = isHidden;
+    fill.hidden = isHidden;
+    status.hidden = isHidden;
+    otbor_timer_title.hidden = isHidden;
+
+    if (isHidden) {
+        strip.classList.remove("warning", "danger");
+        return;
+    }
+
+    const raw = parseInt(au.value || "0", 10);
+    const max = 10;
+    const safe = Number.isNaN(raw) ? 0 : Math.max(0, Math.min(max, raw));
+    const percent = (safe / max) * 100;
+
+    valueNode.textContent = String(safe);
+    fill.style.width = percent + "%";
+
+    strip.classList.remove("warning", "danger");
+
+    if (safe <= 0) {
+        status.textContent = "Время вышло";
+        strip.classList.add("danger");
+    } else if (safe <= 3) {
+        status.textContent = "Нужно ответить сейчас";
+        strip.classList.add("danger");
+    } else if (safe <= 5) {
+        status.textContent = "Осталось мало времени";
+        strip.classList.add("warning");
+    } else {
+        status.textContent = "Введите ответ и нажмите кнопку";
+    }
+}
+
+
 function get_status(){
 
     var user_name = document.getElementById("user_name").value;
@@ -102,6 +150,7 @@ function get_status(){
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
             document.getElementById("otbor_input").value = "";
+            sync_otbor_timer_ui();
             clearInterval(timerHelps);
             clearInterval(timeWainAnswerFromMain);
             clearInterval(timeWainAnswerFromMain);
@@ -138,6 +187,7 @@ function get_status(){
              document.getElementById("otbor_input").hidden = true;
             document.getElementById("otbor_submit").hidden = true;
             document.getElementById("au").hidden = true;
+            sync_otbor_timer_ui();
             status_btn(true);
            
             //clearInterval(timerToGame);
@@ -172,6 +222,7 @@ function get_status(){
             document.getElementById("otbor_input").hidden = true;
             document.getElementById("otbor_submit").hidden = true;
             document.getElementById("au").hidden = true;
+            sync_otbor_timer_ui();
             timerHelps = setInterval(() => get_helps(), 5000);
             status_btn(true);
             //clearInterval(timerToGame);
@@ -273,6 +324,7 @@ function get_status(){
             document.getElementById("otbor_input").hidden = false;
             document.getElementById("otbor_submit").hidden = false;
             document.getElementById("au").hidden = false;
+            sync_otbor_timer_ui();
             document.getElementById("question").value = "";
             document.getElementById("ex2").value ="0"
             document.getElementById("o1").hidden = true;
@@ -332,6 +384,7 @@ function get_status(){
         if (data == "warning otbor")
         {
             document.getElementById("au").value = "10";
+            sync_otbor_timer_ui();
         }
         if (data == "start otbor")
         {
@@ -351,6 +404,7 @@ function get_status(){
             document.getElementById("otbor_submit").hidden = true;
             document.getElementById("au").hidden = true;
             document.getElementById("ex2").value = "0";
+            sync_otbor_timer_ui();
             get_answer_otbor();
         }
         
@@ -368,14 +422,17 @@ console.error('Ошибка:', error);
 function timer_otbor(){
     if (document.getElementById("au").value == "0")
     {
-        //document.getElementById("answer_otbor").disabled = false;
         document.getElementById("otbor_submit").disabled = true;
+        sync_otbor_timer_ui();
         return;
     }
-    document.getElementById("au").value = (parseInt(document.getElementById("au").value)-1).toString();
-    setTimeout(() => { timer_otbor(); 
-}, 1000);
 
+    document.getElementById("au").value =
+        (parseInt(document.getElementById("au").value) - 1).toString();
+
+    sync_otbor_timer_ui();
+
+    setTimeout(() => { timer_otbor(); }, 1000);
 }
 
 

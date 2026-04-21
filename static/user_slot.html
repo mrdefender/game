@@ -104,6 +104,19 @@
 
                 <section class="otbor-panel panel-inner">
                     <div class="section-title">Отборочный тур</div>
+                    <div class="otbor-timer-strip" id="otborTimerStrip" hidden>
+  <div class="otbor-timer-head">
+    <span class="otbor-timer-title" id="otbor-timer-title" hidden>Таймер ответа</span>
+    <span class="otbor-timer-digits" id="otborTimerValue" >10</span>
+  </div>
+
+  <div class="otbor-timer-bar">
+    <div class="otbor-timer-bar-fill" id="otborTimerBarFill"></div>
+  </div>
+
+  <div class="otbor-timer-caption" id="otborTimerStatus">Ожидание старта</div>
+</div>
+                    
                     <div class="otbor-grid">
                         <input class="otbor_input otbor-field" id="otbor_input" name="otbor_input" type="number" placeholder="Ответ" required hidden>
                         <input type="submit" class="send_answer_otbor otbor-submit" id="otbor_submit" onclick="send_answer_otbor()" value="Ответить" disabled hidden>

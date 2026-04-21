@@ -1153,3 +1153,111 @@ input.help-icon[type="submit"]:hover:not(:disabled){
   filter:grayscale(34%) brightness(.72) contrast(.90) !important;
   cursor:default;
 }
+.otbor-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.otbor-timer-strip {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(103, 197, 255, 0.18);
+  background:
+    linear-gradient(180deg, rgba(20, 35, 63, 0.95), rgba(7, 15, 28, 0.95));
+  box-shadow:
+    inset 0 0 24px rgba(39, 123, 255, 0.12),
+    0 0 18px rgba(0, 170, 255, 0.08);
+}
+
+.otbor-timer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.otbor-timer-title {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 800;
+  color: #7fd8ff;
+}
+
+.otbor-timer-digits {
+  min-width: 56px;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #101b31, #09111f);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff3bf;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.otbor-timer-bar {
+  position: relative;
+  overflow: hidden;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.otbor-timer-bar-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #00d9ff 0%, #2f7bff 55%, #8d5bff 100%);
+  box-shadow: 0 0 12px rgba(0, 225, 255, 0.35);
+  transition: width 0.35s linear, filter 0.2s ease, background 0.2s ease;
+}
+
+.otbor-timer-caption {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.otbor-timer-strip.warning .otbor-timer-bar-fill {
+  background: linear-gradient(90deg, #ffd54a 0%, #ff9f1a 100%);
+  box-shadow: 0 0 14px rgba(255, 180, 0, 0.35);
+}
+
+.otbor-timer-strip.danger .otbor-timer-bar-fill {
+  background: linear-gradient(90deg, #ff7b54 0%, #ff3b3b 100%);
+  box-shadow: 0 0 16px rgba(255, 59, 59, 0.45);
+}
+
+.otbor-timer-strip.danger .otbor-timer-digits {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 90, 90, 0.55);
+  animation: otborTimerPulse 0.75s infinite;
+}
+
+@keyframes otborTimerPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 460px) {
+  .otbor-timer-strip {
+    padding: 10px 12px;
+  }
+
+  .otbor-timer-digits {
+    min-width: 50px;
+    font-size: 1.05rem;
+    padding: 7px 10px;
+  }
+
+  .otbor-timer-caption {
+    font-size: 0.78rem;
+  }
+}
