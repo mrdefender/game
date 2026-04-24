@@ -25,6 +25,44 @@ function btn_default(){
     document.getElementById("o15").value = "15";
 }
 
+function setGameStatus(text, type = "wait") {
+    const el = document.getElementById("welcome3");
+    const panel = document.querySelector(".welcome-panel");
+    const body = document.querySelector(".player-body");
+
+    if (!el || !panel || !body) return;
+
+    el.innerText = text;
+
+    el.classList.remove("wait", "main", "interactive", "status-flash");
+    panel.classList.remove("game-wait", "game-main", "game-interactive", "stage-flash");
+    body.classList.remove("stage-focus");
+
+    switch (type) {
+        case "main":
+            el.classList.add("main");
+            panel.classList.add("game-main");
+            body.classList.add("stage-focus");
+            break;
+
+        case "interactive":
+            el.classList.add("interactive");
+            panel.classList.add("game-interactive");
+            body.classList.add("stage-focus");
+            break;
+
+        default:
+            el.classList.add("wait");
+            panel.classList.add("game-wait");
+    }
+
+    void el.offsetWidth;
+    void panel.offsetWidth;
+
+    el.classList.add("status-flash");
+    panel.classList.add("stage-flash");
+}
+
 function sync_otbor_timer_ui() {
     const au = document.getElementById("au");
     const strip = document.getElementById("otborTimerStrip");
@@ -95,7 +133,7 @@ function get_status(){
     {
          document.getElementById('welcome').innerHTML = "";
             document.getElementById('welcome2').innerHTML = "";
-            document.getElementById('welcome3').innerHTML = "Ожидайте дальнейших указаний!";
+            setGameStatus("Ожидайте дальнейших указаний", "wait");
             document.getElementById("question").hidden = true;
             document.getElementById("question").value = "";
             document.getElementById("ex2").value ="0"
@@ -164,7 +202,7 @@ function get_status(){
             btn_default();
             document.getElementById('welcome').innerHTML = "";
             document.getElementById('welcome2').innerHTML = "";
-            document.getElementById('welcome3').innerHTML = "Интерактивная игра";
+            setGameStatus("Интерактивная игра", "interactive");
             document.getElementById("question").hidden = false;
             document.getElementById("question").value = "";
             document.getElementById("question").innerText = " ";
@@ -198,7 +236,7 @@ function get_status(){
             document.getElementById("ans").value = "";
             document.getElementById('welcome').innerHTML = " ";
             document.getElementById('welcome2').innerHTML = " ";
-            document.getElementById('welcome3').innerHTML = "Основная игра";
+            setGameStatus("Основная игра", "main");
             document.getElementById("question").hidden = false;
             document.getElementById("question").value = "";
             document.getElementById("question").innerText = " ";

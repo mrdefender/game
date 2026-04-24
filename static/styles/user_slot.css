@@ -1261,3 +1261,140 @@ input.help-icon[type="submit"]:hover:not(:disabled){
     font-size: 0.78rem;
   }
 }
+/* === GAME STATUS (ТВ-индикатор) === */
+
+.game-status {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+
+  border: 1px solid rgba(255,255,255,0.12);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 0 18px rgba(0,0,0,0.25);
+
+  transition: all 0.25s ease;
+}
+
+/* ожидание */
+.game-status.wait {
+  color: #9bb8d8;
+  background: rgba(255,255,255,0.04);
+}
+
+/* основная игра */
+.game-status.main {
+  color: #fff3bf;
+  background: linear-gradient(180deg, #2a1c00, #120c00);
+  border-color: rgba(255,200,0,0.25);
+
+  box-shadow:
+    0 0 12px rgba(255,180,0,0.25),
+    0 0 28px rgba(255,180,0,0.15);
+}
+
+/* интерактив */
+.game-status.interactive {
+  color: #b9f7ff;
+  background: linear-gradient(180deg, #0a2a33, #03141a);
+  border-color: rgba(0,220,255,0.25);
+
+  box-shadow:
+    0 0 12px rgba(0,220,255,0.25),
+    0 0 28px rgba(0,220,255,0.15);
+}
+
+/* лёгкое свечение */
+.game-status.main,
+.game-status.interactive {
+  animation: statusGlow 2.5s infinite ease-in-out;
+}
+
+@keyframes statusGlow {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.15); }
+  100% { filter: brightness(1); }
+}
+/* === WELCOME PANEL GAME STATE === */
+
+.welcome-panel.game-wait {
+  box-shadow:
+    inset 0 0 24px rgba(80,160,255,0.12),
+    0 0 12px rgba(0,0,0,0.25);
+}
+
+.welcome-panel.game-main {
+  border-color: rgba(255,200,0,0.35);
+
+  box-shadow:
+    inset 0 0 30px rgba(255,180,0,0.18),
+    0 0 24px rgba(255,180,0,0.22),
+    0 0 42px rgba(255,180,0,0.12);
+
+  animation: panelGlowMain 3s ease-in-out infinite;
+}
+
+.welcome-panel.game-interactive {
+  border-color: rgba(0,220,255,0.35);
+
+  box-shadow:
+    inset 0 0 30px rgba(0,220,255,0.18),
+    0 0 24px rgba(0,220,255,0.22),
+    0 0 42px rgba(0,220,255,0.12);
+
+  animation: panelGlowInteractive 3s ease-in-out infinite;
+}
+
+/* анимации */
+
+@keyframes panelGlowMain {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.15); }
+  100% { filter: brightness(1); }
+}
+
+@keyframes panelGlowInteractive {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+  100% { filter: brightness(1); }
+}
+
+/* === STAGE MODE TRANSITION === */
+
+.player-body.stage-focus .question-panel,
+.player-body.stage-focus .answers-panel,
+.player-body.stage-focus .helps-panel,
+.player-body.stage-focus .otbor-panel {
+  opacity: 0.72;
+  filter: brightness(0.82);
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+.welcome-panel.stage-flash {
+  animation: welcomeStageFlash 0.85s ease-out;
+}
+
+@keyframes welcomeStageFlash {
+  0% {
+    transform: scale(0.98);
+    filter: brightness(0.75);
+  }
+
+  35% {
+    transform: scale(1.015);
+    filter: brightness(1.45);
+    box-shadow:
+      inset 0 0 36px rgba(255,244,185,0.22),
+      0 0 28px rgba(255,244,185,0.38),
+      0 0 64px rgba(255,174,0,0.22);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
