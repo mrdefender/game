@@ -29,7 +29,9 @@ login_manager.login_message_category = "info"
 app.config['TELEGRAM_BOT_TOKEN'] = ''
 DEFAULT_ROOM_CODE = os.environ.get("DEFAULT_ROOM_CODE", "99999999")
 HOST_USERNAME = os.environ.get("HOST_USERNAME", "admin")
-
+@app.route("/error-test/<int:code>")
+def error_test_code(code):
+    abort(code)
 
 @socketio.on("connect")
 def on_connect():
@@ -67,6 +69,7 @@ def socket_join_room(data):
         "role": role,
         "username": username
     })   
+
 
 
 @login_manager.user_loader
