@@ -19,7 +19,7 @@ app = Flask(__name__, template_folder="static/")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY","6c462f7711b57067efb7e1dc9fa7da72s") #"000001C9E687F6E0" #os.urandom(32).hex
 app.secret_key = app.config["SECRET_KEY"] #"000001C9E687F6E0" #os.urandom(32).hex
-socketio = SocketIO(app, cors_allowed_origins="*",async_mode="gevent")
+socketio = SocketIO(app, cors_allowed_origins="*")
 accepted_user = ""
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)

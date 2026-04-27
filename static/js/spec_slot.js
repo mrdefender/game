@@ -26,6 +26,7 @@
 //var timeWainAnswerFromMain;
 //var timerTreeStatus = setInterval(() => update_tree(), 3000);
 const socket = io();
+
 socket.on("connect", () => {
   console.log("Socket connected:", socket.id);
 
