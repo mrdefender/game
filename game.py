@@ -10,19 +10,16 @@ import mimetypes
 import string
 import flask, flask.views
 import secrets
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.types import JSON
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required 
-
-
-
-
 
 app = Flask(__name__, template_folder="static/")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY","sdasdads") #"000001C9E687F6E0" #os.urandom(32).hex
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY","6c462f7711b57067efb7e1dc9fa7da72s") #"000001C9E687F6E0" #os.urandom(32).hex
 app.secret_key = app.config["SECRET_KEY"] #"000001C9E687F6E0" #os.urandom(32).hex
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*",async_mode="gevent")
 accepted_user = ""
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -33,6 +30,43 @@ app.config['TELEGRAM_BOT_TOKEN'] = ''
 DEFAULT_ROOM_CODE = os.environ.get("DEFAULT_ROOM_CODE", "99999999")
 HOST_USERNAME = os.environ.get("HOST_USERNAME", "admin")
 
+
+@socketio.on("connect")
+def on_connect():
+    print("Client connected")
+
+
+@socketio.on("disconnect")
+def on_disconnect():
+    print("Client disconnected")
+
+
+@socketio.on("ping:test")
+def ping_test(data):
+    print("Ping from client:", data)
+
+    emit("pong:test", {
+        "message": "Socket.IO работает"
+    })
+    
+@socketio.on("room:join")
+def socket_join_room(data):
+    room_code = str(data.get("room") or Room.query.first())
+    role = data.get("role") or "unknown"
+    username = data.get("username") or ""
+
+    join_room(room_code)
+    join_room(f"{room_code}:{role}")
+    if username:
+        join_room(f"{room_code}:user:{username}")
+
+    print(f"Socket joined room={room_code}, role={role}, username={username}")
+    update_list_users()
+    emit("room:joined", {
+        "room": room_code,
+        "role": role,
+        "username": username
+    })   
 
 
 @login_manager.user_loader
@@ -56,6 +90,17 @@ class Users(db.Model, UserMixin):
     red_bomb = db.Column(db.Text)
     def __repr__(self):
         return '<Users %r>' %self.id
+    
+class Helps(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    h50_50 = db.Column(db.Text)
+    alter = db.Column(db.Text)
+    navi = db.Column(db.Text)
+    x2 = db.Column(db.Text)
+    auden = db.Column(db.Text)
+    fact = db.Column(db.Text)
+    def __repr__(self):
+        return '<Helps %r>' %self.id
 
 class Facts(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -64,37 +109,57 @@ class Facts(db.Model):
     def __repr__(self):
         return '<Facts %r>' %self.id
 
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    round = db.Column(db.Integer)
+    fatal = db.Column(JSON)
+    md5 = db.Column(db.Text)
+    count_fatal = db.Column(db.Integer)
+    b_bomb = db.Column(db.Integer)
+    r_bomb = db.Column(db.Integer)
+    def __repr__(self):
+        return '<Task %r>' %self.id
+
+class Answered(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    answer = db.Column(db.Text)
+    round = db.Column(db.Integer)
+    def __repr__(self):
+        return '<Answered %r>' %self.id
 
 
 def init_game():
-    if os.path.exists("answered.json"):
-        os.remove("answered.json")
-    if os.path.exists("task.json"):
-        os.remove("task.json")
+    Task.query.delete()
+    Answered.query.delete()
+    Helps.query.delete()
+    #if os.path.exists("answered.json"):
+    #    os.remove("answered.json")
+   # if os.path.exists("task.json"):
+  #      os.remove("task.json")
     if os.path.exists("task_otbor.json"):
         os.remove("task_otbor.json")
-    if os.path.exists("helps.json"):
-        os.remove("helps.json")
-    if os.path.exists("50_50.json"):
-        os.remove("50_50.json")  
-    if os.path.exists("alter.json"):
-        os.remove("alter.json")
-    if os.path.exists("navi.json"):
-        os.remove("navi.json") 
-    if os.path.exists("auden.json"):
-        os.remove("auden.json") 
-    if os.path.exists("fact.json"):
-        os.remove("fact.json") 
-    if os.path.exists("50_50_spec.json"):
-        os.remove("50_50_spec.json")  
-    if os.path.exists("alter_spec.json"):
-        os.remove("alter_spec.json")
-    if os.path.exists("navi_spec.json"):
-        os.remove("navi_spec.json") 
-    if os.path.exists("auden_spec.json"):
-        os.remove("auden_spec.json") 
-    if os.path.exists("fact_spec.json"):
-        os.remove("fact_spec.json") 
+   # if os.path.exists("helps.json"):
+   #     os.remove("helps.json")
+   # if os.path.exists("50_50.json"):
+   #     os.remove("50_50.json")  
+  #  if os.path.exists("alter.json"):
+  #      os.remove("alter.json")
+  #  if os.path.exists("navi.json"):
+   #     os.remove("navi.json") 
+  #  if os.path.exists("auden.json"):
+    #    os.remove("auden.json") 
+  #  if os.path.exists("fact.json"):
+  #      os.remove("fact.json") 
+  #  if os.path.exists("50_50_spec.json"):
+   #     os.remove("50_50_spec.json")  
+  #  if os.path.exists("alter_spec.json"):
+  #      os.remove("alter_spec.json")
+  #  if os.path.exists("navi_spec.json"):
+   #     os.remove("navi_spec.json") 
+ #   if os.path.exists("auden_spec.json"):
+  #      os.remove("auden_spec.json") 
+ #   if os.path.exists("fact_spec.json"):
+  #      os.remove("fact_spec.json") 
 
 
 @app.route('/')
@@ -211,6 +276,7 @@ def invite_user():
         tmp.time = 0
 	#tmp.time = 0
         db.session.commit()
+        socketio.emit("updated_status_user",tmp.status,to=f"{Room.query.first()}:user:{tmp.username}");
         js = Users.query.all()
         if len(js)!=1:
             for i in range(len(js)):
@@ -218,7 +284,9 @@ def invite_user():
                     js[i].status = 'interactive'
                     js[i].answer = '0'
                     js[i].time = 0
+                    socketio.emit("updated_status_user",js[i].status,to=f"{Room.query.first()}:user:{js[i].username}");
             db.session.commit()
+        update_list_users()    
         return json.dumps(u)
     print (url_for('host_slot'))
     return render_template("host_slot.html")
@@ -237,19 +305,11 @@ def gen_task():
         jsn = generate_string(int(r),bomb)
         if jsn == "null":
             return json.dumps("fail")
+        get_task_user()
         return jsn
   #  print (url_for('host_slot'))
   #  return render_template("host_slot.html")
 
-def get_summs():
-    f = open('txt/sum.txt','r')
-    f_t = open('txt/text_sum.txt', 'r')
-    f1 = f.readlines()
-    f2 = f_t.readlines()
-    print(f1[0])
-    print(f2[0])
-    f.close()
-    f_t.close()
 
 def get_md5_hash(stroka):
     characters = string.ascii_letters + string.punctuation
@@ -272,6 +332,8 @@ def generate_string(round_id,is_bombed):
        # md5_hash = hashlib.md5(str(otbor_chislo).encode()).hexdigest()
         md5_hash = get_md5_hash(otbor_chislo)
         result = [current_round,a,b,otbor_chislo,md5_hash]
+        socketio.emit("get_task_otbor",result,to=f"{DEFAULT_ROOM_CODE}:spectator")
+        socketio.emit("get_task_otbor",result,to=f"{Room.query.first()}:user")
         js = json.dumps(result)
         with open('task_otbor.json', 'w') as file:
             json.dump(result, file)
@@ -293,9 +355,20 @@ def generate_string(round_id,is_bombed):
         #md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
         md5_hash = get_md5_hash(fatal)
         result = [current_round,fatal,md5_hash, count_fatal]
+        socketio.emit("get_task",result,to=f"{DEFAULT_ROOM_CODE}:spectator")
+        socketio.emit("get_task",result,to=f"{Room.query.first()}")
+        Task.query.delete()
+        task = Task()
+        task.round = current_round
+        task.fatal = fatal
+        task.md5 = md5_hash
+        task.count_fatal = count_fatal
+        db.session.add(task)
+        db.session.flush()
+        db.session.commit()
         js = json.dumps(result)
-        with open('task.json','w') as file:
-            json.dump(result,file)
+      #  with open('task.json','w') as file:
+       #     json.dump(result,file)
         return js
     else:
         fatal = random.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
@@ -309,9 +382,24 @@ def generate_string(round_id,is_bombed):
         #md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
         md5_hash = get_md5_hash(fatal)
         result = [current_round,fatal,md5_hash,count_fatal,b_bomb,r_bomb]
+        socketio.emit("get_task",result,to=f"{DEFAULT_ROOM_CODE}:spectator")
+        socketio.emit("get_task",result,to=f"{Room.query.first()}")
+        Task.query.delete()
+        task = Task()
+        task.round = current_round
+        task.fatal = json.dumps(fatal)
+        task.md5 = md5_hash
+        task.count_fatal = count_fatal
+        if b_bomb != "false":
+            task.b_bomb = b_bomb
+        if r_bomb != "false":
+            task.r_bomb = r_bomb
+        db.session.add(task)
+        db.session.flush()
+        db.session.commit()
         js = json.dumps(result)
-        with open('task.json','w') as file:
-            json.dump(result,file)
+       # with open('task.json','w') as file:
+           # json.dump(result,file)
         return js
 
 
@@ -322,38 +410,93 @@ def get_fatal_host():
         r = request.json["answer"]
         r1 = request.json["round"]
         res = [r, r1]
-        with open('answered.json', 'w') as file:
-            json.dump(res, file)
-        jsn = 0
-        with open('task.json') as file:
-           jsn = json.load(file)
+       # Answered.query.delete()
+        answered = Answered()
+        answered.answer = r
+        answered.round = r1
+        db.session.add(answered)
+        db.session.flush()
+        db.session.commit()
+        #with open('answered.json', 'w') as file:
+        #    json.dump(res, file)
+        jsn = []
+        task = Task.query.first()
+        jsn.append(task.round)
+        if task.round == 1:
+            jsn.append(task.fatal)
+        else:
+            jsn.append(json.loads(task.fatal))
+        jsn.append(task.md5)
+        jsn.append(task.count_fatal)
+        if task.b_bomb == None:
+            jsn.append("false")
+        else:
+            jsn.append(task.b_bomb)
+        if task.r_bomb == None:
+            jsn.append("false")
+        else:
+            jsn.append(task.r_bomb)
+        #with open('task.json') as file:
+        #   jsn = json.load(file)
     return jsn
 
 @app.route('/h50_50', methods=["POST", "GET"])
 def h50_50():
     if request.method == 'POST':
         r = request.json["round"]
-        jsn = 0
-        with open('task.json') as file:
-           jsn = json.load(file)
+        task = Task.query.first()
+        jsn =[]
+            #with open('task.json') as file:
+        jsn.append(task.round)
+        if task.round == 1:
+            jsn.append(task.fatal)
+        else:
+            jsn.append(json.loads(task.fatal))
+        jsn.append(task.md5)
+        jsn.append(task.count_fatal)
+        if task.b_bomb == None:
+            jsn.append("false")
+        else:
+            jsn.append(task.b_bomb)
+        if task.r_bomb == None:
+            jsn.append("false")
+        else:
+            jsn.append(task.r_bomb)
         f = jsn[1]
         cf = round(len(f)/2)
         res_f = []
         for i in range(cf):
             res_f.append(f[i])
-        with open('50_50.json', 'w') as file:
-            json.dump(res_f, file)
-        with open('50_50_spec.json', 'w') as file:
-            json.dump(res_f, file)
+        socketio.emit("response_50_50",res_f,to=f"{Room.query.first()}")
+        socketio.emit("response_50_50",res_f,to=f"{DEFAULT_ROOM_CODE}:spectator")
+        #with open('50_50.json', 'w') as file:
+        #    json.dump(res_f, file)
+       # with open('50_50_spec.json', 'w') as file:
+       #     json.dump(res_f, file)
         return res_f
 
 @app.route('/alter', methods=["POST", "GET"])
 def alter():
     if request.method == 'POST':
         r = request.json["round"]
-        jsn = 0
-        with open('task.json') as file:
-           jsn = json.load(file)
+        task = Task.query.first()
+        jsn =[]
+            #with open('task.json') as file:
+        jsn.append(task.round)
+        if task.round == 1:
+            jsn.append(task.fatal)
+        else:
+            jsn.append(json.loads(task.fatal))
+        jsn.append(task.md5)
+        jsn.append(task.count_fatal)
+        if task.b_bomb == None:
+            jsn.append("false")
+        else:
+            jsn.append(task.b_bomb)
+        if task.r_bomb == None:
+            jsn.append("false")
+        else:
+            jsn.append(task.r_bomb)
         f = jsn[1]
         cf = len(f)
         random.seed(secrets.randbelow(99999))
@@ -370,19 +513,36 @@ def alter():
                     break
         
         res = [f[rf],str(j)]
-        with open('alter.json', 'w') as file:
-            json.dump(res, file)
-        with open('alter_spec.json', 'w') as file:
-            json.dump(res, file)
+        socketio.emit("response_alter",res,to=f"{Room.query.first()}")
+        socketio.emit("response_alter",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
+       # with open('alter.json', 'w') as file:
+       #     json.dump(res, file)
+       # with open('alter_spec.json', 'w') as file:
+       #     json.dump(res, file)
         return res
     
 @app.route('/navi', methods=["POST", "GET"])
 def navi():
     if request.method == 'POST':
         r = request.json["round"]
-        jsn = 0
-        with open('task.json') as file:
-           jsn = json.load(file)
+        task = Task.query.first()
+        jsn =[]
+            #with open('task.json') as file:
+        jsn.append(task.round)
+        if task.round == 1:
+            jsn.append(task.fatal)
+        else:
+            jsn.append(json.loads(task.fatal))
+        jsn.append(task.md5)
+        jsn.append(task.count_fatal)
+        if task.b_bomb == None:
+            jsn.append("false")
+        else:
+            jsn.append(task.b_bomb)
+        if task.r_bomb == None:
+            jsn.append("false")
+        else:
+            jsn.append(task.r_bomb)
         f = jsn[1]
         f.sort()
         row1 = [0,0,0,0,0]
@@ -476,10 +636,12 @@ def navi():
                 res = ["4","9","14"]
             if tmp==4:
                 res = ["5","10","15"]
-            with open('navi.json','w') as file:
-                json.dump(res,file)
-            with open('navi_spec.json', 'w') as file:
-                json.dump(res, file)
+            socketio.emit("response_navi",res,to=f"{Room.query.first()}")
+            socketio.emit("response_navi",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
+            #with open('navi.json','w') as file:
+            #    json.dump(res,file)
+           # with open('navi_spec.json', 'w') as file:
+            #    json.dump(res, file)
             return res
         if max_c < max_r:
             tmp = -1
@@ -493,10 +655,12 @@ def navi():
                 res = ["6","7","8","9","10"]
             if tmp==2:
                 res = ["11","12","13","14","15"]
-            with open('navi.json','w') as file:
-                json.dump(res,file)
-            with open('navi_spec.json', 'w') as file:
-                json.dump(res, file)
+            socketio.emit("response_navi",res,to=f"{Room.query.first()}")
+            socketio.emit("response_navi",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
+            #with open('navi.json','w') as file:
+            #    json.dump(res,file)
+            #with open('navi_spec.json', 'w') as file:
+            #    json.dump(res, file)
             return res
         if max_r == max_c:
             j = random.randint(1,2)
@@ -516,10 +680,12 @@ def navi():
                     res = ["4","9","14"]
                 if tmp==4:
                     res = ["5","10","15"]
-                with open('navi.json','w') as file:
-                    json.dump(res,file)
-                with open('navi_spec.json', 'w') as file:
-                    json.dump(res, file)
+                socketio.emit("response_navi",res,to=f"{Room.query.first()}")
+                socketio.emit("response_navi",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
+                #with open('navi.json','w') as file:
+               #     json.dump(res,file)
+               # with open('navi_spec.json', 'w') as file:
+               #     json.dump(res, file)
                 return res
             if j==2:
                 tmp = -1
@@ -533,10 +699,12 @@ def navi():
                     res = ["6","7","8","9","10"]
                 if tmp==2:
                     res = ["11","12","13","14","15"]
-                with open('navi.json','w') as file:
-                    json.dump(res,file)
-                with open('navi_spec.json', 'w') as file:
-                    json.dump(res, file)
+                socketio.emit("response_navi",res,to=f"{Room.query.first()}")
+                socketio.emit("response_navi",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
+                #with open('navi.json','w') as file:
+                #    json.dump(res,file)
+               # with open('navi_spec.json', 'w') as file:
+                #    json.dump(res, file)
                 return res
 
 
@@ -545,7 +713,7 @@ def navi():
 def check_answered():
     if request.method == 'POST':
         r = request.json["check"]
-    if os.path.exists("answered.json"):
+    if Answered.query.first()!=None:
         return "true"
     else:
         return "false"   
@@ -567,19 +735,25 @@ def show_rights():
                     jjj[i].status = "check main x2"
                 if jjj[i].status == "interactive no answer":
                     jjj[i].status = "check interactive"
-            db.session.commit()                                       
+            db.session.commit()
+        update_list_users()                                       
         r = request.json["round"]
-        if os.path.exists("answered.json"):
-            with open('answered.json') as file:
-                jsn = json.load(file)
-            os.remove("answered.json")
-            if os.path.exists("50_50.json"):
-                os.remove("50_50.json")
-            if os.path.exists("alter.json"):
-                os.remove("alter.json")
-            if os.path.exists("navi.json"):
-                os.remove("navi.json")
-            return jsn
+        ans = Answered.query.first()
+        jsn = [ans.answer, ans.round]
+        Answered.query.delete()
+        #if os.path.exists("answered.json"):
+         #   with open('answered.json') as file:
+         #       jsn = json.load(file)
+          #  os.remove("answered.json")
+       # if os.path.exists("50_50.json"):
+       #     os.remove("50_50.json")
+      #  if os.path.exists("alter.json"):
+      #     os.remove("alter.json")
+      #  if os.path.exists("navi.json"):
+      #      os.remove("navi.json")
+        check_answer()
+        answered_check_spec()
+        return jsn
            ## answered interactive
             
             
@@ -609,9 +783,10 @@ def serve_audio(filename):
 
     return result  
     
-@app.route('/update_list_users', methods=["POST", "GET"])
+#@app.route('/update_list_users', methods=["POST", "GET"])
+@socketio.on("update_list_users")
 def update_list_users():
-    if request.method == 'POST':
+    #if request.method == 'POST':
         js = Users.query.all()
         if len(js)==1:
             id = js[0].id
@@ -623,8 +798,10 @@ def update_list_users():
             main_money = js[0].main_money
             red_bomb = js[0].red_bomb
             jsn = [id,username,answer,money,time, status,main_money,red_bomb,"true"]
-            result = json.dumps(jsn)
-            return result
+            result = jsn
+            socketio.emit("updated_list_user", result, to=DEFAULT_ROOM_CODE)
+            socketio.emit("updated_status_user",js[0].status,to=f"{Room.query.first()}:user:{js[0].username}");
+            update_for_spec()
         else:
             jsn = []
             for i in range(0,len(js)):
@@ -637,9 +814,13 @@ def update_list_users():
                 main_money = js[i].main_money
                 red_bomb = js[i].red_bomb
                 tmp = [id,username,answer,money,time, status,main_money,red_bomb,"false"]
+                socketio.emit("updated_status_user",js[i].status,to=f"{Room.query.first()}:user:{js[i].username}");
                 jsn.append(tmp)
-            result = json.dumps(jsn)
+            result = jsn
+            socketio.emit("updated_list_user",result, to=DEFAULT_ROOM_CODE)
+            update_for_spec()
             return result
+            
 
 
 @app.route('/open_room', methods=["POST", "GET"])
@@ -691,6 +872,7 @@ def game_over():
                 else:
                     jh[i].status = "game over"
             db.session.commit()
+            update_list_users()
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -720,38 +902,68 @@ def get_user_status():
 @app.route('/reset_user_to_wait', methods=["POST", "GET"])
 def reset_user_to_wait():
     if request.method == 'POST':
-         if os.path.exists('helps.json'):
-            os.remove('helps.json')
-         if os.path.exists('answered.json'):
-            os.remove('answered.json')
-         if os.path.exists("task.json"):
-            os.remove("task.json")
+         #if os.path.exists('helps.json'):
+         #   os.remove('helps.json')
+         Helps.query.delete()
+        # if os.path.exists('answered.json'):
+        #    os.remove('answered.json')
+         Answered.query.delete()
+        # Task.query.delete()
+       #  if os.path.exists("task.json"):
+       #     os.remove("task.json")
          js = Users.query.all()
          for i in range(0,len(js)):
             js[i].status = "wait"
             js[i].answer = "0"
             js[i].time = 0
             db.session.commit()
+            socketio.emit("updated_status_user",js[i].status,to=f"{Room.query.first()}:user:{js[i].username}");
          init_game()
+         update_list_users()
          return json.dumps(" ")
 
-@app.route('/get_helps', methods=["POST", "GET"])
+#@app.route('/get_helps', methods=["POST", "GET"])
 def get_helps():
-    if request.method == 'POST':
-        tmp_u = request.json['user']
+    #if request.method == 'POST':
+        #tmp_u = request.json['user']
         try:
-            if os.path.exists("helps.json"):
-                user = Users()
-                user = Users.query.filter(Users.username==tmp_u).first()
-                if (user.status == "main") or (user.status == "wait task main") or (user.status == "given task main"):
-                    db.session.commit()
-                    with open('helps.json') as file:
-                        jsn = json.load(file)
-                    return jsn
-                else:
-                    return json.dumps("no change")
-            else:
-                 return json.dumps("fail")   
+            #if os.path.exists("helps.json"):
+            user = Users.query.all()
+            result = []
+            for i in range(len(user)):
+                if (user[i].status == "main") or (user[i].status == "wait task main") or (user[i].status == "given task main"):
+                    help = Helps.query.first()
+                    if help == None:
+                       socketio.emit("get_helps", "fail", to=f"{Room.query.first()}:user:{user[i].username}")
+                       socketio.emit("get_helps", "fail",to=f"{DEFAULT_ROOM_CODE}:spectator")
+                       return
+                    else:
+                        if help.h50_50 == "50:50":
+                            result.append(help.h50_50)
+                        if help.alter == "alter":
+                            result.append(help.alter)
+                        if help.navi == "navi":
+                            result.append(help.navi)
+                        if help.x2 == "x2":
+                            result.append(help.x2)
+                        if help.auden == "help_auden":
+                            result.append(help.auden)
+                        if help.fact == "fact":
+                            result.append(help.fact)
+                        socketio.emit("get_helps", result, to=f"{Room.query.first()}:user:{user[i].username}")
+                        socketio.emit("get_helps", result, to=f"{DEFAULT_ROOM_CODE}:spectator")
+                     
+            #    user = Users()
+            #    user = Users.query.filter(Users.username==tmp_u).first()
+            #    if (user.status == "main") or (user.status == "wait task main") or (user.status == "given task main"):
+            #        db.session.commit()
+            #        with open('helps.json') as file:
+            #            jsn = json.load(file)
+            #        return jsn
+            #    else:
+            #        return json.dumps("no change")
+            #else:
+               #  return json.dumps("fail")   
         except:
             return json.dumps("fail")
 
@@ -759,8 +971,27 @@ def get_helps():
 def send_helps():
     if request.method == 'POST':
         tmp = request.json['helps']
-        with open('helps.json','w') as file:
-            json.dump(tmp,file)
+        Helps.query.delete()
+        help = Helps()
+        for i in tmp:
+            if i == "50:50":
+                help.h50_50 = i
+            if i == "alter":
+                help.alter = i
+            if i == "navi":
+                help.navi = i
+            if i == "x2":
+                help.x2 = i
+            if i == "help_auden":
+                help.auden = i
+            if i == "fact":
+                help.fact = i
+        db.session.add(help)
+        db.session.flush()
+        db.session.commit()
+        get_helps()
+        #with open('helps.json','w') as file:
+         #   json.dump(tmp,file)
         return json.dumps("OK") 
     else:
         return json.dumps("fail")
@@ -778,76 +1009,98 @@ def start_game():
                         js[i].status = "wait task interactive"
                     js[i].time = 0
                 db.session.commit()
+                update_list_users()
             else: 
                 return json.dumps("fail")
+            
             return json.dumps("ok")
         except:
             return json.dumps("fail")
   
-@app.route('/get_task_user', methods=["POST", "GET"])
+#@app.route('/get_task_user', methods=["POST", "GET"])
 def get_task_user():
-    if request.method == 'POST':
-        if not os.path.exists("task.json"):
-            return json.dumps("fail")
-        with open('task.json') as file:
-            jsn = json.load(file)
-        if request.json['user']=="spec":
-            return json.dumps(jsn)
+    #if request.method == 'POST':
+        #if not os.path.exists("task.json"):
+        #    return json.dumps("fail")
+       # with open('task.json') as file:
+        #    jsn = json.load(file)
+       # if request.json['user']=="spec":
+        #    return json.dumps(jsn)
         try:
+            task = Task.query.first_or_404()
             js = Users.query.all()
             if len(js)!=1:
                 for i in range(len(js)):
                     if js[i].status =="wait task main":
                         js[i].status = "given task main"
-                        break
                     if js[i].status =="wait task interactive":
                         js[i].status = "given task interactive"
                 db.session.commit()
-              
-            return json.dumps(jsn)
+            update_list_users()  
+            #return json.dumps(jsn)
         except:
             return json.dumps("fail")
         
 
-@app.route('/check_answered_main', methods=["POST", "GET"])
+#@app.route('/check_answered_main', methods=["POST", "GET"])
 def check_answered_main():
-    if request.method == 'POST':
+    #if request.method == 'POST':
         try:
-            u_tmp = request.json['user']
-            s_tmp = request.json['inter']
-            if not s_tmp:
-                return json.dumps("fail")
+            #u_tmp = request.json['user']
+            #s_tmp = request.json['inter']
+            #if not s_tmp:
+            #    return json.dumps("fail")
             user2 = Users.query.filter((Users.status == "answered main")|(Users.status == "answered main x2")).first_or_404()
-            user = Users.query.filter(Users.username == u_tmp).first()
-            if user.status != "answered interactive":
-               user.status = "interactive no answer"
-               db.session.commit()
-            return json.dumps("ok")
+            users = Users.query.all()
+            for i in range(len(users)):
+                if (users[i].status == "given task interactive"):
+                    users[i].status = "interactive no answer"
+                    db.session.commit()
+            update_list_users()
+            socketio.emit("check_answered_main","ok",to=f"{Room.query.first()}")
             
         except:
             return json.dumps("fail")
  
-@app.route('/answered_main_spec', methods=["POST", "GET"])
+#@app.route('/answered_main_spec', methods=["POST", "GET"])
 def answered_main_spec():
-    if request.method == 'POST':
+   # if request.method == 'POST':
         try:
-            if os.path.exists("answered.json"):
-                 with open('answered.json') as file:
-                    jsn = json.load(file)
-            return json.dumps(jsn)
-            
+            ans = Users.query.filter((Users.status == "answered main")|(Users.status == "answered main x2")).first_or_404()
+            if ans!=None:
+                 #with open('answered.json') as file:
+                 jsn = "o"+str(ans.answer)
+                 socketio.emit("answered_main",jsn,to=f"{DEFAULT_ROOM_CODE}:spectator")
+            #return json.dumps(jsn)
         except:
             return json.dumps("fail") 
 
 
 
-@app.route('/answered_check_spec', methods=["POST", "GET"])
+#@app.route('/answered_check_spec', methods=["POST", "GET"])
 def answered_check_spec():
-    if request.method == 'POST':
+    #if request.method == 'POST':
         try:
-            with open('task.json') as file:
-                    jsn = json.load(file)
-            return json.dumps(jsn)
+             task = Task.query.first()
+             jsn =[]
+            #with open('task.json') as file:
+             jsn.append(task.round)
+             if task.round == 1:
+                jsn.append(task.fatal)
+             else:
+                jsn.append(json.loads(task.fatal))
+             jsn.append(task.md5)
+             jsn.append(task.count_fatal)
+             if task.b_bomb == None:
+                jsn.append("false")
+             else:
+                jsn.append(task.b_bomb)
+             if task.r_bomb == None:
+                jsn.append("false")
+             else:
+                jsn.append(task.r_bomb)
+             socketio.emit("answered_check_spec",jsn,to=f"{DEFAULT_ROOM_CODE}:spectator")
+            #return json.dumps(jsn)
         except:
             return json.dumps("fail")  
 
@@ -865,19 +1118,43 @@ def send_answer():
                 user.answer = a_tnp
                 user.time = t_tmp
                 db.session.commit()
+                update_list_users()
+                wait_answer_for_host()
+                check_answered_main()
+                answered_main_spec()
                 return json.dumps("ok")
             if (user.status == "x2"):
                 user.status = "answered main x2"
                 user.answer = a_tnp
                 user.time = t_tmp
                 db.session.commit()
+                update_list_users()
+                wait_answer_for_host()
+                answered_main_spec()
                 return json.dumps("ok")
             if (user.status == "given task interactive"):
                 user.status = "answered interactive"
                 user.answer = a_tnp
                 user.time = t_tmp
-                with open('task.json') as file:
-                    jsn = json.load(file)
+                task = Task.query.first()
+                jsn =[]
+                jsn.append(task.round)
+                if task.round == 1:
+                    jsn.append(task.fatal)
+                else:
+                    jsn.append(json.loads(task.fatal))
+                jsn.append(task.md5)
+                jsn.append(task.count_fatal)
+                if task.b_bomb == None:
+                    jsn.append("false")
+                else:
+                    jsn.append(task.b_bomb)
+                if task.r_bomb == None:
+                    jsn.append("false")
+                else:
+                    jsn.append(task.r_bomb)   
+                #with open('task.json') as file:
+                 #   jsn = json.load(file)
                 fatals = jsn[1]
                 c_fatals = jsn[3]
                 r = jsn[0]
@@ -903,14 +1180,16 @@ def send_answer():
                             break
                 if not wrong:
                     user.money = user.money + 100*c_fatals
-            db.session.commit()
+                db.session.commit()
+            update_list_users()
+            wait_answer_for_host()
             return json.dumps("ok")
         except:
             return json.dumps("fail")
 
 
 
-@app.route('/wait_answer_for_host', methods=["POST", "GET"])
+#@app.route('/wait_answer_for_host', methods=["POST", "GET"])
 def wait_answer_for_host():
     if request.method == 'POST':
         try:
@@ -920,24 +1199,46 @@ def wait_answer_for_host():
             res = user.answer
             if res == '0':
                 return json.dumps("fail")
-            return json.dumps(res)
+            socketio.emit("user answered",res,to=f"{DEFAULT_ROOM_CODE}:host")
+            #return json.dumps(res)
         except:
             return json.dumps("fail")
 
-@app.route('/check_answer', methods=["POST", "GET"])
+#@app.route('/check_answer', methods=["POST", "GET"])
 def check_answer():
-    if request.method == 'POST':
+   # if request.method == 'POST':
         try:
-            tmp_u = request.json['user']
-            user = Users.query.filter(Users.username == tmp_u).first()
-            if user.status == "check main":
-                user.status = "wait next round main"
-            if user.status == "check interactive":
-                user.status = "wait next round interactive"
-            with open('task.json') as file:
-                    jsn = json.load(file)
+            #tmp_u = request.json['user']
+            users = Users.query.all()
+            for i in range(len(users)):
+                if users[i].status == "check main":
+                    users[i].status = "wait next round main"
+                if users[i].status == "check interactive":
+                    users[i].status = "wait next round interactive"
+            #with open('task.json') as file:
+            #        jsn = json.load(file)
+            task = Task.query.first()
+            jsn =[]
+            #with open('task.json') as file:
+            jsn.append(task.round)
+            if task.round == 1:
+                jsn.append(task.fatal)
+            else:
+                jsn.append(json.loads(task.fatal))
+            jsn.append(task.md5)
+            jsn.append(task.count_fatal)
+            if task.b_bomb == None:
+                jsn.append("false")
+            else:
+                jsn.append(task.b_bomb)
+            if task.r_bomb == None:
+                jsn.append("false")
+            else:
+                jsn.append(task.r_bomb)
             db.session.commit()
-            return json.dumps(jsn)
+            update_list_users()
+            socketio.emit("checked answer", jsn, to=f"{Room.query.first()}")
+            #return json.dumps(jsn)
         except:
             return json.dumps("fail")
 
@@ -965,131 +1266,104 @@ def next_round():
                         user[i].status = "wait task interactive"
                         user[i].answer = "0"
                     user[i].time = 0
-            if os.path.exists('task.json'):
-                os.remove('task.json')
+            #if os.path.exists('task.json'):
+            #    os.remove('task.json')
             db.session.commit()
+            Task.query.delete()
+            update_list_users()
             return json.dumps("ok")
         except:
             return json.dumps("fail")
 
 
-@app.route('/get_50_50', methods=["POST", "GET"])
-def get_50_50():
-    if request.method == 'POST':
+#@app.route('/get_50_50', methods=["POST", "GET"])
+
+@socketio.on("get 50:50")
+def get_50_50(data=None):
+    #if request.method == 'POST':
         try:
-            tmp_u = request.json['user']
-            user = Users.query.filter(Users.username==tmp_u).first()
-            find = False
+         #   tmp_u = request.json['user']
+          #  user = Users.query.filter(Users.username==tmp_u).first()
+          #  find = False
            # user.status = "50:50"
            # db.session.commit()
             #while not find:
-            if os.path.exists("50_50.json"):
-                with open('50_50.json') as file:
-                    p = json.load(file)
+           # if os.path.exists("50_50.json"):
+            #    with open('50_50.json') as file:
+            #        p = json.load(file)
                # os.remove("50_50.json")
-            return json.dumps(p)
+            #return json.dumps(p)
+            socketio.emit("request 50:50", "ok",to=f"{DEFAULT_ROOM_CODE}:host")
         except:
             return json.dumps("fail")
         
-@app.route('/get_50_50_spec', methods=["POST", "GET"])
-def get_50_50_spec():
-    if request.method == 'POST':
-        try:
-            #find = False
-           # while not find:
-            if os.path.exists("50_50_spec.json"):
-                with open('50_50_spec.json') as file:
-                    p = json.load(file)
-                        #find = True
-                os.remove("50_50_spec.json")
-            return json.dumps(p)
-        except:
-            return json.dumps("fail")        
+      
 
-@app.route('/get_alter', methods=["POST", "GET"])
-def get_alter():
-    if request.method == 'POST':
+#@app.route('/get_alter', methods=["POST", "GET"])
+@socketio.on("get alter")
+def get_alter(data=None):
+   # if request.method == 'POST':
         try:
-            tmp_u = request.json['user']
-            user = Users.query.filter(Users.username==tmp_u).first()
+           # tmp_u = request.json['user']
+           # user = Users.query.filter(Users.username==tmp_u).first()
             #find = False
            # user.status = "alter"
            # db.session.commit()
             #while not find:
-            if os.path.exists("alter.json"):
-                with open('alter.json') as file:
-                    p = json.load(file)
+           # if os.path.exists("alter.json"):
+           #     with open('alter.json') as file:
+           #         p = json.load(file)
                         #find = True
                        # user.status = "given task main"
             #db.session.commit()
                # os.remove("alter.json")
-            return json.dumps(p)
-        except:
-            return json.dumps("fail")
-
-@app.route('/get_alter_spec', methods=["POST", "GET"])
-def get_alter_spec():
-    if request.method == 'POST':
-        try:
-            #find = False
-            #while not find:
-            if os.path.exists("alter_spec.json"):
-                with open('alter_spec.json') as file:
-                    p = json.load(file)
-                        #find = True
-                os.remove("alter_spec.json")
-            return json.dumps(p)
+            socketio.emit("request alter", "ok",to=f"{DEFAULT_ROOM_CODE}:host")
+            #return json.dumps(p)
         except:
             return json.dumps("fail")
 
 
 
-@app.route('/get_navi', methods=["POST", "GET"])
-def get_navi():
-    if request.method == 'POST':
+#@app.route('/get_navi', methods=["POST", "GET"])
+@socketio.on("get navi")
+def get_navi(data=None):
+   # if request.method == 'POST':
         try:
-            tmp_u = request.json['user']
-            user = Users.query.filter(Users.username==tmp_u).first()
+           # tmp_u = request.json['user']
+          #  user = Users.query.filter(Users.username==tmp_u).first()
            # find = False
             #user.status = "navi"
            # db.session.commit()
             #while not find:
-            if os.path.exists("navi.json"):
-                with open('navi.json') as file:
-                    p = json.load(file)
+           # if os.path.exists("navi.json"):
+          #      with open('navi.json') as file:
+          #          p = json.load(file)
                         #find = True
                         #user.status = "given task main"
             #db.session.commit()
                 #os.remove("navi.json")
-            return json.dumps(p)
+            socketio.emit("request navi", "ok",to=f"{DEFAULT_ROOM_CODE}:host")
+           # return json.dumps(p)
         except:
             return json.dumps("fail")
         
 
-@app.route('/get_navi_spec', methods=["POST", "GET"])
-def get_navi_spec():
-    if request.method == 'POST':
-        try:
-            #find = False
-            #while not find:
-            if os.path.exists("navi_spec.json"):
-                with open('navi_spec.json') as file:
-                    p = json.load(file)
-                        #find = True
-                os.remove("navi_spec.json")
-            return json.dumps(p)
-        except:
-            return json.dumps("fail")
 
 
-@app.route('/get_x2', methods=["POST", "GET"])
-def get_x2():
-    if request.method == 'POST':
+
+#@app.route('/get_x2', methods=["POST", "GET"])
+@socketio.on("get x2")
+def get_x2(data=None):
+   # if request.method == 'POST':
         try:
-            tmp_u = request.json['user']
-            user = Users.query.filter(Users.username==tmp_u).first()
+           # tmp_u = request.json['user']
+            user = Users.query.filter(Users.status=="given task main").first()
             user.status = "x2"
             db.session.commit()
+            update_list_users()
+            socketio.emit("request x2", "ok", to=f"{DEFAULT_ROOM_CODE}:host")
+            socketio.emit("response_x2", "ok", to=f"{DEFAULT_ROOM_CODE}:spectator")
+            socketio.emit("response_x2", "ok", to=f"{Room.query.first()}:user:{user.username}")
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -1168,8 +1442,23 @@ def help_auden():
             result.append(round(a13/col_ans*100,2))
             result.append(round(a14/col_ans*100,2))
             result.append(round(a15/col_ans*100,2))
-            with open('task.json') as file:
-                jsn = json.load(file)
+            jsn = []
+            task = Task.query.first()
+            jsn.append(task.round)
+            if task.round == 1:
+                jsn.append(task.fatal)
+            else:
+                jsn.append(json.loads(task.fatal))
+            jsn.append(task.md5)
+            jsn.append(task.count_fatal)
+            if task.b_bomb == None:
+                jsn.append("false")
+            else:
+                jsn.append(task.b_bomb)
+            if task.r_bomb == None:
+                jsn.append("false")
+            else:
+                jsn.append(task.r_bomb)
             fatals = jsn[1]
             fatals.sort()
             for i in range(jsn[3]):
@@ -1180,57 +1469,63 @@ def help_auden():
             
             result.append(round(col_find_fatal/col_ans*100))
             result.append(100-round(col_find_fatal/col_ans*100))   
-            with open('auden.json','w') as file:
-                json.dump(result,file)
-            with open('auden_spec.json', 'w') as file:
-                json.dump(result, file)
+            #with open('auden.json','w') as file:
+           #     json.dump(result,file)
+           # with open('auden_spec.json', 'w') as file:
+            #    json.dump(result, file)
            # time.sleep(10)
-            if os.path.exists("auden.json"):
-                os.remove("auden.json")        
+            #if os.path.exists("auden.json"):
+             #   os.remove("auden.json")        
+            socketio.emit("response_auden",result,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(result)
         except:
             return json.dumps("fail")
 
-@app.route('/get_auden', methods=["POST", "GET"])
-def get_auden():
-    if request.method == 'POST':
+#@app.route('/get_auden', methods=["POST", "GET"])
+@socketio.on("get auden")
+def get_auden(data=None):
+   # if request.method == 'POST':
         try:
-            uu = request.json['user']
-            user = Users.query.filter(Users.username==uu).first()
+         #   uu = request.json['user']
+          #  user = Users.query.filter(Users.username==uu).first()
             #user.status = "auden"
             #db.session.commit()
             #while (True):
-            if os.path.exists("auden.json"):
+           # if os.path.exists("auden.json"):
                     #break
-                pass
+            #    pass
             #user.status = "given task main"
             #db.session.commit()
-            return json.dumps("ok")
+           socketio.emit("request auden", "ok",to=f"{DEFAULT_ROOM_CODE}:host") 
+           # return json.dumps("ok")
         except:
             return json.dumps("fail")
 
-@app.route('/get_auden_spec', methods=["POST", "GET"])
-def get_auden_spec():
-    if request.method == 'POST':
-        try:
-            if os.path.exists("auden_spec.json"):
-                with open('auden_spec.json') as file:
-                    p = json.load(file)
-                os.remove('auden_spec.json')
-                return json.dumps(p)
-            else:
-                return json.dumps("fail")      
-        except:
-            return json.dumps("fail")
+
 
 @app.route('/fact', methods=["POST", "GET"])
-def fact():
+def fact(data=None):
     if request.method == 'POST':
         try:
             random.seed(secrets.randbelow(99999))
             slot = random.randint(1,15)
-            with open('task.json') as file:
-                    jsn = json.load(file)
+            jsn = []
+            task = Task.query.first()
+            jsn.append(task.round)
+            if task.round == 1:
+                jsn.append(task.fatal)
+            else:
+                jsn.append(json.loads(task.fatal))
+            jsn.append(task.md5)
+            jsn.append(task.count_fatal)
+            if task.b_bomb == None:
+                jsn.append("false")
+            else:
+                jsn.append(task.b_bomb)
+            if task.r_bomb == None:
+                jsn.append("false")
+            else:
+                jsn.append(task.r_bomb)
             fat = jsn[1]
             find = False
             
@@ -1246,51 +1541,41 @@ def fact():
             result = []
             result.append(facts.slot)
             result.append(facts.des_fact)
-            with open('fact.json','w') as file:
-                json.dump(result,file)
-            with open('fact_spec.json', 'w') as file:
-                json.dump(result, file)
+            socketio.emit("response_fact",result,to=f"{DEFAULT_ROOM_CODE}:spectator")
+            #with open('fact.json','w') as file:
+           #     json.dump(result,file)
+           # with open('fact_spec.json', 'w') as file:
+            #    json.dump(result, file)
             db.session.delete(facts)
             db.session.commit()
            # time.sleep(10)
-            if os.path.exists("fact.json"):
-                os.remove("fact.json")   
+            #if os.path.exists("fact.json"):
+             #   os.remove("fact.json")   
             return json.dumps(result)
         except:
             return json.dumps("fail")
 
-
-@app.route('/get_fact', methods=["POST", "GET"])
-def get_fact():
-    if request.method == 'POST':
+@socketio.on("get fact")
+#@app.route('/get_fact', methods=["POST", "GET"])
+def get_fact(data=None):
+   # if request.method == 'POST':
         try:
-            uu = request.json['user']
-            user = Users.query.filter(Users.username==uu).first()
+          #  uu = request.json['user']
+          #  user = Users.query.filter(Users.username==uu).first()
            # user.status = "fact"
            # db.session.commit()
            # while (True):
-            if os.path.exists("fact.json"):
+            #if os.path.exists("fact.json"):
                 #break
-                pass
+           #     pass
            # user.status = "given task main"
            # db.session.commit()
-            return json.dumps("ok")
+            #return json.dumps("ok")
+            socketio.emit("request fact", "ok",to=f"{DEFAULT_ROOM_CODE}:host") 
         except:
             return json.dumps("fail")
         
-@app.route('/get_fact_spec', methods=["POST", "GET"])
-def get_fact_spec():
-    if request.method == 'POST':
-        try:
-            if os.path.exists("fact_spec.json"):
-                with open('fact_spec.json') as file:
-                    p = json.load(file)
-                os.remove('fact_spec.json')
-                return json.dumps(p)
-            else:
-                return json.dumps("fail")
-        except:
-            return json.dumps("fail")
+
 
 
 ##
@@ -1298,6 +1583,7 @@ def get_fact_spec():
 def clear_table():
     if request.method == 'POST':
         user_all = Users.query.delete()
+        update_list_users()
         db.session.commit()
         return json.dumps("ok")
         
@@ -1305,38 +1591,44 @@ def clear_table():
 
 
 
-@app.route('/update_for_spec', methods=["POST", "GET"])
+#@app.route('/update_for_spec', methods=["POST", "GET"])
 def update_for_spec():
-    if request.method == 'POST':
+   # if request.method == 'POST':
         user_waits = Users.query.filter(Users.status == "wait").count()
         user_all = Users.query.all()
         if len(user_all)==0:
+            socketio.emit("updated_list_user_spec","fail",to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps("fail")
         if (len(user_all)==user_waits):
+            socketio.emit("updated_list_user_spec","wait",to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps("wait")
         user_main = Users.query.filter(Users.status == "main").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "wait task main").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "given task main").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "answered main").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "answered main x2").first()
         if (user_main != None):
@@ -1350,100 +1642,116 @@ def update_for_spec():
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "check main x2").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "game over lose").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "game over").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "50:50").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "alter").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "x2").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "navi").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "auden").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "fact").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "otbor").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "warning otbor").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "start otbor").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "winner otbor").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "otbor end").first()
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res) 
         user_main = Users.query.filter(Users.status == "show result").first()
         if (user_main != None):
             res = get_result()
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
         user_main = Users.query.filter(Users.status == "show total result").first()
         if (user_main != None):
             res = get_total_result()
+            socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-    return json.dumps("fail")
 
 
 def get_result():
@@ -1469,41 +1777,46 @@ def get_total_result():
     return result
 
 
-@app.route('/send_script', methods=["POST", "GET"])
-def send_script():
-    if request.method == 'POST':
+#@app.route('/send_script', methods=["POST", "GET"])
+@socketio.on("send_script")
+def send_script(data):
+    #if request.method == 'POST':
         try:
-            scr = request.json['script']
-            with open('script.json', 'w') as file:
-                json.dump(scr, file)
-            return json.dumps("ok")
-        
+           # scr = request.json['script']
+            scr = data.get("script")
+            #with open('script.json', 'w') as file:
+            #    json.dump(scr, file)
+            socketio.emit("updated_script",scr,to=DEFAULT_ROOM_CODE) 
         except:
             return json.dumps("fail")
     
     
-@app.route('/send_fix', methods=["POST", "GET"])
-def send_fix():
-    if request.method == 'POST':
+#@app.route('/send_fix', methods=["POST", "GET"])
+@socketio.on("send_fix")
+def send_fix(data):
+    #if request.method == 'POST':
         try:
-            scr = request.json['fix']
-            with open('fix.json', 'w') as file:
-                json.dump(scr, file)
-            return json.dumps("ok")
-        
+            #scr = request.json['fix']
+            scr = data.get("fix")
+            #with open('fix.json', 'w') as file:
+            #    json.dump(scr, file)
+           # return json.dumps("ok")
+            socketio.emit("updated_fix",scr,to=DEFAULT_ROOM_CODE)  
         except:
             return json.dumps("fail")
         
 
-@app.route('/send_round', methods=["POST", "GET"])
-def send_round():
-    if request.method == 'POST':
+#@app.route('/send_round', methods=["POST", "GET"])
+@socketio.on("send_round")
+def send_round(data):
+    #if request.method == 'POST':
         try:
-            scr = request.json['round']
-            with open('round.json', 'w') as file:
-                json.dump(scr, file)
-            return json.dumps("ok")
-        
+            scr = data.get("round")
+            #scr = request.json['round']
+           # with open('round.json', 'w') as file:
+           #     json.dump(scr, file)
+           # return json.dumps("ok")
+            socketio.emit("updated_round",scr,to=DEFAULT_ROOM_CODE) 
         except:
             return json.dumps("fail")
         
@@ -1536,7 +1849,9 @@ def otbor():
                     continue
                 u_all[i].status = "otbor"
                 u_all[i].time = "0"
+                socketio.emit("updated_status_user",u_all[i].status,to=f"{Room.query.first()}:user:{u_all[i].username}");
             db.session.commit()
+            update_list_users()
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -1551,6 +1866,8 @@ def warning_otbor():
                     continue
                 u_all[i].status = "warning otbor"
                 db.session.commit()
+                update_list_users()
+                socketio.emit("updated_status_user",u_all[i].status,to=f"{Room.query.first()}:user:{u_all[i].username}");
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -1565,6 +1882,8 @@ def start_otbor():
                     continue
                 u_all[i].status = "start otbor"
                 db.session.commit()
+                update_list_users()
+                socketio.emit("updated_status_user",u_all[i].status,to=f"{Room.query.first()}:user:{u_all[i].username}");
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -1574,14 +1893,18 @@ def show_answer_otbor():
     if request.method == 'POST':
         try:
             u_all = Users.query.all()
+            with open('task_otbor.json') as file:
+                p = json.load(file)
             for i in range(len(u_all)):
                 if u_all[i].red_bomb == 'true':
                     continue
                 u_all[i].status = "otbor end"
                 db.session.commit()
-            with open('task_otbor.json') as file:
-                p = json.load(file)
-           # os.remove('task_otbor.json')
+                update_list_users()
+                socketio.emit("updated_status_user",u_all[i].status,to=f"{Room.query.first()}:user:{u_all[i].username}");
+                socketio.emit("get_answer_otbor",p,to=f"{DEFAULT_ROOM_CODE}:spectator");
+                socketio.emit("get_answer_otbor",p,to=f"{Room.query.first()}:user:{u_all[i].username}");
+            #os.remove('task_otbor.json')
             return json.dumps(p)
         except:
             return json.dumps("fail")
@@ -1611,6 +1934,7 @@ def send_answer_otbor():
             user_db.answer = ans
             user_db.time = time
             db.session.commit()
+            update_list_users()
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -1660,6 +1984,8 @@ def show_result_otbor():
             result.append(user_winner.username)
             result.append(user_winner.answer)
             result.append(user_winner.time)
+            
+            socketio.emit("show_winner_otbor",update_list_users(),to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(result)
         except:
             return json.dumps("fail")
@@ -1678,11 +2004,18 @@ def show_result_interactive():
                 if action == "hide":
                     user_all[i].status = "wait"
             db.session.commit()
+            update_list_users()
             return json.dumps("ok")
         except:
             return json.dumps("fail")
 
-
+@socketio.on("wait_4_min")
+def wait_4_min():
+    socketio.emit("wait_4min","ok",to=f"{DEFAULT_ROOM_CODE}:spectator")
+    
+@socketio.on("wait_1_min")
+def wait_1_min():
+    socketio.emit("wait_1min","ok",to=f"{DEFAULT_ROOM_CODE}:spectator")
 
 
 

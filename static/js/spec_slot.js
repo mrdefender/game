@@ -21,21 +21,88 @@
  * Spectator обновляется через таймеры и backend-состояния.
  * Здесь важно не менять имена функций и id элементов.
  */
-var timerStatus = setInterval(() => update_list_user(), 1500);
-var timerHelps;
-var timeWainAnswerFromMain;
-var timerTreeStatus = setInterval(() => update_tree(), 3000);
+//var timerStatus = setInterval(() => update_list_user(), 1500);
+//var timerHelps;
+//var timeWainAnswerFromMain;
+//var timerTreeStatus = setInterval(() => update_tree(), 3000);
+const socket = io();
+socket.on("connect", () => {
+  console.log("Socket connected:", socket.id);
 
+  socket.emit("ping:test", {
+    page: window.location.pathname
+  });
+});
+
+socket.on("disconnect", () => {
+  console.log("Socket disconnected");
+});
+
+socket.on("pong:test", (data) => {
+  console.log("Ответ от сервера:", data);
+});
+
+
+socket.on("connect", () => {
+  console.log("Socket connected:", socket.id);
+
+  socket.emit("room:join", {
+    room: "99999999",
+    role: "spectator",
+    username: "spectator"
+  });
+});
+
+socket.on("room:joined", (data) => {
+  console.log("Joined socket room:", data);
+});
+
+socket.on("updated_round", (data) => {
+    console.log("Раунд:", data);
+  update_round(data);
+});
+socket.on("updated_fix", (data) => {
+    console.log("Несгораяемая сумма:", data);
+  update_fix(data);
+});
+socket.on("updated_script", (data) => {
+    console.log("Сценарий:", data);
+  update_script(data);
+});
+
+socket.on("wait_4min", (data) => {
+    wait_4min();
+})
+
+socket.on("wait_1min", (data) => {
+    wait_1min();
+})
+
+/** Показывает большой таймер ожидания 4:12. */
+function wait_1min(){
+    time = 60;
+   // inputName = document.createElement('input');
+   // inputName.setAttribute('type', 'submit');
+   // inputName.setAttribute('class', 'timer');
+   // inputName.setAttribute('id', 'r0');
+  //  inputName.setAttribute('value', "4:12");
+   // document.getElementById("r0").value
+    document.getElementById("au").value = "1:00";
+    setTimeout(() => {
+  timer_wait(time); 
+}, 1000);
+}
 
 /** Показывает большой таймер ожидания 4:12. */
 function wait_4min(){
-    time = 252;
-    inputName = document.createElement('input');
-    inputName.setAttribute('type', 'submit');
-    inputName.setAttribute('class', 'timer');
-    inputName.setAttribute('id', 'r0');
-    inputName.setAttribute('value', "4:12");
-    document.body.appendChild(inputName);
+    time = 257;
+   // inputName = document.createElement('input');
+   // inputName.setAttribute('type', 'submit');
+   // inputName.setAttribute('class', 'timer');
+   // inputName.setAttribute('id', 'r0');
+  //  inputName.setAttribute('value', "4:12");
+   // document.getElementById("r0").value
+    document.getElementById("au").value = "4:17";
     setTimeout(() => {
   timer_wait(time); 
 }, 1000);
@@ -45,8 +112,13 @@ function wait_4min(){
 function timer_wait(time_all){
     if (time_all<=0)
     {
-        let result_button = document.getElementById('r0')
-        result_button.remove();
+        setWait4MinStage(0);
+
+    setTimeout(() => {
+        clearWait4MinVisual();
+        clearWait4MinStage();
+        }, 900);
+        document.getElementById('au').value = ""
         return;
     }
     time_all = time_all -1
@@ -54,15 +126,69 @@ function timer_wait(time_all){
     second = time_all%60;
     if (second<10)
     {
-        document.getElementById("r0").value = min.toString()+':'+'0'+second.toString();
+        document.getElementById("au").value = min.toString()+':'+'0'+second.toString();
         setTimeout(() => { timer_wait(time_all); }, 1000);
         return;
     }
-    document.getElementById("r0").value = min.toString()+':'+second.toString();
+    document.getElementById("au").value = min.toString()+':'+second.toString();
+    syncWait4MinVisual(time_all);
+    setWait4MinStage(time_all);
 
     setTimeout(() => { timer_wait(time_all); }, 1000);
 
 }
+
+function syncWait4MinVisual(secondsLeft) {
+    const au = document.getElementById("au");
+    const wrap = document.querySelector(".au-wrap");
+
+    if (!au || !wrap) return;
+
+    wrap.classList.add("wait-4min-mode");
+    au.classList.add("wait-4min-active");
+
+    if (secondsLeft <= 30 && secondsLeft > 0) {
+        au.classList.add("wait-4min-danger");
+    } else {
+        au.classList.remove("wait-4min-danger");
+    }
+}
+
+function clearWait4MinVisual() {
+    const au = document.getElementById("au");
+    const wrap = document.querySelector(".au-wrap");
+
+    if (!au || !wrap) return;
+
+    wrap.classList.remove("wait-4min-mode");
+    au.classList.remove("wait-4min-active", "wait-4min-danger");
+}
+
+function setWait4MinStage(secondsLeft) {
+    document.body.classList.add("wait-4min-focus");
+
+    if (secondsLeft <= 30 && secondsLeft > 0) {
+        document.body.classList.add("wait-4min-ending");
+    } else {
+        document.body.classList.remove("wait-4min-ending");
+    }
+
+    if (secondsLeft <= 0) {
+        document.body.classList.add("wait-4min-freeze");
+    } else {
+        document.body.classList.remove("wait-4min-freeze");
+    }
+}
+
+function clearWait4MinStage() {
+    document.body.classList.remove(
+        "wait-4min-focus",
+        "wait-4min-ending",
+        "wait-4min-freeze"
+    );
+}
+
+
 
 /** Возвращает кнопки ответов зрительского экрана в базовое состояние. */
 function btn_default(){
@@ -115,24 +241,24 @@ function btn_default(){
 }
 
 
-
-
-
+socket.on("updated_list_user_spec", (data) =>{
+    update_list_user(data)
+})
 
 /** Основной polling spectator UI через backend. */
-function update_list_user()
+function update_list_user(data)
 {
-    fetch('/update_for_spec', {
-        method: 'POST',
-        body: JSON.stringify({ "":""}),
-        headers: {
-            'Content-Type': 'application/data'
-        }
-    }
-)
-.then(response => response.json())
+    //fetch('/update_for_spec', {
+     //   method: 'POST',
+     //   body: JSON.stringify({ "":""}),
+    //    headers: {
+    //        'Content-Type': 'application/data'
+       // }
+    //}
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
     console.log(data)
     
 
@@ -351,8 +477,8 @@ function update_list_user()
             {
                 document.getElementById(get_o(i.toString())).value = i;
             }
-        get_task();
-        get_helps();
+       // get_task();
+       // get_helps();
         return;
     }
         if ((data[0] == "given task main") || (data[0] == "x2" ))
@@ -360,30 +486,30 @@ function update_list_user()
        // if ((document.getElementById("ex2").value != "auden") && (document.getElementById("ex2").value != "fact"))
          //   document.getElementById("au").value = "";
         //document.getElementById("question").value = "";
-        get_task();
-        get_helps();
-        get_fact();
-        get_auden();
-        get_50_50();
-        get_alter();
-        get_navi();
+       // get_task();
+       // get_helps();
+       // get_fact();
+       // get_auden();
+       // get_50_50();
+       // get_alter();
+       // get_navi();
        
     }
 
     if ((data[0] == "answered main") || (data[0] == "answered main x2"))
     {
         
-        answered_main();
-        return;
+       // answered_main();
+        //return;
 
         
     }
     if ((data[0] == "check main") || (data[0] == "check main x2") || (data[0] == "wait next round main"))
     {
-        check_answered();
+       // check_answered();
         //document.getElementById("au").value = " ";
         //document.getElementById("question").value = " ";
-        return;
+       // return;
     }
 
     if (data[0] == "game over lose")
@@ -410,27 +536,27 @@ function update_list_user()
 
     if (data[0] == "50:50")
     {
-        get_50_50();
-        return;
+       //get_50_50();
+        //return;
     }
      if (data[0] == "alter")
     {
 
-        get_alter();
-        return;
+      //  get_alter();
+       // return;
     }
     if (data[0] == "navi")
     {
 
-        get_navi();
-        return;
+      //  get_navi();
+       // return;
     }
 
     if (data[0] == "x2")
     {
 
-        get_x2();
-        return;
+        //get_x2();
+        //return;
     }
     if (data[0] == "auden")
     {
@@ -442,7 +568,7 @@ function update_list_user()
     {
 
         //get_fact();
-        return;
+        //return;
     }
     if (data[0] == "otbor")
     {
@@ -451,8 +577,8 @@ function update_list_user()
             document.getElementById("user").value = ""
             document.getElementById("au").value = ""
             document.getElementById("ans").value = ""
-            document.getElementById("question").value = " ";
-            document.getElementById('question').innerText = "";
+            //document.getElementById("question").value = " ";
+           // document.getElementById('question').innerText = "";
             document.getElementById("ex2").value = "0"
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
@@ -498,19 +624,19 @@ function update_list_user()
             document.getElementById("pauden").style.backgroundColor = "#000c11";
              document.getElementById("pfact").style.backgroundColor = "#000c11";
         document.getElementById("question").hidden = false;
-        get_task_otbor();
+       // get_task_otbor();
         return;
     }
     if (data[0] == "warning otbor")
     {
-        document.getElementById("au").value = "10";
+        document.getElementById("au").value = "20";
     }
     if (data[0] == "start otbor")
     {
         if (document.getElementById("ex2").value == "start otbor")
                 return;
             document.getElementById("ex2").value = "start otbor";
-            setTimeout(() => {timer_otbor(); }, 2000);
+            setTimeout(() => {timer_otbor(); }, 1000);
     }
     if (data[0] == "otbor end")
         {
@@ -523,7 +649,7 @@ function update_list_user()
     if (data[0] == "winner otbor")
         {
            
-            show_winner_otbor();
+           // show_winner_otbor();
         }
     if ((data[0][0] == "show result") || (data[0][0] == "show total result"))
     {
@@ -549,17 +675,23 @@ function update_list_user()
             inputName.setAttribute('value','Общий результат игры');
             document.body.appendChild(inputName);
         }
-        for (var i = 0; i< data.length;i++)
-        {
-            inputName = document.createElement('input');
-            inputName.setAttribute('type', 'submit');
-            inputName.setAttribute('class', 'result_otbor');
-            inputName.setAttribute('id', 'r'+i.toString());
-            inputName.setAttribute('innerText', (i+1).toString()+". " + data[i][1]+"                         "+ data[i][2].toLocaleString("ru"));
-            inputName.setAttribute('value',(i+1).toString()+". " +  data[i][1]+"                         "+ data[i][2].toLocaleString("ru"));
-            document.body.appendChild(inputName);
-            
-        }
+        for (var i = 0; i < data.length; i++)
+{
+    const row = document.createElement('div');
+
+    row.className = 'result_otbor result-row';
+    row.id = 'r' + i.toString();
+
+    row.innerHTML = `
+        <span class="result-place">${i + 1}.</span>
+        <span class="result-name">${data[i][1]}</span>
+        <span class="result-score">${Number(data[i][2] ?? 0).toLocaleString("ru")}</span>
+    `;
+    if (i === 0) {
+    row.classList.add("result-top1");
+}
+    document.body.appendChild(row);
+}
         document.getElementById("ex2").value = "show_result";
 
     }
@@ -567,10 +699,10 @@ function update_list_user()
     
 
 
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 }
 
 
@@ -622,18 +754,22 @@ function calc_total()
 
 }
 
-function get_task_otbor(){
-        fetch('/get_task_otbor', {
-        method: 'POST',
-        body: JSON.stringify({ "":""}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+socket.on("get_task_otbor", (data) => {
+    get_task_otbor(data)
+})
 
-.then(data => {
+function get_task_otbor(data){
+       // fetch('/get_task_otbor', {
+      //  method: 'POST',
+       // body: JSON.stringify({ "":""}),
+       // headers: {
+       //     'Content-Type': 'application/json'
+       // }
+    //}
+//)
+//.then(response => response.json())
+
+//.then(data => {
 
     if (data=="fail")
     {
@@ -641,10 +777,10 @@ function get_task_otbor(){
     }
     document.getElementById('question').innerText="Отборочный тур"+'\n'+ "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];  
 
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 }
 
 
@@ -660,19 +796,23 @@ function timer_otbor(){
 
 }
 
+socket.on("get_answer_otbor", (data)=>{
+    get_answer_otbor(data)
+})
 
-function get_answer_otbor(){
-        fetch('/get_task_otbor', {
-        method: 'POST',
-        body: JSON.stringify({ " ":" "}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+function get_answer_otbor(data){
+       // fetch('/get_task_otbor', {
+     //   method: 'POST',
+       // body: JSON.stringify({ " ":" "}),
+      //  headers: {
+      //      'Content-Type': 'application/json'
+      //  }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
+    console.log(data);
 
     if (data=="fail")
     {
@@ -680,25 +820,28 @@ function get_answer_otbor(){
     }
     document.getElementById('question').innerText= "Правильный ответ: " + data[3];  
 
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 }
 
+socket.on ("show_winner_otbor", (data) => {
+    show_winner_otbor(data)
+})
 
-function show_winner_otbor(){
-    fetch('/update_list_users', {
-        method: 'POST',
-        body: JSON.stringify({ " ":" "}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+function show_winner_otbor(data){
+    //fetch('/update_list_users', {
+   //     method: 'POST',
+    //    body: JSON.stringify({ " ":" "}),
+     //   headers: {
+     //       'Content-Type': 'application/json'
+    //    }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
 
     if (data=="fail")
     {
@@ -750,64 +893,68 @@ function show_winner_otbor(){
 
 
 
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 }
 
+socket.on("answered_main", (data) => {
+    answered_main(data)
+})
 
 
+function answered_main(data){
+    //fetch('/answered_main_spec', {
+    //    method: 'POST',
+   ///     body: JSON.stringify({ " ":" "}),
+     //   headers: {
+      //      'Content-Type': 'application/json'
+    //    }
+   // }
+//)
+///.then(response => response.json())
 
-function answered_main(){
-    fetch('/answered_main_spec', {
-        method: 'POST',
-        body: JSON.stringify({ " ":" "}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+//.then(data => {
 
-.then(data => {
-
-    
-
-    if (data == "fail")
+      if (data == "fail")
     {
         return;
     }
 
     
-    ans = data[0];
+    ans = data;
     document.getElementById("ans").value = ans;
     document.getElementById(ans).style.backgroundColor = "orange";
     if (document.getElementById("ex2").value=="x2-2")
         document.getElementById("ex2").value="0";
  
     
-})
+//})
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 }
 
 
-function check_answered(){
-    fetch('/answered_check_spec', {
-        method: 'POST',
-        body: JSON.stringify({ " ":" "}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+socket.on("answered_check_spec", (data) =>{
+check_answered(data)
+})
 
-.then(data => {
+function check_answered(data){
+    //fetch('/answered_check_spec', {
+      //  method: 'POST',
+      //  body: JSON.stringify({ " ":" "}),
+      //  headers: {
+       //     'Content-Type': 'application/json'
+      //  }
+    //}
+//)
+//.then(response => response.json())
+
+//.then(data => {
     
 
    if (data == "fail")
@@ -901,11 +1048,11 @@ function check_answered(){
 
  
     
-})
+//})
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 
 }
@@ -946,20 +1093,22 @@ function get_o(answer)
     
 }
 
+socket.on("get_task", (data) => {
+    get_task(data)
+})
 
+function get_task(data){
+ //   fetch('/get_task_user', {
+  //      method: 'POST',
+  //      body: JSON.stringify({ user:"spec"}),
+   //     headers: {
+   //         'Content-Type': 'application/json'
+   //     }
+  //  }
+//)
+//.then(response => response.json())
 
-function get_task(){
-    fetch('/get_task_user', {
-        method: 'POST',
-        body: JSON.stringify({ user:"spec"}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
+//.then(data => {
     
 
     if (data == "fail")
@@ -1032,32 +1181,19 @@ function get_task(){
    
     
 
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 }
 
 
-/** Обновляет денежное дерево на зрительском экране. */
-function update_tree(){
-
-    fetch('/get_tree', {
-        method: 'POST',
-        body: JSON.stringify({ "":""}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
+function update_script(data)
+{
     if (data == "fail")
         return;
-     if (data[0] == "Классика")
+    if (data == "Классика")
     {
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
@@ -1067,11 +1203,11 @@ function update_tree(){
         c6.style.color = "white";
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
-        document.getElementById("script").value = data[0];
+        document.getElementById("script").value = data;
     }
-    if (data[0]== "Экстрим")
+    if (data== "Экстрим")
     {
-        document.getElementById("script").value = data[0];
+        document.getElementById("script").value = data;
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
         c3.style.color = "#dd6706";
@@ -1082,10 +1218,23 @@ function update_tree(){
         c8.style.color = "#dd6706";
         document.getElementById("fix").value = "0"
     }    
-    if (data[0] == "Рискованный")
+    if (data == "Рискованный")
     {
-        document.getElementById("script").value = data[0];
-        if (data[1] =="0")
+         c1.style.color = "#dd6706";
+        c2.style.color = "#dd6706";
+        c3.style.color = "#dd6706";
+        c4.style.color = "#dd6706";
+        c5.style.color = "#dd6706";
+        c6.style.color = "#dd6706";
+        c7.style.color = "#dd6706";
+        c8.style.color = "#dd6706";
+        document.getElementById("fix").value = "0"
+    }
+}
+
+function update_fix(data)
+{
+     if (data =="0")
     {
         //fix_money.value = "0";
         c1.style.color = "#dd6706";
@@ -1096,9 +1245,9 @@ function update_tree(){
         c6.style.color = "#dd6706";
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
-        document.getElementById("fix").value = data[1]
+        document.getElementById("fix").value = data
     }
-    if (data[1] == "1 000")
+    if (data == "1 000")
     {
        // fix_money.value = "1 000";
         c1.style.color = "white";
@@ -1109,9 +1258,9 @@ function update_tree(){
         c6.style.color = "#dd6706";
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
-        document.getElementById("fix").value = data[1]
+        document.getElementById("fix").value = data
     }
-    if (data[1]== "3 000")
+    if (data== "3 000")
     {
        // fix_money.value = "3 000";
         c1.style.color = "#dd6706";
@@ -1122,9 +1271,9 @@ function update_tree(){
         c6.style.color = "#dd6706";
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
-        document.getElementById("fix").value = data[1]
+        document.getElementById("fix").value = data
     }
-    if (data[1] == "5 000")
+    if (data == "5 000")
     {
        // fix_money.value = "5 000";
         c1.style.color = "#dd6706";
@@ -1135,10 +1284,10 @@ function update_tree(){
         c6.style.color = "#dd6706";
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
-        document.getElementById("fix").value = data[1]
+        document.getElementById("fix").value = data
 
     }
-     if (data[1] == "10 000")
+     if (data == "10 000")
     {
         c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
@@ -1148,10 +1297,10 @@ function update_tree(){
         c6.style.color = "#dd6706";
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
-        document.getElementById("fix").value = data[1]
+        document.getElementById("fix").value = data
 
     }
-     if (data[1] == "25 000")
+     if (data== "25 000")
     {
        // fix_money.value = "25 000";
         c1.style.color = "#dd6706";
@@ -1162,10 +1311,10 @@ function update_tree(){
         c6.style.color = "#dd6706";
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
-        document.getElementById("fix").value = data[1]
+        document.getElementById("fix").value = data
 
     }
-     if (data[1] == "50 000")
+     if (data == "50 000")
     {
        // fix_money.value = "50 000";
         c1.style.color = "#dd6706";
@@ -1176,10 +1325,10 @@ function update_tree(){
         c6.style.color = "white";
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
-        document.getElementById("fix").value = data[1]
+        document.getElementById("fix").value = data
 
     }
-    if (data[1] == "150 000")
+    if (data == "150 000")
     {
       //  fix_money.value = "150 000";
         c1.style.color = "#dd6706";
@@ -1190,9 +1339,9 @@ function update_tree(){
         c6.style.color = "#dd6706";
         c7.style.color = "white";
         c8.style.color = "#dd6706";
-        document.getElementById("fix").value = data[1]
+        document.getElementById("fix").value = data
     }
-    if (data[1] == "500 000")
+    if (data == "500 000")
     {
         //fix_money.value = "500 000";
         c1.style.color = "#dd6706";
@@ -1203,11 +1352,14 @@ function update_tree(){
         c6.style.color = "#dd6706";
         c7.style.color = "#dd6706";
         c8.style.color = "white";
-        document.getElementById("fix").value = data[1]
+        document.getElementById("fix").value = data
 
     }
-    }    
-    if (data[2] == "Отборочный тур")
+}
+
+function update_round(data)
+{
+    if (data == "Отборочный тур")
     {
         document.getElementById("current").value = "0";
         document.getElementById("fix").value = "0";
@@ -1221,7 +1373,7 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     }
-    if (data[2] == "1")
+    if (data == "1")
     {
         document.getElementById("current").value = "0";
         c1.style.backgroundColor = "black";
@@ -1234,7 +1386,7 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     }   
-    if (data[2] == "2")
+    if (data == "2")
     {
         document.getElementById("current").value = "1 000";
         c1.style.backgroundColor = "orange";
@@ -1247,7 +1399,7 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (data[2] == "3")
+    if (data == "3")
     {
         document.getElementById("current").value = "3 000";
         c1.style.backgroundColor = "black";
@@ -1260,7 +1412,7 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (data[2] == "4")
+    if (data == "4")
     {
          if(document.getElementById("script").value == "Классика")
         {
@@ -1277,7 +1429,7 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (data[2] == "5")
+    if (data == "5")
     {
          if(document.getElementById("script").value == "Классика")
         {
@@ -1294,7 +1446,7 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (data[2] == "6")
+    if (data == "6")
     {
          if(document.getElementById("script").value == "Классика")
         {
@@ -1311,7 +1463,7 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (data[2] == "7")
+    if (data == "7")
     {
          if(document.getElementById("script").value == "Классика")
         {
@@ -1328,7 +1480,7 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     }  
-    if (data[2]== "8")
+    if (data== "8")
     {
          if(document.getElementById("script").value == "Классика")
         {
@@ -1345,7 +1497,7 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "black";
     } 
-    if (data[2] == "9")
+    if (data == "9")
     {
          if(document.getElementById("script").value == "Классика")
         {
@@ -1362,7 +1514,7 @@ function update_tree(){
         c8.style.backgroundColor = "orange";
         c9.style.backgroundColor = "black";
     }   
-    if (data[2] == "Победа")
+    if (data == "Победа")
     {
         
         document.getElementById("fix").value = "1 000 000";
@@ -1377,34 +1529,30 @@ function update_tree(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "orange";
     }  
-    
-
-
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-
 }
+socket.on("get_helps", (data) => {
+    get_helps(data);
+})
 
 
-function get_helps(){
-        var user_name = document.getElementById("user").value;
-        if ((document.getElementById("ex2").value=="x2") || (document.getElementById("ex2").value=="x2-2"))
-            return;
+function get_helps(data){
+        //var user_name = document.getElementById("user").value;
+        const blockedByMode =
+        document.getElementById("ex2").value === "alter" ||
+        document.getElementById("ex2").value === "x2" ||
+        document.getElementById("ex2").value === "x2-2";
        
-        fetch('/get_helps', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+      //  fetch('/get_helps', {
+      //  method: 'POST',
+      //  body: JSON.stringify({ user:user_name}),
+      //  headers: {
+       //     'Content-Type': 'application/json'
+       // }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
     
 
     if (data=="fail")
@@ -1449,31 +1597,41 @@ function get_helps(){
     document.getElementById("px2").style.backgroundColor = "#000c11"
     document.getElementById("pauden").style.backgroundColor = "#000c11"
     document.getElementById("pfact").style.backgroundColor = "#000c11"
-    
-
-
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+     if (blockedByMode) {
+        document.getElementById("p50_50").disabled = true;
+        document.getElementById("palter").disabled = true;
+        document.getElementById("pnavi").disabled = true;
+        document.getElementById("px2").disabled = true;
+        document.getElementById("pauden").disabled = true;
+        document.getElementById("pfact").disabled = true;
     }
 
+
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
+ }
 
 /** Отображает подсказку 50:50 на spectator. */
-function get_50_50(){
+socket.on ("response_50_50", (data) => {
+    get_50_50(data)
+})
+
+function get_50_50(data){
     // document.getElementById("p50_50").style.backgroundColor = "orange";
      //document.getElementById("ex2").value = "50:50"
-    fetch('/get_50_50_spec', {
-        method: 'POST',
-        body: JSON.stringify({ " ":" "}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+   // fetch('/get_50_50_spec', {
+      //  method: 'POST',
+      //  body: JSON.stringify({ " ":" "}),
+      //  headers: {
+      //      'Content-Type': 'application/json'
+      //  }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
 
     if (data == "fail")
     {
@@ -1488,29 +1646,33 @@ function get_50_50(){
 
 
 
-})
+//})
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 
 }
+
+socket.on ("response_alter", (data) => {
+    get_alter(data)
+})
 /** Отображает подсказку Альтернатива на spectator. */
-function get_alter(){
+function get_alter(data){
      //document.getElementById("palter").style.backgroundColor = "orange";
      //document.getElementById("ex2").value = "alter"
-    fetch('/get_alter_spec', {
-        method: 'POST',
-        body: JSON.stringify({ " ":" "}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+ //   fetch('/get_alter_spec', {
+    //    method: 'POST',
+    //    body: JSON.stringify({ " ":" "}),
+   //     headers: {
+   //         'Content-Type': 'application/json'
+   //     }
+  //  }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
 
     
     if (data == "fail")
@@ -1527,28 +1689,32 @@ function get_alter(){
     document.getElementById("ex2").value = "alter";
 
 
-})
+//})
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 }
+
+socket.on ("response_navi", (data) => {
+    get_navi(data)
+})
 /** Отображает подсказку Навигатор на spectator. */
-function get_navi(){
+function get_navi(data){
      //document.getElementById("pnavi").style.backgroundColor = "orange";
      //document.getElementById("ex2").value = "navi"
-    fetch('/get_navi_spec', {
-        method: 'POST',
-        body: JSON.stringify({ " ":" "}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+   // fetch('/get_navi_spec', {
+    //    method: 'POST',
+    //    body: JSON.stringify({ " ":" "}),
+    //    headers: {
+     //       'Content-Type': 'application/json'
+     //   }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
 
     if (data == "fail")
     {
@@ -1563,33 +1729,43 @@ function get_navi(){
     document.getElementById("ex2").value = "navi";
 
 
-})
+//})
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 }
-function get_x2(){
+socket.on ("response_x2", (data) => {
+    get_x2(data)
+})
+
+function get_x2(data){
      document.getElementById("px2").style.backgroundColor = "orange";
      document.getElementById("ex2").value = "x2";
 
 }
-function get_auden(){
+
+
+socket.on ("response_auden", (data) => {
+    get_auden(data)
+})
+
+function get_auden(data){
 
      
      //document.getElementById("ex2").value = "auden"
-    fetch('/get_auden_spec', {
-        method: 'POST',
-        body: JSON.stringify({ " ":" "}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+   // fetch('/get_auden_spec', {
+     //   method: 'POST',
+      //  body: JSON.stringify({ " ":" "}),
+       // headers: {
+       //     'Content-Type': 'application/json'
+       // }
+    //}
+//)
+//.then(response => response.json())
 
-.then(data => {
+//then(data => {
 
     if (data == "fail")
     {
@@ -1607,11 +1783,11 @@ function get_auden(){
     document.getElementById("ex2").value = "auden";
 
 
-})
+//})
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 
 
@@ -1619,21 +1795,25 @@ console.error('Ошибка:', error);
 
 }
 
-function get_fact(){
+socket.on ("response_fact", (data) => {
+    get_fact(data)
+})
+
+function get_fact(data){
 
    // document.getElementById("pfact").style.backgroundColor = "orange";
     // document.getElementById("ex2").value = "fact"
-    fetch('/get_fact_spec', {
-        method: 'POST',
-        body: JSON.stringify({ " ":" "}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+   // fetch('/get_fact_spec', {
+    //    method: 'POST',
+     //   body: JSON.stringify({ " ":" "}),
+     //   headers: {
+      //      'Content-Type': 'application/json'
+     //   }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
    
 
     if (data == "fail")
@@ -1648,11 +1828,11 @@ function get_fact(){
     document.getElementById("ex2").value = "fact";
 
 
-})
+//})
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 }
 

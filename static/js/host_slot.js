@@ -46,6 +46,41 @@ var currentAudio = [];
 var currentUrl = document.URL;
 var ffffff = currentUrl.split('/host_slot');//адресная строка пользователя без /host_slot http://ip:5000
 var audioUrl = ffffff[0]+'/sounds/';
+
+const socket = io();
+
+socket.on("connect", () => {
+  console.log("Socket connected:", socket.id);
+
+  socket.emit("ping:test", {
+    page: window.location.pathname
+  });
+});
+
+socket.on("disconnect", () => {
+  console.log("Socket disconnected");
+});
+
+socket.on("pong:test", (data) => {
+  console.log("Ответ от сервера:", data);
+});
+
+socket.on("connect", () => {
+  console.log("Socket connected:", socket.id);
+
+  socket.emit("room:join", {
+    room: "99999999",
+    role: "host",
+    username: "admin"
+  });
+});
+
+socket.on("room:joined", (data) => {
+  console.log("Joined socket room:", data);
+});
+
+
+
 function getAudio(name) {
     if (!audioCache[name]) {
         var a = new Audio(audioUrl+ name);
@@ -77,78 +112,18 @@ function stop_current_sound() {
    }
     currentAudio = [];
 }
-/** 
-var audio_q1_3 = new Audio(audioUrl+"q1-3.ogg");//добавить все звуки
-var audio_q4_5 = new Audio(audioUrl+"q4-5.ogg");
-var audio_q6 = new Audio(audioUrl+"q6.ogg");
-var audio_q7 = new Audio(audioUrl+"q7.ogg");
-var audio_q8 = new Audio(audioUrl+"q8.ogg");
-var audio_q9 = new Audio(audioUrl+"q9.ogg");
-var audio_r1_2 = new Audio(audioUrl+"r1-2.ogg");
-var audio_r3 = new Audio(audioUrl+"r3.ogg");
-var audio_r4 = new Audio(audioUrl+"r4.ogg");
-var audio_r5 = new Audio(audioUrl+"r5.ogg");
-var audio_r6 = new Audio(audioUrl+"r6.ogg");
-var audio_r7 = new Audio(audioUrl+"r7.ogg");
-var audio_r8 = new Audio(audioUrl+"r8.ogg");
-var audio_r9 = new Audio(audioUrl+"r9.ogg");
-var audio_a4_9 = new Audio(audioUrl+"a4-9.ogg");
-var audio_a5 = new Audio(audioUrl+"a5.ogg");
-var audio_a6 = new Audio(audioUrl+"a6.ogg");
-var audio_a9 = new Audio(audioUrl+"a9.ogg");
-var audio_w1_3 = new Audio(audioUrl+"w1-3.ogg");
-var audio_w4 = new Audio(audioUrl+"w4.ogg");
-var audio_w5 = new Audio(audioUrl+"w5.ogg");
-var audio_w6 = new Audio(audioUrl+"w6.ogg");
-var audio_w7 = new Audio(audioUrl+"w7.ogg");
-var audio_w8 = new Audio(audioUrl+"w8.ogg");
-var audio_w9 = new Audio(audioUrl+"w9.ogg");
-var audio_n4 = new Audio(audioUrl+"n4.ogg");
-var audio_n5 = new Audio(audioUrl+"n5.ogg");
-var audio_n6 = new Audio(audioUrl+"n6.ogg");
-var audio_n7 = new Audio(audioUrl+"n7.ogg");
-var audio_n8 = new Audio(audioUrl+"n8.ogg");
-var audio_n9 = new Audio(audioUrl+"n9.ogg");
-var audio_h3 = new Audio(audioUrl+"h3.ogg");
-var audio_h4 = new Audio(audioUrl+"h4.ogg");
-var audio_begin1 = new Audio(audioUrl+"begin1.ogg");
-var audio_begin2 = new Audio(audioUrl+"begin2.ogg");
-var audio_otbor_rules= new Audio(audioUrl+"otbor_rules.ogg");
-var audio_otbor_warning= new Audio(audioUrl+"otbor_warning.ogg");
-var audio_otbor_play= new Audio(audioUrl+"otbor_play.ogg");
-var audio_otbor_resullt= new Audio(audioUrl+"otbor_resullt.ogg")
-var audio_start_background= new Audio(audioUrl+"start_background.ogg");
-var audio_rules_player= new Audio(audioUrl+"rules_player.ogg");
-var audio_fix_script= new Audio(audioUrl+"fix_script.ogg");
-var audio_back= new Audio(audioUrl+"back.ogg");
-var audio_reklama= new Audio(audioUrl+"reklama.ogg");
-var audio_invite= new Audio(audioUrl+"invite.ogg");
-var audio_rave_50_50= new Audio(audioUrl+"rave_50_50.ogg");
-var audio_alter= new Audio(audioUrl+"alter.ogg");
-var audio_take_money= new Audio(audioUrl+"take_money.ogg");
-var audio_x2= new Audio(audioUrl+"x2.ogg");
-var audio_x2_2= new Audio(audioUrl+"x2_2.ogg");
-var audio_start_game= new Audio(audioUrl+"start_game.ogg");
-var audio_navigator= new Audio(audioUrl+"navigator.ogg");
-var audio_out_player= new Audio(audioUrl+"out_player.ogg");
-var audio_pre_final= new Audio(audioUrl+"pre-final.ogg");
-var audio_final= new Audio(audioUrl+"final.ogg");
-var audio_help_auden= new Audio(audioUrl+"help_auden.ogg");
-var audio_wait_1min= new Audio(audioUrl+"wait_1min.ogg");
-var audio_4_20= new Audio(audioUrl+"4_20.ogg");
-**/
-var timerWaitAnswer;
-var timerHelps;
+//var timerWaitAnswer;
+//var timerHelps;
 /** Сбрасывает состояние пульта ведущего к начальному состоянию. */
 function cancel_all(){
     btn_default();
-    clearInterval(timerHelps);
+   // clearInterval(timerHelps);
     document.getElementById("rb").value = "false";
     document.getElementById("user_id").disabled = false;
     document.getElementById("user_id").value = "";
     document.getElementById("in_game").value = "В игре: ";
     reset_user_to_wait();
-    update_list_user();
+    //update_list_user();
     var select = document.querySelector('#select_round');
     var select_fix = document.querySelector('#select_fix');
     document.getElementById("au").value = "";
@@ -272,6 +247,10 @@ function ch1()
         select_fix.disabled = false;
     }    
 
+    socket.emit("send_script",{script:select_script.value})
+
+
+    /* 
     fetch('/send_script', {
         method: 'POST',
         body: JSON.stringify({ script:select_script.value}),
@@ -289,7 +268,7 @@ function ch1()
 .catch(error => {
 console.error('Ошибка:', error);
 });
-
+*/
 }
 
 
@@ -414,7 +393,8 @@ function ch2(){
         c8.style.color = "white";
 
     }
-
+    socket.emit("send_fix",{fix:select_fix.value})
+    /*
      fetch('/send_fix', {
         method: 'POST',
         body: JSON.stringify({ fix:select_fix.value}),
@@ -431,7 +411,7 @@ function ch2(){
 })
 .catch(error => {
 console.error('Ошибка:', error);
-});
+}); */
 }
 
 
@@ -744,7 +724,8 @@ function ch3(){
         document.getElementById("get_task").disabled = true; 
     }  
     console.log("Раунд " + round.value);
-
+    socket.emit("send_round",{round:round.value})
+    /*
 
      fetch('/send_round', {
         method: 'POST',
@@ -763,7 +744,7 @@ function ch3(){
 .catch(error => {
 console.error('Ошибка:', error);
 });
-
+*/
 
 
 }
@@ -814,10 +795,6 @@ console.error('Ошибка:', error);
 });
 
 
-
-    
-       
-
 }
 
 function fixed_script()
@@ -832,6 +809,8 @@ document.getElementById("help_auden").disabled = false;
 document.getElementById("fact").disabled = false;
 stop_current_sound();
 playAudio("fix_script.ogg",false)
+update_helps()
+/*
 var helps = [];
     if (document.getElementById("p50_50").checked)
         helps.push("50:50");
@@ -846,10 +825,13 @@ var helps = [];
     if (document.getElementById("pfact").checked)
         helps.push("fact");
     send_helps(helps);
-    timerHelps = setInterval(() => update_helps(), 5000);
+   // timerHelps = setInterval(() => update_helps(), 5000);
 
-
+*/
 }
+
+
+
 
     function update_helps(){
         var helps = [];
@@ -942,7 +924,7 @@ function gen_task()
 {
     
     if (select.value == "Победа")
-        true;
+        return;
     var input = document.getElementById("user_id").value;
     round = document.getElementById("status-round").value;
     var bombs = "false"
@@ -1015,7 +997,7 @@ function gen_task()
        playAudio("q9.ogg",true);
     }
   
-    timerWaitAnswer = setInterval(() => wait_answer(), 5000);
+    //timerWaitAnswer = setInterval(() => wait_answer(), 5000);
 
 })
 .catch(error => {
@@ -1780,7 +1762,7 @@ function show_right(){
         {
             document.getElementById(data[0]).style.backgroundColor ="red"
             document.getElementById("x2").style.backgroundColor =  "#1a1b02";
-            timerWaitAnswer = setInterval(() => wait_answer(), 5000);
+            //timerWaitAnswer = setInterval(() => wait_answer(), 5000);
             return;
         }
 
@@ -2232,6 +2214,9 @@ function take_money()
      playAudio("take_money.ogg",false);
 }
 
+socket.on("request 50:50", (data) => {
+    h50_50();
+})
 
 /** Активирует подсказку 50:50. */
 function h50_50(){
@@ -2261,6 +2246,7 @@ function h50_50(){
     document.getElementById('p50_50').checked = false;
      playAudio("rave_50_50.ogg",false);
     document.getElementById("h50_50").style.backgroundColor = "#000c11";
+    update_helps();
 
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
@@ -2275,6 +2261,11 @@ console.error('Ошибка:', error);
 
 
 }
+
+socket.on("request alter", (data) => {
+    alter();
+})
+
 /** Активирует подсказку Альтернатива. */
 function alter(){
     if(document.getElementById("x2").style.backgroundColor == "orange")
@@ -2307,6 +2298,7 @@ function alter(){
     document.getElementById("palter").checked = false;
     document.getElementById("alter").style.backgroundColor = "orange";
     playAudio("alter.ogg",false);
+    update_helps();
 
 
 
@@ -2319,6 +2311,9 @@ console.error('Ошибка:', error);
 
 
 }
+socket.on("request navi", (data) => {
+    navi();
+})
 /** Активирует подсказку Навигатор. */
 function navi(){
     if(document.getElementById("x2").style.backgroundColor == "orange")
@@ -2350,6 +2345,7 @@ function navi(){
     }
 
     document.getElementById("navi").style.backgroundColor = "#000c11";
+    update_helps();
 
 
 
@@ -2363,6 +2359,9 @@ console.error('Ошибка:', error);
 });
 
 }
+socket.on("request x2", (data) => {
+    x2();
+})
 /** Активирует подсказку x2. */
 function x2(){
     if(check_answered())
@@ -2376,10 +2375,13 @@ function x2(){
     
     stop_current_sound();
     playAudio("x2.ogg",false);
+    update_helps();
 
 
 }
-
+socket.on("request auden", (data) => {
+    help_auden();
+})
 
 /** Активирует подсказку помощи интерактива. */
 function help_auden(){
@@ -2417,6 +2419,7 @@ function help_auden(){
     }
     document.getElementById("au").value = document.getElementById("au").value + " Фатал- "+ data[15] +"%" + " " + " Cвободный слот - "+data[16]+ "%";
     document.getElementById("help_auden").style.backgroundColor = "#000c11";
+    update_helps();
 
    
 
@@ -2427,6 +2430,9 @@ console.error('Ошибка:', error);
 });
 
 }
+socket.on("request fact", (data) => {
+    fact();
+})
 
 /** Активирует подсказку Факт. */
 function fact(){
@@ -2457,6 +2463,7 @@ function fact(){
     document.getElementById("au").value = ""
     document.getElementById("au").value = document.getElementById("au").value + data[0]+": "+ data[1];
     document.getElementById("fact").style.backgroundColor = "#000c11";
+    update_helps();
 
    
 
@@ -2652,22 +2659,27 @@ console.error('Ошибка:', error);
 }
 
 
-let timerId = setInterval(() => update_list_user(), 5000);
+//let timerId = setInterval(() => update_list_user(), 5000);
 
-/** Обновляет таблицу игроков и их статусы. */
-function update_list_user()
-{
-    fetch('/update_list_users', {
-        method: 'POST',
-        body: JSON.stringify({ "":""}),
-        headers: {
-            'Content-Type': 'application/data'
-        }
-    }
+
+socket.on("updated_list_user", (data) => {
+    update_list_user(data);
+}
+
 )
-.then(response => response.json())
+/** Обновляет таблицу игроков и их статусы. */
+function update_list_user(data)
+{
+  //  fetch('/update_list_users', {
+      //  method: 'POST',
+       // body: JSON.stringify({ "":""}),
+      //  headers: {
+       //     'Content-Type': 'application/data'
+    //   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
 
     console.log(data);
     var interactive_col = 0;
@@ -2711,7 +2723,7 @@ function update_list_user()
     return;
    }
 
-    for (var i=0;data.length;i++)
+    for (var i=0;i<data.length;i++)
     {
     var tr = document.createElement("tr")
     var cell1 = document.createElement("td")
@@ -2768,13 +2780,13 @@ function update_list_user()
     tr.appendChild(cell8);
     table.appendChild(tr);
     }
-    
+}  
 
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
-}
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
+//}
 
 function clear_table(){
     fetch('/clear_table', {
@@ -2801,39 +2813,42 @@ console.error('Ошибка:', error);
 });
 }
 
+socket.on ("user answered",(data) =>{
+    wait_answer(data);
+})
 
 /** Периодически проверяет, пришёл ли ответ игрока. */
-function wait_answer(){
-    fetch('/wait_answer_for_host', {
-        method: 'POST',
-        body: JSON.stringify({ "":""}),
-        headers: {
-            'Content-Type': 'application/data'
-        }
-    }
-)
-.then(response => response.json())
+function wait_answer(data){
+    //fetch('/wait_answer_for_host', {
+     //   method: 'POST',
+      //  body: JSON.stringify({ "":""}),
+      //  headers: {
+      //      'Content-Type': 'application/data'
+      //  }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
     
 
-    console.log(data);
+//    console.log(data);
     if (data == 'fail')
         return;
-    console.log(timerWaitAnswer)
-    clearInterval(timerWaitAnswer);
-    clearInterval(timerWaitAnswer);
-    clearInterval(timerWaitAnswer);
-    clearInterval(timerWaitAnswer);
-    clearInterval(timerWaitAnswer);
-    clearInterval(timerWaitAnswer);
-    clearInterval(timerWaitAnswer);
-    clearInterval(timerWaitAnswer);
-    clearInterval(timerWaitAnswer);
-    clearInterval(timerWaitAnswer);
-   if (timerWaitAnswer == undefined)
-        return;
-    timerWaitAnswer = undefined;
+//    console.log(timerWaitAnswer)
+//    clearInterval(timerWaitAnswer);
+ //   clearInterval(timerWaitAnswer);
+ //   clearInterval(timerWaitAnswer);
+ //   clearInterval(timerWaitAnswer);
+ //   clearInterval(timerWaitAnswer);
+ //   clearInterval(timerWaitAnswer);
+ //   clearInterval(timerWaitAnswer);
+ //   clearInterval(timerWaitAnswer);
+ //   clearInterval(timerWaitAnswer);
+ //   clearInterval(timerWaitAnswer);
+//   if (timerWaitAnswer == undefined)
+   //     return;
+ //   timerWaitAnswer = undefined;
     if (data == "1")
     {
         
@@ -2913,10 +2928,10 @@ function wait_answer(){
 
 
 
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 }
 
 
@@ -2980,7 +2995,7 @@ function warning_otbor(){
         return;
     stop_current_sound();
     playAudio("otbor_warning.ogg",false);
-    document.getElementById("au").value = "10";
+    document.getElementById("au").value = "20";
     document.getElementById("start_otbor").disabled = false;
     
 
@@ -3011,7 +3026,7 @@ function start_otbor(){
     playAudio("otbor_play.ogg",false);
     setTimeout(() => {
   timer_otbor(); 
-}, 2000);
+}, 1000);
     
 
 })
@@ -3161,10 +3176,52 @@ function wait_1min(){
     document.getElementById("au").value = "1:00";
     stop_current_sound();
     playAudio("wait_1min.ogg",false);
+    socket.emit("wait_1_min")
     setTimeout(() => {
   timer_wait(time); 
 }, 2000);
 }
+
+/** Показывает большой таймер ожидания 4:12. */
+function wait_4_min(){
+    time = 257;
+   // inputName = document.createElement('input');
+   // inputName.setAttribute('type', 'submit');
+   // inputName.setAttribute('class', 'timer');
+   // inputName.setAttribute('id', 'r0');
+  //  inputName.setAttribute('value', "4:12");
+   // document.getElementById("r0").value
+    document.getElementById("au").value = "4:17";
+    stop_current_sound();
+    playAudio("4_20.ogg",false);
+    socket.emit("wait_4_min")
+    setTimeout(() => {
+  timer_wait2(time); 
+}, 1000);
+}
+
+/** Сервисный обратный отсчёт для spectator. */
+function timer_wait2(time_all){
+    if (time_all<=0)
+    {
+        return;
+    }
+    
+    time_all = time_all -1
+    min = parseInt(time_all/60)
+    second = time_all%60;
+    if (second<10)
+    {
+        document.getElementById("au").value = min.toString()+':'+'0'+second.toString();
+        setTimeout(() => { timer_wait2(time_all); }, 1000);
+        return;
+    }
+    document.getElementById("au").value = min.toString()+':'+second.toString();
+
+    setTimeout(() => { timer_wait2(time_all); }, 1000);
+
+}
+
 
 function timer_wait(time_w){
     if (time_w<=0)

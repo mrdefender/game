@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/static/style/host_slot_inline_table.css">
 	<link rel="stylesheet" href="{{ url_for('static', filename='styles/host_slot_inline_table.css') }}">
 </head>
-<body>
+<body data-role="host">
   <div class="show-shell">
     <header class="show-header panel-glow">
       <div>
@@ -179,12 +179,12 @@
             <div class="control-group">
               <div class="group-title">Подсказки</div>
               <div class="checks-grid">
-                <label class="check-chip"><input type="checkbox" id="p50_50" class="helps1"> <span>50:50</span></label>
-                <label class="check-chip"><input type="checkbox" id="palter" class="helps2"> <span>Альтернатива</span></label>
-                <label class="check-chip"><input type="checkbox" id="pnavi" class="helps3"> <span>Навигатор</span></label>
-                <label class="check-chip"><input type="checkbox" id="px2" class="helps4"> <span>x2</span></label>
-                <label class="check-chip"><input type="checkbox" id="phelp_auden" class="helps5"> <span>Помощь интерактива</span></label>
-                <label class="check-chip"><input type="checkbox" id="pfact" class="helps6"> <span>Факт</span></label>
+                <label class="check-chip"><input type="checkbox" id="p50_50" class="helps1" onclick="update_helps()"> <span>50:50</span></label>
+                <label class="check-chip"><input type="checkbox" id="palter" class="helps2" onclick="update_helps()"> <span>Альтернатива</span></label>
+                <label class="check-chip"><input type="checkbox" id="pnavi" class="helps3" onclick="update_helps()"> <span>Навигатор</span></label>
+                <label class="check-chip"><input type="checkbox" id="px2" class="helps4" onclick="update_helps()"> <span>x2</span></label>
+                <label class="check-chip"><input type="checkbox" id="phelp_auden" class="helps5" onclick="update_helps()"> <span>Помощь интерактива</span></label>
+                <label class="check-chip"><input type="checkbox" id="pfact" class="helps6" onclick="update_helps()"> <span>Факт</span></label>
                 <label class="check-chip"><input type="checkbox" id="bomb" class="helps6"> <span>Бомбы</span></label>
               </div>
               <div class="button-grid button-grid-3">
@@ -203,7 +203,7 @@
                 <input type="submit" class="invite btn-role-primary" id="get_task" onclick="gen_task()" value="Получить задание" disabled>
                 <input type="submit" class="take_money btn-role-money" id="take_money" onclick="take_money()" value="Забрать деньги" disabled>
                 <input type="submit" class="take_money btn-role-money" id="total_money" onclick="total_money()" value="Выигрыш" disabled>
-                <input type="submit" class="cancel-answer btn-role-neutral" id="cancel-answer" value="N/A" disabled>
+                <input type="submit" class="cancel-answer btn-role-neutral" id="cancel-answer" value="Таймер на 4 мин." onclick="wait_4_min()">
                 <input type="submit" class="show-right btn-role-success" id="show-right" onclick="show_right()" value="Показать верный ответ" disabled>
                 <input type="submit" class="next-round btn-role-primary" id="next-round" onclick="next_round()" value="Следующий раунд" disabled>
                 <input type="submit" class="fixed_script btn-role-warning" id="fixed_script" onclick="fixed_script()" value="Зафиксировать сценарий игры" disabled>
@@ -310,6 +310,7 @@
 
   <input type="submit" class="rb" id="rb" value="false" hidden>
 
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="/static/js/host_slot.js"></script>
   <script src="/static/js/host_slot_keyboard_nav.js"></script>
   <script src="/static/js/host_slot_navi_result_addon.js"></script>

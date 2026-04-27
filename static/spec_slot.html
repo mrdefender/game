@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/spec_slot.css') }}">
 
 </head>
-<body>
+<body data-role="spectator">
   <div class="spec-stage-bg"></div>
 
   <main class="spec-shell">
@@ -157,6 +157,7 @@
 
   <footer class="copyrights"></footer>
 
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="/static/js/spec_slot.js"></script>
   <script src="/static/js/spec_slot_stage_addon.js"></script>
   <script src="/static/js/help_icons_show_patch.js"></script>

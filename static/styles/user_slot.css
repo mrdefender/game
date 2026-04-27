@@ -1366,14 +1366,6 @@ input.help-icon[type="submit"]:hover:not(:disabled){
 
 /* === STAGE MODE TRANSITION === */
 
-.player-body.stage-focus .question-panel,
-.player-body.stage-focus .answers-panel,
-.player-body.stage-focus .helps-panel,
-.player-body.stage-focus .otbor-panel {
-  opacity: 0.72;
-  filter: brightness(0.82);
-  transition: opacity 0.35s ease, filter 0.35s ease;
-}
 
 .welcome-panel.stage-flash {
   animation: welcomeStageFlash 0.85s ease-out;
@@ -1396,5 +1388,187 @@ input.help-icon[type="submit"]:hover:not(:disabled){
 
   100% {
     transform: scale(1);
+  }
+}
+/* === GAME STATUS: OTBOR === */
+
+.game-status.otbor {
+  color: #d8c7ff;
+  background: linear-gradient(180deg, #211047, #0d0620);
+  border-color: rgba(160, 110, 255, 0.32);
+
+  box-shadow:
+    0 0 12px rgba(160, 110, 255, 0.28),
+    0 0 30px rgba(160, 110, 255, 0.16);
+}
+
+.welcome-panel.game-otbor {
+  border-color: rgba(160, 110, 255, 0.38);
+
+  box-shadow:
+    inset 0 0 30px rgba(160, 110, 255, 0.18),
+    0 0 24px rgba(160, 110, 255, 0.22),
+    0 0 42px rgba(160, 110, 255, 0.12);
+
+  animation: panelGlowOtbor 3s ease-in-out infinite;
+}
+
+@keyframes panelGlowOtbor {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.18); }
+  100% { filter: brightness(1); }
+}
+/* =========================================================
+   PLAYER PANEL BRIGHTNESS FIX
+   Makes player remote brighter without overpowering status
+   ========================================================= */
+
+/* общий boost карточки */
+.player-card {
+  box-shadow:
+    0 0 26px rgba(0, 170, 255, 0.16),
+    0 0 58px rgba(0, 120, 255, 0.10),
+    var(--shadow),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+/* =========================================================
+   CLEAN PLAYER BRIGHTNESS PATCH (NO DUPLICATES)
+   ========================================================= */
+
+/* === PANEL BOOST === */
+.panel-inner {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(80,160,255,0.08), transparent 42%),
+    rgba(255,255,255,0.045);
+  border-color: rgba(127,216,255,0.14);
+  box-shadow:
+    inset 0 0 22px rgba(80,160,255,0.10),
+    0 0 14px rgba(0,120,255,0.08);
+}
+
+/* === QUESTION SCREEN === */
+.screen-question {
+  border-color: rgba(127,216,255,0.34);
+  color: #fff6cf;
+  text-shadow: 0 0 10px rgba(255,244,185,0.22);
+  box-shadow:
+    inset 0 0 42px rgba(18,58,118,0.55),
+    0 0 26px rgba(49,142,255,0.16);
+}
+
+/* === SECTION TITLES === */
+.section-title {
+  color: #9ee6ff;
+  text-shadow: 0 0 10px rgba(127,216,255,0.2);
+}
+
+/* === ANSWER BUTTONS === */
+.answer-btn {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(127,216,255,0.12), transparent 46%),
+    linear-gradient(180deg, #24466f, #0e1d32);
+  border-color: rgba(180,225,255,0.22);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 10px 22px rgba(0,0,0,0.32),
+    0 0 16px rgba(80,160,255,0.14);
+
+  transition: all 0.2s ease;
+}
+
+.answer-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    0 12px 26px rgba(0,0,0,0.38),
+    0 0 24px rgba(80,160,255,0.22);
+}
+
+/* === HELP BUTTONS (NON ICON) === */
+.help-btn:not(.help-icon) {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 42%),
+    linear-gradient(180deg, #bf8cff, #753ce8);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 10px 22px rgba(0,0,0,0.32),
+    0 0 18px rgba(156,92,255,0.20);
+}
+
+/* === HELP ICON BOOST (без дублирования базового блока) === */
+.help-icon {
+  filter: brightness(1.05) saturate(1.05);
+}
+
+/* === OTBOR PANEL === */
+.otbor-panel {
+  border-color: rgba(160,110,255,0.18);
+  box-shadow:
+    inset 0 0 22px rgba(160,110,255,0.10),
+    0 0 16px rgba(160,110,255,0.08);
+}
+
+.otbor-field {
+  border-color: rgba(160,110,255,0.22);
+  box-shadow:
+    inset 0 0 16px rgba(160,110,255,0.10);
+}
+
+/* === PLAYER INFO === */
+.user-chip,
+.status-chip {
+  border-color: rgba(127,216,255,0.18);
+  box-shadow:
+    inset 0 0 14px rgba(80,160,255,0.08);
+}
+
+/* === CRITICAL FIX: STAGE FOCUS === */
+/* УДАЛИ старый блок с opacity:0.72 */
+
+.player-body.stage-focus .question-panel,
+.player-body.stage-focus .answers-panel,
+.player-body.stage-focus .helps-panel,
+.player-body.stage-focus .otbor-panel {
+  opacity: 0.88;
+  filter: brightness(0.98);
+}
+
+/* === SMOOTH TRANSITIONS === */
+.question-panel,
+.answers-panel,
+.helps-panel,
+.otbor-panel,
+.panel-inner,
+.answer-btn,
+.help-btn {
+  transition:
+    opacity 0.35s ease,
+    filter 0.35s ease,
+    box-shadow 0.25s ease;
+}
+
+/* === MOBILE SAFE === */
+@media (max-width: 460px) {
+  .panel-inner {
+    box-shadow:
+      inset 0 0 16px rgba(80,160,255,0.08),
+      0 0 8px rgba(0,120,255,0.06);
+  }
+
+  .answer-btn {
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.07),
+      0 8px 16px rgba(0,0,0,0.28),
+      0 0 10px rgba(80,160,255,0.10);
+  }
+
+  .player-body.stage-focus .question-panel,
+  .player-body.stage-focus .answers-panel,
+  .player-body.stage-focus .helps-panel,
+  .player-body.stage-focus .otbor-panel {
+    opacity: 0.92;
+    filter: brightness(1);
   }
 }

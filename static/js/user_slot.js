@@ -3,9 +3,47 @@ welcome.innerText = "Добро пожаловать на игру";
 var welcome2 = document.getElementById("welcome2");
 welcome2.innerText = "Свободный слот!";
 
-var timerStatus = setInterval(() => get_status(), 5000);
-var timerHelps;
+//var timerStatus = setInterval(() => get_status(), 5000);
+//var timerHelps;
 var timeWainAnswerFromMain;
+
+const socket = io();
+
+socket.on("connect", () => {
+  console.log("Socket connected:", socket.id);
+
+  socket.emit("ping:test", {
+    page: window.location.pathname
+  });
+});
+
+socket.on("disconnect", () => {
+  console.log("Socket disconnected");
+  document.getElementById("user_name").style.backgroundColor = "red";
+});
+
+socket.on("pong:test", (data) => {
+  console.log("Ответ от сервера:", data);
+});
+
+
+socket.on("connect", () => {
+  console.log("Socket connected:", socket.id);
+
+  socket.emit("room:join", {
+    room: null,
+    role: "user",
+    username: document.getElementById("user_name").value
+  });
+});
+
+socket.on("room:joined", (data) => {
+  console.log("Joined socket room:", data);
+    document.getElementById("user_name").style.backgroundColor = "green";
+});
+
+
+
 
 function btn_default(){
     document.getElementById("o1").value = "1";
@@ -34,8 +72,8 @@ function setGameStatus(text, type = "wait") {
 
     el.innerText = text;
 
-    el.classList.remove("wait", "main", "interactive", "status-flash");
-    panel.classList.remove("game-wait", "game-main", "game-interactive", "stage-flash");
+    el.classList.remove("wait", "main", "interactive", "otbor", "status-flash");
+    panel.classList.remove("game-wait", "game-main", "game-interactive", "game-otbor", "stage-flash");
     body.classList.remove("stage-focus");
 
     switch (type) {
@@ -48,6 +86,12 @@ function setGameStatus(text, type = "wait") {
         case "interactive":
             el.classList.add("interactive");
             panel.classList.add("game-interactive");
+            body.classList.add("stage-focus");
+            break;
+
+        case "otbor":
+            el.classList.add("otbor");
+            panel.classList.add("game-otbor");
             body.classList.add("stage-focus");
             break;
 
@@ -86,8 +130,8 @@ function sync_otbor_timer_ui() {
         return;
     }
 
-    const raw = parseInt(au.value || "0", 10);
-    const max = 10;
+    const raw = parseInt(au.value);
+    const max = 20;
     const safe = Number.isNaN(raw) ? 0 : Math.max(0, Math.min(max, raw));
     const percent = (safe / max) * 100;
 
@@ -99,10 +143,10 @@ function sync_otbor_timer_ui() {
     if (safe <= 0) {
         status.textContent = "Время вышло";
         strip.classList.add("danger");
-    } else if (safe <= 3) {
+    } else if (safe <= 5) {
         status.textContent = "Нужно ответить сейчас";
         strip.classList.add("danger");
-    } else if (safe <= 5) {
+    } else if (safe <= 10) {
         status.textContent = "Осталось мало времени";
         strip.classList.add("warning");
     } else {
@@ -111,20 +155,24 @@ function sync_otbor_timer_ui() {
 }
 
 
-function get_status(){
+socket.on("updated_status_user", (data) => {
+  get_status(data);
+});
 
-    var user_name = document.getElementById("user_name").value;
-    fetch('/get_user_status', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+function get_status(data){
 
-.then(data => {
+   // var user_name = document.getElementById("user_name").value;
+   // fetch('/get_user_status', {
+     //   method: 'POST',
+     //   body: JSON.stringify({ user:user_name}),
+     //   headers: {
+      //      'Content-Type': 'application/json'
+     //   }
+    //}
+//)
+//then(response => response.json())
+
+//.then(data => {
 
    
     if (data=="fail")
@@ -189,7 +237,7 @@ function get_status(){
             document.getElementById("o15").style.backgroundColor = "#000c11";
             document.getElementById("otbor_input").value = "";
             sync_otbor_timer_ui();
-            clearInterval(timerHelps);
+          //  clearInterval(timerHelps);
             clearInterval(timeWainAnswerFromMain);
             clearInterval(timeWainAnswerFromMain);
             clearInterval(timeWainAnswerFromMain);
@@ -261,7 +309,7 @@ function get_status(){
             document.getElementById("otbor_submit").hidden = true;
             document.getElementById("au").hidden = true;
             sync_otbor_timer_ui();
-            timerHelps = setInterval(() => get_helps(), 5000);
+            //timerHelps = setInterval(() => get_helps(), 5000);
             status_btn(true);
             //clearInterval(timerToGame);
         }
@@ -292,7 +340,7 @@ function get_status(){
             document.getElementById("o15").style.backgroundColor = "#000c11";
             btn_default();
             document.getElementById("question").value = " ";
-            get_task();
+            //get_task();
             //clearInterval(timerToGame);
             
         }
@@ -319,26 +367,26 @@ function get_status(){
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
             document.getElementById("question").value = " ";
-            get_task();
+           // get_task();
             //clearInterval(timerToGame);
         }
     if (data == "given task interactive")
         {
-            get_task();
-            p50_50();
-            palter();
-            pnavi();
+           // get_task();
+         //   p50_50();
+         //   palter();
+         //   pnavi();
            // pauden();
             //clearInterval(timerToGame);
            // check_answered_main();
-            timeWainAnswerFromMain = setInterval(() => check_answered_main(), 5000);
+           // timeWainAnswerFromMain = setInterval(() => check_answered_main(), 5000);
         }
     if (data == "given task main")
         {
-            get_task();
-            p50_50();
-            palter();
-            pnavi();
+           // get_task();
+          //  p50_50();
+          //  palter();
+          //  pnavi();
            // pauden();
         }
     if (data == "check main")
@@ -357,13 +405,13 @@ function get_status(){
         {
              document.getElementById('welcome').innerHTML = "";
             document.getElementById('welcome2').innerHTML = "";
-            document.getElementById('welcome3').innerHTML = "Отборочный тур!";
+            setGameStatus("Отборочный тур", "otbor");
             document.getElementById("question").hidden = false;
             document.getElementById("otbor_input").hidden = false;
             document.getElementById("otbor_submit").hidden = false;
             document.getElementById("au").hidden = false;
             sync_otbor_timer_ui();
-            document.getElementById("question").value = "";
+            //document.getElementById("question").value = "";
             document.getElementById("ex2").value ="0"
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
@@ -394,7 +442,7 @@ function get_status(){
               document.getElementById("pfact").disabled = true;
             document.getElementById("question").value = "";
             document.getElementById("ans").value = "";
-            document.getElementById("question").innerText = " ";
+            //document.getElementById("question").innerText = " ";
             document.getElementById("o1").style.backgroundColor = "#000c11";
             document.getElementById("o2").style.backgroundColor = "#000c11";
             document.getElementById("o3").style.backgroundColor = "#000c11";
@@ -410,18 +458,18 @@ function get_status(){
             document.getElementById("o13").style.backgroundColor = "#000c11";
             document.getElementById("o14").style.backgroundColor = "#000c11";
             document.getElementById("o15").style.backgroundColor = "#000c11";
-            clearInterval(timerHelps);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);clearInterval(timeWainAnswerFromMain);
+            //clearInterval(timerHelps);
+           // clearInterval(timeWainAnswerFromMain);
+           // clearInterval(timeWainAnswerFromMain);
+          //  clearInterval(timeWainAnswerFromMain);
+          //  clearInterval(timeWainAnswerFromMain);
+           // clearInterval(timeWainAnswerFromMain);clearInterval(timeWainAnswerFromMain);
             document.getElementById("otbor_input").value = "";
-            get_task_otbor();
+           // get_task_otbor();
         }
         if (data == "warning otbor")
         {
-            document.getElementById("au").value = "10";
+            document.getElementById("au").value = "20";
             sync_otbor_timer_ui();
         }
         if (data == "start otbor")
@@ -433,7 +481,7 @@ function get_status(){
             document.getElementById("ex2").value = "start otbor";
             document.getElementById("otbor_submit").disabled = false;
             document.getElementById("time-start").value = Date.now().toString();
-            setTimeout(() => {timer_otbor(); }, 2000);
+            setTimeout(() => {timer_otbor(); }, 1000);
             
         }
         if (data == "otbor end")
@@ -443,17 +491,17 @@ function get_status(){
             document.getElementById("au").hidden = true;
             document.getElementById("ex2").value = "0";
             sync_otbor_timer_ui();
-            get_answer_otbor();
+            //get_answer_otbor();
         }
         
 
 
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 }
 
@@ -465,8 +513,7 @@ function timer_otbor(){
         return;
     }
 
-    document.getElementById("au").value =
-        (parseInt(document.getElementById("au").value) - 1).toString();
+    document.getElementById("au").value = (parseInt(document.getElementById("au").value) - 1).toString();
 
     sync_otbor_timer_ui();
 
@@ -475,6 +522,14 @@ function timer_otbor(){
 
 
 
+socket.on("get_task_otbor", (data) => {
+    if (data=="fail")
+    {
+       return; 
+    }
+    document.getElementById('question').innerText="Отборочный тур" +'\n'+ "Диапазон: " + data[1] + " - " + data[2] + '\n' +  "md5: " + data[4];  
+})
+/*
 function get_task_otbor(){
     var user_name = document.getElementById("user_name").value;
         fetch('/get_task_otbor', {
@@ -500,31 +555,35 @@ function get_task_otbor(){
 console.error('Ошибка:', error);
 });
 }
+*/
+socket.on ("get_answer_otbor", (data) => {
+    get_answer_otbor(data)
+})
 
-function get_answer_otbor(){
-    var user_name = document.getElementById("user_name").value;
-        fetch('/get_task_otbor', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+function get_answer_otbor(data){
+    //var user_name = document.getElementById("user_name").value;
+     //   fetch('/get_task_otbor', {
+     //   method: 'POST',
+      //  body: JSON.stringify({ user:user_name}),
+      //  headers: {
+      //      'Content-Type': 'application/json'
+     //   }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
 
     if (data=="fail")
     {
        return; 
     }
-    document.getElementById('question').innerText= "Правильный ответ: " + data[3];  
+    document.getElementById('question').innerText= "Правильный ответ: " + data[3].toString();  
 
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 }
 
 
@@ -563,22 +622,28 @@ function send_answer_otbor(){
 console.error('Ошибка:', error);
 });
 }
+socket.on("get_helps", (data) => {
+    get_helps(data);
+})
 
+function get_helps(data){
+    //    var user_name = document.getElementById("user_name").value;
+    //    fetch('/get_helps', {
+    //    method: 'POST',
+    //    body: JSON.stringify({ user:user_name}),
+    //    headers: {
+      //      'Content-Type': 'application/json'
+   //     }
+   // }
+//)
+//.then(response => response.json())
 
-function get_helps(){
-        var user_name = document.getElementById("user_name").value;
-        fetch('/get_helps', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+//.then(data => {
 
-.then(data => {
-
+    const blockedByMode =
+        document.getElementById("ex2").value === "alter" ||
+        document.getElementById("ex2").value === "x2" ||
+        document.getElementById("ex2").value === "x2-2";
     if (data=="fail")
     {
         document.getElementById("p50_50").disabled = true;
@@ -589,17 +654,6 @@ function get_helps(){
      document.getElementById("pfact").disabled = true;
        return;
     
-    }
-
-    if ((document.getElementById("ex2").value == "alter") || (document.getElementById("ex2").value == "x2"))
-    {
-    document.getElementById("p50_50").disabled = true;
-    document.getElementById("palter").disabled = true;
-    document.getElementById("pnavi").disabled = true;
-    document.getElementById("px2").disabled = true;
-    document.getElementById("pauden").disabled = true;
-     document.getElementById("pfact").disabled = true;
-    return;
     }
 
     document.getElementById("p50_50").hidden = true;
@@ -630,30 +684,38 @@ function get_helps(){
     document.getElementById("px2").style.backgroundColor = "#000c11"
     document.getElementById("pauden").style.backgroundColor = "#000c11"
     document.getElementById("pfact").style.backgroundColor = "#000c11"
-    
+    if (blockedByMode) {
+        document.getElementById("p50_50").disabled = true;
+        document.getElementById("palter").disabled = true;
+        document.getElementById("pnavi").disabled = true;
+        document.getElementById("px2").disabled = true;
+        document.getElementById("pauden").disabled = true;
+        document.getElementById("pfact").disabled = true;
+    }
 
-
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
+    }
+socket.on("get_task", (data) => {
+    get_task(data)
 })
-.catch(error => {
-console.error('Ошибка:', error);
-});
-    }
 
-function get_task(){
-    var user_name = document.getElementById("user_name").value;
-    fetch('/get_task_user', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+function get_task(data){
+   /// var user_name = document.getElementById("user_name").value;
+   // fetch('/get_task_user', {
+   //     method: 'POST',
+    //    body: JSON.stringify({ user:user_name}),
+     //   headers: {
+      //      'Content-Type': 'application/json'
+      // / }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
     
-
     if (data == "fail")
     {
         return;
@@ -766,32 +828,35 @@ function get_task(){
 
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
-})
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//})
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 }
+socket.on("check_answered_main", (data) => {
+    check_answered_main(data)
+})
 
-function check_answered_main(){
-    var user_name = document.getElementById("user_name").value;
-    var inter = false;
-    clearInterval(timeWainAnswerFromMain);
-    if (timeWainAnswerFromMain == undefined)
-        return;
-    if (document.getElementById("welcome3").innerHTML=="Интерактивная игра")
-        inter = true;
-    fetch('/check_answered_main', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name, inter:inter}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+function check_answered_main(data){
+//var user_name = document.getElementById("user_name").value;
+   // var inter = false;
+   // clearInterval(timeWainAnswerFromMain);
+   // if (timeWainAnswerFromMain == undefined)
+   //     return;
+   // if (document.getElementById("welcome3").innerHTML=="Интерактивная игра")
+    //    inter = true;
+   // fetch('/check_answered_main', {
+    //    method: 'POST',
+     //   body: JSON.stringify({ user:user_name, inter:inter}),
+    //   headers: {
+     //       'Content-Type': 'application/json'
+     //   }
+   //}
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
 
     if (data == "fail")
     {
@@ -799,18 +864,19 @@ function check_answered_main(){
     }
     if (data == "ok")
     {
-        status_btn(true);
-        clearInterval(timeWainAnswerFromMain);
-        timeWainAnswerFromMain = undefined;
+        if (document.getElementById("welcome3").innerHTML=="Интерактивная игра")
+            status_btn(true);
+        //clearInterval(timeWainAnswerFromMain);
+        //timeWainAnswerFromMain = undefined;
        
        // timeWainAnswerFromMain = undefined;
     }
     
-})
+//})
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 }
 
 function status_btn(it_disable)
@@ -878,7 +944,7 @@ function a1(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -917,7 +983,7 @@ function a2(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -956,7 +1022,7 @@ function a3(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -995,7 +1061,7 @@ function a4(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+   // clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1034,7 +1100,7 @@ function a5(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+   // clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1073,7 +1139,7 @@ function a6(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1112,7 +1178,7 @@ function a7(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1151,7 +1217,7 @@ function a8(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1189,7 +1255,7 @@ function a9(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1228,7 +1294,7 @@ function a10(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1267,7 +1333,7 @@ function a11(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1306,7 +1372,7 @@ function a12(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1345,7 +1411,7 @@ function a13(){
     document.getElementById("pauden").disabled = true;
      document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+   // clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1384,7 +1450,7 @@ function a14(){
     document.getElementById("pauden").disabled = true;
     document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+  //  clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1423,7 +1489,7 @@ function a15(){
     document.getElementById("pauden").disabled = true;
     document.getElementById("pfact").disabled = true;
     status_btn(true);
-    clearInterval(timeWainAnswerFromMain);
+   // clearInterval(timeWainAnswerFromMain);
 })
 
 .catch(error => {
@@ -1432,22 +1498,24 @@ console.error('Ошибка:', error);
 
 }
 
+socket.on("checked answer",(data) => {
+    show_right_user(data);
+})
 
-function show_right_user(){
+function show_right_user(data){
     
-    var user_name = document.getElementById("user_name").value;
-    fetch('/check_answer', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name, double: "0"}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+   // var user_name = document.getElementById("user_name").value;
+   // fetch('/check_answer', {
+      //  method: 'POST',
+    //    body: JSON.stringify({ user:user_name, double: "0"}),
+    //    headers: {
+     //       'Content-Type': 'application/json'
+     //   }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
-
+//.then(data => {
     if (data == "fail")
     {
         return;
@@ -1561,11 +1629,11 @@ function show_right_user(){
 
 
 
-})
+//})
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 
 }
@@ -1645,22 +1713,28 @@ function play5050ShowEffect(id) {
 function p50_50(){
          if (!can_activate_help("50:50"))
         return;
-
-var user_name = document.getElementById("user_name").value;
+   socket.emit("get 50:50",{o:"o"})
+}
+//var user_name = document.getElementById("user_name").value;
 	
      //document.getElementById("p50_50").style.backgroundColor = "orange";
      //document.getElementById("ex2").value = "50:50"
-    fetch('/get_50_50', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+   // fetch('/get_50_50', {
+    //    method: 'POST',
+     //   body: JSON.stringify({ user:user_name}),
+      //  headers: {
+      //      'Content-Type': 'application/json'
+      //  }
+   // }
+//)
+//.then(response => response.json())
 
-.then(data => {
+//.then(data => {
+socket.on ("response_50_50", (data) => {
+    response_50_50(data)
+})
+
+function response_50_50(data){
 
     if (data == "fail")
     {
@@ -1674,36 +1748,26 @@ var user_name = document.getElementById("user_name").value;
      document.getElementById("p50_50").style.backgroundColor = "orange";
      play5050ShowEffect("p50_50");
      document.getElementById("ex2").value = "50:50"
-   
+//})
 
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
+//.catch(error => {
+//console.error('Ошибка:', error);
+//});
 
 }
+
 
 function palter(){
          if (!can_activate_help("alter"))
         return;
+   socket.emit("get alter",{o:"o"})
+}
 
-var user_name = document.getElementById("user_name").value;
-   //  document.getElementById("palter").style.backgroundColor = "orange";
-    // document.getElementById("ex2").value = "alter"
-    fetch('/get_alter', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+socket.on ("response_alter", (data) => {
+    response_alter(data)
+})
 
-.then(data => {
+function response_alter(data){
 
     if (data == "fail")
     {
@@ -1719,34 +1783,20 @@ var user_name = document.getElementById("user_name").value;
     document.getElementById("palter").style.backgroundColor = "orange";
      document.getElementById("ex2").value = "alter"
      play5050ShowEffect("palter");
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
 }
 
 function pnavi(){
-        if (!can_activate_help("navi"))
+         if (!can_activate_help("navi"))
         return;
+   socket.emit("get navi",{o:"o"})
+}
 
-var user_name = document.getElementById("user_name").value;
-    // document.getElementById("pnavi").style.backgroundColor = "orange";
-    // document.getElementById("ex2").value = "navi"
-    fetch('/get_navi', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+socket.on ("response_navi", (data) => {
+    response_navi(data)
+})
 
-.then(data => {
+function response_navi(data){
+       
 
     if (data == "fail")
     {
@@ -1762,115 +1812,61 @@ var user_name = document.getElementById("user_name").value;
     document.getElementById("ex2").value = "navi";
     play5050ShowEffect("pnavi");
 
+}
 
+function px2(){
+         if (!can_activate_help("x2"))
+        return;
+   socket.emit("get x2",{o:"o"})
+}
+
+socket.on ("response_x2", (data) => {
+    response_x2(data)
 })
 
-.catch(error => {
-console.error('Ошибка:', error);
-});
 
-}
-function px2(){
-
-        if (!can_activate_help("x2"))
-        return;
-	
-
-var user_name = document.getElementById("user_name").value;
-     document.getElementById("px2").style.backgroundColor = "orange";
-     document.getElementById("ex2").value = "x2"
-    fetch('/get_x2', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
+function response_x2(data){
+     
 
     if (data == "fail")
     {
         return;
     }
+    document.getElementById("px2").style.backgroundColor = "orange";
+     document.getElementById("ex2").value = "x2"
 	document.getElementById("px2")?.classList.add("is-active");
     play5050ShowEffect("px2");
 
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
-
-
 }
+
+
 
 function pauden(){
         if (!can_activate_help("pauden"))
         return;
 
 document.getElementById("pauden").style.backgroundColor = "orange";
-    var user_name = document.getElementById("user_name").value;
-     fetch('/get_auden', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
-
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
+    
     play5050ShowEffect("pauden");
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
+    socket.emit("get auden",{o:"o"})
 
 }
 
+
+
+
 function pfact(){
     
-        if (!can_activate_help("pfact"))
+    if (!can_activate_help("pfact"))
         return;
 
-document.getElementById("pfact").style.backgroundColor = "orange";
-    var user_name = document.getElementById("user_name").value;
-     fetch('/get_fact', {
-        method: 'POST',
-        body: JSON.stringify({ user:user_name}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-)
-.then(response => response.json())
+    document.getElementById("pfact").style.backgroundColor = "orange";
 
-.then(data => {
-
-    if (data == "fail")
-    {
-        return;
-    }
+  //  if (data == "fail")
+ //   {
+ //       return;
+ //   }
     play5050ShowEffect("pfact");
-
-
-})
-
-.catch(error => {
-console.error('Ошибка:', error);
-});
+    socket.emit("get fact",{o:"o"})
 
 }

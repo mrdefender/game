@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='styles/user_slot.css') }}">
 	
 </head>
-<body>
+<body data-role="player">
     <div class="player-stage-bg"></div>
 
     <main class="player-shell">
@@ -93,12 +93,12 @@
                     </div>
 
                     <div class="helps-grid">
-                        <button type="button" class="help-btn help-icon help-5050" id="p50_50" value="" onclick="" disabled hidden> </button>
-                        <button type="button" class="help-btn help-icon help-alter" id="palter" value="" onclick="" disabled hidden></button>
-                        <button type="button" class="help-btn help-icon help-navi" id="pnavi" value="" onclick="" disabled hidden></button>
+                        <button type="button" class="help-btn help-icon help-5050" id="p50_50" value="" onclick="p50_50()" disabled hidden> </button>
+                        <button type="button" class="help-btn help-icon help-alter" id="palter" value="" onclick="palter()" disabled hidden></button>
+                        <button type="button" class="help-btn help-icon help-navi" id="pnavi" value="" onclick="pnavi()" disabled hidden></button>
                         <button type="button" class="help-btn help-icon help-x2" id="px2" value="" onclick="px2()" disabled hidden></button>
-                        <button type="button" class="help-btn help-icon help-auden" id="pauden" value="" onclick="" disabled hidden></button>
-                        <button type="button" class="help-btn help-icon help-fact" id="pfact" value="" onclick="" disabled hidden></button>
+                        <button type="button" class="help-btn help-icon help-auden" id="pauden" value="" onclick="pauden()" disabled hidden></button>
+                        <button type="button" class="help-btn help-icon help-fact" id="pfact" value="" onclick="pfact()" disabled hidden></button>
                     </div>
                 </section>
 
@@ -135,6 +135,7 @@
         Здесь могло бы быть ваше имя и ваша реклама.
     </footer>
 
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="/static/js/user_slot.js"></script>
     <script src="/static/js/user_slot_stage_addon_light.js"></script>
     <script src="/static/js/user_slot_navi_result_addon.js"></script>
