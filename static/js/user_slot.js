@@ -8,7 +8,17 @@ welcome2.innerText = "Свободный слот!";
 var timeWainAnswerFromMain;
 
 const socket = io();
+function setSocketStatus(isOnline) {
+  const box = document.getElementById("socket-status");
+  const text = document.getElementById("socket-status-text");
 
+  if (!box || !text) return;
+
+  box.classList.toggle("socket-online", isOnline);
+  box.classList.toggle("socket-offline", !isOnline);
+
+  text.innerText = isOnline ? "Сервер подключён" : "Сервер отключён";
+}
 socket.on("connect", () => {
   console.log("Socket connected:", socket.id);
 
@@ -19,7 +29,7 @@ socket.on("connect", () => {
 
 socket.on("disconnect", () => {
   console.log("Socket disconnected");
-  document.getElementById("user_name").style.backgroundColor = "red";
+  setSocketStatus(false);
 });
 
 socket.on("pong:test", (data) => {
@@ -29,7 +39,7 @@ socket.on("pong:test", (data) => {
 
 socket.on("connect", () => {
   console.log("Socket connected:", socket.id);
-
+setSocketStatus(true);
   socket.emit("room:join", {
     room: null,
     role: "user",
@@ -42,7 +52,17 @@ socket.on("room:joined", (data) => {
     document.getElementById("user_name").style.backgroundColor = "green";
 });
 
+socket.on("connect_error", () => {
+  setSocketStatus(false);
+});
 
+socket.on("reconnect_attempt", () => {
+  setSocketStatus(false);
+});
+
+socket.on("reconnect", () => {
+  setSocketStatus(true);
+});
 
 
 function btn_default(){

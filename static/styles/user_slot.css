@@ -1572,3 +1572,44 @@ input.help-icon[type="submit"]:hover:not(:disabled){
     filter: brightness(1);
   }
 }
+.socket-status{
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  z-index:9999;
+  min-height:38px;
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 13px;
+  border-radius:999px;
+  font-size:.78rem;
+  font-weight:900;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:#edf7ff;
+  background:linear-gradient(180deg,rgba(15,34,60,.96),rgba(9,24,43,.95));
+  border:1px solid rgba(111,190,255,.25);
+  box-shadow:0 10px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.socket-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#ff3d57;
+  box-shadow:0 0 16px rgba(255,61,87,.75);
+}
+
+.socket-online .socket-dot{
+  background:#15e06f;
+  box-shadow:0 0 16px rgba(21,224,111,.75);
+}
+
+.socket-offline{
+  border-color:rgba(255,61,87,.35);
+}
+
+.socket-online{
+  border-color:rgba(21,224,111,.35);
+}
