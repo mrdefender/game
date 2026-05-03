@@ -1246,7 +1246,8 @@ function update_script(data)
     }    
     if (data == "Рискованный")
     {
-         c1.style.color = "#dd6706";
+        document.getElementById("script").value = data;
+        c1.style.color = "#dd6706";
         c2.style.color = "#dd6706";
         c3.style.color = "#dd6706";
         c4.style.color = "#dd6706";

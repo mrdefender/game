@@ -1133,6 +1133,7 @@ def send_answer():
                 db.session.commit()
                 update_list_users()
                 wait_answer_for_host()
+                check_answered_main()
                 answered_main_spec()
                 return json.dumps("ok")
             if (user.status == "given task interactive"):
@@ -1194,7 +1195,7 @@ def send_answer():
 
 #@app.route('/wait_answer_for_host', methods=["POST", "GET"])
 def wait_answer_for_host():
-    if request.method == 'POST':
+    #if request.method == 'POST':
         try:
             user = Users.query.filter((Users.status == "answered main")|(Users.status == "answered main x2")).first()
             if user == None:

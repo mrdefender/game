@@ -153,6 +153,8 @@ function cancel_all(){
     status_btn(true,"o");
     select.value = "Раунд 1";
     select_fix.value = "0";
+    select_fix.disabled = true;
+    select_script.value = "Сценарий";
     document.getElementById("take_money").disabled = true;
     document.getElementById("take_money").style.backgroundColor ="#1a1b02";
     document.getElementById("o1").style.backgroundColor = "#000c11";
@@ -266,6 +268,7 @@ function ch1()
     if (select_script.value == "Рискованный")
     {
         select_fix.disabled = false;
+        ch2();
     }    
 
     socket.emit("send_script",{script:select_script.value})
@@ -743,7 +746,9 @@ function ch3(){
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "orange";
         document.getElementById("get_task").disabled = true; 
-    }  
+    } 
+    ch1();
+    ch2(); 
     console.log("Раунд " + round.value);
     socket.emit("send_round",{round:round.value})
     /*
