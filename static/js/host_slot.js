@@ -305,6 +305,8 @@ select_fix.addEventListener('change', function(){
 
 /** Меняет несгораемую сумму в рискованном сценарии. */
 function ch2(){
+    if (select_fix.disabled)
+        return;
     if (select_fix.value =="0")
     {
         //fix_money.value = "0";
