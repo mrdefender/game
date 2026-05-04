@@ -1231,7 +1231,7 @@ function update_script(data)
         c8.style.color = "#dd6706";
         document.getElementById("script").value = data;
     }
-    if (data== "Экстрим")
+    if ((data== "Экстрим") || (data == "Сценарий"))
     {
         document.getElementById("script").value = data;
         c1.style.color = "#dd6706";

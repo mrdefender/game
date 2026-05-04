@@ -252,7 +252,7 @@ function ch1()
         c7.style.color = "#dd6706";
         c8.style.color = "#dd6706";
     }
-    if (select_script.value == "Экстрим")
+    if ((select_script.value == "Экстрим") || (select_script.value == "Сценарий"))
     {
         select_fix.disabled = true;
         c1.style.color = "#dd6706";
