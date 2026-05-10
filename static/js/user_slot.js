@@ -81,6 +81,21 @@ function btn_default(){
     document.getElementById("o13").value = "13";
     document.getElementById("o14").value = "14";
     document.getElementById("o15").value = "15";
+    document.getElementById("o1").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o2").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o3").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o4").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o5").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o6").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o7").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o8").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o9").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o10").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o11").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o12").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o13").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o14").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o15").classList.remove("bomb-red","bomb-black");
 }
 
 function setGameStatus(text, type = "wait") {
@@ -1583,11 +1598,15 @@ function show_right_user(data){
                     {
                         if (ff[i] == data[4])
                         {
-                        document.getElementById(get_o(ff[i].toString())).value = "💣";
+                        const btn = document.getElementById(get_o(ff[i]));
+                    //btn.value = "";
+                    btn.classList.add("bomb-black");
                         }
                         if (ff[i] == data[5])
                         {
-                        document.getElementById(get_o(ff[i].toString())).value = "🧨";
+                        const btn = document.getElementById(get_o(ff[i]));
+                    //btn.value = "";
+                    btn.classList.add("bomb-red");
                         }
                     }
 
@@ -1616,11 +1635,15 @@ function show_right_user(data){
             {
                 if (f[i]==data[4])
                 {
-                    document.getElementById(a).value = "💣";
+                    const btn = document.getElementById(a);
+                    //btn.value = "";
+                    btn.classList.add("bomb-black");
                 }
                 if (f[i]==data[5])
                 {
-                    document.getElementById(a).value = "🧨";
+                    const btn = document.getElementById(a);
+                    //btn.value = "";
+                    btn.classList.add("bomb-red");
                 }
             }
             

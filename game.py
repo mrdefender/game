@@ -322,6 +322,7 @@ def get_md5_hash(stroka):
     
 def generate_string(round_id,is_bombed):
     random.seed(secrets.randbelow(99999))
+    random.seed(secrets.randbelow(99999))
     current_round = int(round_id); #получить номер раунда, 0 - отборочный тур
     count_fatal = 0
     otbor_chislo = 0

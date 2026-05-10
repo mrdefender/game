@@ -1613,3 +1613,44 @@ input.help-icon[type="submit"]:hover:not(:disabled){
 .socket-online{
   border-color:rgba(21,224,111,.35);
 }
+
+/* =====================================================
+   SVG bombs for user_slot answer INPUT buttons
+   ===================================================== */
+
+.answer-btn.bomb-red,
+.answer-btn.bomb-black {
+  font-size: 0 !important;
+  color: transparent !important;
+
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 42px 42px !important;
+}
+
+/* Красная бомба */
+.answer-btn.bomb-red {
+  background-image: url("/static/img/bomb-red.svg") !important;
+
+  box-shadow:
+    0 0 0 2px rgba(212, 0, 31, .28),
+    0 0 24px rgba(255, 40, 40, .42),
+    0 0 46px rgba(180, 0, 0, .26) !important;
+}
+
+/* Черная бомба */
+.answer-btn.bomb-black {
+  background-image: url("/static/img/bomb-black.svg") !important;
+
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, .12),
+    0 0 18px rgba(0, 0, 0, .75),
+    0 0 38px rgba(0, 0, 0, .55) !important;
+}
+
+@media (max-width: 760px) {
+  .answer-btn.bomb-red,
+  .answer-btn.bomb-black {
+    background-size: 34px 34px !important;
+  }
+}

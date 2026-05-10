@@ -793,6 +793,21 @@ function btn_default(){
     btn13.value = "13";
     btn14.value = "14";
     btn15.value = "15";
+    document.getElementById("btn1").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn2").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn3").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn4").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn5").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn6").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn7").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn8").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn9").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn10").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn11").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn12").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn13").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn14").classList.remove("bomb-red","bomb-black");
+    document.getElementById("btn15").classList.remove("bomb-red","bomb-black");
 }
 
 
@@ -1212,8 +1227,10 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
-                document.getElementById(get_btn(b_bomb)).value = "💣";
-                document.getElementById(get_btn(r_bomb)).value = "🧨";
+                //document.getElementById(get_btn(b_bomb)).value = "💣";
+                //document.getElementById(get_btn(r_bomb)).value = "🧨";
+                document.getElementById(get_btn(b_bomb)).classList.add("bomb-black");
+                document.getElementById(get_btn(r_bomb)).classList.add("bomb-red");
             }
             
         }
@@ -1228,8 +1245,10 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
-                document.getElementById(get_btn(b_bomb)).value = "💣";
-                document.getElementById(get_btn(r_bomb)).value = "🧨";
+                //document.getElementById(get_btn(b_bomb)).value = "💣";
+                //document.getElementById(get_btn(r_bomb)).value = "🧨";
+                document.getElementById(get_btn(b_bomb)).classList.add("bomb-black");
+                document.getElementById(get_btn(r_bomb)).classList.add("bomb-red");
             }
             
         }
@@ -1244,8 +1263,10 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
-                document.getElementById(get_btn(b_bomb)).value = "💣";
-                document.getElementById(get_btn(r_bomb)).value = "🧨";
+                //document.getElementById(get_btn(b_bomb)).value = "💣";
+                //document.getElementById(get_btn(r_bomb)).value = "🧨";
+                document.getElementById(get_btn(b_bomb)).classList.add("bomb-black");
+                document.getElementById(get_btn(r_bomb)).classList.add("bomb-red");
             }
             
         }
@@ -1260,8 +1281,10 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
-                document.getElementById(get_btn(b_bomb)).value = "💣";
-                document.getElementById(get_btn(r_bomb)).value = "🧨";
+                //document.getElementById(get_btn(b_bomb)).value = "💣";
+                //document.getElementById(get_btn(r_bomb)).value = "🧨";
+                document.getElementById(get_btn(b_bomb)).classList.add("bomb-black");
+                document.getElementById(get_btn(r_bomb)).classList.add("bomb-red");
             }
             
         }
@@ -1276,8 +1299,10 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
-                document.getElementById(get_btn(b_bomb)).value = "💣";
-                document.getElementById(get_btn(r_bomb)).value = "🧨";
+                //document.getElementById(get_btn(b_bomb)).value = "💣";
+                //document.getElementById(get_btn(r_bomb)).value = "🧨";
+                document.getElementById(get_btn(b_bomb)).classList.add("bomb-black");
+                document.getElementById(get_btn(r_bomb)).classList.add("bomb-red");
             }
             
         }
@@ -1292,8 +1317,10 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
-                document.getElementById(get_btn(b_bomb)).value = "💣";
-                document.getElementById(get_btn(r_bomb)).value = "🧨";
+                //document.getElementById(get_btn(b_bomb)).value = "💣";
+                //document.getElementById(get_btn(r_bomb)).value = "🧨";
+                document.getElementById(get_btn(b_bomb)).classList.add("bomb-black");
+                document.getElementById(get_btn(r_bomb)).classList.add("bomb-red");
             }
             
         }
@@ -1994,11 +2021,11 @@ function show_right(){
         document.getElementById("au").value = fix_money.value;
         document.getElementById("next-round").disabled = true;
         document.getElementById("total_money").disabled = false;
-        if (document.getElementById(o_to_btn(data[0])).value=="💣")
+        if (document.getElementById(o_to_btn(data[0])).classList.contains("bomb-black"))
         {
             document.getElementById("au").value = "0";
         }
-        if (document.getElementById(o_to_btn(data[0])).value=="🧨")
+        if (document.getElementById(o_to_btn(data[0])).classList.contains("bomb-red"))
         {
             document.getElementById("au").value = "0";
             document.getElementById("rb").value = "true";

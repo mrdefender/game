@@ -892,3 +892,97 @@ input[type="submit"] {
 .socket-online{
   border-color:rgba(21,224,111,.35);
 }
+/* =====================================================
+   HOST SLOT — SVG bombs FIX for input buttons
+   ===================================================== */
+
+.answer-btn.bomb-red,
+.answer-btn.bomb-black {
+  color: transparent !important;
+  font-size: 0 !important;
+
+  background-color: transparent !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 42px 42px !important;
+}
+
+.answer-btn.bomb-red {
+  background:
+    linear-gradient(180deg, #3b070b, #160205),
+    url("/static/img/bomb-red.svg") center / 42px 42px no-repeat !important;
+
+  border-color: rgba(255, 80, 80, .65) !important;
+
+  box-shadow:
+    0 0 0 2px rgba(212, 0, 31, .24),
+    0 0 22px rgba(255, 40, 40, .34),
+    0 0 46px rgba(180, 0, 0, .24) !important;
+}
+
+.answer-btn.bomb-black {
+  background:
+    linear-gradient(180deg, #14191f, #05070a),
+    url("/static/img/bomb-black.svg") center / 42px 42px no-repeat !important;
+
+  border-color: rgba(255,255,255,.22) !important;
+
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.08),
+    0 0 18px rgba(0,0,0,.75),
+    0 0 36px rgba(0,0,0,.55) !important;
+}
+
+@media (max-width:760px) {
+  .answer-btn.bomb-red {
+    background:
+      linear-gradient(180deg, #3b070b, #160205),
+      url("/static/img/bomb-red.svg") center / 34px 34px no-repeat !important;
+  }
+
+  .answer-btn.bomb-black {
+    background:
+      linear-gradient(180deg, #14191f, #05070a),
+      url("/static/img/bomb-black.svg") center / 34px 34px no-repeat !important;
+  }
+}
+/* =====================================================
+   HOST SLOT — SVG bombs FINAL FIX
+   перебивает #btn[style] правила
+   ===================================================== */
+
+#btn1.bomb-red, #btn2.bomb-red, #btn3.bomb-red, #btn4.bomb-red, #btn5.bomb-red,
+#btn6.bomb-red, #btn7.bomb-red, #btn8.bomb-red, #btn9.bomb-red, #btn10.bomb-red,
+#btn11.bomb-red, #btn12.bomb-red, #btn13.bomb-red, #btn14.bomb-red, #btn15.bomb-red {
+  font-size: 0 !important;
+  color: transparent !important;
+
+  background:
+    url("/static/img/bomb-red.svg") center / 42px 42px no-repeat,
+    linear-gradient(180deg, #3b070b, #160205) !important;
+
+  border-color: rgba(255, 80, 80, .65) !important;
+
+  box-shadow:
+    0 0 0 2px rgba(212, 0, 31, .24),
+    0 0 22px rgba(255, 40, 40, .34),
+    0 0 46px rgba(180, 0, 0, .24) !important;
+}
+
+#btn1.bomb-black, #btn2.bomb-black, #btn3.bomb-black, #btn4.bomb-black, #btn5.bomb-black,
+#btn6.bomb-black, #btn7.bomb-black, #btn8.bomb-black, #btn9.bomb-black, #btn10.bomb-black,
+#btn11.bomb-black, #btn12.bomb-black, #btn13.bomb-black, #btn14.bomb-black, #btn15.bomb-black {
+  font-size: 0 !important;
+  color: transparent !important;
+
+  background:
+    url("/static/img/bomb-black.svg") center / 42px 42px no-repeat,
+    linear-gradient(180deg, #14191f, #05070a) !important;
+
+  border-color: rgba(255,255,255,.22) !important;
+
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.08),
+    0 0 18px rgba(0,0,0,.75),
+    0 0 36px rgba(0,0,0,.55) !important;
+}

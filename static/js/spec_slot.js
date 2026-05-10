@@ -173,7 +173,7 @@ function syncWait4MinVisual(secondsLeft) {
     wrap.classList.add("wait-4min-mode");
     au.classList.add("wait-4min-active");
 
-    if (secondsLeft <= 30 && secondsLeft > 0) {
+    if (secondsLeft <= 60 && secondsLeft > 0) {
         au.classList.add("wait-4min-danger");
     } else {
         au.classList.remove("wait-4min-danger");
@@ -193,7 +193,7 @@ function clearWait4MinVisual() {
 function setWait4MinStage(secondsLeft) {
     document.body.classList.add("wait-4min-focus");
 
-    if (secondsLeft <= 30 && secondsLeft > 0) {
+    if (secondsLeft <= 60 && secondsLeft > 0) {
         document.body.classList.add("wait-4min-ending");
     } else {
         document.body.classList.remove("wait-4min-ending");
@@ -263,7 +263,21 @@ function btn_default(){
     document.getElementById("o15").value = "15";
     document.getElementById("o15").classList.remove("wrong");
     document.getElementById("o15").classList.remove("right");
-
+    document.getElementById("o1").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o2").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o3").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o4").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o5").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o6").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o7").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o8").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o9").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o10").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o11").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o12").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o13").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o14").classList.remove("bomb-red","bomb-black");
+    document.getElementById("o15").classList.remove("bomb-red","bomb-black");
 }
 
 
@@ -542,7 +556,7 @@ function update_list_user(data)
     {
        // calc_total();
         an = document.getElementById("ans").value;
-        if ((document.getElementById(an).value == "💣") || (document.getElementById(an).value == "🧨"))
+        if ((document.getElementById(an).classList.contains("bomb-black")) || (document.getElementById(an).classList.contains("bomb-red")))
         {
             document.getElementById("au").value ="Выигрыш:" +'\n'+ "0";
             return;
@@ -1007,9 +1021,18 @@ function check_answered(data){
            if ((data[4]!="false") && (data[5]!="false"))
            {
                 if (fa[i]==data[4])
-                    document.getElementById(id).value = "💣";
+                {
+                    const btn = document.getElementById(get_o(fa[i]));
+                    //btn.value = "";
+                    btn.classList.add("bomb-black");
+                }
                 if (fa[i]==data[5])
-                    document.getElementById(id).value = "🧨";
+                    {
+                    const btn = document.getElementById(get_o(fa[i]));
+                    //btn.value = "";
+                    btn.classList.add("bomb-red");
+                }
+                    
            }
             return;
         }
@@ -1027,9 +1050,17 @@ function check_answered(data){
         if ((data[4]!="false") && (data[5]!="false"))
            {
                 if (fa[i]==data[4])
-                    document.getElementById(id).value = "💣";
+                {
+                    const btn = document.getElementById(get_o(fa[i]));
+                    //btn.value = "";
+                    btn.classList.add("bomb-black");
+                }
                 if (fa[i]==data[5])
-                    document.getElementById(id).value = "🧨";
+                    {
+                    const btn = document.getElementById(get_o(fa[i]));
+                    //btn.value = "";
+                    btn.classList.add("bomb-red");
+                }
            }
            
     }
