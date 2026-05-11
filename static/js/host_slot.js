@@ -2113,6 +2113,7 @@ function next_round()
         stop_current_sound();
         playAudio("n9.ogg",false);
     }
+    update_helps();
     document.getElementById("o1").style.backgroundColor = "#000c11";
     document.getElementById("o2").style.backgroundColor = "#000c11";
     document.getElementById("o3").style.backgroundColor = "#000c11";

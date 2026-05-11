@@ -336,8 +336,9 @@ def generate_string(round_id,is_bombed):
        # md5_hash = hashlib.md5(str(otbor_chislo).encode()).hexdigest()
         md5_hash = get_md5_hash(otbor_chislo)
         result = [current_round,a,b,otbor_chislo,md5_hash]
-        socketio.emit("get_task_otbor",result,to=f"{DEFAULT_ROOM_CODE}:spectator")
-        socketio.emit("get_task_otbor",result,to=f"{Room.query.first()}:user")
+        result_send = [current_round,a,b,None,md5_hash]
+        socketio.emit("get_task_otbor",result_send,to=f"{DEFAULT_ROOM_CODE}:spectator")
+        socketio.emit("get_task_otbor",result_send,to=f"{Room.query.first()}:user")
         js = json.dumps(result)
         with open('task_otbor.json', 'w') as file:
             json.dump(result, file)
@@ -359,8 +360,9 @@ def generate_string(round_id,is_bombed):
         #md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
         md5_hash = get_md5_hash(fatal)
         result = [current_round,fatal,md5_hash, count_fatal]
-        socketio.emit("get_task",result,to=f"{DEFAULT_ROOM_CODE}:spectator")
-        socketio.emit("get_task",result,to=f"{Room.query.first()}")
+        result_send = [current_round,None,md5_hash, count_fatal]
+        socketio.emit("get_task",result_send,to=f"{DEFAULT_ROOM_CODE}:spectator")
+        socketio.emit("get_task",result_send,to=f"{Room.query.first()}")
         Task.query.delete()
         task = Task()
         task.round = current_round
@@ -386,8 +388,9 @@ def generate_string(round_id,is_bombed):
         #md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
         md5_hash = get_md5_hash(fatal)
         result = [current_round,fatal,md5_hash,count_fatal,b_bomb,r_bomb]
-        socketio.emit("get_task",result,to=f"{DEFAULT_ROOM_CODE}:spectator")
-        socketio.emit("get_task",result,to=f"{Room.query.first()}")
+        result_send = [current_round,None,md5_hash,count_fatal,None,None]
+        socketio.emit("get_task",result_send,to=f"{DEFAULT_ROOM_CODE}:spectator")
+        socketio.emit("get_task",result_send,to=f"{Room.query.first()}")
         Task.query.delete()
         task = Task()
         task.round = current_round
