@@ -231,6 +231,7 @@ def select():
         if request.form.values == "Свободный слот":
          print (url_for('slot'))
          return render_template("slot.html")
+    abort(403)
     print (url_for('join'))
     return render_template("login.html")
 
@@ -239,14 +240,21 @@ def slot():
     if request.method == 'POST':
         print (url_for('slot'))
         return render_template("slot.html")
+    abort(403)
     print (url_for('join'))
     return render_template("login.html")
+
+@app.route('/user_slot', methods=["GET"])
+def user_slot():
+    if request.method == 'GET':
+        abort(401)
 
 @app.route('/spec_slot', methods=["POST", "GET"])
 def spec_slot():
     if request.method == 'POST':
         print (url_for('slot'))
         return render_template("spec_slot.html")
+    abort(400)
     print (url_for('join'))
     return render_template("login.html")
 
@@ -258,6 +266,7 @@ def host_slot():
         #for i in _users:
           #  flash (i)
         return render_template("host_slot.html")
+    abort(403)
     print (url_for('join'))
     return render_template("login.html")
 
@@ -1176,10 +1185,12 @@ def send_answer():
                         if int(user.answer)==jsn[4]:
                             user.money = 0
                             db.session.commit()
+                            update_list_users()
                             return json.dumps("ok")
                         if int(user.answer)==jsn[5]:
                            user.money = user.money - 3000*c_fatals
                            db.session.commit()
+                           update_list_users()
                            return json.dumps("ok")
                     for i in range(c_fatals):
                         if int(user.answer)==fatals[i]:
