@@ -13,13 +13,20 @@
 </head>
 <body data-role="spectator">
   <div class="spec-stage-bg"></div>
-
+      <div id="room-code-toast" class="room-code-toast">
+        <div class="room-code-label">Код комнаты</div>
+        <div id="room-code-value" class="room-code-value"></div>
+        <div class="room-code-domain">
+        <p>Присоединяйтесь к игре:<br>
+         https://games.mokaque-t.ru/join</p>
+        </div>
+        </div>
   <main class="spec-shell">
     <header class="spec-header panel-glow">
       <div class="brand-block">
-        <div class="eyebrow">TV STUDIO EDITION</div>
-        <h1>Свободный слот — зрительский экран</h1>
-        <div class="subline">Единый стиль с пультами ведущего и игрока</div>
+        <div class="eyebrow"></div>
+        <h1>Свободный слот</h1>
+        <div class="subline"></div>
       </div>
       <div class="spec-legend">
         <span class="legend-chip legend-player">Ответ игрока</span>
@@ -27,6 +34,7 @@
         <span class="legend-chip legend-right">Верный ответ</span>
         <span class="legend-chip legend-navi">Навигатор</span>
       </div>
+
     </header>
 
     <section class="spec-main">
@@ -35,7 +43,7 @@
           <div class="section-title">Статус игры</div>
           <div class="section-note">Зрительский режим</div>
         </div>
-
+        
         <input class="in_game display-field" id="in_game" value="">
 <input type="submit" class="tree-status display-field" id="users" name="user_name" value="" disabled>
 

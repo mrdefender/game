@@ -851,6 +851,7 @@ def open_room():
             db.session.add(room_code)
             db.session.flush()
             db.session.commit()
+            socketio.emit("room_code_show", {"room":room_code.id}, to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(room_code.id)
         except:
             return json.dumps("fail")
@@ -899,6 +900,7 @@ def close_room():
     if request.method == 'POST':
         Room.query.delete()
         db.session.commit()
+        socketio.emit("room_code_hide", {}, to=f"{DEFAULT_ROOM_CODE}:spectator")
         return json.dumps("ok")
     else:
         return json.dumps("fail")

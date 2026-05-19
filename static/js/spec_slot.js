@@ -215,6 +215,27 @@ function clearWait4MinStage() {
 }
 
 
+socket.on("room_code_show", (data) => {
+  const toast = document.getElementById("room-code-toast");
+  const value = document.getElementById("room-code-value");
+
+  if (!toast || !value) return;
+
+  value.innerText = data.room || "";
+  toast.classList.add("is-visible");
+});
+
+socket.on("room_code_hide", () => {
+  const toast = document.getElementById("room-code-toast");
+  const value = document.getElementById("room-code-value");
+
+  if (!toast || !value) return;
+
+  toast.classList.remove("is-visible");
+  value.innerText = "";
+});
+
+
 
 /** Возвращает кнопки ответов зрительского экрана в базовое состояние. */
 function btn_default(){
