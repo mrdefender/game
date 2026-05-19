@@ -1551,16 +1551,20 @@ body.wait-4min-freeze .au-inline {
   left: 50%;
   z-index: 9998;
   transform: translate(-50%, -140%);
-  min-width: 280px;
-  padding: 14px 22px;
+  min-width:240px;
+  padding:12px 18px;
   border-radius: 20px;
   text-align: center;
   opacity: 0;
   pointer-events: none;
 
- background:
-  radial-gradient(circle at top, rgba(120,190,255,.22), transparent 48%),
-  linear-gradient(180deg, rgba(10,28,78,.98), rgba(4,10,28,.98));
+background:
+  radial-gradient(circle at top, rgba(120,190,255,.18), transparent 52%),
+  linear-gradient(
+    180deg,
+    rgba(8,28,78,.96),
+    rgba(3,10,28,.98)
+  );
 
 border: 1px solid rgba(120,190,255,.55);
 
@@ -1587,6 +1591,7 @@ box-shadow:
   color:#8fdfff;
   font-weight: 900;
   margin-bottom: 4px;
+  
 }
 
 .room-code-value {
@@ -1600,7 +1605,7 @@ box-shadow:
     0 0 28px rgba(80,160,255,.28);
 }
 .room-code-domain{
-  margin-top:10px;
+  margin-top:8px;
 
   display:inline-flex;
   align-items:center;
@@ -1620,7 +1625,7 @@ box-shadow:
 
   border:1px solid rgba(255,255,255,.10);
 
-  font-size:.74rem;
+  font-size:1rem;
   font-weight:800;
   letter-spacing:.08em;
 
