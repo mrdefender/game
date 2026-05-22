@@ -1965,3 +1965,83 @@ function status_btn(it_disable)
     btn15 = document.getElementById("o15");
     btn15.disabled = it_disable;
 }
+
+
+socket.on("show_credits", (data) => {
+  const overlay = document.getElementById("credits-overlay");
+  const roll = overlay?.querySelector(".credits-roll");
+  const title = document.getElementById("credits-title");
+  const linesBox = document.getElementById("credits-lines");
+
+  if (!overlay || !roll || !title || !linesBox) return;
+
+  title.innerText = data.title || "Спасибо за игру!";
+
+  const lines = Array.isArray(data.lines) ? data.lines : [];
+
+  linesBox.innerHTML = lines
+    .map(line => `<div class="credits-line">${line}</div>`)
+    .join("");
+
+  overlay.classList.remove("is-visible", "is-hiding");
+  document.body.classList.remove("credits-mode");
+
+  roll.style.animation = "none";
+  roll.style.transform = "translateY(0)";
+
+  void roll.offsetWidth;
+
+  roll.style.animation = "";
+
+  overlay.classList.add("is-visible");
+  document.body.classList.add("credits-mode");
+});
+
+socket.on("hide_credits", () => {
+  const overlay = document.getElementById("credits-overlay");
+  const roll = overlay?.querySelector(".credits-roll");
+
+  if (!overlay || !roll) return;
+
+  overlay.classList.add("is-hiding");
+
+  setTimeout(() => {
+    overlay.classList.remove("is-visible", "is-hiding");
+    document.body.classList.remove("credits-mode");
+
+    roll.style.animation = "none";
+    roll.style.transform = "translateY(0)";
+
+    void roll.offsetWidth;
+
+    roll.style.animation = "";
+  }, 700);
+});
+
+socket.on("show_intro", () => {
+  const intro = document.getElementById("intro-overlay");
+  if (!intro) return;
+
+  const animatedItems = intro.querySelectorAll(
+    ".intro-beams-blue, .intro-beams-gold, .intro-smoke, .intro-scan, .intro-center, .intro-flash"
+  );
+
+  intro.classList.remove("is-active");
+
+  animatedItems.forEach((el) => {
+    el.style.animation = "none";
+  });
+
+  void intro.offsetWidth;
+
+  animatedItems.forEach((el) => {
+    el.style.animation = "";
+  });
+
+  intro.classList.add("is-active");
+
+  clearTimeout(window.introHideTimer);
+  window.introHideTimer = setTimeout(() => {
+    intro.classList.remove("is-active");
+  }, 7200);
+});

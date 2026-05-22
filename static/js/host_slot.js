@@ -203,6 +203,7 @@ function cancel_all(){
    ch1();
    ch2();
    ch3();
+   socket.emit("host_hide_credits");
   //  location.reload();
 }
 
@@ -2644,6 +2645,7 @@ function start_sound_begin1()
 {
     stop_current_sound();
     playAudio("begin1.ogg",false);
+    socket.emit("show_intro");
 }
 function start_sound_begin2()
 {
@@ -2669,6 +2671,7 @@ function start_final()
 {
     stop_current_sound();
     playAudio("final.ogg",false);
+    socket.emit("host_show_credits");
 }
 
 

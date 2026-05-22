@@ -2038,6 +2038,28 @@ def wait_4_min():
 def wait_1_min():
     socketio.emit("wait_1min","ok",to=f"{DEFAULT_ROOM_CODE}:spectator")
 
+@socketio.on("host_show_credits")
+def host_show_credits():
+    socketio.emit("show_credits", {
+    "title": "Спасибо за игру!",
+    "lines": [
+        "Ведущий: Mokaque",
+        "Авторы идеи: Сергей Бойцов,  Игорь Черкасов",
+        "Композитор: Дмитрий Яковлев",
+        "Программное обеспечение: Mokaque",
+        "До встречи в следующей игре!"
+    ]
+}, to=f"{DEFAULT_ROOM_CODE}:spectator")
+    
+
+@socketio.on("host_hide_credits")
+def host_hide_credits():
+    socketio.emit("hide_credits", {}, to=f"{DEFAULT_ROOM_CODE}:spectator")
+
+
+@socketio.on("show_intro")
+def handle_show_intro():
+    emit("show_intro", to=f"{DEFAULT_ROOM_CODE}:spectator")
 
 
 if __name__ == "__main__":
