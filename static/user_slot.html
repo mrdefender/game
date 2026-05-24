@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style/user_slot.css">
 	<link rel="stylesheet" href="{{ url_for('static', filename='styles/user_slot.css') }}">
-	
+	<button class="theme-toggle-btn" onclick="cycleTheme()">Сменить цвет интерфейса</button>
 </head>
 <body data-role="player">
     <div class="player-stage-bg"></div>
@@ -141,6 +141,60 @@
     <script src="/static/js/user_slot_navi_result_addon.js"></script>
 	<script src="/static/js/help_icons_show_patch.js"></script>
 	<script src="/static/js/help_disabled_states.js"></script>
+    <script>
+const themes = [
+  "blue",
+  "violet",
+  "emerald",
+  "gold",
+  "crimson",
+  "ice",
+
+  "sky",
+  "aqua",
+  "pearl",
+  "rose",
+  "sunset",
+  "arctic"
+];
+
+let currentTheme = 0;
+
+function cycleTheme() {
+
+  currentTheme++;
+
+  if(currentTheme >= themes.length){
+    currentTheme = 0;
+  }
+
+  const theme = themes[currentTheme];
+
+  if(theme === "default"){
+    document.body.removeAttribute("data-theme");
+  } else {
+    document.body.setAttribute("data-theme", theme);
+  }
+
+  localStorage.setItem("ui_theme", theme);
+}
+
+window.addEventListener("load", () => {
+
+  const saved = localStorage.getItem("ui_theme");
+
+  if(saved && saved !== "default"){
+
+    document.body.setAttribute("data-theme", saved);
+
+    const idx = themes.indexOf(saved);
+
+    if(idx >= 0){
+      currentTheme = idx;
+    }
+  }
+});
+</script>
     <div id="socket-status" class="socket-status socket-offline">
   <span class="socket-dot"></span>
   <span id="socket-status-text">Сервер отключён</span>

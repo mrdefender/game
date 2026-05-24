@@ -1654,3 +1654,510 @@ input.help-icon[type="submit"]:hover:not(:disabled){
     background-size: 34px 34px !important;
   }
 }
+/* =========================================================
+   THEME TOGGLE BUTTON
+   TV SHOW STYLE
+   ========================================================= */
+
+.theme-toggle-btn {
+
+  position: relative;
+
+  min-width: 120px;
+  min-height: 44px;
+
+  padding: 10px 18px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+
+  background:
+    radial-gradient(circle at top, rgba(120,180,255,.16), transparent 55%),
+    linear-gradient(180deg, #182b47 0%, #0a1425 100%);
+
+  color: #edf7ff;
+
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 0 18px rgba(80,160,255,.12),
+    0 8px 20px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.06);
+
+  transition:
+    transform .16s ease,
+    filter .16s ease,
+    box-shadow .16s ease,
+    border .16s ease;
+}
+
+/* hover */
+
+.theme-toggle-btn:hover {
+
+  transform: translateY(-1px);
+
+  filter: brightness(1.06);
+
+  border-color: rgba(140,200,255,.24);
+
+  box-shadow:
+    0 0 22px rgba(80,160,255,.24),
+    0 12px 24px rgba(0,0,0,.32),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* click */
+
+.theme-toggle-btn:active {
+
+  transform: scale(.98);
+}
+
+/* glow line */
+
+.theme-toggle-btn::before {
+
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -120%;
+
+  width: 80%;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.18),
+      transparent
+    );
+
+  transform: skewX(-20deg);
+
+  transition: left .6s ease;
+}
+
+.theme-toggle-btn:hover::before {
+
+  left: 140%;
+}
+
+/* focus */
+
+.theme-toggle-btn:focus {
+
+  outline: none;
+
+  box-shadow:
+    0 0 0 2px rgba(127,216,255,.24),
+    0 0 22px rgba(80,160,255,.30),
+    0 8px 24px rgba(0,0,0,.32);
+}
+
+/* =========================================================
+   THEME COLORS
+   ========================================================= */
+
+/* violet */
+
+body[data-theme="violet"] .theme-toggle-btn {
+
+  background:
+    radial-gradient(circle at top, rgba(180,120,255,.18), transparent 55%),
+    linear-gradient(180deg, #2a1542 0%, #13081f 100%);
+
+  box-shadow:
+    0 0 22px rgba(160,80,255,.18),
+    0 8px 24px rgba(0,0,0,.32);
+}
+
+/* emerald */
+
+body[data-theme="emerald"] .theme-toggle-btn {
+
+  background:
+    radial-gradient(circle at top, rgba(120,255,190,.16), transparent 55%),
+    linear-gradient(180deg, #123628 0%, #07150f 100%);
+
+  box-shadow:
+    0 0 22px rgba(40,220,140,.16),
+    0 8px 24px rgba(0,0,0,.32);
+}
+
+/* gold */
+
+body[data-theme="gold"] .theme-toggle-btn {
+
+  background:
+    radial-gradient(circle at top, rgba(255,210,120,.18), transparent 55%),
+    linear-gradient(180deg, #3b2a0f 0%, #181005 100%);
+
+  color: #fff2cf;
+
+  box-shadow:
+    0 0 22px rgba(255,180,60,.18),
+    0 8px 24px rgba(0,0,0,.32);
+}
+
+/* crimson */
+
+body[data-theme="crimson"] .theme-toggle-btn {
+
+  background:
+    radial-gradient(circle at top, rgba(255,120,140,.18), transparent 55%),
+    linear-gradient(180deg, #3a1018 0%, #17060a 100%);
+
+  box-shadow:
+    0 0 22px rgba(255,70,90,.18),
+    0 8px 24px rgba(0,0,0,.32);
+}
+
+/* ice */
+
+body[data-theme="ice"] .theme-toggle-btn {
+
+  background:
+    radial-gradient(circle at top, rgba(120,220,255,.18), transparent 55%),
+    linear-gradient(180deg, #103244 0%, #06131b 100%);
+
+  box-shadow:
+    0 0 22px rgba(80,180,255,.18),
+    0 8px 24px rgba(0,0,0,.32);
+}
+/* =========================================================
+   USER COLOR THEMES
+   Меняет атмосферу интерфейса, НЕ трогает кнопки ответов
+   ========================================================= */
+
+/* ---------- THEME VARIABLES ---------- */
+
+body[data-theme="blue"] {
+  --theme-bg-a:#02050b;
+  --theme-bg-b:#07111f;
+  --theme-bg-c:#02050b;
+  --theme-glow-a:rgba(62,119,245,.25);
+  --theme-glow-b:rgba(255,174,0,.18);
+  --theme-panel-a:rgba(15,34,60,.96);
+  --theme-panel-b:rgba(9,24,43,.95);
+  --theme-inner:rgba(255,255,255,.03);
+  --theme-line:rgba(111,190,255,.25);
+  --theme-title:#7fd8ff;
+  --theme-muted:#9bb8d8;
+}
+
+body[data-theme="violet"] {
+  --theme-bg-a:#080511;
+  --theme-bg-b:#170c2a;
+  --theme-bg-c:#05030a;
+  --theme-glow-a:rgba(150,80,255,.24);
+  --theme-glow-b:rgba(255,110,220,.12);
+  --theme-panel-a:rgba(39,20,66,.96);
+  --theme-panel-b:rgba(20,10,38,.96);
+  --theme-inner:rgba(196,120,255,.045);
+  --theme-line:rgba(196,120,255,.24);
+  --theme-title:#d8b7ff;
+  --theme-muted:#c6b5dd;
+}
+
+body[data-theme="emerald"] {
+  --theme-bg-a:#03100b;
+  --theme-bg-b:#082218;
+  --theme-bg-c:#020806;
+  --theme-glow-a:rgba(40,220,140,.18);
+  --theme-glow-b:rgba(120,255,200,.10);
+  --theme-panel-a:rgba(11,45,34,.96);
+  --theme-panel-b:rgba(5,24,18,.96);
+  --theme-inner:rgba(80,255,180,.04);
+  --theme-line:rgba(90,255,180,.20);
+  --theme-title:#9dffd3;
+  --theme-muted:#a8d6c8;
+}
+
+body[data-theme="gold"] {
+  --theme-bg-a:#120b03;
+  --theme-bg-b:#24170a;
+  --theme-bg-c:#080502;
+  --theme-glow-a:rgba(255,180,60,.17);
+  --theme-glow-b:rgba(255,220,120,.10);
+  --theme-panel-a:rgba(48,31,10,.96);
+  --theme-panel-b:rgba(24,15,5,.96);
+  --theme-inner:rgba(255,200,80,.045);
+  --theme-line:rgba(255,200,80,.22);
+  --theme-title:#ffd989;
+  --theme-muted:#dcc29a;
+}
+
+body[data-theme="crimson"] {
+  --theme-bg-a:#130407;
+  --theme-bg-b:#26080f;
+  --theme-bg-c:#090204;
+  --theme-glow-a:rgba(255,70,90,.17);
+  --theme-glow-b:rgba(255,120,140,.10);
+  --theme-panel-a:rgba(48,12,22,.96);
+  --theme-panel-b:rgba(22,5,10,.96);
+  --theme-inner:rgba(255,90,110,.04);
+  --theme-line:rgba(255,90,110,.20);
+  --theme-title:#ffb3be;
+  --theme-muted:#d8aeb7;
+}
+
+body[data-theme="ice"] {
+  --theme-bg-a:#041018;
+  --theme-bg-b:#082031;
+  --theme-bg-c:#02070b;
+  --theme-glow-a:rgba(80,180,255,.18);
+  --theme-glow-b:rgba(120,240,255,.10);
+  --theme-panel-a:rgba(10,36,54,.96);
+  --theme-panel-b:rgba(5,18,28,.96);
+  --theme-inner:rgba(120,220,255,.04);
+  --theme-line:rgba(120,220,255,.22);
+  --theme-title:#b7eeff;
+  --theme-muted:#aed4df;
+}
+
+/* ---------- APPLY THEME ONLY TO LAYOUT / PANELS ---------- */
+
+body[data-theme] {
+  color: var(--text);
+  background:
+    radial-gradient(circle at top, var(--theme-glow-a), transparent 32%),
+    radial-gradient(circle at 85% 15%, var(--theme-glow-b), transparent 22%),
+    linear-gradient(
+      180deg,
+      var(--theme-bg-a) 0%,
+      var(--theme-bg-b) 35%,
+      var(--theme-bg-c) 100%
+    ) !important;
+}
+
+body[data-theme] .player-stage-bg {
+  background:
+    radial-gradient(circle at 50% 0%, var(--theme-glow-a), transparent 35%),
+    radial-gradient(circle at 0% 100%, var(--theme-glow-b), transparent 30%),
+    linear-gradient(180deg, rgba(4,7,15,.1), rgba(4,7,15,.4)) !important;
+}
+
+body[data-theme] .panel-glow,
+body[data-theme] .player-card {
+  background:
+    linear-gradient(
+      180deg,
+      var(--theme-panel-a),
+      var(--theme-panel-b)
+    ) !important;
+
+  border-color: var(--theme-line) !important;
+
+  box-shadow:
+    var(--shadow),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+body[data-theme] .panel-inner,
+body[data-theme] .welcome-panel,
+body[data-theme] .question-panel,
+body[data-theme] .answers-panel,
+body[data-theme] .helps-panel,
+body[data-theme] .otbor-panel {
+  background:
+    radial-gradient(circle at 50% 0%, var(--theme-inner), transparent 42%),
+    rgba(255,255,255,.035) !important;
+
+  border-color: var(--theme-line) !important;
+}
+
+body[data-theme] .section-title,
+body[data-theme] .answers-title,
+body[data-theme] .otbor-timer-title,
+body[data-theme] .eyebrow {
+  color: var(--theme-title) !important;
+}
+
+body[data-theme] .answers-note,
+body[data-theme] .welcome-subtitle,
+body[data-theme] .otbor-timer-caption {
+  color: var(--theme-muted) !important;
+}
+
+/* chips / fields — НЕ answer buttons */
+body[data-theme] .user-chip,
+body[data-theme] .status-chip,
+body[data-theme] .otbor-field,
+body[data-theme] .message,
+body[data-theme] .questions {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10,18,32,.96),
+      rgba(5,10,18,.98)
+    ) !important;
+
+  color:#eef5ff !important;
+  border-color: var(--theme-line) !important;
+}
+
+/* socket */
+body[data-theme] .socket-status {
+  background:
+    linear-gradient(
+      180deg,
+      var(--theme-panel-a),
+      var(--theme-panel-b)
+    ) !important;
+
+  border-color: var(--theme-line) !important;
+}
+
+/* copyright */
+body[data-theme] .copyrights {
+  background:
+    linear-gradient(0deg, var(--theme-bg-c), var(--theme-bg-b)) !important;
+}
+
+/* =========================================================
+   IMPORTANT:
+   Ничего не задаём для .answer-btn,
+   .is-player, .is-right, .is-fatal, .is-action,
+   .is-navi-result, :disabled.
+   Они остаются как в дефолтном user.css.
+   ========================================================= */
+/* =========================================================
+   LIGHTER THEMES
+   ========================================================= */
+
+/* ---------- SKY ---------- */
+
+body[data-theme="sky"] {
+  --theme-bg-a:#0b1728;
+  --theme-bg-b:#14304f;
+  --theme-bg-c:#08111d;
+
+  --theme-glow-a:rgba(120,200,255,.26);
+  --theme-glow-b:rgba(180,240,255,.12);
+
+  --theme-panel-a:rgba(24,52,86,.96);
+  --theme-panel-b:rgba(12,24,42,.96);
+
+  --theme-inner:rgba(120,220,255,.05);
+
+  --theme-line:rgba(150,220,255,.24);
+
+  --theme-title:#bfeeff;
+  --theme-muted:#b8d8e8;
+}
+
+/* ---------- AQUA ---------- */
+
+body[data-theme="aqua"] {
+  --theme-bg-a:#07191a;
+  --theme-bg-b:#10353a;
+  --theme-bg-c:#041012;
+
+  --theme-glow-a:rgba(80,255,220,.20);
+  --theme-glow-b:rgba(120,255,240,.10);
+
+  --theme-panel-a:rgba(14,54,58,.96);
+  --theme-panel-b:rgba(6,24,28,.96);
+
+  --theme-inner:rgba(120,255,240,.05);
+
+  --theme-line:rgba(120,255,230,.22);
+
+  --theme-title:#bafff3;
+  --theme-muted:#b8ddd8;
+}
+
+/* ---------- PEARL ---------- */
+
+body[data-theme="pearl"] {
+  --theme-bg-a:#111723;
+  --theme-bg-b:#263447;
+  --theme-bg-c:#0b1017;
+
+  --theme-glow-a:rgba(220,230,255,.16);
+  --theme-glow-b:rgba(180,210,255,.08);
+
+  --theme-panel-a:rgba(40,55,78,.96);
+  --theme-panel-b:rgba(18,26,38,.96);
+
+  --theme-inner:rgba(220,230,255,.05);
+
+  --theme-line:rgba(210,225,255,.18);
+
+  --theme-title:#eef5ff;
+  --theme-muted:#c8d3e4;
+}
+
+/* ---------- ROSE ---------- */
+
+body[data-theme="rose"] {
+  --theme-bg-a:#190b13;
+  --theme-bg-b:#3a1c2f;
+  --theme-bg-c:#0d0509;
+
+  --theme-glow-a:rgba(255,150,200,.18);
+  --theme-glow-b:rgba(255,210,230,.08);
+
+  --theme-panel-a:rgba(60,28,48,.96);
+  --theme-panel-b:rgba(24,10,18,.96);
+
+  --theme-inner:rgba(255,180,220,.04);
+
+  --theme-line:rgba(255,180,220,.18);
+
+  --theme-title:#ffd7e9;
+  --theme-muted:#dfbfd0;
+}
+
+/* ---------- SUNSET ---------- */
+
+body[data-theme="sunset"] {
+  --theme-bg-a:#1b0d08;
+  --theme-bg-b:#4a2418;
+  --theme-bg-c:#120603;
+
+  --theme-glow-a:rgba(255,140,90,.20);
+  --theme-glow-b:rgba(255,220,140,.10);
+
+  --theme-panel-a:rgba(68,34,22,.96);
+  --theme-panel-b:rgba(28,12,7,.96);
+
+  --theme-inner:rgba(255,180,120,.05);
+
+  --theme-line:rgba(255,190,140,.22);
+
+  --theme-title:#ffe1c7;
+  --theme-muted:#dcbfa6;
+}
+
+/* ---------- ARCTIC ---------- */
+
+body[data-theme="arctic"] {
+  --theme-bg-a:#09131b;
+  --theme-bg-b:#183042;
+  --theme-bg-c:#050b10;
+
+  --theme-glow-a:rgba(180,240,255,.18);
+  --theme-glow-b:rgba(220,255,255,.08);
+
+  --theme-panel-a:rgba(24,48,66,.96);
+  --theme-panel-b:rgba(10,20,28,.96);
+
+  --theme-inner:rgba(220,255,255,.05);
+
+  --theme-line:rgba(200,245,255,.20);
+
+  --theme-title:#dff8ff;
+  --theme-muted:#c3dbe2;
+}
