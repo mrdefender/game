@@ -1278,7 +1278,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<10;i++)
         {
             stop_current_sound();
-            playAudio("a6.ogg",false);
+            playAudio("a7.ogg",false);
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
@@ -1296,7 +1296,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<12;i++)
         {
             stop_current_sound();
-            playAudio("a6.ogg",false);
+            playAudio("a8.ogg",false);
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {
