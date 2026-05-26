@@ -223,6 +223,7 @@ socket.on("room_code_show", (data) => {
 
   value.innerText = data.room || "";
   toast.classList.add("is-visible");
+  showSpecRoomQR(data.room)
 });
 
 socket.on("room_code_hide", () => {
@@ -233,8 +234,45 @@ socket.on("room_code_hide", () => {
 
   toast.classList.remove("is-visible");
   value.innerText = "";
+  hideSpecRoomQR();
 });
 
+function showSpecRoomQR(roomId) {
+  const box = document.getElementById("spec-room-qr");
+  const img = document.getElementById("spec-room-qr-img");
+  const code = document.getElementById("spec-room-qr-code");
+
+  if (!box || !img || !code || !roomId) return;
+
+  const loginUrl = `https://games.mokaque-t.ru/join`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(loginUrl)}`;
+
+  img.src = qrUrl;
+  code.textContent = roomId;
+  box.classList.add("is-visible");
+}
+
+function hideSpecRoomQR() {
+  const box = document.getElementById("spec-room-qr");
+  const img = document.getElementById("spec-room-qr-img");
+  const code = document.getElementById("spec-room-qr-code");
+
+  if (box) box.classList.remove("is-visible");
+  if (img) img.src = "";
+  if (code) code.textContent = "----";
+}
+
+socket.on("room_opened", (data) => {
+  const roomId = typeof data === "object"
+    ? data.room || data.room_id || data.roomId || data.code
+    : data;
+
+  showSpecRoomQR(roomId);
+});
+
+socket.on("room_closed", () => {
+  hideSpecRoomQR();
+});
 
 
 /** Возвращает кнопки ответов зрительского экрана в базовое состояние. */

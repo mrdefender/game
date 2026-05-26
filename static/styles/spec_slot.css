@@ -1545,6 +1545,10 @@ body.wait-4min-freeze .au-inline {
     background-size:34px 34px !important;
   }
 }
+
+/* =====================================================
+   ROOME CODE
+   ===================================================== */
 .room-code-toast {
   position: fixed;
   top: 18px;
@@ -1603,37 +1607,6 @@ box-shadow:
   text-shadow:
     0 0 12px rgba(120,190,255,.55),
     0 0 28px rgba(80,160,255,.28);
-}
-.room-code-domain{
-  margin-top:8px;
-
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-
-  min-height:30px;
-  padding:6px 12px;
-
-  border-radius:999px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.06),
-      rgba(255,255,255,.02)
-    );
-
-  border:1px solid rgba(255,255,255,.10);
-
-  font-size:1rem;
-  font-weight:800;
-  letter-spacing:.08em;
-
-  color:#d7ecff;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.04),
-    0 0 12px rgba(120,190,255,.08);
 }
 /* =====================================================
    TV SHOW CREDITS OVERLAY
@@ -2054,4 +2027,63 @@ body:has(.intro-overlay.is-active) .room-code-toast {
   84% {
     opacity: 0;
   }
+}
+.spec-room-qr {
+  display: none;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top, rgba(80,160,255,.16), transparent 48%),
+    linear-gradient(180deg, rgba(11,24,43,.96), rgba(5,12,24,.98));
+  border: 1px solid rgba(127,216,255,.22);
+  box-shadow: 0 0 20px rgba(80,160,255,.14), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.spec-room-qr.is-visible {
+  display: block;
+}
+
+.spec-room-qr-title {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #8fdfff;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.spec-room-qr-img-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.spec-room-qr-img-wrap img {
+  width: 126px;
+  height: 126px;
+  padding: 8px;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.spec-room-qr-code {
+  text-align: center;
+  color: #edf7ff;
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+.spec-room-qr-code span {
+  color: #ffd46b;
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.spec-room-qr-site {
+  margin-top: 6px;
+  text-align: center;
+  color: #9bb8d8;
+  font-size: .68rem;
 }

@@ -16,9 +16,6 @@
       <div id="room-code-toast" class="room-code-toast">
         <div class="room-code-label">Код комнаты</div>
         <div id="room-code-value" class="room-code-value"></div>
-        <div class="room-code-domain">
-         https://games.mokaque-t.ru/join
-        </div>
         </div>
   <main class="spec-shell">
     <header class="spec-header panel-glow">
@@ -46,6 +43,22 @@
         <input class="in_game display-field" id="in_game" value="">
 <input type="submit" class="tree-status display-field" id="users" name="user_name" value="" disabled>
 
+        <div class="spec-room-qr" id="spec-room-qr">
+  <div class="spec-room-qr-title">Подключение к игре</div>
+
+  <div class="spec-room-qr-img-wrap">
+    <img id="spec-room-qr-img" src="" alt="QR">
+  </div>
+
+  <div class="spec-room-qr-code">
+    Код комнаты:
+    <span id="spec-room-qr-code">----</span>
+  </div>
+
+  <div class="spec-room-qr-site">
+    games.mokaque-t.ru/join
+  </div>
+</div>
         <section class="state-panel">
           <div class="state-card state-card-player">
             <div class="state-title">Ответ игрока</div>
@@ -124,7 +137,7 @@
         </div>
 
         <div class="au-wrap panel-glow-soft">
-          <input type="submit" class="message display-field message-field au-inline" id="au" value="" onclick="wait_4min()">
+          <input type="submit" class="message display-field message-field au-inline" id="au" value="">
         </div>
 
         <section class="results-panel">
