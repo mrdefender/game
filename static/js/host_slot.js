@@ -2516,7 +2516,7 @@ function fact(){
         return;
     document.getElementById("pfact").checked = false;
     stop_current_sound();
-    playAudio("help_auden.ogg",false);
+    playAudio("fact.ogg",false);
     document.getElementById("au").value = ""
     document.getElementById("au").value = document.getElementById("au").value + data[0]+": "+ data[1];
     document.getElementById("fact").style.backgroundColor = "#000c11";
