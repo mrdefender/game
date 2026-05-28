@@ -891,7 +891,7 @@ var helps = [];
         helps.push("help_auden");
     if (document.getElementById("pfact").checked)
         helps.push("fact");
-    
+     console.log(helps);
     send_helps(helps);
 }
 
@@ -2381,7 +2381,7 @@ function navi(){
     if (document.getElementById("alter").style.backgroundColor == "orange")
         return;
     document.getElementById("pnavi").checked = false;
-    document.getElementById("navi").style.backgroundColor = "#000c11";
+   // document.getElementById("navi").style.backgroundColor = "#000c11";
 
     fetch('/navi', {
         method: 'POST',
@@ -2395,14 +2395,15 @@ function navi(){
 
 .then(data => {
     playAudio("navigator.ogg",false);
+    update_helps();
     for (var i = 0; data.length;i++)
     {
     document.getElementById(get_btn(data[i])).style.backgroundColor = "#d905ec";
     document.getElementById(get_o(data[i])).style.backgroundColor = "#d905ec";
     }
 
-    document.getElementById("navi").style.backgroundColor = "#000c11";
-    update_helps();
+    //document.getElementById("navi").style.backgroundColor = "#000c11";
+    
 
 
 

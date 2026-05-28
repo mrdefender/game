@@ -424,18 +424,6 @@ function get_status(data){
           //  pnavi();
            // pauden();
         }
-    if (data == "check main")
-        {
-            show_right_user();
-        }
-    if (data == "check main x2")
-        {
-            show_right_user();
-        }
-    if (data == "check interactive")
-        {
-            show_right_user();
-        }
         if (data == "otbor")
         {
              document.getElementById('welcome').innerHTML = "";
@@ -675,10 +663,7 @@ function get_helps(data){
 
 //.then(data => {
 
-    const blockedByMode =
-        document.getElementById("ex2").value === "alter" ||
-        document.getElementById("ex2").value === "x2" ||
-        document.getElementById("ex2").value === "x2-2";
+    const blockedByMode = document.getElementById("ex2").value === "alter" || document.getElementById("ex2").value === "x2" || document.getElementById("ex2").value === "x2-2";
     if (data=="fail")
     {
         document.getElementById("p50_50").disabled = true;
@@ -1851,9 +1836,9 @@ function response_navi(data){
         n = data[i];
         document.getElementById(get_o(n)).style.backgroundColor = "#d905ec"
     }
-    document.getElementById("pnavi").style.backgroundColor = "orange";
+    //document.getElementById("pnavi").style.backgroundColor = "orange";
     document.getElementById("ex2").value = "navi";
-    play5050ShowEffect("pnavi");
+    //play5050ShowEffect("pnavi");
 
 }
 

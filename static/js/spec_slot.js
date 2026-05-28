@@ -1668,10 +1668,7 @@ socket.on("get_helps", (data) => {
 
 function get_helps(data){
         //var user_name = document.getElementById("user").value;
-        const blockedByMode =
-        document.getElementById("ex2").value === "alter" ||
-        document.getElementById("ex2").value === "x2" ||
-        document.getElementById("ex2").value === "x2-2";
+        const blockedByMode = document.getElementById("ex2").value === "alter" || document.getElementById("ex2").value === "x2" || document.getElementById("ex2").value === "x2-2";
        
       //  fetch('/get_helps', {
       //  method: 'POST',
@@ -1909,7 +1906,7 @@ function get_auden(data){
         idb = get_o((i+1).toString())
         document.getElementById(idb).value = document.getElementById(idb).value+'\n' +data[i] +"%";
     }
-    document.getElementById("au").value = document.getElementById("au").value + " Фатал- "+ data[15] +"%" + " " + " Cвободный слот - "+data[16]+ "%";
+    document.getElementById("au").value = document.getElementById("au").value + " Фатал: "+ data[15] +"%" + '\n' + " Cвободный слот: "+data[16]+ "%";
     document.getElementById("help_auden").style.backgroundColor = "#000c11";
     document.getElementById("ex2").value = "auden";
 
