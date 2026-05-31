@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles/user_slot.css">
 	<link rel="stylesheet" href="{{ url_for('static', filename='styles/user_slot.css') }}">
-	<button class="theme-toggle-btn" onclick="cycleTheme()">Сменить цвет интерфейса</button>
+	
 </head>
 <body data-role="player">
     <div class="player-stage-bg"></div>
@@ -39,6 +39,13 @@
         <span class="legend-label">Навигатор</span>
         <span class="legend-value" id="ui-player-navi-result">—</span>
     </div>
+</div>
+<div class="theme-custom">
+  <button type="button" id="theme_color_btn" class="theme-toggle-btn">
+    🎨 Сменить цвет интерфейса
+  </button>
+
+  <input type="color" id="theme_color_picker" value="#3d8dff" hidden>
 </div>
             </header>
 
@@ -141,62 +148,76 @@
     <script src="/static/js/user_slot_navi_result_addon.js"></script>
 	<script src="/static/js/help_icons_show_patch.js"></script>
 	<script src="/static/js/help_disabled_states.js"></script>
-    <script>
-const themes = [
-  "blue",
-  "violet",
-  "emerald",
-  "gold",
-  "crimson",
-  "ice",
-  "sky",
-  "aqua",
-  "pearl",
-  "rose",
-  "sunset",
-  "arctic"
-];
-
-let currentTheme = 0;
-
-function cycleTheme() {
-
-  currentTheme++;
-
-  if(currentTheme >= themes.length){
-    currentTheme = 0;
-  }
-
-  const theme = themes[currentTheme];
-
-  if(theme === "default"){
-    document.body.removeAttribute("data-theme");
-  } else {
-    document.body.setAttribute("data-theme", theme);
-  }
-
-  localStorage.setItem("ui_theme", theme);
-}
-
-window.addEventListener("load", () => {
-
-  const saved = localStorage.getItem("ui_theme");
-
-  if(saved && saved !== "default"){
-
-    document.body.setAttribute("data-theme", saved);
-
-    const idx = themes.indexOf(saved);
-
-    if(idx >= 0){
-      currentTheme = idx;
-    }
-  }
-});
-</script>
+    
     <div id="socket-status" class="socket-status socket-offline">
   <span class="socket-dot"></span>
   <span id="socket-status-text">Сервер отключён</span>
 </div>
+<script>
+(function () {
+  const btn = document.getElementById("theme_color_btn");
+  const picker = document.getElementById("theme_color_picker");
+
+  if (!btn || !picker) return;
+
+  function hexToRgb(hex) {
+    const clean = hex.replace("#", "");
+
+    return {
+      r: parseInt(clean.slice(0, 2), 16),
+      g: parseInt(clean.slice(2, 4), 16),
+      b: parseInt(clean.slice(4, 6), 16)
+    };
+  }
+
+  function rgba(hex, alpha) {
+    const { r, g, b } = hexToRgb(hex);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  function darken(hex, amount) {
+    const { r, g, b } = hexToRgb(hex);
+
+    const nr = Math.max(0, Math.round(r * (1 - amount)));
+    const ng = Math.max(0, Math.round(g * (1 - amount)));
+    const nb = Math.max(0, Math.round(b * (1 - amount)));
+
+    return `rgb(${nr}, ${ng}, ${nb})`;
+  }
+
+  function applyCustomTheme(color) {
+    document.body.setAttribute("data-theme", "custom");
+
+    document.documentElement.style.setProperty("--custom-color", color);
+    document.documentElement.style.setProperty("--custom-glow", rgba(color, 0.24));
+    document.documentElement.style.setProperty("--custom-glow-soft", rgba(color, 0.12));
+    document.documentElement.style.setProperty("--custom-line", rgba(color, 0.28));
+
+    document.documentElement.style.setProperty("--custom-panel-a", rgba(color, 0.18));
+    document.documentElement.style.setProperty("--custom-panel-b", rgba(color, 0.08));
+
+    document.documentElement.style.setProperty("--custom-bg-a", darken(color, 0.88));
+    document.documentElement.style.setProperty("--custom-bg-b", darken(color, 0.76));
+    document.documentElement.style.setProperty("--custom-bg-c", "#02050b");
+
+    localStorage.setItem("custom_ui_color", color);
+  }
+
+  btn.addEventListener("click", () => {
+    picker.click();
+  });
+
+  picker.addEventListener("input", (e) => {
+    applyCustomTheme(e.target.value);
+  });
+
+  const saved = localStorage.getItem("custom_ui_color");
+
+  if (saved) {
+    picker.value = saved;
+    applyCustomTheme(saved);
+  }
+})();
+</script>
 </body>
 </html>

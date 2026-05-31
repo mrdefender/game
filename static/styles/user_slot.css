@@ -2024,140 +2024,81 @@ body[data-theme] .copyrights {
   background:
     linear-gradient(0deg, var(--theme-bg-c), var(--theme-bg-b)) !important;
 }
-
 /* =========================================================
-   IMPORTANT:
-   Ничего не задаём для .answer-btn,
-   .is-player, .is-right, .is-fatal, .is-action,
-   .is-navi-result, :disabled.
-   Они остаются как в дефолтном user.css.
-   ========================================================= */
-/* =========================================================
-   LIGHTER THEMES
+   CUSTOM USER THEME
+   Меняет интерфейс, НЕ трогает answer-btn состояния
    ========================================================= */
 
-/* ---------- SKY ---------- */
-
-body[data-theme="sky"] {
-  --theme-bg-a:#0b1728;
-  --theme-bg-b:#14304f;
-  --theme-bg-c:#08111d;
-
-  --theme-glow-a:rgba(120,200,255,.26);
-  --theme-glow-b:rgba(180,240,255,.12);
-
-  --theme-panel-a:rgba(24,52,86,.96);
-  --theme-panel-b:rgba(12,24,42,.96);
-
-  --theme-inner:rgba(120,220,255,.05);
-
-  --theme-line:rgba(150,220,255,.24);
-
-  --theme-title:#bfeeff;
-  --theme-muted:#b8d8e8;
+body[data-theme="custom"] {
+  background:
+    radial-gradient(circle at top, var(--custom-glow), transparent 34%),
+    radial-gradient(circle at 85% 15%, var(--custom-glow-soft), transparent 24%),
+    linear-gradient(
+      180deg,
+      var(--custom-bg-a) 0%,
+      var(--custom-bg-b) 42%,
+      var(--custom-bg-c) 100%
+    ) !important;
 }
 
-/* ---------- AQUA ---------- */
-
-body[data-theme="aqua"] {
-  --theme-bg-a:#07191a;
-  --theme-bg-b:#10353a;
-  --theme-bg-c:#041012;
-
-  --theme-glow-a:rgba(80,255,220,.20);
-  --theme-glow-b:rgba(120,255,240,.10);
-
-  --theme-panel-a:rgba(14,54,58,.96);
-  --theme-panel-b:rgba(6,24,28,.96);
-
-  --theme-inner:rgba(120,255,240,.05);
-
-  --theme-line:rgba(120,255,230,.22);
-
-  --theme-title:#bafff3;
-  --theme-muted:#b8ddd8;
+body[data-theme="custom"] .player-stage-bg {
+  background:
+    radial-gradient(circle at 50% 0%, var(--custom-glow), transparent 35%),
+    radial-gradient(circle at 0% 100%, var(--custom-glow-soft), transparent 30%),
+    linear-gradient(180deg, rgba(4,7,15,.1), rgba(4,7,15,.4)) !important;
 }
 
-/* ---------- PEARL ---------- */
-
-body[data-theme="pearl"] {
-  --theme-bg-a:#111723;
-  --theme-bg-b:#263447;
-  --theme-bg-c:#0b1017;
-
-  --theme-glow-a:rgba(220,230,255,.16);
-  --theme-glow-b:rgba(180,210,255,.08);
-
-  --theme-panel-a:rgba(40,55,78,.96);
-  --theme-panel-b:rgba(18,26,38,.96);
-
-  --theme-inner:rgba(220,230,255,.05);
-
-  --theme-line:rgba(210,225,255,.18);
-
-  --theme-title:#eef5ff;
-  --theme-muted:#c8d3e4;
+body[data-theme="custom"] .panel-glow,
+body[data-theme="custom"] .player-card {
+  border-color: var(--custom-line) !important;
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.45),
+    0 0 28px var(--custom-glow-soft),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
 }
 
-/* ---------- ROSE ---------- */
+body[data-theme="custom"] .panel-inner {
+  background:
+    radial-gradient(circle at 50% 0%, var(--custom-panel-a), transparent 42%),
+    rgba(255,255,255,.035) !important;
 
-body[data-theme="rose"] {
-  --theme-bg-a:#190b13;
-  --theme-bg-b:#3a1c2f;
-  --theme-bg-c:#0d0509;
-
-  --theme-glow-a:rgba(255,150,200,.18);
-  --theme-glow-b:rgba(255,210,230,.08);
-
-  --theme-panel-a:rgba(60,28,48,.96);
-  --theme-panel-b:rgba(24,10,18,.96);
-
-  --theme-inner:rgba(255,180,220,.04);
-
-  --theme-line:rgba(255,180,220,.18);
-
-  --theme-title:#ffd7e9;
-  --theme-muted:#dfbfd0;
+  border-color: var(--custom-line) !important;
 }
 
-/* ---------- SUNSET ---------- */
-
-body[data-theme="sunset"] {
-  --theme-bg-a:#1b0d08;
-  --theme-bg-b:#4a2418;
-  --theme-bg-c:#120603;
-
-  --theme-glow-a:rgba(255,140,90,.20);
-  --theme-glow-b:rgba(255,220,140,.10);
-
-  --theme-panel-a:rgba(68,34,22,.96);
-  --theme-panel-b:rgba(28,12,7,.96);
-
-  --theme-inner:rgba(255,180,120,.05);
-
-  --theme-line:rgba(255,190,140,.22);
-
-  --theme-title:#ffe1c7;
-  --theme-muted:#dcbfa6;
+body[data-theme="custom"] .section-title,
+body[data-theme="custom"] .answers-title,
+body[data-theme="custom"] .eyebrow {
+  color: var(--custom-color) !important;
+  text-shadow: 0 0 12px var(--custom-glow-soft);
 }
 
-/* ---------- ARCTIC ---------- */
+body[data-theme="custom"] .user-chip,
+body[data-theme="custom"] .status-chip,
+body[data-theme="custom"] .otbor-field,
+body[data-theme="custom"] .message,
+body[data-theme="custom"] .questions {
+  border-color: var(--custom-line) !important;
+  box-shadow:
+    inset 0 0 16px var(--custom-panel-b),
+    0 0 16px var(--custom-glow-soft) !important;
+}
 
-body[data-theme="arctic"] {
-  --theme-bg-a:#09131b;
-  --theme-bg-b:#183042;
-  --theme-bg-c:#050b10;
+/* Кнопка выбора цвета */
+.theme-custom {
+  display: flex;
+  justify-content: flex-start;
+}
 
-  --theme-glow-a:rgba(180,240,255,.18);
-  --theme-glow-b:rgba(220,255,255,.08);
-
-  --theme-panel-a:rgba(24,48,66,.96);
-  --theme-panel-b:rgba(10,20,28,.96);
-
-  --theme-inner:rgba(220,255,255,.05);
-
-  --theme-line:rgba(200,245,255,.20);
-
-  --theme-title:#dff8ff;
-  --theme-muted:#c3dbe2;
+.theme-toggle-btn {
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background:
+    radial-gradient(circle at top, rgba(120,180,255,.16), transparent 55%),
+    linear-gradient(180deg, #182b47 0%, #0a1425 100%);
+  color: #edf7ff;
+  font-size: .82rem;
+  font-weight: 800;
+  cursor: pointer;
 }
