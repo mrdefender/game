@@ -1668,7 +1668,7 @@ box-shadow:
 
   will-change: transform;
 
-  animation: creditsRoll 30s linear forwards;
+  animation: creditsRoll 24s linear forwards;
 }
 
 @keyframes creditsRoll {
