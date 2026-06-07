@@ -215,3 +215,4 @@ _Pvt_Extensions/
 ModelManifest.xml
 
 *.json
+.env

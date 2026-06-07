@@ -14,12 +14,16 @@ from flask_socketio import SocketIO, emit, join_room
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.types import JSON
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required 
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__, template_folder="static/")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY","6c462f7711b57067efb7e1dc9fa7da72s") #"000001C9E687F6E0" #os.urandom(32).hex
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_PATH")#'sqlite:///game.db'
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") #убрать в переменные среды
+if app.config['SECRET_KEY'] is None:
+    raise ValueError("ОШИБКА: Переменная окружения SECRET_KEY не установлена!")
 app.secret_key = app.config["SECRET_KEY"] #"000001C9E687F6E0" #os.urandom(32).hex
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*",logger=True, engineio_logger=True) # добавить конкретный домен
 accepted_user = ""
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -27,9 +31,9 @@ login_manager.session_protection = "strong"
 login_manager.login_view = "login"
 login_manager.login_message_category = "info"
 app.config['TELEGRAM_BOT_TOKEN'] = ''
-DEFAULT_ROOM_CODE = os.environ.get("DEFAULT_ROOM_CODE", "99999999")
-HOST_USERNAME = os.environ.get("HOST_USERNAME", "admin")
-@app.route("/error-test/<int:code>")
+DEFAULT_ROOM_CODE = os.environ.get("DEFAULT_ROOM_CODE") #убрать в переменные среды
+HOST_USERNAME = os.environ.get("HOST_USERNAME") #убрать в переменные среды
+@app.route("/error-test/<int:code>") 
 def error_test_code(code):
     abort(code)
 
@@ -325,24 +329,21 @@ def gen_task():
 
 def get_md5_hash(stroka):
     characters = string.ascii_letters + string.punctuation
-    random_string = str(stroka).join(secrets.choice(characters))
+    random_string ="".join(secrets.choice(characters) for _ in range(12))
+    result_str = str(stroka)+'_'+random_string
     return hashlib.md5(random_string.encode()).hexdigest()
     
     
 def generate_string(round_id,is_bombed):
-    random.seed(secrets.randbelow(99999))
-    random.seed(secrets.randbelow(99999))
+    secure_rnd = secrets.SystemRandom()
     current_round = int(round_id); #получить номер раунда, 0 - отборочный тур
     count_fatal = 0
     otbor_chislo = 0
     bomb = is_bombed
     if current_round == 0:
-        otbor_chislo = random.randint(10,999)
-        random.seed(secrets.randbelow(99999))
-        a = random.randint(10,otbor_chislo)
-        random.seed(secrets.randbelow(99999))
-        b = random.randint(otbor_chislo,999)
-       # md5_hash = hashlib.md5(str(otbor_chislo).encode()).hexdigest()
+        otbor_chislo = secure_rnd.randint(10,999)
+        a = secure_rnd.randint(10,otbor_chislo)
+        b = secure_rnd.randint(otbor_chislo,999)
         md5_hash = get_md5_hash(otbor_chislo)
         result = [current_round,a,b,otbor_chislo,md5_hash]
         result_send = [current_round,a,b,None,md5_hash]
@@ -365,7 +366,7 @@ def generate_string(round_id,is_bombed):
             case 9: count_fatal=14
     
     if count_fatal == 1:
-        fatal = random.randint(1,15)
+        fatal = secure_rnd.randint(1,15)
         #md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
         md5_hash = get_md5_hash(fatal)
         result = [current_round,fatal,md5_hash, count_fatal]
@@ -386,12 +387,11 @@ def generate_string(round_id,is_bombed):
        #     json.dump(result,file)
         return js
     else:
-        fatal = random.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
+        fatal = secure_rnd.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
         b_bomb = 'false'
         r_bomb = 'false'
         if bomb and (current_round >= 4):
-            random.seed(secrets.randbelow(99999))
-            tmp_bombs = random.sample(fatal,2)
+            tmp_bombs = secure_rnd.sample(fatal,2)
             b_bomb = tmp_bombs[0]
             r_bomb = tmp_bombs[1]
         #md5_hash = hashlib.md5(str(fatal).encode()).hexdigest()
@@ -846,9 +846,8 @@ def open_room():
         db.session.commit()
         try:
             room_code = Room()
-            random.seed(secrets.randbelow(9999999))
-            random.seed(secrets.randbelow(9999999))
-            room_code.id = random.randint(1000,9999)
+            secret_rnd = secrets.SystemRandom()
+            room_code.id = secret_rnd.randint(1000,9999)
             db.session.add(room_code)
             db.session.flush()
             db.session.commit()
