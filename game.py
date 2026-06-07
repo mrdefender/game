@@ -23,7 +23,7 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") #убрать в пер�
 if app.config['SECRET_KEY'] is None:
     raise ValueError("ОШИБКА: Переменная окружения SECRET_KEY не установлена!")
 app.secret_key = app.config["SECRET_KEY"] #"000001C9E687F6E0" #os.urandom(32).hex
-socketio = SocketIO(app, cors_allowed_origins="*",logger=True, engineio_logger=True) # добавить конкретный домен
+socketio = SocketIO(app, cors_allowed_origins="*") # добавить конкретный домен
 accepted_user = ""
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
