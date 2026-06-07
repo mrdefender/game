@@ -18,11 +18,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__, template_folder="static/")
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_PATH")#'sqlite:///game.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_PATH")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") #убрать в переменные среды
 if app.config['SECRET_KEY'] is None:
     raise ValueError("ОШИБКА: Переменная окружения SECRET_KEY не установлена!")
-app.secret_key = app.config["SECRET_KEY"] #"000001C9E687F6E0" #os.urandom(32).hex
+app.secret_key = app.config["SECRET_KEY"] #os.urandom(32).hex
 socketio = SocketIO(app, cors_allowed_origins="*") # добавить конкретный домен
 accepted_user = ""
 db = SQLAlchemy(app)
