@@ -459,6 +459,7 @@ def get_fatal_host():
 @app.route('/h50_50', methods=["POST", "GET"])
 def h50_50():
     if request.method == 'POST':
+        secure_rnd = secrets.SystemRandom()
         r = request.json["round"]
         task = Task.query.first()
         jsn =[]
@@ -480,9 +481,7 @@ def h50_50():
             jsn.append(task.r_bomb)
         f = jsn[1]
         cf = round(len(f)/2)
-        res_f = []
-        for i in range(cf):
-            res_f.append(f[i])
+        res_f = secure_rnd.sample(f, cf)
         socketio.emit("response_50_50",res_f,to=f"{Room.query.first()}")
         socketio.emit("response_50_50",res_f,to=f"{DEFAULT_ROOM_CODE}:spectator")
         #with open('50_50.json', 'w') as file:
@@ -494,6 +493,7 @@ def h50_50():
 @app.route('/alter', methods=["POST", "GET"])
 def alter():
     if request.method == 'POST':
+        secret_rnd = secrets.SystemRandom()
         r = request.json["round"]
         task = Task.query.first()
         jsn =[]
@@ -515,14 +515,12 @@ def alter():
             jsn.append(task.r_bomb)
         f = jsn[1]
         cf = len(f)
-        random.seed(secrets.randbelow(99999))
-        rf = random.randint(1,cf-1)
-        random.seed(secrets.randbelow(99999))
+        rf = secret_rnd.randint(1,cf-1)
         j = 0
         checked = False
         while (checked==False):
             checked = True
-            j = random.randint(1,15)
+            j = secret_rnd.randint(1,15)
             for i in f:
                 if i == j:
                     checked = False
@@ -540,6 +538,7 @@ def alter():
 @app.route('/navi', methods=["POST", "GET"])
 def navi():
     if request.method == 'POST':
+        secret_rnd = secrets.SystemRandom()
         r = request.json["round"]
         task = Task.query.first()
         jsn =[]
@@ -679,7 +678,7 @@ def navi():
             #    json.dump(res, file)
             return res
         if max_r == max_c:
-            j = random.randint(1,2)
+            j = secret_rnd.randint(1,2)
             if j==1:
                 tmp = -1
                 for i in range(0,5):
@@ -1528,8 +1527,8 @@ def get_auden(data=None):
 def fact(data=None):
     if request.method == 'POST':
         try:
-            random.seed(secrets.randbelow(99999))
-            slot = random.randint(1,15)
+            secret_rnd = secrets.SystemRandom()
+            slot = secret_rnd.randint(1,15)
             jsn = []
             task = Task.query.first()
             jsn.append(task.round)
@@ -1554,8 +1553,7 @@ def fact(data=None):
                 find = True
                 for i in range(jsn[3]):
                     if fat[i]==slot:
-                        random.seed(secrets.randbelow(99999))
-                        slot = random.randint(1,15)
+                        slot = secret_rnd.randint(1,15)
                         find = False
                         break
             facts = Facts.query.filter(Facts.slot==str(slot)).first()
