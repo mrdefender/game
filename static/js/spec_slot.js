@@ -1659,6 +1659,7 @@ function update_round(data)
         c7.style.backgroundColor = "black";
         c8.style.backgroundColor = "black";
         c9.style.backgroundColor = "orange";
+        startMillionWinEffect();
     }  
 }
 socket.on("get_helps", (data) => {

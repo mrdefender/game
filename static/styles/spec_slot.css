@@ -2087,3 +2087,156 @@ body:has(.intro-overlay.is-active) .room-code-toast {
   color: #9bb8d8;
   font-size: .68rem;
 }
+/* =========================================================
+   MILLION WIN EFFECT — spectator
+   ========================================================= */
+
+.million-win-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  background:
+    radial-gradient(circle at center, rgba(255, 210, 80, .22), transparent 34%),
+    radial-gradient(circle at 50% 70%, rgba(255, 80, 160, .10), transparent 36%),
+    rgba(0, 0, 0, .86);
+
+  transition: opacity .55s ease;
+}
+
+.million-win-overlay.is-active {
+  opacity: 1;
+}
+
+.million-win-rays {
+  position: absolute;
+  inset: -60%;
+  opacity: .75;
+
+  background:
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(255, 210, 80, .20) 0deg,
+      rgba(255, 210, 80, 0) 10deg,
+      rgba(255, 210, 80, .16) 20deg
+    );
+
+  animation: millionRaysRotate 18s linear infinite;
+}
+
+@keyframes millionRaysRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.million-win-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  opacity: 0;
+  transform: scale(.72);
+
+  animation: none;
+}
+
+.million-win-overlay.is-active .million-win-content {
+  animation: millionWinPop 1.1s ease forwards;
+}
+
+@keyframes millionWinPop {
+  0% {
+    opacity: 0;
+    transform: scale(.72);
+    filter: brightness(.8);
+  }
+
+  58% {
+    opacity: 1;
+    transform: scale(1.12);
+    filter: brightness(1.35);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.million-win-title {
+  font-size: clamp(2.2rem, 7vw, 6rem);
+  font-weight: 900;
+  letter-spacing: .08em;
+  color: #fff8d6;
+
+  text-shadow:
+    0 0 18px rgba(255, 244, 185, .72),
+    0 0 44px rgba(255, 174, 0, .55),
+    0 0 90px rgba(255, 174, 0, .28);
+}
+
+.million-win-money {
+  margin-top: .15em;
+
+  font-size: clamp(3.2rem, 11vw, 9rem);
+  line-height: .95;
+  font-weight: 900;
+  color: #ffd35b;
+
+  text-shadow:
+    0 0 20px rgba(255, 211, 91, .82),
+    0 0 58px rgba(255, 174, 0, .58),
+    0 0 110px rgba(255, 174, 0, .35);
+
+  animation: millionMoneyPulse 1.35s ease-in-out infinite;
+}
+
+@keyframes millionMoneyPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: scale(1.045);
+    filter: brightness(1.18);
+  }
+}
+
+.million-win-subtitle {
+  margin-top: 18px;
+
+  font-size: clamp(1rem, 2.5vw, 2rem);
+  font-weight: 800;
+  color: #edf7ff;
+
+  text-shadow:
+    0 0 14px rgba(120, 190, 255, .42),
+    0 0 34px rgba(80, 160, 255, .22);
+}
+
+#million-confetti-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  pointer-events: none;
+}
+
+body.million-win-mode .spec-header,
+body.million-win-mode .spec-main,
+body.million-win-mode .socket-status,
+body.million-win-mode .room-code-toast {
+  filter: brightness(.38) blur(1.2px);
+  transition: filter .55s ease;
+}
