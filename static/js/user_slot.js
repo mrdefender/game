@@ -5,7 +5,7 @@ welcome2.innerText = "Свободный слот!";
 
 //var timerStatus = setInterval(() => get_status(), 5000);
 //var timerHelps;
-var timeWainAnswerFromMain;
+//var timeWainAnswerFromMain;
 
 const socket = io();
 function setSocketStatus(isOnline) {
@@ -273,11 +273,11 @@ function get_status(data){
             document.getElementById("otbor_input").value = "";
             sync_otbor_timer_ui();
           //  clearInterval(timerHelps);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);
-            clearInterval(timeWainAnswerFromMain);clearInterval(timeWainAnswerFromMain);
+           // clearInterval(timeWainAnswerFromMain);
+           // clearInterval(timeWainAnswerFromMain);
+          //  clearInterval(timeWainAnswerFromMain);
+          //  clearInterval(timeWainAnswerFromMain);
+         //   clearInterval(timeWainAnswerFromMain);clearInterval(timeWainAnswerFromMain);
     }
     if (data == "interactive")
         {

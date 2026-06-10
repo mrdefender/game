@@ -1290,6 +1290,7 @@ def next_round():
             #    os.remove('task.json')
             db.session.commit()
             Task.query.delete()
+            get_helps()
             update_list_users()
             return json.dumps("ok")
         except:

@@ -1351,3 +1351,34 @@ select:disabled, input[type="text"]:disabled {
   display: block;
   resize: none;
 }
+
+/* =========================================================
+   РАЗНОЦВЕТНЫЕ СТРОКИ ТАБЛИЦЫ ИГРОКОВ
+   ========================================================= */
+
+#status_users tr:first-child {
+    background: linear-gradient(90deg,#1f2d4d,#152038);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* чередование строк */
+#status_users tr:nth-child(2n) {
+    background: rgba(0, 180, 255, 0.08);
+}
+
+#status_users tr:nth-child(2n+1):not(:first-child) {
+    background: rgba(255, 180, 0, 0.08);
+}
+
+
+/* hover */
+#status_users tr:hover:not(:first-child) {
+    filter: brightness(1.15);
+    transition: .15s;
+}
+
+/* ячейки */
+#status_users td {
+    transition: background .15s, color .15s;
+}
