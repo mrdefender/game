@@ -1786,8 +1786,9 @@ function response_50_50(data){
 
 
 function palter(){
-         if (!can_activate_help("alter"))
+   if (!can_activate_help("alter"))
         return;
+    
    socket.emit("get alter",{o:"o"})
 }
 
@@ -1801,6 +1802,8 @@ function response_alter(data){
     {
         return;
     }
+    if (document.getElementById("ans").value!="")
+        return;
     status_btn(true);
     
     b1 = data[0].toString();
@@ -1814,7 +1817,7 @@ function response_alter(data){
 }
 
 function pnavi(){
-         if (!can_activate_help("navi"))
+    if (!can_activate_help("navi"))
         return;
    socket.emit("get navi",{o:"o"})
 }
@@ -1830,6 +1833,8 @@ function response_navi(data){
     {
         return;
     }
+    if (document.getElementById("ans").value!="")
+        return;
     
     for (var i = 0;i<data.length;i++)
     {
@@ -1843,7 +1848,7 @@ function response_navi(data){
 }
 
 function px2(){
-         if (!can_activate_help("x2"))
+    if (!can_activate_help("x2"))
         return;
    socket.emit("get x2",{o:"o"})
 }
@@ -1870,7 +1875,7 @@ function response_x2(data){
 
 
 function pauden(){
-        if (!can_activate_help("pauden"))
+    if (!can_activate_help("pauden"))
         return;
 
 document.getElementById("pauden").style.backgroundColor = "orange";
