@@ -793,8 +793,8 @@ def serve_audio(filename):
     )
 
     result.cache_control.public = True
-    result.cache_control.max_age = 31536000  # 1 год
-    result.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    result.cache_control.max_age = 432000  # 5 дней
+    result.headers["Cache-Control"] = "public, max-age=432000, immutable"
 
     return result  
     

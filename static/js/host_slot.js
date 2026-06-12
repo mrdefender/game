@@ -3239,7 +3239,7 @@ function wait_1min(){
     socket.emit("wait_1_min")
     setTimeout(() => {
   timer_wait(time); 
-}, 2000);
+}, 1000);
 }
 
 /** Показывает большой таймер ожидания 4:12. */
