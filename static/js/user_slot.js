@@ -1720,23 +1720,6 @@ function can_activate_help(helpName) {
     return true;
 }
 
-function play5050ShowEffect(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-
-  el.classList.remove("show5050-flash", "show5050-split", "show5050-pulse");
-
-  // перезапуск анимации
-  void el.offsetWidth;
-
-  el.classList.add("show5050-flash");
-  el.classList.add("show5050-split");
-  el.classList.add("show5050-pulse");
-
-  setTimeout(() => el.classList.remove("show5050-flash"), 560);
-  setTimeout(() => el.classList.remove("show5050-split"), 720);
-  setTimeout(() => el.classList.remove("show5050-pulse"), 820);
-}
 
 function p50_50(){
          if (!can_activate_help("50:50"))
@@ -1813,7 +1796,6 @@ function response_alter(data){
     document.getElementById(get_o(b2)).disabled = false;
     document.getElementById("palter").style.backgroundColor = "orange";
      document.getElementById("ex2").value = "alter"
-     play5050ShowEffect("palter");
 }
 
 function pnavi(){
@@ -1868,7 +1850,6 @@ function response_x2(data){
     document.getElementById("px2").style.backgroundColor = "orange";
      document.getElementById("ex2").value = "x2"
 	document.getElementById("px2")?.classList.add("is-active");
-    play5050ShowEffect("px2");
 
 }
 
@@ -1880,7 +1861,6 @@ function pauden(){
 
 document.getElementById("pauden").style.backgroundColor = "orange";
     
-    play5050ShowEffect("pauden");
     socket.emit("get auden",{o:"o"})
 
 }
@@ -1899,7 +1879,6 @@ function pfact(){
  //   {
  //       return;
  //   }
-    play5050ShowEffect("pfact");
     socket.emit("get fact",{o:"o"})
 
 }
