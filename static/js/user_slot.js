@@ -746,7 +746,7 @@ function get_task(data){
 	{
     	document.getElementById("time-start").value = Date.now().toString();
 	}
-    document.getElementById('question').innerText ="Раунд "+data[0]+'\n'+"md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
+    document.getElementById('question').innerText ="Раунд "+data[0]+'\n'+"md5: "+data[2] + '\n' + info_fatals(data[3]);
     document.getElementById("o1").disabled = false;
     document.getElementById("o2").disabled = false;
     document.getElementById("o3").disabled = false;
@@ -854,6 +854,17 @@ function get_task(data){
 //});
 
 }
+
+function info_fatals(col_fatals)
+{
+    if (col_fatals==1)
+        return "1 фатал";
+    if ((col_fatals>1) && (col_fatals<5))
+        return col_fatals.toString() + " фатала";
+    if (col_fatals>=5)
+        return col_fatals.toString() + " фаталов";
+}
+
 socket.on("check_answered_main", (data) => {
     check_answered_main(data)
 })

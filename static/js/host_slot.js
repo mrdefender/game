@@ -1011,7 +1011,7 @@ function gen_task()
          document.getElementById("warning_otbor").disabled = false;
          return;
     }
-    document.getElementById('question').innerText ="Раунд " + data[0] +'\n'+ "md5: "+data[2] + '\n' + "Количество фаталов: "+ data[3];
+    document.getElementById('question').innerText ="Раунд " + data[0] +'\n'+ "md5: "+data[2] + '\n' + info_fatals(data[3]);// "Количество фаталов: "+ data[3];
     status_btn (false,"o");
     status_btn (false,"btn");
     document.getElementById('take_money').disabled = false;
@@ -1050,7 +1050,15 @@ console.error('Ошибка:', error);
 
 }
 
-
+function info_fatals(col_fatals)
+{
+    if (col_fatals==1)
+        return "1 фатал";
+    if ((col_fatals>1) && (col_fatals<5))
+        return col_fatals.toString() + " фатала";
+    if (col_fatals>=5)
+        return col_fatals.toString() + " фаталов";
+}
 
 function status_btn(it_disable,code_btn)
 {
