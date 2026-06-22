@@ -1060,6 +1060,82 @@ function info_fatals(col_fatals)
         return col_fatals.toString() + " фаталов";
 }
 
+function start_timer_games()
+{
+    let min_total = 0;
+    try
+    {
+        min_total = parseInt(document.getElementById("min_timer").value);
+        
+    }
+    catch(error){
+        return;
+    };
+    document.getElementById("start_timer_game").disabled = true;
+    document.getElementById("stop_timer_game").disabled = false;
+    if (min_total == 0)
+            stop_timer_games();
+    timer_game(min_total);
+
+}
+
+function stop_timer_games()
+{
+    document.getElementById("timer_game").value = "0:00:00";
+    document.getElementById("min_timer").value = "";
+    document.getElementById("start_timer_game").disabled = false;
+    document.getElementById("stop_timer_game").disabled = true;
+}
+
+function timer_game(min_total){
+    time = min_total*60;
+   // inputName = document.createElement('input');
+   // inputName.setAttribute('type', 'submit');
+   // inputName.setAttribute('class', 'timer');
+   // inputName.setAttribute('id', 'r0');
+  //  inputName.setAttribute('value', "4:12");
+   // document.getElementById("r0").value
+    hour = parseInt(time/3600);
+    min = parseInt(time/60)%60;
+    second = time%60;
+    if (min < 10)
+        min = '0'+min.toString();
+    if (second < 10)
+        second = '0'+second.toString();
+    document.getElementById("timer_game").value = hour.toString()+':'+min.toString()+':'+second.toString();
+    setTimeout(() => {timer_wait_game(time);}, 1000);
+}
+
+
+function timer_wait_game(time_w){
+    if (document.getElementById("stop_timer_game").disabled)
+    {
+        return;
+    }
+    
+    if (time_w<=0)
+    {
+        stop_current_sound()
+        playAudio("timer_out.ogg",false);
+        stop_timer_games();
+        return;
+    }
+    time_w=time_w-1;
+    hour = parseInt(time_w/3600)
+    min = parseInt(time_w/60)%60;
+    second = time_w%60
+    if (min < 10)
+        min = '0'+min.toString();
+    if (second < 10)
+        second = '0'+second.toString();
+    document.getElementById("timer_game").value = hour.toString()+':'+min.toString()+':'+second.toString();
+    setTimeout(() => { timer_wait_game(time_w); }, 1000);
+
+}
+
+
+
+
 function status_btn(it_disable,code_btn)
 {
     if (code_btn == "o")

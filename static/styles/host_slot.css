@@ -346,6 +346,9 @@ input:disabled,select:disabled {
 .btn-role-sound {
   background:linear-gradient(180deg,#126cff,#073d9f)
 }
+.btn-role-timer-games {
+  background:linear-gradient(180deg,#55009b,#460274)
+}
 
 .btn-role-help {
   background:linear-gradient(180deg,#8d5aff,#4b24b8)

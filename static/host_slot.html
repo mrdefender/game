@@ -61,7 +61,8 @@
           <div class="room-stack">
             <label class="field-label" for="room">ID комнаты</label>
             <input class="room_id control-input" id="room" name="room_id" type="text" maxlength="4" placeholder="Room ID" readonly>
-            <div class="button-grid button-grid-1">
+            <!--div class="button-grid button-grid-1"-->
+             <div class="button-grid button-grid-2 compact-top">
               <input type="submit" class="open_room btn-role-primary" id="open_room" onclick="open_room()" value="Открыть комнату">
               <input type="submit" class="open_room btn-role-danger" id="close_room" onclick="close_room()" value="Закрыть комнату" disabled>
             </div>
@@ -78,8 +79,10 @@
             <input class="user_id control-input" id="user_id" name="user_id" type="text" maxlength="4" placeholder="User_id" required>
             <input class="in_game info-display" id="in_game" value="В игре:">
             <input type="submit" class="message info-display info-message" id="au" value="">
+            <p></p>
           </div>
-          <div class="button-grid button-grid-2 compact-top">
+          <!--div class="button-grid button-grid-2 compact-top"-->
+          <div class="button-grid button-grid-1">
             <input type="submit" class="invite btn-role-warning" id="invite" onclick="invite_to_game()" value="Пригласить">
             
           </div>
@@ -87,6 +90,7 @@
 
         <section class="panel-glow service-panel">
           <div class="section-title">Звук и сервис</div>
+          <div class="section-row compact-row"></div>
           <div class="button-grid button-grid-2 service-grid">
             <input type="submit" class="music btn-role-sound" onclick="start_sound_begin1()" value="Заставка">
             <input type="submit" class="music btn-role-sound" onclick="start_sound_begin2()" value="Выход ведущего">
@@ -101,7 +105,18 @@
             <input type="submit" class="clear_table btn-role-danger" onclick="clear_table()" value="Очистить БД">
           </div>
         </section>
-
+        <section class="panel-glow service-panel">
+          <div class="section-title">Таймер игры</div>
+          <div class="section-row compact-row"></div>
+            <div class="field-stack">
+            <input class="info-display" id="timer_game" value="0:00:00">
+            <input class="control-input" id="min_timer" type="number" placeholder="Введите время в мин." required>   
+            </div>
+            <div class="button-grid button-grid-2 compact-top">
+          <input type="submit" class="btn-role-timer-games" id="start_timer_game" onclick="start_timer_games()" value="Запустить таймер">
+          <input type="submit" class="btn-role-timer-games" id="stop_timer_game" onclick="stop_timer_games()" value="Остановить таймер" disabled>
+          </div>
+        </section>
         
 
       </aside>
@@ -253,7 +268,7 @@
 
         <section class="panel-glow hints-panel">
           <div class="section-title">Пульт подсказок</div>
-          <div class="button-grid button-grid-2 hints-buttons">
+          <div class="button-grid button-grid-3 hints-buttons ">
             <input type="submit" class="p50_50 btn-role-help" id="h50_50" onclick="h50_50()" value="50:50" disabled>
             <input type="submit" class="alter btn-role-help" id="alter" onclick="alter()" value="Альтернатива" disabled>
             <input type="submit" class="navi btn-role-help" id="navi" onclick="navi()" value="Навигатор" disabled>
