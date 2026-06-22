@@ -1112,12 +1112,13 @@ function timer_wait_game(time_w){
     {
         return;
     }
-    
+    const timer = document.getElementById("timer_game");
     if (time_w<=0)
     {
         stop_current_sound()
         playAudio("timer_out.ogg",false);
         stop_timer_games();
+        timer.classList.remove("warning","danger");
         return;
     }
     time_w=time_w-1;
@@ -1129,6 +1130,20 @@ function timer_wait_game(time_w){
     if (second < 10)
         second = '0'+second.toString();
     document.getElementById("timer_game").value = hour.toString()+':'+min.toString()+':'+second.toString();
+    
+    if(time_w <= 30){
+        timer.classList.add("danger");
+        timer.classList.remove("warning");
+    }
+    else if(time_w <= 60){
+        timer.classList.add("warning");
+        timer.classList.remove("danger");
+    }
+    else{
+        timer.classList.remove("warning","danger");
+    }
+
+    
     setTimeout(() => { timer_wait_game(time_w); }, 1000);
 
 }
@@ -2812,6 +2827,18 @@ socket.on("updated_list_user", (data) => {
 
 )
 /** Обновляет таблицу игроков и их статусы. */
+
+
+function setPlayerStatus(row, status){
+
+    row.classList.remove(
+        "player-main",
+        "player-playing",
+    );
+
+    row.classList.add(status);
+}
+
 function update_list_user(data)
 {
   //  fetch('/update_list_users', {
@@ -2888,10 +2915,14 @@ function update_list_user(data)
     cell8.innerHTML = data[i][7];
     if (data[i][5]=="answered interactive")
         interactive_col++;
-    if (data[i][5]=="50:50")
-    {
-        document.getElementById("h50_50").style.backgroundColor = "blue";
-    }
+    if (data[i][5]=="main")
+        setPlayerStatus(tr, "player-main");
+    if (data[i][5]=="interactive")
+        setPlayerStatus(tr, "player-playing");
+    if (data[i][5]=="otbor")
+        setPlayerStatus(tr, "player-otbor");
+    if (data[i][5]=="wait")
+        tr.classList.remove("player-main","player-playing");
     if (data[i][5]=="alter")
     {
         document.getElementById("alter").style.backgroundColor = "blue";
@@ -2904,14 +2935,7 @@ function update_list_user(data)
     {
         document.getElementById("x2").style.backgroundColor = "orange";
     }
-       if (data[i][5]=="auden")
-    {
-        document.getElementById("help_auden").style.backgroundColor = "blue";
-    }
-     if (data[i][5]=="fact")
-    {
-        document.getElementById("fact").style.backgroundColor = "blue";
-    }
+
     console.log(interactive_col);
     document.getElementById("count_interactive").value = interactive_col.toString();
     tr.appendChild(cell1);

@@ -349,7 +349,59 @@ input:disabled,select:disabled {
 .btn-role-timer-games {
   background:linear-gradient(180deg,#55009b,#460274)
 }
+/* ===== GAME TIMER ===== */
 
+#timer_game{
+    height:70px;
+    text-align:center;
+    font-size:32px;
+    font-weight:900;
+    letter-spacing:2px;
+
+    color:#00d9ff;
+
+    border:1px solid rgba(0,217,255,.25);
+    border-radius:18px;
+
+    background:
+      radial-gradient(circle at center,
+      rgba(0,217,255,.12),
+      transparent 70%);
+
+    box-shadow:
+      inset 0 0 20px rgba(0,217,255,.08),
+      0 0 25px rgba(0,217,255,.15);
+
+    transition:.3s;
+}
+
+/* Последняя минута */
+#timer_game.warning{
+    color:#ffcc33;
+
+    border-color:rgba(255,204,51,.35);
+
+    box-shadow:
+      0 0 25px rgba(255,204,51,.25);
+}
+
+/* Последние 30 секунд */
+#timer_game.danger{
+    color:#ff5757;
+
+    border-color:rgba(255,87,87,.45);
+
+    box-shadow:
+      0 0 35px rgba(255,87,87,.35);
+
+    animation:timerPulse .8s infinite;
+}
+
+@keyframes timerPulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.03);}
+    100%{transform:scale(1);}
+}
 .btn-role-help {
   background:linear-gradient(180deg,#8d5aff,#4b24b8)
 }
@@ -1355,33 +1407,33 @@ select:disabled, input[type="text"]:disabled {
   resize: none;
 }
 
-/* =========================================================
-   РАЗНОЦВЕТНЫЕ СТРОКИ ТАБЛИЦЫ ИГРОКОВ
-   ========================================================= */
+/* ===== СТАТУСЫ СТРОК ИГРОКОВ ===== */
 
-#status_users tr:first-child {
-    background: linear-gradient(90deg,#1f2d4d,#152038);
-    color: #fff;
-    font-weight: 700;
+
+tr.player-main{
+    background:#060e55!important;
+
+    box-shadow:
+      inset 4px 0 0 #061ef3;
 }
 
-/* чередование строк */
-#status_users tr:nth-child(2n) {
-    background: rgba(0, 180, 255, 0.08);
+tr.player-playing{
+    background:#037969!important;
+
+    box-shadow:
+      inset 4px 0 0 #02ecb2;
+}
+tr.player-otbor{
+    background:#360663!important;
+
+    box-shadow:
+      inset 4px 0 0 #4f0396;
 }
 
-#status_users tr:nth-child(2n+1):not(:first-child) {
-    background: rgba(255, 180, 0, 0.08);
-}
+/* Наведение мыши */
 
-
-/* hover */
-#status_users tr:hover:not(:first-child) {
-    filter: brightness(1.15);
-    transition: .15s;
-}
-
-/* ячейки */
-#status_users td {
-    transition: background .15s, color .15s;
+tr.player-main:hover,
+tr.player-playing:hover,
+tr.player-otbor:hover{
+    filter:brightness(1.1);
 }
