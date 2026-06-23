@@ -3,43 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <title>Веселые игры</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/mokaque.ico') }}">
-    <link rel="stylesheet" href="styles/login.css">
 </head>
 <body>
-    <div class="login-stage-bg"></div>
 
-    <main class="login-shell">
-        <section class="login-card panel-glow">
-            <header class="login-header">
-                <div class="eyebrow">TV-режим</div>
-                <h1>Веселые игры</h1>
-                <div class="subline">Подключение к игровой комнате</div>
-            </header>
+<div class="login-stage-bg"></div>
 
-            <section class="login-intro panel-inner">
-                <div class="intro-title">Пульт игрока</div>
-                <div class="intro-text">
-                    Введите свое имя и код комнаты, чтобы присоединиться к текущей игре.
-                </div>
-                <div class="hint-box focus-disclaimer">
+<main class="login-shell">
+
+    <section class="login-card panel-glow">
+
+        <header class="login-header">
+            <div class="eyebrow">TV-режим</div>
+            <h1>Веселые игры</h1>
+            <div class="subline">Подключение к игровой комнате</div>
+        </header>
+
+        <section class="login-intro panel-inner">
+
+            <div class="intro-title">Пульт игрока</div>
+
+            <div class="intro-text">
+                Введите свое имя и код комнаты, чтобы присоединиться к текущей игре.
+            </div>
+
+            <div class="hint-box focus-disclaimer">
                 <strong>Важно для игрока:</strong><br>
-                    Для корректной работы пульта игрока, держите страницу открытой и активной в браузере.
-                    Не обновляйте страницу и не закрывайте вкладку без указания ведущего.
-                </div>
-            </section>
+                Обязательно ознакомьтесь с информацией о работе пульта игрока!!!!!
+                <button
+                    type="button"
+                    class="info-btn"
+                    id="openInfo">
+                    Информация о работе пульта игрока
+                </button>            
+            </div>
 
-            <section class="login-form-wrap panel-inner">
-                <form action="/join" method="post" class="auth" id="loginForm">
-                    <div class="form_group">
-                        <label class="form_label" for="name">Имя игрока</label>
-                        <div class="field-wrap">
+        </section>
 
+        <section class="login-form-wrap panel-inner">
+
+            <form action="/join" method="post" class="auth" id="loginForm">
+
+                <div class="form_group">
+
+                    <label class="form_label" for="name">
+                        Имя игрока
+                    </label>
+
+                    <div class="field-wrap">
                         <!-- TELEGRAM AUTH (disabled)
                         <p>
                            <script async src="https://telegram.org/js/telegram-widget.js?22"
@@ -61,47 +81,121 @@
                             </script>
                         </p>
                         -->
-
-                            <input class="form_control" type="text" id="name" name="user_name" placeholder="Введите имя" required autofocus autocomplete="name">
-                        </div>
+                        <input
+                            class="form_control"
+                            type="text"
+                            id="name"
+                            name="user_name"
+                            placeholder="Введите имя"
+                            required
+                            autofocus
+                            autocomplete="name">
                     </div>
 
-                    <div class="form_group">
-                        <label class="form_label" for="room">Код игровой комнаты</label>
-                        <div class="field-wrap field-wrap-room">
-                            <input class="form_control" id="room" name="room_id" type="text" maxlength="8" inputmode="numeric" placeholder="1234" required autocomplete="one-time-code">
-                        </div>
+                </div>
+
+                <div class="form_group">
+
+                    <label class="form_label" for="room">
+                        Код игровой комнаты
+                    </label>
+
+                    <div class="field-wrap field-wrap-room">
+                        <input
+                            class="form_control"
+                            id="room"
+                            name="room_id"
+                            type="text"
+                            maxlength="8"
+                            inputmode="numeric"
+                            placeholder="1234"
+                            required
+                            autocomplete="one-time-code">
                     </div>
 
-                    <div class="hint-box">
-                        Для входа используйте код комнаты, который сообщил ведущий.
-                    </div>
+                </div>
 
-                    <input type="submit" class="submit" id="submitBtn" value="Войти в игру"/>
-                </form>
+                <div class="hint-box">
+                    Для входа используйте код комнаты, который сообщил ведущий.
+                </div>
 
-                {%for msg in get_flashed_messages()%}
+                
+
+                <input
+                    type="submit"
+                    class="submit"
+                    id="submitBtn"
+                    value="Войти в игру">
+
+            </form>
+
+            {%for msg in get_flashed_messages()%}
                 <div class="flash">{{msg}}</div>
-                {%endfor%}
-            </section>
+            {%endfor%}
+
         </section>
-    </main>
 
-    <script>
-    (function(){
-        const form = document.getElementById("loginForm");
-        const submitBtn = document.getElementById("submitBtn");
-        const room = document.getElementById("room");
+    </section>
 
-        room.addEventListener("input", () => {
-            room.value = room.value.replace(/\D/g, "").slice(0, 8);
-        });
+</main>
 
-        form.addEventListener("submit", () => {
-            submitBtn.value = "Подключение...";
-            submitBtn.disabled = true;
-        });
-    })();
-    </script>
+<div class="info-modal" id="infoModal">
+
+    <div class="info-modal-content">
+
+        <button
+            class="close-modal"
+            id="closeInfo">
+            ✕
+        </button>
+
+        <img
+            src="{{ url_for('static', filename='img/browser_help.png') }}"
+            alt="Совместимость браузеров"
+            class="info-image">
+
+    </div>
+
+</div>
+
+<script>
+
+(function(){
+
+    const form = document.getElementById("loginForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const room = document.getElementById("room");
+
+    room.addEventListener("input", () => {
+        room.value = room.value.replace(/\D/g, "").slice(0, 8);
+    });
+
+    form.addEventListener("submit", () => {
+        submitBtn.value = "Подключение...";
+        submitBtn.disabled = true;
+    });
+
+})();
+
+const infoModal = document.getElementById("infoModal");
+const openInfo = document.getElementById("openInfo");
+const closeInfo = document.getElementById("closeInfo");
+
+openInfo.addEventListener("click", () => {
+    infoModal.classList.add("show");
+});
+
+closeInfo.addEventListener("click", () => {
+    infoModal.classList.remove("show");
+});
+
+infoModal.addEventListener("click", (e) => {
+    if (e.target === infoModal) {
+        infoModal.classList.remove("show");
+    }
+});
+
+</script>
+
 </body>
 </html>
