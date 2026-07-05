@@ -931,7 +931,7 @@ function get_answer_otbor(data){
     {
        return; 
     }
-    document.getElementById('question').innerText= "Правильный ответ: " + data[3];  
+    document.getElementById('question').innerText= "Загаданное число: " + data[3];  
 
 //})
 //.catch(error => {

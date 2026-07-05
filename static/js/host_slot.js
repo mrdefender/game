@@ -3245,7 +3245,7 @@ function show_answer_otbor(){
     stop_current_sound();
     playAudio("navigator.ogg",false);
     document.getElementById("au").value =" ";
-    document.getElementById('question').innerText= "Правильный ответ: " + data[3];
+    document.getElementById('question').innerText= "Загаданное число: " + data[3];
     document.getElementById('result_otbor').disabled = false;
    
 
