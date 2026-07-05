@@ -133,6 +133,10 @@ function stop_current_sound() {
    }
     currentAudio = [];
 }
+
+
+
+
 //var timerWaitAnswer;
 //var timerHelps;
 /** Сбрасывает состояние пульта ведущего к начальному состоянию. */
@@ -817,6 +821,7 @@ function start_to_game()
     
     document.getElementById("start_game").disabled = true;
     document.getElementById("get_task").disabled = false;
+    document.getElementById("au").value = "";
     stop_current_sound();
     playAudio("start_game.ogg",false)
     fetch('/start_game', {
@@ -966,7 +971,7 @@ console.error('Ошибка:', error);
 /** Получает новое задание для текущего раунда. */
 function gen_task()
 {
-    
+    document.getElementById("au").value = "";
     if (select.value == "Победа")
         return;
     var input = document.getElementById("user_id").value;
@@ -2182,6 +2187,7 @@ function next_round()
 {   
     btn_default();
     document.getElementById("rb").value = "false";
+    document.getElementById("au").value = "";
     ch3();
     if (select.value == "Раунд 4")
     {
@@ -2574,7 +2580,7 @@ function help_auden(){
     {
         document.getElementById("au").value = document.getElementById("au").value+" " + (i+1).toString()+" - "+data[i] +"%"+ ";";
     }
-    document.getElementById("au").value = document.getElementById("au").value + " Фатал- "+ data[15] +"%" + " " + " Cвободный слот - "+data[16]+ "%";
+    document.getElementById("au").value = document.getElementById("au").value + " Фатал - "+ data[15] +"%" + ";" + " Cвободный слот - "+data[16]+ "%";
     document.getElementById("help_auden").style.backgroundColor = "#000c11";
     update_helps();
 
