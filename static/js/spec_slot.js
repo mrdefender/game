@@ -1013,6 +1013,18 @@ function show_winner_otbor(data){
 
 }
 
+socket.on("count_answer_interactive_for_spec", (data) => {
+    console.log(data)
+    if (data==0)
+        document.getElementById("users").value = "";
+    if (data==1)
+        document.getElementById("users").value = "1 ответ в интерактиве";
+    if ((data>=2) && (data<=4))
+        document.getElementById("users").value = data.toString() + " ответа в интерактиве";
+    if (data>=5)
+        document.getElementById("users").value = data.toString() + " ответов в интерактиве";
+})
+
 socket.on("answered_main", (data) => {
     answered_main(data)
 })

@@ -74,7 +74,13 @@ def socket_join_room(data):
         "username": username
     })   
 
-
+@socketio.on("count_answer_interactive")
+def count_interactive(data):
+    try:
+        col = int(data["interactive"])
+        socketio.emit("count_answer_interactive_for_spec",col,to=f"{DEFAULT_ROOM_CODE}:spectator")
+    except:
+        return
 
 @login_manager.user_loader
 def load_user(user_id):

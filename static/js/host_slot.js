@@ -2860,7 +2860,7 @@ function update_list_user(data)
 
     console.log(data);
     var interactive_col = 0;
-
+    socket.emit("count_answer_interactive", {interactive: interactive_col});
     var table = document.getElementById("status_users");
     if (table.rows.length!=1)
     {
@@ -2944,6 +2944,7 @@ function update_list_user(data)
 
     console.log(interactive_col);
     document.getElementById("count_interactive").value = interactive_col.toString();
+    
     tr.appendChild(cell1);
     tr.appendChild(cell2);
     tr.appendChild(cell3);
@@ -2954,6 +2955,7 @@ function update_list_user(data)
     tr.appendChild(cell8);
     table.appendChild(tr);
     }
+    socket.emit("count_answer_interactive", {interactive: interactive_col});
 }  
 
 //})
