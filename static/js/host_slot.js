@@ -1025,9 +1025,13 @@ function gen_task()
     {
         playAudio("q1-3.ogg",true);
     }
-    if ((data[0]==4) || (data[0]==5))
+    if (data[0]==4)
     {
-        playAudio("q4-5.ogg",true);
+        playAudio("q4.ogg",true);
+    }
+    if (data[0]==5)
+    {
+        playAudio("q5.ogg",true);
     }
     if (data[0]==6)
     {
@@ -3245,7 +3249,7 @@ function show_answer_otbor(){
     if (data == 'fail')
         return;
     stop_current_sound();
-    playAudio("navigator.ogg",false);
+    playAudio("otbor_answer.ogg",false);
     document.getElementById("au").value =" ";
     document.getElementById('question').innerText= "Загаданное число: " + data[3];
     document.getElementById('result_otbor').disabled = false;
