@@ -2463,6 +2463,7 @@ function alter(){
 
     document.getElementById("palter").checked = false;
     document.getElementById("alter").style.backgroundColor = "orange";
+    stop_current_sound();
     playAudio("alter.ogg",false);
     update_helps();
 
@@ -2685,7 +2686,7 @@ function open_room(){
 
      fetch('/open_room', {
         method: 'POST',
-        body: JSON.stringify({ "":""}),
+        body: JSON.stringify({ game_type:"slot"}),
         headers: {
             'Content-Type': 'application/json'
         }

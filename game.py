@@ -88,6 +88,7 @@ def load_user(user_id):
 
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
+    game = db.Column(db.Text, unique=True)
     def __repr__(self):
         return '<Room %r>' %self.id
 
@@ -190,6 +191,10 @@ def check_id_room(room_id):
         return True
 
 
+def give_name_game(room_code):
+    room_code = Room.query.filter(Room.id == int(room_code)).first()
+    return room_code.game
+
 
 @app.route('/join', methods=["POST", "GET"])
 def join():
@@ -224,15 +229,22 @@ def join():
                 if tmp.username == u.username:
                    # if tmp.username in session['username']:
                         print (url_for('join'))
-                        return render_template("user_slot.html",value=u.username)   
+                        if give_name_game(request.form['room_id']) == 'slot':
+                            return render_template("user_slot.html",value=u.username)
+                        else: 
+                            return render_template("login.html")
+                            
                     #else:
                      #   return render_template("login.html")                       
             db.session.add(u)
             db.session.flush()
             db.session.commit()
             session['username'] = u.username
-            ch = login_user(u)
-            return render_template("user_slot.html",value=u.username)
+            if give_name_game(request.form['room_id']) == 'slot':
+                ch = login_user(u)
+                return render_template("user_slot.html",value=u.username)
+            else:
+                return render_template("login.html")
     return render_template("login.html")
 
 @app.route('/select', methods=["POST", "GET"])
@@ -849,10 +861,12 @@ def open_room():
     if request.method == 'POST':
         Room.query.delete()
         db.session.commit()
+        game_type = request.json['game_type']
         try:
             room_code = Room()
             secret_rnd = secrets.SystemRandom()
             room_code.id = secret_rnd.randint(1000,9999)
+            room_code.game = game_type
             db.session.add(room_code)
             db.session.flush()
             db.session.commit()
@@ -931,7 +945,7 @@ def reset_user_to_wait():
         # if os.path.exists('answered.json'):
         #    os.remove('answered.json')
          Answered.query.delete()
-        # Task.query.delete()
+         Task.query.delete()
        #  if os.path.exists("task.json"):
        #     os.remove("task.json")
          js = Users.query.all()
