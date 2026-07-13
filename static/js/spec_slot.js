@@ -244,7 +244,7 @@ function showSpecRoomQR(roomId) {
 
   if (!box || !img || !code || !roomId) return;
 
-  const loginUrl = `https://games.mokaque-t.ru/join`;
+  const loginUrl = `https://games.mokaque-t.ru`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(loginUrl)}`;
 
   img.src = qrUrl;
