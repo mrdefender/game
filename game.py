@@ -28,7 +28,7 @@ app.secret_key = app.config["SECRET_KEY"] #os.urandom(32).hex
 # CSRF-защита обычных HTTP-запросов. Проверка запускается вручную ниже,
 # чтобы служебный транспорт Socket.IO (/socket.io) не блокировался.
 app.config["WTF_CSRF_CHECK_DEFAULT"] = False
-app.config["WTF_CSRF_TIME_LIMIT"] = 12 * 60 * 60
+app.config["WTF_CSRF_TIME_LIMIT"] = None
 csrf = CSRFProtect(app)
 
 
