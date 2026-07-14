@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/mokaque.ico') }}">
     <link rel="stylesheet" href="styles/main.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="/static/js/csrf.js"></script>
 </head>
 <body>
     <div class="landing-bg"></div>

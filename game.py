@@ -15,6 +15,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.types import JSON
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required 
 from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFProtect, CSRFError
 
 load_dotenv()
 app = Flask(__name__, template_folder="static/")
@@ -23,7 +24,39 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") #убрать в пер�
 if app.config['SECRET_KEY'] is None:
     raise ValueError("ОШИБКА: Переменная окружения SECRET_KEY не установлена!")
 app.secret_key = app.config["SECRET_KEY"] #os.urandom(32).hex
-socketio = SocketIO(app, cors_allowed_origins="*") # добавить конкретный домен
+
+# CSRF-защита обычных HTTP-запросов. Проверка запускается вручную ниже,
+# чтобы служебный транспорт Socket.IO (/socket.io) не блокировался.
+app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+app.config["WTF_CSRF_TIME_LIMIT"] = 12 * 60 * 60
+csrf = CSRFProtect(app)
+
+
+@app.before_request
+def protect_http_requests_from_csrf():
+    """Проверяет CSRF для изменяющих HTTP-запросов, кроме транспорта Socket.IO."""
+    if request.path.startswith("/socket.io"):
+        return None
+
+    if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        csrf.protect()
+
+    return None
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(error):
+    """Возвращает JSON для fetch и понятную ошибку для обычных форм."""
+    if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return jsonify({
+            "status": "error",
+            "error": "csrf_failed",
+            "message": "Сессия устарела или CSRF-токен недействителен. Обновите страницу."
+        }), 400
+
+    return render_template("csrf_error.html", reason=error.description), 400
+
+socketio = SocketIO(app, cors_allowed_origins=os.environ.get("ALLOWED_ORIGINS")) # добавить конкретный домен
 accepted_user = ""
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)

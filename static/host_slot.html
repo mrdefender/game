@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="/static/styles/host_slot.css">
   <link rel="icon" href="{{ url_for('static', filename='img/slot.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/host_slot.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="/static/js/csrf.js"></script>
 </head>
 <body data-role="host">
   <div class="show-shell dashboard-shell">

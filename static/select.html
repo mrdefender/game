@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <title>Веселые игры</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/select.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="/static/js/csrf.js"></script>
 </head>
 <body>
     <div class="stage-bg"></div>
@@ -28,10 +30,12 @@
             <section class="screen-actions panel-inner">
                 <div class="section-title">Доступные игры</div>
                 <form action="/slot" method="post" class="select_game">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="submit" class="action-btn action-primary-slot" value="Свободный слот">
                     
                 </form>
                 <form action="" method="post" class="select_game">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="submit" class="action-btn action-primary-tpv" value="The People Versus" disabled>
                 </form>
             </section>

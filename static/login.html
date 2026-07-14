@@ -13,6 +13,8 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/mokaque.ico') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="/static/js/csrf.js"></script>
 </head>
 <body>
 
@@ -52,6 +54,7 @@
         <section class="login-form-wrap panel-inner">
 
             <form action="/join" method="post" class="auth" id="loginForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="form_group">
 
