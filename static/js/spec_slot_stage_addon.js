@@ -67,7 +67,6 @@
 
     if (ex2 === '50:50') {
       off.forEach((b) => b.classList.add('spec-5050-off'));
-      setText('ui-help-5050', off.length ? 'Исключены варианты: ' + off.map((b) => b.value).join(', ') : 'Подсказка применена');
       help5050?.classList.add('is-active-5050');
     } else {
       setText('ui-help-5050', 'Не применялась');
@@ -76,7 +75,6 @@
 
     if (ex2 === 'alter') {
       on.forEach((b) => b.classList.add('spec-alter-on'));
-      setText('ui-help-alter', on.length ? 'Оставлены варианты: ' + on.map((b) => b.value).join(', ') : 'Подсказка применена');
       helpAlter?.classList.add('is-active-alter');
     } else {
       setText('ui-help-alter', 'Не применялась');
@@ -138,10 +136,6 @@
 
     document.getElementById('pnavi')?.classList.toggle('spec-navi-active', navi.length > 0);
 
-    setText('ui-spec-player', player.length ? player.join(', ') : '—');
-    setText('ui-spec-right', right.length ? right.join(', ') : '—');
-    setText('ui-spec-fatal', fatal.length ? fatal.join(', ') : '—');
-    setText('ui-spec-navi', navi.length ? navi.join(', ') : '—');
   }
 
   function start() {
