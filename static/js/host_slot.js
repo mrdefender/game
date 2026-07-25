@@ -45,7 +45,7 @@ var audioCache = {};
 var currentAudio = [];
 var currentUrl = document.URL;
 var ffffff = currentUrl.split('/host_slot');//адресная строка пользователя без /host_slot http://ip:5000
-var audioUrl = ffffff[0]+'/sounds/';
+var audioUrl = ffffff[0]+'/sounds/slot/';
 
 const socket = io();
 function setSocketStatus(isOnline) {

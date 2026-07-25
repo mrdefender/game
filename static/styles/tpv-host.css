@@ -1,33 +1,1554 @@
-*{
-
+*{box-sizing:border-box}
+:root{
+  --bg:#020507;
+  --panel:#071218;
+  --panel-soft:#0c1a20;
+  --line:#203841;
+  --cyan:#00a7b8;
+  --cyan-dark:#003d45;
+  --silver1:#f2f4f5;
+  --silver2:#7a8287;
+  --silver3:#191d20;
+  --red1:#d92330;
+  --red2:#721018;
+  --green1:#22a864;
+  --green2:#0b5632;
+  --amber1:#d98a12;
+  --amber2:#754207;
+  --blue1:#2379b2;
+  --blue2:#0a416d;
+  --purple1:#8157aa;
+  --purple2:#3d225f;
+  --text:#eef7fa;
+  --muted:#91a8b0;
 }
-.socket-status {
-  position:fixed;
-  right:14px;
-  bottom:14px;
-  z-index:9999;
-  display:inline-flex;
+
+html,body{margin:0;min-height:100%;background:#000;color:var(--text)}
+body{
+  font-family:Montserrat,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 80% 10%,rgba(0,119,139,.18),transparent 28%),
+    linear-gradient(145deg,#020405,#061118 56%,#020405);
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+textarea{resize:vertical}
+
+.tpv-console{
+  min-height:100dvh;
+  max-width:1920px;
+  margin:0 auto;
+  padding:12px;
+}
+
+.console-header{
+  min-height:70px;
+  display:flex;
   align-items:center;
-  gap:9px;
-  height:38px;
-  padding:0 13px;
-  border-radius:999px;
-  background:rgba(4,12,22,.92);
-  border:1px solid rgba(126,191,255,.2);
-  box-shadow:0 12px 28px rgba(0,0,0,.38);
-  font-size:.76rem;
-  font-weight:900
+  justify-content:space-between;
+  gap:16px;
+  padding:11px 16px;
+  border:1px solid #1e3842;
+  border-radius:16px;
+  background:linear-gradient(180deg,#0b171d,#040708);
+  box-shadow:0 12px 26px rgba(0,0,0,.4);
 }
 
-.socket-dot {
-  width:10px;
-  height:10px;
+.console-brand__eyebrow{
+  color:#69dbe6;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.18em;
+}
+
+.console-brand h1{
+  margin:2px 0 0;
+  font-size:clamp(23px,2.3vw,38px);
+}
+
+.console-header__status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.room-badge,.socket-status{
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 13px;
+  border:1px solid #245965;
+  border-radius:999px;
+  background:#08191f;
+}
+
+.room-badge span{
+  color:#8eb7c0;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+}
+
+.room-badge output{
+  font-size:18px;
+  font-style:italic;
+  font-weight:800;
+}
+
+.socket-status{
+  color:#aebcc1;
+  font-size:11px;
+  font-weight:700;
+}
+
+.socket-dot{
+  width:9px;
+  height:9px;
   border-radius:50%;
   background:#ff3152;
-  box-shadow:0 0 14px #ff3152
+  box-shadow:0 0 12px #ff3152;
 }
 
-.socket-online .socket-dot {
+.socket-online .socket-dot{
   background:#20e165;
-  box-shadow:0 0 14px #20e165
+  box-shadow:0 0 12px #20e165;
+}
+
+.metrics-strip{
+  display:grid;
+  grid-template-columns:1.05fr repeat(4,.76fr) 1.15fr 1.15fr;
+  gap:8px;
+  margin:10px 0;
+}
+
+.metric-shell{
+  position:relative;
+  min-width:0;
+  padding:6px;
+  border:4px solid transparent;
+  border-radius:16px;
+  background:linear-gradient(145deg,var(--silver1),var(--silver2) 21%,var(--silver3) 50%,#adb4b9) border-box;
+  box-shadow:0 7px 14px rgba(0,0,0,.42);
+}
+
+.metric-shell::before{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:9px;
+  background:linear-gradient(180deg,#0d8498,#07515e 50%,#022a32);
+  box-shadow:inset 0 4px 7px rgba(255,255,255,.15),inset 0 -7px 9px rgba(0,0,0,.45);
+}
+
+.metric-shell--red::before{
+  background:linear-gradient(180deg,#df2430,#9a0d17 50%,#4a0409);
+}
+
+.metric-shell span,.metric-shell output{
+  position:relative;
+  z-index:1;
+}
+
+.metric-shell span{
+  display:block;
+  margin-bottom:1px;
+  color:#d7eff3;
+  text-align:center;
+  font-size:8px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+}
+
+.metric-value{
+  min-height:31px;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font-size:clamp(16px,1.4vw,23px);
+  font-style:italic;
+  font-weight:700;
+}
+
+.metric-value--text{
+  font-size:clamp(12px,1vw,16px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.console-grid{
+  display:grid;
+  grid-template-columns:minmax(340px,.9fr) minmax(500px,1.3fr) minmax(330px,.85fr);
+  gap:10px;
+  align-items:start;
+}
+
+.console-column{
+  display:grid;
+  gap:10px;
+}
+
+.tpv-panel{
+  min-width:0;
+  padding:12px;
+  border:1px solid var(--line);
+  border-left:3px solid var(--cyan);
+  border-radius:13px;
+  background:linear-gradient(180deg,#08151b,#040708);
+  box-shadow:0 10px 22px rgba(0,0,0,.34);
+}
+
+.tree-panel{border-left-color:#d6ad1b}
+.actions-panel{border-left-color:#7f5caf}
+.params-panel{border-left-color:#df780c}
+.players-panel{border-left-color:#00a3b3}
+
+.panel-heading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:9px;
+  margin-bottom:10px;
+}
+
+.panel-heading h2{
+  margin:0;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+
+.panel-heading p{
+  margin:2px 0 0;
+  color:var(--muted);
+  font-size:9px;
+}
+
+.panel-chip,.panel-counter{
+  padding:4px 8px;
+  border:1px solid #28525d;
+  border-radius:999px;
+  color:#8adce7;
+  background:#071a20;
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+
+.question-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.field,.compact-field,.params-grid label{
+  display:grid;
+  gap:4px;
+}
+
+.field--full{grid-column:1/-1}
+
+.field span,.compact-field span,.params-grid label span{
+  color:#90a7af;
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+
+.field input,.field textarea,.compact-field input,.params-grid input{
+  width:100%;
+  min-height:35px;
+  border:1px solid #304952;
+  border-radius:7px;
+  color:#fff;
+  background:#10191d;
+  padding:7px 9px;
+  outline:none;
+}
+
+.field textarea{
+  min-height:70px;
+}
+
+.field input:focus,.field textarea:focus,.compact-field input:focus,.params-grid input:focus{
+  border-color:#00a2b2;
+  box-shadow:0 0 0 2px rgba(0,162,178,.13);
+}
+
+.status-orbs-wrap{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:9px;
+  flex-wrap:wrap;
+}
+
+.mini-label{
+  display:block;
+  margin-bottom:5px;
+  color:#92a8b0;
+  font-size:8px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.status-orbs{
+  display:flex;
+  gap:5px;
+}
+
+.status-orb{
+  width:33px;
+  height:33px;
+  display:grid;
+  place-items:center;
+  border:3px solid #90989d;
+  border-radius:50%;
+  color:#fff;
+  background:linear-gradient(180deg,#0c7891,#034250);
+  font-size:13px;
+  font-weight:800;
+}
+
+.status-orb--flip{
+  background:linear-gradient(180deg,#125e99,#063761);
+}
+
+.money-tree{
+  display:grid;
+  gap:7px;
+}
+
+.money-row{
+  position:relative;
+  min-height:48px;
+  padding:0 13px 0 62px;
+  border:3px solid #788087;
+  border-radius:11px;
+  color:#fff;
+  background:linear-gradient(180deg,#0b7187,#043f4d 55%,#02242c);
+  box-shadow:inset 0 4px 7px rgba(255,255,255,.1),inset 0 -6px 8px rgba(0,0,0,.38);
+}
+
+.money-row span{
+  position:absolute;
+  left:-3px;
+  top:50%;
+  width:59px;
+  height:44px;
+  transform:translateY(-50%);
+  display:grid;
+  place-items:center;
+  border:3px solid #a1a8ad;
+  border-radius:50%;
+  background:radial-gradient(ellipse at 50% 25%,#1489a1,#075367 55%,#022632);
+  font-style:italic;
+}
+
+.money-row strong{
+  font-size:18px;
+  font-style:italic;
+}
+
+.money-row.is-active{
+  filter:brightness(1.28);
+  box-shadow:0 0 12px rgba(0,204,224,.4),inset 0 0 0 2px #dce5e8;
+}
+
+.action-group{
+  padding:9px;
+  border:1px solid #1f343c;
+  border-radius:9px;
+  background:#071015;
+}
+
+.action-group + .action-group{
+  margin-top:7px;
+}
+
+.action-group h3{
+  margin:0 0 7px;
+  color:#9ecbd4;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.action-grid{
+  display:grid;
+  gap:6px;
+}
+
+.action-grid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.action-grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.action-grid--4{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+.player-select-grid{
+  display:grid;
+  grid-template-columns:1fr minmax(110px,.7fr) 1fr;
+  gap:6px;
+  align-items:end;
+}
+
+.game-btn{
+  width:100%;
+  min-height:42px;
+  padding:7px 9px;
+  border:1px solid #007786;
+  border-radius:7px;
+  color:#fff;
+  background:linear-gradient(180deg,#007b83,#003e43);
+  font-size:11px;
+  font-weight:800;
+  line-height:1.15;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:anywhere;
+  transition:filter .15s ease,transform .15s ease;
+}
+
+.game-btn:hover{filter:brightness(1.14)}
+.game-btn:active{transform:translateY(1px)}
+
+.game-btn--primary{background:linear-gradient(180deg,#0aa8b6,#00636c)}
+.game-btn--danger{border-color:#a01823;background:linear-gradient(180deg,var(--red1),var(--red2))}
+.game-btn--success{border-color:#1a8651;background:linear-gradient(180deg,var(--green1),var(--green2))}
+.game-btn--warning{border-color:#9b5d0e;background:linear-gradient(180deg,var(--amber1),var(--amber2))}
+.game-btn--info{border-color:#1e6399;background:linear-gradient(180deg,var(--blue1),var(--blue2))}
+.game-btn--purple{border-color:#694292;background:linear-gradient(180deg,var(--purple1),var(--purple2))}
+.game-btn--square{font-size:16px}
+.game-btn--full{margin-top:9px}
+
+.params-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+
+.table-wrap{
+  overflow:auto;
+  border:1px solid #243a43;
+}
+
+.status-users{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.status-users th,.status-users td{
+  height:35px;
+  padding:6px 9px;
+  border-bottom:1px solid #1c4f59;
+  text-align:left;
+}
+
+.status-users th{
+  color:#8eaab2;
+  background:#101a1e;
+  font-size:8px;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+
+.status-users td{background:#06373c}
+.status-users tbody tr:nth-child(even) td{background:#052e32}
+
+@media(max-width:1450px){
+  .metrics-strip{grid-template-columns:repeat(4,minmax(125px,1fr))}
+  .console-grid{grid-template-columns:minmax(340px,.9fr) minmax(500px,1.25fr)}
+  .console-column--right{grid-column:1/-1;grid-template-columns:1fr 1fr}
+  .params-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+@media(max-width:1000px){
+  .console-header{align-items:flex-start;flex-direction:column}
+  .console-header__status{width:100%;justify-content:space-between}
+  .metrics-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .console-grid{grid-template-columns:1fr}
+  .console-column--right{grid-column:auto;grid-template-columns:1fr}
+  .action-grid--4{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:620px){
+  .tpv-console{padding:7px}
+  .console-header__status{align-items:stretch;flex-direction:column}
+  .room-badge,.socket-status{justify-content:center}
+  .metrics-strip{grid-template-columns:1fr 1fr}
+  .metric-shell--wide,.metric-shell--red,.metric-shell--name{grid-column:1/-1}
+  .question-layout,.params-grid,.action-grid--2,.action-grid--3,.action-grid--4,.player-select-grid{grid-template-columns:1fr}
+  .game-btn{min-height:46px;font-size:12px}
+}
+
+
+.room-control-panel{
+  border-left-color:#00a8b9;
+}
+
+.room-control-grid{
+  display:grid;
+  grid-template-columns:minmax(120px,1fr) 1fr 1fr;
+  gap:6px;
+  align-items:end;
+}
+
+.room-code-field{
+  display:grid;
+  gap:4px;
+}
+
+.room-code-field span{
+  color:#90a7af;
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+
+.room-code-field input{
+  width:100%;
+  min-height:35px;
+  border:1px solid #304952;
+  border-radius:7px;
+  color:#fff;
+  background:#10191d;
+  padding:7px 9px;
+  text-align:center;
+  font-weight:800;
+  letter-spacing:.14em;
+  outline:none;
+}
+
+.room-control-grid button:disabled{
+  opacity:.42;
+  cursor:not-allowed;
+  filter:none;
+}
+
+@media(max-width:620px){
+  .room-control-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* =========================================================
+   v3: вопрос в центре, дерево и комната слева,
+   параметры справа, игроки снизу
+   ========================================================= */
+
+.console-grid--centered-question{
+  display:grid;
+  grid-template-columns:
+    minmax(240px,.58fr)
+    minmax(560px,1.48fr)
+    minmax(290px,.72fr);
+  grid-template-areas:
+    "left center right"
+    "bottom bottom bottom";
+  gap:10px;
+  align-items:start;
+}
+
+.console-grid--centered-question > .console-column--left{
+  grid-area:left;
+}
+
+.console-grid--centered-question > .console-column--center{
+  grid-area:center;
+}
+
+.console-grid--centered-question > .console-column--right{
+  grid-area:right;
+}
+
+.console-grid--centered-question > .console-column--bottom{
+  grid-area:bottom;
+}
+
+.console-grid--centered-question .question-panel{
+  min-height:360px;
+}
+
+.console-grid--centered-question .question-layout{
+  grid-template-columns:minmax(0,1fr) minmax(0,.72fr);
+}
+
+.console-grid--centered-question .question-layout .field--full:first-child textarea{
+  min-height:128px;
+  font-size:14px;
+  line-height:1.45;
+}
+
+.console-grid--centered-question .question-layout .field--full:last-child textarea{
+  min-height:88px;
+}
+
+.console-grid--centered-question .actions-panel{
+  width:100%;
+}
+
+.console-grid--centered-question .params-panel{
+  position:sticky;
+  top:10px;
+}
+
+.console-grid--centered-question .players-panel{
+  width:100%;
+}
+
+.console-grid--centered-question .table-wrap{
+  max-height:300px;
+}
+
+.console-grid--centered-question .status-users{
+  table-layout:fixed;
+}
+
+.console-grid--centered-question .status-users th:first-child,
+.console-grid--centered-question .status-users td:first-child{
+  width:64px;
+}
+
+.console-grid--centered-question .room-control-grid{
+  grid-template-columns:1fr;
+}
+
+.console-grid--centered-question .room-control-grid .game-btn{
+  min-height:40px;
+}
+
+@media(max-width:1450px){
+  .console-grid--centered-question{
+    grid-template-columns:minmax(230px,.58fr) minmax(520px,1.42fr);
+    grid-template-areas:
+      "left center"
+      "right center"
+      "bottom bottom";
+  }
+
+  .console-grid--centered-question > .console-column--right{
+    align-self:start;
+  }
+
+  .console-grid--centered-question .params-panel{
+    position:static;
+  }
+}
+
+@media(max-width:1000px){
+  .console-grid--centered-question{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "center"
+      "left"
+      "right"
+      "bottom";
+  }
+
+  .console-grid--centered-question .question-layout{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:620px){
+  .console-grid--centered-question .question-layout{
+    grid-template-columns:1fr;
+  }
+
+  .console-grid--centered-question .question-layout .field--full{
+    grid-column:auto;
+  }
+}
+
+
+/* =========================================================
+   v4 — компактный пульт без постоянной прокрутки
+   ========================================================= */
+
+html,body{
+  height:100%;
+}
+
+body{
+  overflow:hidden;
+}
+
+.tpv-console{
+  height:100dvh;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.console-header{
+  flex:0 0 auto;
+}
+
+.metrics-strip{
+  flex:0 0 auto;
+}
+
+.console-grid--centered-question{
+  flex:1 1 auto;
+  min-height:0;
+  grid-template-columns:
+    minmax(220px,.52fr)
+    minmax(600px,1.55fr)
+    minmax(270px,.66fr);
+  grid-template-rows:minmax(0,1fr) minmax(145px,.34fr);
+  grid-template-areas:
+    "left center right"
+    "bottom bottom bottom";
+  overflow:hidden;
+}
+
+.console-grid--centered-question > .console-column{
+  min-height:0;
+}
+
+.console-grid--centered-question > .console-column--left,
+.console-grid--centered-question > .console-column--center,
+.console-grid--centered-question > .console-column--right{
+  overflow:auto;
+  scrollbar-width:thin;
+  scrollbar-color:#195d68 transparent;
+}
+
+.console-grid--centered-question > .console-column--bottom{
+  overflow:hidden;
+}
+
+.console-grid--centered-question .question-panel{
+  min-height:0;
+}
+
+.console-grid--centered-question .question-layout .field--full:first-child textarea{
+  min-height:92px;
+}
+
+.console-grid--centered-question .question-layout .field--full:last-child textarea{
+  min-height:62px;
+}
+
+.actions-panel--compact{
+  padding:10px;
+}
+
+.actions-panel--compact .panel-heading{
+  margin-bottom:7px;
+}
+
+.primary-actions{
+  margin-bottom:7px;
+}
+
+.action-group--primary{
+  border-color:#285b65;
+}
+
+.primary-actions .action-grid--5{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:5px;
+}
+
+.secondary-actions{
+  display:grid;
+  grid-template-columns:1.1fr 1.4fr 1fr .85fr;
+  gap:6px;
+}
+
+.secondary-actions .action-group{
+  margin:0;
+  min-width:0;
+}
+
+.actions-panel--compact .action-group{
+  padding:7px;
+}
+
+.actions-panel--compact .action-group h3{
+  margin-bottom:5px;
+}
+
+.actions-panel--compact .game-btn{
+  min-height:36px;
+  padding:5px 7px;
+  font-size:10px;
+}
+
+.actions-panel--compact .compact-field--inline{
+  align-self:stretch;
+}
+
+.actions-panel--compact .compact-field--inline input{
+  min-height:36px;
+  padding:5px 7px;
+}
+
+.console-grid--centered-question .params-grid{
+  grid-template-columns:1fr;
+}
+
+.console-grid--centered-question .room-control-panel,
+.console-grid--centered-question .tree-panel,
+.console-grid--centered-question .params-panel{
+  padding:10px;
+}
+
+.console-grid--centered-question .money-row{
+  min-height:42px;
+}
+
+.console-grid--centered-question .money-row span{
+  width:54px;
+  height:39px;
+}
+
+.console-grid--centered-question .money-row{
+  padding-left:57px;
+}
+
+.console-grid--centered-question .players-panel{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+.console-grid--centered-question .players-panel .table-wrap{
+  flex:1;
+  min-height:0;
+  max-height:none;
+  overflow:auto;
+}
+
+@media(max-width:1450px){
+  body{
+    overflow:auto;
+  }
+
+  .tpv-console{
+    height:auto;
+    min-height:100dvh;
+    overflow:visible;
+  }
+
+  .console-grid--centered-question{
+    display:grid;
+    grid-template-columns:minmax(230px,.58fr) minmax(520px,1.42fr);
+    grid-template-rows:auto;
+    grid-template-areas:
+      "left center"
+      "right center"
+      "bottom bottom";
+    overflow:visible;
+  }
+
+  .console-grid--centered-question > .console-column--left,
+  .console-grid--centered-question > .console-column--center,
+  .console-grid--centered-question > .console-column--right{
+    overflow:visible;
+  }
+
+  .secondary-actions{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .primary-actions .action-grid--5{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+
+@media(max-width:1000px){
+  .secondary-actions,
+  .primary-actions .action-grid--5{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:620px){
+  .secondary-actions,
+  .primary-actions .action-grid--5{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* =========================================================
+   v5 — оптимизация компоновки для Full HD 1920×1080
+   ========================================================= */
+
+.console-grid--centered-question{
+  grid-template-columns:
+    minmax(210px,.48fr)
+    minmax(690px,1.68fr)
+    minmax(360px,.84fr);
+  grid-template-rows:minmax(0,1fr);
+  grid-template-areas:"left center right";
+}
+
+.console-grid--centered-question > .console-column--right{
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+  overflow:hidden;
+}
+
+.console-grid--centered-question .params-panel{
+  position:static;
+  flex:0 0 auto;
+  padding:9px 10px;
+}
+
+.console-grid--centered-question .params-panel .panel-heading{
+  margin-bottom:6px;
+}
+
+.console-grid--centered-question .params-panel .panel-heading p{
+  display:none;
+}
+
+.console-grid--centered-question .params-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:5px;
+}
+
+.console-grid--centered-question .params-grid label{
+  gap:3px;
+}
+
+.console-grid--centered-question .params-grid label span{
+  font-size:8px;
+  line-height:1.05;
+}
+
+.console-grid--centered-question .params-grid input{
+  min-height:30px;
+  padding:4px 6px;
+  font-size:12px;
+}
+
+.console-grid--centered-question #action-update-state{
+  min-height:34px;
+  margin-top:6px;
+}
+
+.console-grid--centered-question .players-panel{
+  min-height:0;
+  height:auto;
+  padding:9px 10px;
+  overflow:hidden;
+}
+
+.console-grid--centered-question .players-panel .panel-heading{
+  flex:0 0 auto;
+  margin-bottom:6px;
+}
+
+.console-grid--centered-question .players-panel .panel-heading p{
+  display:none;
+}
+
+.console-grid--centered-question .players-panel .table-wrap{
+  flex:1 1 auto;
+  min-height:0;
+  height:100%;
+  max-height:none;
+  overflow:auto;
+}
+
+.console-grid--centered-question .status-users th,
+.console-grid--centered-question .status-users td{
+  height:30px;
+  padding:4px 7px;
+}
+
+.console-grid--centered-question .status-users th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  font-size:8px;
+}
+
+.actions-panel--compact .game-btn{
+  min-height:42px;
+  padding:6px 8px;
+  font-size:11px;
+  line-height:1.18;
+  font-weight:800;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:break-word;
+  hyphens:auto;
+}
+
+.primary-actions .action-grid--5{
+  grid-template-columns:repeat(5,minmax(105px,1fr));
+}
+
+.secondary-actions{
+  grid-template-columns:1.05fr 1.45fr 1fr .9fr;
+}
+
+.secondary-actions .game-btn{
+  min-height:40px;
+  font-size:10.5px;
+}
+
+.actions-panel--compact .action-group{
+  padding:7px;
+}
+
+.console-grid--centered-question .question-panel{
+  padding:10px 12px;
+}
+
+.console-grid--centered-question .question-panel .panel-heading{
+  margin-bottom:7px;
+}
+
+.console-grid--centered-question .question-layout .field--full:first-child textarea{
+  min-height:104px;
+  font-size:14px;
+  line-height:1.42;
+}
+
+.console-grid--centered-question .question-layout .field--full:last-child textarea{
+  min-height:66px;
+}
+
+.console-grid--centered-question .tree-panel{
+  padding:9px;
+}
+
+.console-grid--centered-question .tree-panel .panel-heading,
+.console-grid--centered-question .room-control-panel .panel-heading{
+  margin-bottom:6px;
+}
+
+.console-grid--centered-question .tree-panel .panel-heading p,
+.console-grid--centered-question .room-control-panel .panel-heading p{
+  display:none;
+}
+
+.console-grid--centered-question .money-tree{
+  gap:5px;
+}
+
+.console-grid--centered-question .money-row{
+  min-height:39px;
+  padding-left:54px;
+  font-size:11px;
+}
+
+.console-grid--centered-question .money-row span{
+  width:51px;
+  height:36px;
+}
+
+.console-grid--centered-question .room-control-panel{
+  padding:9px;
+}
+
+.console-grid--centered-question .room-control-grid{
+  gap:5px;
+}
+
+.console-grid--centered-question .room-control-grid .game-btn{
+  min-height:36px;
+  font-size:10px;
+}
+
+/* На Full HD не допускаем выход содержимого за границы окна. */
+@media(min-width:1451px) and (min-height:850px){
+  .console-grid--centered-question > .console-column--left,
+  .console-grid--centered-question > .console-column--center{
+    overflow:auto;
+  }
+
+  .console-grid--centered-question > .console-column--right{
+    overflow:hidden;
+  }
+}
+
+@media(max-width:1450px){
+  .console-grid--centered-question{
+    grid-template-columns:minmax(220px,.55fr) minmax(520px,1.45fr);
+    grid-template-areas:
+      "left center"
+      "right center";
+  }
+
+  .console-grid--centered-question > .console-column--right{
+    min-height:650px;
+  }
+
+  .console-grid--centered-question .params-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+
+  .primary-actions .action-grid--5{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+
+  .secondary-actions{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:1000px){
+  .console-grid--centered-question{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "center"
+      "left"
+      "right";
+  }
+
+  .console-grid--centered-question > .console-column--right{
+    min-height:auto;
+    overflow:visible;
+  }
+
+  .console-grid--centered-question .players-panel{
+    min-height:360px;
+  }
+}
+
+@media(max-width:620px){
+  .console-grid--centered-question .params-grid,
+  .primary-actions .action-grid--5,
+  .secondary-actions{
+    grid-template-columns:1fr;
+  }
+
+  .actions-panel--compact .game-btn{
+    min-height:48px;
+    font-size:12px;
+  }
+}
+
+
+/* =========================================================
+   FINAL — эргономика быстрых действий и брендирование
+   ========================================================= */
+
+:root{
+  --host-brand-accent:#00a7b8;
+  --host-brand-accent-dark:#00636c;
+  --host-brand-name-max:34px;
+}
+
+#display-game-name{
+  max-width:min(56vw,760px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:clamp(22px,2.2vw,var(--host-brand-name-max));
+}
+
+/* Центральная зона получает приоритет по ширине. */
+.console-grid--centered-question{
+  grid-template-columns:
+    minmax(205px,.45fr)
+    minmax(760px,1.82fr)
+    minmax(350px,.78fr);
+}
+
+/* Главные действия: две читаемые строки по 5 элементов. */
+.primary-actions .action-grid--5{
+  grid-template-columns:repeat(5,minmax(125px,1fr));
+  gap:7px;
+}
+
+.primary-actions .game-btn{
+  min-height:50px;
+  padding:8px 10px;
+  font-size:13px;
+  line-height:1.18;
+  letter-spacing:.01em;
+}
+
+/* Особенно важные решения ведущего. */
+#action-answer-correct,
+#action-answer-wrong{
+  min-height:54px;
+  font-size:14px;
+  text-transform:uppercase;
+  letter-spacing:.045em;
+}
+
+#action-start-round,
+#action-start-circle,
+#action-select-random-player,
+#action-question-flip{
+  font-size:12.5px;
+}
+
+/* Поле ID игрока визуально равно кнопкам. */
+.compact-field--inline{
+  min-width:0;
+}
+
+.compact-field--inline input{
+  height:50px;
+  min-height:50px!important;
+  font-size:13px;
+  text-align:center;
+}
+
+/* Второстепенные группы остаются компактными, но читаемыми. */
+.secondary-actions{
+  grid-template-columns:1.05fr 1.45fr 1fr .92fr;
+  gap:7px;
+}
+
+.secondary-actions .action-group{
+  min-width:0;
+}
+
+.secondary-actions .game-btn{
+  min-height:42px;
+  padding:6px 8px;
+  font-size:11px;
+  line-height:1.18;
+}
+
+.secondary-actions .game-btn--square{
+  font-size:16px;
+  min-height:42px;
+}
+
+/* Явная цветовая иерархия без декоративных шоу-эффектов. */
+.game-btn--primary{
+  border-color:var(--host-brand-accent);
+  background:linear-gradient(180deg,var(--host-brand-accent),var(--host-brand-accent-dark));
+}
+
+#action-start-game{
+  font-size:12px;
+}
+
+#action-start-game-label{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Панель вопроса немного компактнее, чтобы освободить высоту кнопкам. */
+.console-grid--centered-question .question-layout .field--full:first-child textarea{
+  min-height:88px;
+}
+
+.console-grid--centered-question .question-layout .field--full:last-child textarea{
+  min-height:56px;
+}
+
+.console-grid--centered-question .question-panel .status-orbs-wrap{
+  margin-top:7px;
+}
+
+/* Правая колонка: параметры сверху, игроки занимают всё остаточное место. */
+.console-grid--centered-question > .console-column--right{
+  grid-template-rows:auto minmax(260px,1fr);
+}
+
+.console-grid--centered-question .players-panel{
+  min-height:260px;
+}
+
+/* Более различимые строки списка игроков. */
+.console-grid--centered-question .status-users tbody tr:hover td{
+  background:#0a5258;
+}
+
+.console-grid--centered-question .status-users td{
+  font-size:11px;
+}
+
+/* Состояния будущего JS. */
+.game-btn.is-active,
+.game-btn[aria-pressed="true"]{
+  outline:2px solid rgba(255,255,255,.8);
+  outline-offset:1px;
+  filter:brightness(1.18);
+}
+
+.game-btn:disabled,
+.game-btn.is-disabled{
+  opacity:.38;
+  cursor:not-allowed;
+  filter:saturate(.45);
+}
+
+@media(max-width:1700px) and (min-width:1451px){
+  .console-grid--centered-question{
+    grid-template-columns:
+      minmax(195px,.43fr)
+      minmax(680px,1.72fr)
+      minmax(330px,.82fr);
+  }
+
+  .primary-actions .action-grid--5{
+    grid-template-columns:repeat(5,minmax(112px,1fr));
+  }
+
+  .primary-actions .game-btn{
+    font-size:12px;
+  }
+}
+
+@media(max-width:1450px){
+  #display-game-name{
+    max-width:70vw;
+  }
+
+  .primary-actions .action-grid--5{
+    grid-template-columns:repeat(3,minmax(150px,1fr));
+  }
+
+  .secondary-actions{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:1000px){
+  .primary-actions .action-grid--5{
+    grid-template-columns:1fr 1fr;
+  }
+
+  #display-game-name{
+    max-width:88vw;
+    white-space:normal;
+  }
+}
+
+@media(max-width:620px){
+  .primary-actions .action-grid--5,
+  .secondary-actions{
+    grid-template-columns:1fr;
+  }
+
+  .primary-actions .game-btn,
+  .secondary-actions .game-btn{
+    min-height:50px;
+    font-size:13px;
+  }
+}
+
+
+/* =========================================================
+   FINAL v2 — таблица без внутренней прокрутки,
+   улучшенная читаемость второстепенных команд
+   ========================================================= */
+
+/* Страница снова может естественно увеличиваться по высоте. */
+html,
+body{
+  min-height:100%;
+  height:auto;
+}
+
+body{
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+.tpv-console{
+  height:auto;
+  min-height:100dvh;
+  overflow:visible;
+}
+
+/* Основная сетка не ограничивает правую колонку высотой окна. */
+.console-grid--centered-question{
+  flex:0 0 auto;
+  min-height:auto;
+  overflow:visible;
+  align-items:start;
+}
+
+.console-grid--centered-question > .console-column--left,
+.console-grid--centered-question > .console-column--center,
+.console-grid--centered-question > .console-column--right{
+  overflow:visible;
+  min-height:auto;
+}
+
+/* Правая колонка растёт по содержимому. */
+.console-grid--centered-question > .console-column--right{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* Таблица игроков без внутреннего скролла. */
+.console-grid--centered-question .players-panel{
+  height:auto;
+  min-height:0;
+  overflow:visible;
+}
+
+.console-grid--centered-question .players-panel .table-wrap{
+  flex:none;
+  height:auto;
+  max-height:none;
+  min-height:0;
+  overflow:visible;
+}
+
+.console-grid--centered-question .status-users{
+  width:100%;
+  table-layout:fixed;
+}
+
+.console-grid--centered-question .status-users thead th{
+  position:static;
+}
+
+/* Строки становятся чуть выше и легче читаются. */
+.console-grid--centered-question .status-users th,
+.console-grid--centered-question .status-users td{
+  height:34px;
+  padding:6px 8px;
+}
+
+.console-grid--centered-question .status-users td{
+  font-size:11.5px;
+}
+
+/* Второстепенные группы делаем просторнее. */
+.secondary-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.secondary-actions .action-group{
+  padding:9px;
+}
+
+.secondary-actions .action-group h3{
+  margin-bottom:7px;
+  font-size:11px;
+  letter-spacing:.08em;
+}
+
+/* Кнопки в четырёх проблемных секциях. */
+.secondary-actions .game-btn{
+  min-height:48px;
+  padding:8px 10px;
+  font-size:12px;
+  line-height:1.22;
+  font-weight:800;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:normal;
+  word-break:normal;
+  hyphens:none;
+}
+
+/* Экран зрителя — две широкие колонки. */
+.secondary-actions .action-group:nth-child(1) .action-grid{
+  grid-template-columns:repeat(2,minmax(150px,1fr));
+}
+
+/* Гонг-игра: числовые кнопки компактные, остальные широкие. */
+.secondary-actions .action-group:nth-child(2) .action-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+
+#action-bong-start,
+#action-bong-stop,
+#action-bong-author-win,
+#action-bong-next-sum,
+#action-bong-player-win{
+  min-height:50px;
+  font-size:12px;
+}
+
+#action-bong-option-1,
+#action-bong-option-2,
+#action-bong-option-3{
+  min-height:50px;
+  font-size:18px;
+}
+
+/* Музыка и завершение — по три читаемые колонки. */
+.secondary-actions .action-group:nth-child(3) .action-grid,
+.secondary-actions .action-group:nth-child(4) .action-grid{
+  grid-template-columns:repeat(3,minmax(120px,1fr));
+}
+
+/* Секция завершения получает немного больше визуального веса. */
+#action-finish-game,
+#action-show-results,
+#action-reset-game{
+  min-height:50px;
+  font-size:12px;
+}
+
+/* На Full HD центральная зона остаётся широкой. */
+@media(min-width:1451px){
+  .console-grid--centered-question{
+    grid-template-columns:
+      minmax(205px,.44fr)
+      minmax(780px,1.86fr)
+      minmax(350px,.78fr);
+  }
+}
+
+/* На средних экранах второстепенные группы всё ещё читаемы. */
+@media(max-width:1450px){
+  .secondary-actions{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .secondary-actions .action-group:nth-child(3) .action-grid,
+  .secondary-actions .action-group:nth-child(4) .action-grid{
+    grid-template-columns:repeat(3,minmax(110px,1fr));
+  }
+}
+
+@media(max-width:1000px){
+  .secondary-actions{
+    grid-template-columns:1fr;
+  }
+
+  .secondary-actions .action-group:nth-child(1) .action-grid,
+  .secondary-actions .action-group:nth-child(3) .action-grid,
+  .secondary-actions .action-group:nth-child(4) .action-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:620px){
+  .secondary-actions .action-group:nth-child(1) .action-grid,
+  .secondary-actions .action-group:nth-child(2) .action-grid,
+  .secondary-actions .action-group:nth-child(3) .action-grid,
+  .secondary-actions .action-group:nth-child(4) .action-grid{
+    grid-template-columns:1fr;
+  }
+
+  .secondary-actions .game-btn{
+    min-height:52px;
+    font-size:13px;
+  }
+}
+.console-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.console-brand__logo {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  flex: 0 0 auto;
 }

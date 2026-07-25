@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from number_voice import number_to_audio
 import tpv
+from pathlib import Path
 
 load_dotenv()
 app = Flask(__name__, template_folder="static/")
@@ -32,6 +33,43 @@ app.secret_key = app.config["SECRET_KEY"] #os.urandom(32).hex
 app.config["WTF_CSRF_CHECK_DEFAULT"] = False
 app.config["WTF_CSRF_TIME_LIMIT"] = None
 csrf = CSRFProtect(app)
+BASE_DIR = Path(__file__).resolve().parent
+BRANDING_FILE = BASE_DIR / "config" / "branding.json"
+
+with open(
+    BASE_DIR / "config" / "branding.json",
+    encoding="utf-8"
+) as f:
+    BRAND = json.load(f)
+    
+@app.context_processor
+def inject_brand():
+
+    return BRAND
+
+def load_branding() -> dict:
+    """Загружает настройки бренда из JSON."""
+    default_branding = {
+        "game_name": "The People Versus",
+        "game_short_name": "TPV",
+        "game_subtitle": "LIVE GAME MASTER CONSOLE",
+    }
+
+    if not BRANDING_FILE.exists():
+        return default_branding
+
+    try:
+        with BRANDING_FILE.open("r", encoding="utf-8") as file:
+            loaded = json.load(file)
+
+        # Значения из JSON дополняют настройки по умолчанию.
+        return {**default_branding, **loaded}
+
+    except (OSError, json.JSONDecodeError) as error:
+        app.logger.error("Не удалось загрузить branding.json: %s", error)
+        return default_branding
+
+
 
 
 @app.before_request
@@ -310,10 +348,11 @@ def tpv():
     print (url_for('join'))
     return render_template("login.html")
 
-@app.route('/tpv-host', methods=["POST", "GET"])
+
+@app.route('/tpv_host', methods=["POST", "GET"])
 def tpv_host():
     if request.method == 'POST':
-        print (url_for('tpv-host'))
+        print (url_for('tpv_host'))
         #for i in _users:
           #  flash (i)
         return render_template("tpv-host.html")

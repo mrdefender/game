@@ -1,0 +1,13 @@
+:root{
+  --host-brand-accent:#00a7b8;
+  --host-brand-accent-dark:#00636c;
+}
+
+/*
+Пример другой темы:
+
+:root{
+  --host-brand-accent:#2477b5;
+  --host-brand-accent-dark:#123f69;
+}
+*/
