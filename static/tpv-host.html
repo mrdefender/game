@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The People Versys — пульт ведущего</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles/tpv-host.css">
+  <link rel="icon" href="{{ url_for('static', filename='img/slot.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-host.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="/static/js/csrf.js"></script>
+    <script src="/static/js/tpv-host.js"></script>
+    <script src="/static/js/number_voice.js"></script>
+</head>
+
+<body data-role="host">
+   <header class="show-header dashboard-header panel-glow">
+      <div class="brand-row">
+        <div class="eyebrow">LIVE GAME MASTER CONSOLE</div>
+        <h1>The People Versus</h1>
+      </div>
+      <div class="header-actions">
+      <div class="host-pill">Пульт ведущего</div>
+      </div>
+    </header>
+    <div class="status-game">
+     <section class="top-metrics">
+      <div class="metric-card metric-card-round">
+        <span>Время</span>
+        <input type="submit" id="time-сircle" class="time-circle metric metric-circle" value="4:00">
+      </div>
+      <div class="metric-card">
+        <span>Текущий круг</span>
+        <input type="submit" id="current-circle" class="current-circle" value="1">
+      </div>
+      <div class="metric-card metric-card-current">
+        <span>Текущий раунд</span>
+        <input type="submit" id="current-round" class="current-round metric metric-current" value="1">
+      </div>
+      <div class="metric-card metric-card-bank">
+        <span>Несгораемый банк</span>
+        <input type="submit" id="bank" class="bank metric metric-bank" value="0">
+      </div>
+      <div class="metric-card metric-card-current-money">
+        <span>Текущая сумма</span>
+        <input type="submit" id="current-money" class="current-money metric metric-current" value="0">
+      </div>
+       <div class="metric-card metric-card-player">
+        <input type="submit" id="current-player" class="current-player" value="--player--">
+      </div>
+      <div class="metric-card metric-card-current-flip">
+        <input type="submit" id="current-flip" class="current-flip" value="--flip--">
+      </div>
+    </section>
+</div>
+<div class="panel-tree-money">
+    <section class="tree-money">
+      <div class="money-round1">
+        <span>1.</span>
+        <input type="submit" id="c1" class="round-value" value="10 000">
+      </div>
+       <div class="money-round2">
+        <span>2.</span>
+        <input type="submit" id="c1" class="round-value" value="25 000">
+      </div>
+       </div>
+       <div class="money-round3">
+        <span>3.</span>
+        <input type="submit" id="c1" class="round-value" value="50 000">
+      </div>
+       </div>
+       <div class="money-round4">
+        <span>4.</span>
+        <input type="submit" id="c1" class="round-value" value="150 000">
+      </div>
+       </div>
+       <div class="money-round5">
+        <span>5.</span>
+        <input type="submit" id="c1" class="round-value" value="500 000">
+      </div>
+    </section>
+</div>
+<div class="panel-questions">
+    <section class="questions">
+        <div class="question">
+        <span>Вопрос.</span>
+        <input type="text" id="task" class="question" value="" readonly>
+      </div>
+      <div class="answer">
+        <span>Ответ.</span>
+        <input type="text" id="answer" class="question" value="" readonly>
+      </div>
+      <div class="author">
+        <span>Автор вопроса</span>
+        <input type="text" id="author" class="question" value="" readonly>
+      </div>
+      <div class="comment">
+        <span>Комментарий к вопросу</span>
+        <input type="text" id="comment" class="question" value="" readonly>
+      </div>
+      <p>
+        <input class="stat-question" id="stat-question1" value="B" readonly>
+        <input class="stat-question" id="stat-question2" value="B" readonly>
+        <input class="stat-question" id="stat-question3" value="B" readonly>
+        <input class="stat-question" id="stat-question4" value="B" readonly>
+        <input class="stat-question" id="stat-question5" value="B" readonly>
+        </p>
+        <p>
+        <input class="stat-flips" id="stat-flip1" value="->" readonly>
+        <input class="stat-flips" id="stat-flip2" value="->" readonly>
+        <input class="stat-flips" id="stat-flip3" value="->" readonly>
+        </p>
+    </section>
+</div>
+
+<div class="control-panel">
+    <section class="panel">
+        <div class="timer-panel">
+         <span>Время, сек.</span>
+        <input id="timer-panel" class="timer-control" type="number" value="240">
+        </div>
+         <div class="circle-panel">
+         <span>Текущий круг:</span>
+        <input id="circle-panel" class="circle-control" type="number" value="1">
+        </div>
+        <div class="round-panel">
+         <span>Текущий раунд:</span>
+        <input id="round-panel" class="round-control" type="number" value="1">
+        </div>
+        <div class="bank-panel">
+         <span>В банке:</span>
+        <input id="bank-panel" class="bank-control" type="number" value="1">
+        </div>
+        <div class="current-money-panel">
+         <span>В круге:</span>
+        <input id="current-money-panel" class="current-money-control" type="number" value="0">
+        </div>
+         <div class="current-number-question-panel">
+         <span>№ вопроса:</span>
+        <input id="current-number-question-panel" class="current-number-question-control" type="number" value="1">
+        </div>
+        <div class="current-col-rights-panel">
+         <span>Верных ответов:</span>
+        <input id="current-col-rights-panel" class="current-col-rights-control" type="number" value="1">
+        </div>
+        <div class="current-col-flips-panel">
+         <span>Замены:</span>
+        <input id="current-col-flips-panel" class="current-col-flips-control" type="number" value="3">
+        </div>
+        <div class="current-col-pass-panel">
+         <span>Пас:</span>
+        <input id="current-col-pass-panel" class="current-col-pass-control" type="number" value="0">
+        </div>
+         <div class="update-panel">
+        <input id="update-panel" class="update-panel" type="submit" value="Обновить данные">
+        </div>
+    </section>
+</div>
+
+        <section class="panel-glow room-panel">
+          <div class="section-row compact-row">
+            <div class="section-title">Комната</div>
+            <div class="panel-tag">Player room</div>
+          </div>
+          <div class="room-stack">
+            <label class="field-label" for="room">ID комнаты</label>
+            <input class="room_id control-input" id="room" name="room_id" type="text" maxlength="4" placeholder="Room ID" readonly>
+             <div class="button-grid button-grid-2 compact-top">
+              <input type="submit" class="open_room btn-role-primary" id="open_room" onclick="open_room()" value="Открыть комнату">
+              <input type="submit" class="open_room btn-role-danger" id="close_room" onclick="close_room()" value="Закрыть комнату" disabled>
+            </div>
+          </div>
+        </section>
+
+        <div class="buttons-panels">
+            <section class="start-game">
+                <input class="tpv-start" id="tpv-start" type="submit" value="The People Versus......">
+                <input class="start-circle" id="start-circle" type="submit" value="Начать круг.">
+            </section>
+            <section class="button-questions">
+                <input class="start-round" id="start-round" type="submit" value="Начать раунд.">
+                <input class="correct" id="correct" type="submit" value="Верно">
+                <input class="wrong" id="wrong" type="submit" value="Неверно">
+                <input class="pass" id="pass" type="submit" value="Пас">
+                <input class="flip" id="flip" type="submit" value="Замена вопроса">
+            </section>
+            <section class="button-stats">
+                <input class="show-tree" id="show-tree" type="submit" value="Показать дерево">
+                <input class="hide-tree" id="hide-tree" type="submit" value="Убрать дерево">
+                <input class="show-stats" id="show-stats" type="submit" value="Показать статистику">
+                <input class="hide-stats" id="hide-stats" type="submit" value="Убрать статистику">
+            </section>
+            <section class="bong-games">
+                <input class="show-bong-game" id="show-bong-game" type="submit" value="Гонг-игра">
+                <input class="varables" id="bong-game-1" type="submit" value="1">
+                <input class="varables" id="bong-game-2" type="submit" value="2">
+                <input class="varables" id="bong-game-3" type="submit" value="3">
+                <input class="stop-bong-game" id="stop-bong-game" type="submit" value="Остановить Гонг-игру">
+                <input class="result-sum-author" id="result-sum-author" type="submit" value="Выигрыш автора">
+                <input class="next-sum-bong-game" id="next-sum-bong-game" type="submit" value="Следующая сумма">
+                <input class="result-sum-player" id="result-sum-player" type="submit" value="Выигрыш игрока">
+            </section>
+             <section class="staff">
+                <input class="out-player" id="out-player" type="submit" value="Завершить игру">
+                <input class="stats-games-all" id="stats-games-all" type="submit" value="Результаты игры">
+                <input class="cancel-all" id="cancel-all" type="submit" value="Сброс">
+             </section>
+             <section class="choose-player">
+                <input class="choose-player-random" id="choose-player-random" type="submit" value="Выбрать игрока">
+                <input class="user_id control-input" id="user_id" name="user_id" type="text" maxlength="4" placeholder="User_id" required>
+                <input class="choose-player-id" id="choose-player-id" type="submit" value="Выбрать игрока по id">
+             </section>
+             <section class="music-control">
+                <input class="intro" id="intro" type="submit" value="Заставка">
+                <input class="intro-host" id="intro-host" type="submit" value="Выход ведущего">
+                <input class="bg" id="bg" type="submit" value="Фон">
+                <input class="final" id="final1" type="submit" value="Окончание">
+                <input class="final" id="final2" type="submit" value="Титры">
+                <input class="cancel-sounds" id="cancel-sounds" type="submit" value="Остановить звуки">
+             </section>
+        </div>
+ <section class="panel-glow table-panel table-panel-inline">
+          <div class="section-row compact-row">
+            <div class="section-title">Игроки</div>
+            <div class="table-note">Status</div>
+          </div>
+          <div class="table-wrap compact-table-wrap">
+            <table class="status_users compact-status_users" id="status_users">
+              <tr id="row0">
+                <th>№</th>
+                <th>Игрок</th>
+                <th>Тема замены</th>
+              </tr>
+              <tr id="row1">
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+            </table>
+          </div>
+        </section>
+
+
+
+
+ <div id="socket-status" class="socket-status socket-offline">
+    <span class="socket-dot"></span>
+    <span id="socket-status-text">Сервер отключён</span>
+  </div>
+</body>
+</html>

@@ -16,6 +16,8 @@ from sqlalchemy.types import JSON
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required 
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect, CSRFError
+from number_voice import number_to_audio
+import tpv
 
 load_dotenv()
 app = Flask(__name__, template_folder="static/")
@@ -298,6 +300,28 @@ def slot():
     abort(403)
     print (url_for('join'))
     return render_template("login.html")
+
+@app.route('/tpv', methods=["POST", "GET"])
+def tpv():
+    if request.method == 'POST':
+        print (url_for('tpv'))
+        return render_template("tpv.html")
+    abort(403)
+    print (url_for('join'))
+    return render_template("login.html")
+
+@app.route('/tpv-host', methods=["POST", "GET"])
+def tpv_host():
+    if request.method == 'POST':
+        print (url_for('tpv-host'))
+        #for i in _users:
+          #  flash (i)
+        return render_template("tpv-host.html")
+    abort(403)
+    print (url_for('join'))
+    return render_template("login.html")
+
+
 
 @app.route('/user_slot', methods=["GET"])
 def user_slot():
@@ -827,9 +851,9 @@ def show_rights():
 
     
  
-@app.route('/sounds/<filename>')
+@app.route('/sounds/slot/<filename>')
 def serve_audio(filename):
-    CUSTOM_AUDIO_DIR = "sounds/"
+    CUSTOM_AUDIO_DIR = "sounds/slot/"
     sanitized_filename = secure_filename(filename)
 
     mime_type, _ = mimetypes.guess_type(sanitized_filename)
@@ -847,7 +871,9 @@ def serve_audio(filename):
     result.cache_control.max_age = 432000  # 5 дней
     result.headers["Cache-Control"] = "public, max-age=432000, immutable"
 
-    return result  
+    return result 
+
+
     
 #@app.route('/update_list_users', methods=["POST", "GET"])
 @socketio.on("update_list_users")
@@ -2117,14 +2143,77 @@ def handle_show_intro():
     emit("show_intro", to=f"{DEFAULT_ROOM_CODE}:spectator")
 
 
+@app.route('/sounds/tpv/<filename>')
+def serve_audio_tpv(filename):
+    CUSTOM_AUDIO_DIR = "sounds/tpv/"
+    sanitized_filename = secure_filename(filename)
+
+    mime_type, _ = mimetypes.guess_type(sanitized_filename)
+    if not mime_type or not mime_type.startswith('audio/'):
+        abort(400, description="Unsupported audio format.")
+
+    result = send_from_directory(
+        CUSTOM_AUDIO_DIR,
+        sanitized_filename,
+        mimetype=mime_type,
+        as_attachment=False
+    )
+
+    result.cache_control.public = True
+    result.cache_control.max_age = 432000  # 5 дней
+    result.headers["Cache-Control"] = "public, max-age=432000, immutable"
+
+    return result  
+
+
+
+@app.post("/api/voice-number")
+def api_voice_number():
+    data = request.get_json(silent=True) or {}
+
+    try:
+        number = int(data.get("number"))
+    except (TypeError, ValueError):
+        return jsonify({
+            "ok": False,
+            "error": "Необходимо передать целое число",
+        }), 400
+
+    include_currency = bool(
+        data.get("include_currency", False)
+    )
+
+    try:
+        filenames = number_to_audio(
+            number,
+            include_currency=include_currency,
+        )
+    except ValueError as error:
+        return jsonify({
+            "ok": False,
+            "error": str(error),
+        }), 400
+
+    urls = [
+        url_for(
+            "static",
+            filename=f"sounds/tpv/bong-game/{filename}",
+        )
+        for filename in filenames
+    ]
+
+    return jsonify({
+        "ok": True,
+        "number": number,
+        "files": filenames,
+        "urls": urls,
+    })
+
+
 if __name__ == "__main__":
     _users = [' ']
     
     socketio.run(app,debug=False, host='0.0.0.0')
     
-    ##app.run(debug=True)
-    
-
-
 
 

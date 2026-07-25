@@ -1,0 +1,33 @@
+*{
+
+}
+.socket-status {
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  z-index:9999;
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  height:38px;
+  padding:0 13px;
+  border-radius:999px;
+  background:rgba(4,12,22,.92);
+  border:1px solid rgba(126,191,255,.2);
+  box-shadow:0 12px 28px rgba(0,0,0,.38);
+  font-size:.76rem;
+  font-weight:900
+}
+
+.socket-dot {
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#ff3152;
+  box-shadow:0 0 14px #ff3152
+}
+
+.socket-online .socket-dot {
+  background:#20e165;
+  box-shadow:0 0 14px #20e165
+}
