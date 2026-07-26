@@ -1,24 +1,47 @@
 from datetime import datetime, time
-from flask import Flask, Response, abort, jsonify, logging, redirect, render_template, request, send_file, send_from_directory, session, url_for, flash, redirect
-import random
+from flask import (
+    Flask,
+    Response,
+    abort,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    send_from_directory,
+    session,
+    url_for,
+    flash,
+)
 import hashlib
-import os
 import json
-from sqlalchemy import desc
-from werkzeug.utils import secure_filename  
-import mimetypes  
-import string
-import flask, flask.views
+import mimetypes
+import os
+import random
 import secrets
-from flask_socketio import SocketIO, emit, join_room
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.types import JSON
-from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required 
-from dotenv import load_dotenv
-from flask_wtf.csrf import CSRFProtect, CSRFError
-from number_voice import number_to_audio
-import tpv
+import string
 from pathlib import Path
+
+from sqlalchemy import desc, inspect
+from sqlalchemy.types import JSON
+from werkzeug.utils import secure_filename
+from flask_login import (
+    UserMixin,
+    login_user,
+    LoginManager,
+    current_user,
+    logout_user,
+    login_required,
+)
+from flask_wtf.csrf import CSRFProtect, CSRFError
+from dotenv import load_dotenv
+
+from extensions import db, socketio
+from number_voice import number_to_audio
+from flask_socketio import emit, join_room
+
+
+
 
 load_dotenv()
 app = Flask(__name__, template_folder="static/")
@@ -32,6 +55,7 @@ app.secret_key = app.config["SECRET_KEY"] #os.urandom(32).hex
 # чтобы служебный транспорт Socket.IO (/socket.io) не блокировался.
 app.config["WTF_CSRF_CHECK_DEFAULT"] = False
 app.config["WTF_CSRF_TIME_LIMIT"] = None
+
 csrf = CSRFProtect(app)
 BASE_DIR = Path(__file__).resolve().parent
 BRANDING_FILE = BASE_DIR / "config" / "branding.json"
@@ -96,9 +120,16 @@ def handle_csrf_error(error):
 
     return render_template("csrf_error.html", reason=error.description), 400
 
-socketio = SocketIO(app, cors_allowed_origins=os.environ.get("ALLOWED_ORIGINS")) # добавить конкретный домен
+socketio.init_app(app, cors_allowed_origins=os.environ.get("ALLOWED_ORIGINS")) # добавить конкретный домен
 accepted_user = ""
-db = SQLAlchemy(app)
+db.init_app(app)
+with app.app_context():
+    print("DB URI:", app.config["SQLALCHEMY_DATABASE_URI"])
+    print("ENGINE URL:", db.engine.url)
+    print("DATABASE FILE:", db.engine.url.database)
+
+    inspector = inspect(db.engine)
+    print("TABLES:", inspector.get_table_names())
 login_manager = LoginManager(app)
 login_manager.session_protection = "strong"
 login_manager.login_view = "login"
@@ -106,6 +137,12 @@ login_manager.login_message_category = "info"
 app.config['TELEGRAM_BOT_TOKEN'] = ''
 DEFAULT_ROOM_CODE = os.environ.get("DEFAULT_ROOM_CODE") #убрать в переменные среды
 HOST_USERNAME = os.environ.get("HOST_USERNAME") #убрать в переменные среды
+
+with app.app_context():
+    inspector = inspect(db.engine)
+    print(inspector.get_table_names())
+
+
 @app.route("/error-test/<int:code>") 
 def error_test_code(code):
     abort(code)
@@ -128,7 +165,7 @@ def ping_test(data):
         "message": "Socket.IO работает"
     })
     
-@socketio.on("room:join")
+@socketio.on("room:join_slot")
 def socket_join_room(data):
     room_code = str(data.get("room") or Room.query.first())
     role = data.get("role") or "unknown"
@@ -146,6 +183,26 @@ def socket_join_room(data):
         "role": role,
         "username": username
     })   
+    
+    
+@socketio.on("room:join_tpv")
+def socket_join_room(data):
+    room_code = str(data.get("room") or Room.query.first())
+    role = data.get("role") or "unknown"
+    username = data.get("username") or ""
+
+    join_room(room_code)
+    join_room(f"{room_code}:{role}")
+    if username:
+        join_room(f"{room_code}:user:{username}")
+
+    print(f"Socket joined room={room_code}, role={role}, username={username}")
+    update_users_tpv()
+    emit("room:joined", {
+        "room": room_code,
+        "role": role,
+        "username": username
+    }) 
 
 @socketio.on("count_answer_interactive")
 def count_interactive(data):
@@ -264,9 +321,10 @@ def check_id_room(room_id):
         return True
 
 
-def give_name_game(room_code):
-    room_code = Room.query.filter(Room.id == int(room_code)).first()
-    return room_code.game
+def give_name_game(game_name):
+    name = Room.query.filter(Room.id==game_name).first()
+    return name.game
+
 
 
 @app.route('/join', methods=["POST", "GET"])
@@ -289,35 +347,54 @@ def join():
             if check_id_room(request.form['room_id'])==False:
                 flash ('Неверный код комнаты')
                 return render_template("login.html")
-            u = Users()
-            u.username = request.form['user_name']
-            u.answer = "0"
-            u.money = 0
-            u.time = datetime.now()
-            u.status = "wait"
-            u.main_money = 0
-            u.red_bomb = "false"
-            tmp = Users.query.filter(Users.username==u.username).first()
-            if tmp!=None:
-                if tmp.username == u.username:
+            if give_name_game(request.form['room_id']) == 'slot':
+                u = Users()
+                u.username = request.form['user_name']
+                u.answer = "0"
+                u.money = 0
+                u.time = datetime.now()
+                u.status = "wait"
+                u.main_money = 0
+                u.red_bomb = "false"
+                tmp = Users.query.filter(Users.username==u.username).first()
+                if tmp!=None:
+                    if tmp.username == u.username:
                    # if tmp.username in session['username']:
-                        print (url_for('join'))
-                        if give_name_game(request.form['room_id']) == 'slot':
+                            print (url_for('join'))
                             return render_template("user_slot.html",value=u.username)
-                        else: 
-                            return render_template("login.html")
+
                             
                     #else:
                      #   return render_template("login.html")                       
-            db.session.add(u)
-            db.session.flush()
-            db.session.commit()
-            session['username'] = u.username
-            if give_name_game(request.form['room_id']) == 'slot':
+                db.session.add(u)
+                db.session.flush()
+                db.session.commit()
+                session['username'] = u.username
                 ch = login_user(u)
                 return render_template("user_slot.html",value=u.username)
-            else:
+            if give_name_game(request.form['room_id']) == 'tpv':
+                find_user = UsersTpv.query.filter(UsersTpv.username==request.form['user_name']).first()
+                # if find_user == None:
+                #    flash ('К сожалению, Ваша заявку на игру не найдена')
+                 #   return render_template("login.html")
+                # if find_user.flip_col<6:
+                 #   flash ('К сожалению, Ваша заявку на игру не одобрена! Недостаточно вопросов замены')
+                     #return render_template("login.html")  
+                user_tpv = QueryTpv()
+                user_tpv.username = request.form['user_name']
+                #user_tpv.money = find_user.money
+                user_tpv.money = 0
+                #user_tpv.flip = find_user.flip
+                user_tpv.flip = "test"
+                user_tpv.status = "wait"
+                db.session.add(user_tpv)
+                db.session.flush()
+                db.session.commit()
+                update_users_tpv()
+                session['username'] = user_tpv.username 
+                ch = login_user(user_tpv)
                 return render_template("login.html")
+                    
     return render_template("login.html")
 
 @app.route('/select', methods=["POST", "GET"])
@@ -2204,6 +2281,27 @@ def serve_audio_tpv(filename):
 
     return result  
 
+@app.route('/sounds/tpv/bong-game/<filename>')
+def serve_audio_tpv_bong(filename):
+    CUSTOM_AUDIO_DIR = "sounds/tpv/bong-game/"
+    sanitized_filename = secure_filename(filename)
+
+    mime_type, _ = mimetypes.guess_type(sanitized_filename)
+    if not mime_type or not mime_type.startswith('audio/'):
+        abort(400, description="Unsupported audio format.")
+
+    result = send_from_directory(
+        CUSTOM_AUDIO_DIR,
+        sanitized_filename,
+        mimetype=mime_type,
+        as_attachment=False
+    )
+
+    result.cache_control.public = True
+    result.cache_control.max_age = 432000  # 5 дней
+    result.headers["Cache-Control"] = "public, max-age=432000, immutable"
+
+    return result  
 
 
 @app.post("/api/voice-number")
@@ -2235,8 +2333,8 @@ def api_voice_number():
 
     urls = [
         url_for(
-            "static",
-            filename=f"sounds/tpv/bong-game/{filename}",
+            "serve_audio_tpv_bong",
+            filename=f"{filename}",
         )
         for filename in filenames
     ]
@@ -2247,6 +2345,187 @@ def api_voice_number():
         "files": filenames,
         "urls": urls,
     })
+
+
+class UsersTpv(db.Model):
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    username = db.Column(
+        db.String(10),
+        unique=True,
+        nullable=False,
+    )
+    flip = db.Column(db.Text)
+    money = db.Column(db.Integer, default=0)
+    approve = db.Column(db.Text)
+    flip_col = db.Column(db.Integer, default=0)
+    def __repr__(self):
+            return '<UsersTpv %r>' %self.id
+
+
+class Questions(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    task = db.Column(db.Text)
+    answer = db.Column(db.Text)
+    comment = db.Column(db.Text)
+    author = db.Column(db.Text)
+    flip = db.Column(db.Text)
+    show = db.Column(db.Text)
+    def __repr__(self):
+        return '<Questions %r>' %self.id
+
+
+class QueryTpv(db.Model, UserMixin):
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    username = db.Column(
+        db.String(10),
+        unique=True,
+        nullable=False,
+    )
+    flip = db.Column(db.Text)
+    money = db.Column(db.Integer, default=0)
+    status = db.Column(db.Text, default="wait")
+    def __repr__(self):
+            return '<QueryTpv %r>' %self.id
+
+
+
+
+@socketio.on("update_users_tpv")
+def update_users_tpv():
+        js = QueryTpv.query.all()
+        if len(js)==1:
+            id = js[0].id
+            username = js[0].username
+            flip = js[0].flip
+            money = js[0].money
+            status = js[0].status
+            jsn = [id,username,flip,money,status,"true"]
+            result = jsn
+            socketio.emit("updated_users_tpv", result, to=f"{DEFAULT_ROOM_CODE}:host")
+        else:
+            jsn = []
+            for i in range(0,len(js)):
+                id = js[i].id
+                username = js[i].username
+                flip = js[i].flip
+                money = js[i].money
+                status = js[i].status
+                tmp = [id,username,flip,money,status,"false"]
+                #socketio.emit("updated_user_tpv",js[i].status,to=f"{Room.query.first()}:user:{js[i].username}");
+                jsn.append(tmp)
+            result = jsn
+            socketio.emit("updated_users_tpv",result, to=f"{DEFAULT_ROOM_CODE}:host")
+            return result
+
+@socketio.on("clean_db_tpv")
+def clean_db_tpv():
+    QueryTpv.query.delete()
+    update_users_tpv()
+    socketio.emit("DB_clean","ok", to=f"{DEFAULT_ROOM_CODE}:host")
+
+
+@socketio.on("choose_player_random")
+def choose_player_random():
+    try:
+        js = QueryTpv.query.filter(QueryTpv.status=="wait").all()
+        if len(js)==0:
+            return
+        if len(js)==1:
+            js[0].status = "selected"
+            db.session.commit()
+            id = js[0].id
+            username = js[0].username
+            flip = js[0].flip
+            money = js[0].money
+            status = js[0].status
+            jsn = [id,username,flip,money,status]
+            result = jsn
+            socketio.emit("player_selected", result, to=f"{DEFAULT_ROOM_CODE}:host")
+            update_users_tpv()
+        else:
+            secure_rnd = secrets.SystemRandom()
+            num = secure_rnd.randint(0,len(js))
+            js[num].status = "selected"
+            db.session.commit()
+            id = js[num].id
+            username = js[num].username
+            flip = js[num].flip
+            money = js[num].money
+            status = js[num].status
+            jsn = [id,username,flip,money,status]
+            result = jsn
+            socketio.emit("player_selected", result, to=f"{DEFAULT_ROOM_CODE}:host")
+            update_users_tpv()
+    except:
+        pass
+    
+@socketio.on("choose_player_id")
+def choose_player_id(data):
+    try:
+        num = data["id"]
+        js = QueryTpv.query.filter(QueryTpv.id==num).first()
+        if js == None:
+            return
+        js.status = "selected"
+        db.session.commit()
+        id = js.id
+        username = js.username
+        flip = js.flip
+        money = js.money
+        status = js.status
+        jsn = [id,username,flip,money,status]
+        result = jsn
+        socketio.emit("player_selected", result, to=f"{DEFAULT_ROOM_CODE}:host")
+        update_users_tpv()
+    except:
+        pass
+
+@socketio.on("reset_to_wait_tpv")
+def reset_to_wait_tpv():
+    try:
+        js = QueryTpv.query.all()
+        if len(js)==1:
+            js[0].status = "wait"
+            db.session.commit()
+            update_users_tpv()
+        else:
+            for i in range(0,len(js)):
+                if js[i].status != "ended":
+                    js[i].status = "wait"
+                    db.session.commit()
+                    update_users_tpv()
+    except:
+        return json.dump("fail")
+
+@socketio.on("generate_safe_bong_game")
+def generate_safe_bong_game():
+    secure_rnd = secrets.SystemRandom()
+    num = secure_rnd.randint(1,3)
+    socketio.emit("bong_game_safe_var",num,to=f"{DEFAULT_ROOM_CODE}:host")
+
+
+@socketio.on("generate_sum_for_bong_game")
+def generate_sum_for_bong_game(data):
+    secure_rnd = secrets.SystemRandom()
+    col = secure_rnd.randint(6,15)
+    secure_rnd = secrets.SystemRandom()
+    result = secure_rnd.sample(range(1,data['sum']),col)
+    result.sort()
+    result.append(data['sum'])
+    socketio.emit("sum_generated",result,to=f"{DEFAULT_ROOM_CODE}:host")
 
 
 if __name__ == "__main__":

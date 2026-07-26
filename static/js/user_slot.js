@@ -40,7 +40,7 @@ socket.on("pong:test", (data) => {
 socket.on("connect", () => {
   console.log("Socket connected:", socket.id);
 setSocketStatus(true);
-  socket.emit("room:join", {
+  socket.emit("room:join_slot", {
     room: null,
     role: "user",
     username: document.getElementById("user_name").value

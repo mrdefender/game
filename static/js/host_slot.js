@@ -79,7 +79,7 @@ socket.on("pong:test", (data) => {
 socket.on("connect", () => {
   console.log("Socket connected:", socket.id);
 setSocketStatus(true);
-  socket.emit("room:join", {
+  socket.emit("room:join_slot", {
     room: "99999999",
     role: "host",
     username: "admin"
@@ -148,7 +148,7 @@ function cancel_all(){
     document.getElementById("user_id").value = "";
     document.getElementById("in_game").value = "В игре: ";
     reset_user_to_wait();
-    //update_list_user();
+    update_list_user();
     var select = document.querySelector('#select_round');
     var select_fix = document.querySelector('#select_fix');
     document.getElementById("au").value = "";

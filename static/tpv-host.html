@@ -10,8 +10,9 @@
 <link rel="icon" href="{{ favicon }}">
 {% endif %}
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-host.css') }}">
-  <meta name="csrf-token" content="{{ csrf_token() }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/brand-theme.css') }}">
+
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body data-role="host">
@@ -103,6 +104,40 @@
             </button>
           </div>
         </section>
+        <section class="tpv-panel bong-game-panel" id="section-bong-game">
+          <div class="panel-heading">
+            <div>
+              <h2>Гонг-игра</h2>
+              <p>Текущие значения финального этапа</p>
+            </div>
+            <span class="panel-chip">Bong game</span>
+          </div>
+
+          <div class="bong-game-console">
+            <div class="bong-options" role="group" aria-label="Выбор варианта Гонг-игры">
+              <button id="bong-variable-1" class="bong-option-button" type="button" data-bong-option="1" aria-pressed="false">1</button>
+              <button id="bong-variable-2" class="bong-option-button" type="button" data-bong-option="2" aria-pressed="false">2</button>
+              <button id="bong-variable-3" class="bong-option-button" type="button" data-bong-option="3" aria-pressed="false">3</button>
+            </div>
+
+            <div class="bong-info-grid">
+              <div class="bong-display bong-display--sum">
+                <span class="bong-display__label">Сумма Гонг-игры</span>
+                <output id="bong-current-sum" class="bong-display__value">0</output>
+              </div>
+
+              <div class="bong-display bong-display--author">
+                <span class="bong-display__label">Автор вопроса</span>
+                <output id="bong-question-author" class="bong-display__value bong-display__value--text">— Автор вопроса —</output>
+              </div>
+            </div>
+
+            <div class="bong-status">
+              <span class="bong-status__label">Статус</span>
+              <output id="bong-game-status" class="bong-status__value">Ожидание</output>
+            </div>
+          </div>
+        </section>
 
         <section class="tpv-panel room-control-panel" id="section-room-control">
           <div class="panel-heading">
@@ -130,7 +165,7 @@
               id="open_room"
               class="game-btn game-btn--primary"
               type="button"
-              data-action="open-room">
+              data-action="open-room" onclick="open_room()">
               Открыть комнату
             </button>
 
@@ -138,7 +173,7 @@
               id="close_room"
               class="game-btn game-btn--danger"
               type="button"
-              data-action="close-room"
+              data-action="close-room" onclick="close_room()"
               disabled>
               Закрыть комнату
             </button>
@@ -214,35 +249,35 @@
             <section class="action-group action-group--primary">
               <h3>Игра и раунд</h3>
               <div class="action-grid action-grid--5">
-                <button id="action-start-game" class="game-btn game-btn--primary" type="button" data-action="start-game">
+                <button id="action-start-game" class="game-btn game-btn--primary" type="button" data-action="start-game" onclick="tpv()">
                   <span id="action-start-game-label">{{ game_name|default('The People Versus') }}</span>
                 </button>
-                <button id="action-start-circle" class="game-btn" type="button" data-action="start-circle">
+                <button id="action-start-circle" class="game-btn" type="button" data-action="start-circle" onclick="start_circle()" disabled>
                   Начать круг
                 </button>
-                <button id="action-start-round" class="game-btn game-btn--primary" type="button" data-action="start-round">
+                <button id="action-start-round" class="game-btn game-btn--primary" type="button" data-action="start-round" onclick="start_round()" disabled>
                   Начать раунд
                 </button>
-                <button id="action-answer-correct" class="game-btn game-btn--success" type="button" data-action="answer-correct">
+                <button id="action-answer-correct" class="game-btn game-btn--success" type="button" data-action="answer-correct" onclick="correct()" disabled>
                   Верно
                 </button>
-                <button id="action-answer-wrong" class="game-btn game-btn--danger" type="button" data-action="answer-wrong">
+                <button id="action-answer-wrong" class="game-btn game-btn--danger" type="button" data-action="answer-wrong" onclick="wrong()" disabled>
                   Неверно
                 </button>
-                <button id="action-answer-pass" class="game-btn game-btn--warning" type="button" data-action="answer-pass">
+                <button id="action-answer-pass" class="game-btn game-btn--warning" type="button" data-action="answer-pass" onclick="pass()" disabled>
                   Пас
                 </button>
-                <button id="action-question-flip" class="game-btn game-btn--info" type="button" data-action="question-flip">
+                <button id="action-question-flip" class="game-btn game-btn--info" type="button" data-action="question-flip" onclick="flip()" disabled>
                   Замена вопроса
                 </button>
-                <button id="action-select-random-player" class="game-btn game-btn--primary" type="button" data-action="select-random-player">
+                <button id="action-select-random-player" class="game-btn game-btn--primary" type="button" data-action="select-random-player" onclick="choose_player_random()">
                   Выбрать игрока
                 </button>
                 <label class="compact-field compact-field--inline">
                   <span>ID игрока</span>
-                  <input id="control-player-id" type="text" maxlength="12" placeholder="User ID">
+                  <input id="control-player-id" maxlength="12" placeholder="User ID" value="">
                 </label>
-                <button id="action-select-player-by-id" class="game-btn" type="button" data-action="select-player-by-id">
+                <button id="action-select-player-by-id" class="game-btn" type="button" data-action="select-player-by-id" onclick="choose_player_id()">
                   Выбрать по ID
                 </button>
               </div>
@@ -263,26 +298,26 @@
             <section class="action-group">
               <h3>Гонг-игра</h3>
               <div class="action-grid action-grid--4">
-                <button id="action-bong-start" class="game-btn game-btn--primary" type="button" data-action="bong-start">Гонг-игра</button>
-                <button id="action-bong-option-1" class="game-btn game-btn--square" type="button" data-action="bong-option-1">1</button>
-                <button id="action-bong-option-2" class="game-btn game-btn--square" type="button" data-action="bong-option-2">2</button>
-                <button id="action-bong-option-3" class="game-btn game-btn--square" type="button" data-action="bong-option-3">3</button>
-                <button id="action-bong-stop" class="game-btn game-btn--danger" type="button" data-action="bong-stop">Остановить</button>
-                <button id="action-bong-author-win" class="game-btn game-btn--warning" type="button" data-action="bong-author-win">Выигрыш автора</button>
-                <button id="action-bong-next-sum" class="game-btn" type="button" data-action="bong-next-sum">Следующая сумма</button>
-                <button id="action-bong-player-win" class="game-btn game-btn--success" type="button" data-action="bong-player-win">Выигрыш игрока</button>
+                <button id="action-bong-start" class="game-btn game-btn--primary" type="button" data-action="bong-start" onclick="start_bong_game()">Гонг-игра</button>
+                <button id="action-bong-option-1" class="game-btn game-btn--square" type="button" data-action="bong-option-1" onclick="bong_game_start_var_1()" disabled>1</button>
+                <button id="action-bong-option-2" class="game-btn game-btn--square" type="button" data-action="bong-option-2" onclick="bong_game_start_var_2()" disabled>2</button>
+                <button id="action-bong-option-3" class="game-btn game-btn--square" type="button" data-action="bong-option-3" onclick="bong_game_start_var_3()" disabled>3</button>
+                <button id="action-bong-stop" class="game-btn game-btn--danger" type="button" data-action="bong-stop" onclick="stop_bong_game()" disabled>Остановить</button>
+                <button id="action-bong-author-win" class="game-btn game-btn--warning" type="button" data-action="bong-author-win" disabled>Выигрыш автора</button>
+                <button id="action-bong-next-sum" class="game-btn" type="button" data-action="bong-next-sum" onclick="next_sum()" disabled>Следующая сумма</button>
+                <button id="action-bong-player-win" class="game-btn game-btn--success" type="button" data-action="bong-player-win" disabled>Выигрыш игрока</button>
               </div>
             </section>
 
             <section class="action-group">
               <h3>Музыка</h3>
               <div class="action-grid action-grid--3">
-                <button id="sound-intro" class="game-btn game-btn--purple" type="button" data-action="sound-intro">Заставка</button>
-                <button id="sound-host-entrance" class="game-btn game-btn--purple" type="button" data-action="sound-host-entrance">Выход ведущего</button>
-                <button id="sound-background" class="game-btn game-btn--purple" type="button" data-action="sound-background">Фон</button>
-                <button id="sound-ending" class="game-btn game-btn--purple" type="button" data-action="sound-ending">Окончание</button>
-                <button id="sound-credits" class="game-btn game-btn--purple" type="button" data-action="sound-credits">Титры</button>
-                <button id="sound-stop-all" class="game-btn game-btn--danger" type="button" data-action="sound-stop-all">Остановить звуки</button>
+                <button id="sound-intro" class="game-btn game-btn--purple" type="button" data-action="sound-intro" onclick="intro()">Заставка</button>
+                <button id="sound-host-entrance" class="game-btn game-btn--purple" type="button" data-action="sound-host-entrance" onclick="intro_host()">Выход ведущего</button>
+                <button id="sound-background" class="game-btn game-btn--purple" type="button" data-action="sound-background" onclick="bg()">Фон</button>
+                <button id="sound-ending" class="game-btn game-btn--purple" type="button" data-action="sound-ending" onclick="final()">Окончание</button>
+                <button id="sound-credits" class="game-btn game-btn--purple" type="button" data-action="sound-credits" onclick="credits()">Титры</button>
+                <button id="sound-stop-all" class="game-btn game-btn--danger" type="button" data-action="sound-stop-all" onclick="stop_sounds()">Остановить звуки</button>
               </div>
             </section>
 
@@ -291,7 +326,8 @@
               <div class="action-grid action-grid--3">
                 <button id="action-finish-game" class="game-btn game-btn--danger" type="button" data-action="finish-game">Завершить игру</button>
                 <button id="action-show-results" class="game-btn" type="button" data-action="show-results">Результаты игры</button>
-                <button id="action-reset-game" class="game-btn game-btn--warning" type="button" data-action="reset-game">Сброс</button>
+                <button id="action-reset-game" class="game-btn game-btn--warning" type="button" data-action="reset-game" onclick="cancel_all()">Сброс</button>
+                <button id="action-reset-game" class="game-btn game-btn--warning" type="button" data-action="reset-game" onclick="clear_db()">Очистить БД</button>
               </div>
             </section>
           </div>
@@ -331,23 +367,23 @@
             </label>
             <label>
               <span>№ вопроса</span>
-              <input id="control-question-number" type="number" min="1" value="1">
+              <input id="control-question-number" type="number" min="1" max="5" value="1">
             </label>
             <label>
               <span>Верных ответов</span>
-              <input id="control-correct-count" type="number" min="0" value="0">
+              <input id="control-correct-count" type="number" min="0" max="5" value="0">
             </label>
             <label>
               <span>Замены</span>
-              <input id="control-flips-count" type="number" min="0" value="3">
+              <input id="control-flips-count" type="number" min="0" max="3" value="3">
             </label>
             <label>
               <span>Пас</span>
-              <input id="control-pass-count" type="number" min="0" value="0">
+              <input id="control-pass-count" type="number" min="0" max="4" value="0">
             </label>
           </div>
 
-          <button id="action-update-state" class="game-btn game-btn--primary game-btn--full" type="button" data-action="update-state">
+          <button id="action-update-state" class="game-btn game-btn--primary game-btn--full" type="button" data-action="update-state" onclick="update_data()">
             Обновить данные
           </button>
         </section>
@@ -358,7 +394,7 @@
               <h2>Игроки</h2>
               <p>Подключённые участники</p>
             </div>
-            <output id="players-count" class="panel-counter">0 / 30</output>
+            <output id="players-count" class="panel-counter"></output>
           </div>
 
           <div class="table-wrap">
@@ -368,6 +404,8 @@
                   <th>№</th>
                   <th>Игрок</th>
                   <th>Тема замены</th>
+                  <th>Выигрыш</th>
+                  <th>Статус</th>
                 </tr>
               </thead>
               <tbody id="players-table-body">
@@ -375,6 +413,8 @@
                   <td data-column="number"></td>
                   <td data-column="name"></td>
                   <td data-column="flip-topic"></td>
+                  <td data-column="sum-result"></td>
+                  <td data-column="status"></td>
                 </tr>
               </tbody>
             </table>
@@ -385,5 +425,8 @@
       
     </section>
   </main>
+  <script src="/static/js/socket.io.min.js"></script>
+  <script src="/static/js/tpv-host.js"></script>
+  <script src="/static/js/number_voice.js"></script>
 </body>
 </html>

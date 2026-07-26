@@ -2,49 +2,49 @@ from __future__ import annotations
 
 
 HUNDREDS = {
-    1: "num_100.mp3",
-    2: "num_200.mp3",
-    3: "num_300.mp3",
-    4: "num_400.mp3",
-    5: "num_500.mp3",
-    6: "num_600.mp3",
-    7: "num_700.mp3",
-    8: "num_800.mp3",
-    9: "num_900.mp3",
+    1: "num_100.ogg",
+    2: "num_200.ogg",
+    3: "num_300.ogg",
+    4: "num_400.ogg",
+    5: "num_500.ogg",
+    6: "num_600.ogg",
+    7: "num_700.ogg",
+    8: "num_800.ogg",
+    9: "num_900.ogg",
 }
 
 TENS = {
-    2: "num_20.mp3",
-    3: "num_30.mp3",
-    4: "num_40.mp3",
-    5: "num_50.mp3",
-    6: "num_60.mp3",
-    7: "num_70.mp3",
-    8: "num_80.mp3",
-    9: "num_90.mp3",
+    2: "num_20.ogg",
+    3: "num_30.ogg",
+    4: "num_40.ogg",
+    5: "num_50.ogg",
+    6: "num_60.ogg",
+    7: "num_70.ogg",
+    8: "num_80.ogg",
+    9: "num_90.ogg",
 }
 
 TEENS = {
-    number: f"num_{number}.mp3"
+    number: f"num_{number}.ogg"
     for number in range(10, 20)
 }
 
 ONES_MASCULINE = {
-    1: "num_1n.mp3",
-    2: "num_2a.mp3",
-    3: "num_3.mp3",
-    4: "num_4.mp3",
-    5: "num_5.mp3",
-    6: "num_6.mp3",
-    7: "num_7.mp3",
-    8: "num_8.mp3",
-    9: "num_9.mp3",
+    1: "num_1n.ogg",
+    2: "num_2a.ogg",
+    3: "num_3.ogg",
+    4: "num_4.ogg",
+    5: "num_5.ogg",
+    6: "num_6.ogg",
+    7: "num_7.ogg",
+    8: "num_8.ogg",
+    9: "num_9.ogg",
 }
 
 ONES_FEMININE = {
     **ONES_MASCULINE,
-    1: "num_1a.mp3",
-    2: "num_2e.mp3",
+    1: "num_1a.ogg",
+    2: "num_2e.ogg",
 }
 
 
@@ -123,9 +123,9 @@ def number_to_audio(
         result.append(
             plural_form(
                 millions,
-                "num_million.mp3",
-                "num_milliona.mp3",
-                "num_millionov.mp3",
+                "num_million.ogg",
+                "num_milliona.ogg",
+                "num_millionov.ogg",
             )
         )
 
@@ -140,9 +140,9 @@ def number_to_audio(
         result.append(
             plural_form(
                 thousands,
-                "num_tisyacha.mp3",
-                "num_tisyachi.mp3",
-                "num_tisyach.mp3",
+                "num_tisyacha.ogg",
+                "num_tisyachi.ogg",
+                "num_tisyach.ogg",
             )
         )
 
@@ -153,9 +153,9 @@ def number_to_audio(
         result.append(
             plural_form(
                 number,
-                "num_foxcoin.mp3",
-                "num_foxcoina.mp3",
-                "num_foxcoinov.mp3",
+                "num_foxcoin.ogg",
+                "num_foxcoina.ogg",
+                "num_foxcoinov.ogg",
             )
         )
 

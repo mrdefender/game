@@ -1,3 +1,9 @@
+function getCsrfToken() {
+    return document
+        .querySelector('meta[name="csrf-token"]')
+        ?.content || "";
+}
+
 window.NumberVoice = (() => {
     let currentAudio1 = null;
     let playbackId = 0;
@@ -98,7 +104,9 @@ window.NumberVoice = (() => {
             {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({
                     number,

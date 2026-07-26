@@ -311,6 +311,43 @@ textarea{resize:vertical}
   font-weight:800;
 }
 
+.status-orb-pass{
+  width:33px;
+  height:33px;
+  display:grid;
+  place-items:center;
+  border:3px solid #90989d;
+  border-radius:50%;
+  color:#fff;
+  background:linear-gradient(180deg,#0e1516,#172022);
+  font-size:13px;
+  font-weight:800;
+}
+.status-orb-correct-answer{
+  width:33px;
+  height:33px;
+  display:grid;
+  place-items:center;
+  border:3px solid #90989d;
+  border-radius:50%;
+  color:#fff;
+  background:linear-gradient(180deg,#009914,#038b2c);
+  font-size:13px;
+  font-weight:800;
+}
+.status-orb-wrong-answer{
+  width:33px;
+  height:33px;
+  display:grid;
+  place-items:center;
+  border:3px solid #90989d;
+  border-radius:50%;
+  color:#fff;
+  background:linear-gradient(180deg,#992b00,#8b0303);
+  font-size:13px;
+  font-weight:800;
+}
+
 .status-orb--flip{
   background:linear-gradient(180deg,#125e99,#063761);
 }
@@ -354,6 +391,11 @@ textarea{resize:vertical}
 .money-row.is-active{
   filter:brightness(1.28);
   box-shadow:0 0 12px rgba(0,204,224,.4),inset 0 0 0 2px #dce5e8;
+}
+
+.passed{
+  background:radial-gradient(ellipse at 50% 25%,#012830,#00242e 55%,#022632);
+  color: #525657;
 }
 
 .action-group{
@@ -1479,6 +1521,8 @@ body{
   font-size:18px;
 }
 
+
+
 /* Музыка и завершение — по три читаемые колонки. */
 .secondary-actions .action-group:nth-child(3) .action-grid,
 .secondary-actions .action-group:nth-child(4) .action-grid{
@@ -1551,4 +1595,157 @@ body{
   height: 54px;
   object-fit: contain;
   flex: 0 0 auto;
+}
+
+
+/* ===== Блок управления Гонг-игрой ===== */
+
+.bong-game-panel{border-left-color:#d89119}
+.bong-game-panel .panel-heading{margin-bottom:8px}
+.bong-game-console{display:grid;gap:8px}
+
+.bong-options{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+}
+
+.bong-option-button{
+  min-height:44px;
+  border:1px solid #2b7180;
+  border-radius:8px;
+  color:#dffaff;
+  background:linear-gradient(180deg,#0b6574,#063a44);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 5px 12px rgba(0,0,0,.24);
+  font-size:18px;
+  font-weight:900;
+  line-height:1;
+  cursor:pointer;
+  transition:transform .14s ease,filter .14s ease,border-color .14s ease,box-shadow .14s ease;
+}
+
+.bong-option-button:hover{filter:brightness(1.12)}
+.bong-option-button:active{transform:translateY(1px)}
+
+.bong-option-button.is-active,
+.bong-option-button[aria-pressed="true"]{
+  border-color:#f0b33b;
+  color:#fff;
+  background:linear-gradient(180deg,#cb8619,#6f4108);
+  box-shadow:0 0 0 2px rgba(240,179,59,.18),0 0 14px rgba(240,179,59,.28),inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+.bong-info-grid{display:grid;gap:7px}
+
+.bong-option-select{
+  background:linear-gradient(180deg,#bddd04,#bba005);
+}
+
+
+.bong-display{
+  min-width:0;
+  min-height:58px;
+  display:grid;
+  align-content:center;
+  gap:3px;
+  padding:8px 10px;
+  border:1px solid #31515b;
+  border-radius:9px;
+  background:linear-gradient(180deg,#101b20,#091015);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),inset 0 -9px 16px rgba(0,0,0,.2);
+}
+
+.bong-display--sum{
+  border-color:#247885;
+  background:linear-gradient(180deg,#0a4652,#06262d);
+}
+
+.bong-display__label{
+  color:#8fa9b1;
+  font-size:8px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+}
+
+.bong-display__value{
+  min-width:0;
+  color:#fff;
+  font-size:23px;
+  font-weight:900;
+  font-style:italic;
+  line-height:1.1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  text-align: center;
+}
+
+.bong-display__value--text{font-size:12px;font-style:normal}
+
+.bong-status{
+  min-height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:6px 9px;
+  border:1px solid #293a41;
+  border-radius:8px;
+  background:#090f12;
+}
+
+.bong{
+  min-width:0;
+  background-color: #bb0808;
+  font-size:23px;
+  font-weight:900;
+  font-style:italic;
+  line-height:1.1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  text-align: center;
+}
+
+
+.bong-status__label{
+  color:#81949c;
+  font-size:8px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.bong-status__value{
+  min-width:0;
+  color:#d7f7fb;
+  font-size:10px;
+  font-weight:800;
+  text-align:right;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.bong-game-panel.is-running{border-left-color:#20b86b}
+.bong-game-panel.is-running .bong-status__value{color:#49dc8b}
+.bong-game-panel.is-finished{border-left-color:#d92330}
+.bong-game-panel.is-finished .bong-status__value{color:#ff7180}
+
+@media(max-width:1000px){
+  .bong-info-grid{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:620px){
+  .bong-info-grid{grid-template-columns:1fr}
+  .bong-option-button{min-height:48px;font-size:19px}
+  .bong-display__value{font-size:21px}
+  .bong-display__value--text{font-size:12px}
+}
+
+:disabled{
+    background:     linear-gradient(135deg, transparent 0 45%, rgba(255,255,255,.20) 46% 48%, transparent 49% 100%),     repeating-linear-gradient(135deg, rgba(255,255,255,.12) 0 7px, rgba(255,255,255,.025) 7px 14px),     linear-gradient(180deg,#252b36,#090e15)!important;
+  border-color:rgba(205,215,230,.46)!important;
+  border-style:dashed!important;
+  color:#92a0b4!important;
 }
