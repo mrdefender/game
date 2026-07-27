@@ -693,7 +693,7 @@ function start_round(){
     playAudio("tpv-r"+document.getElementById("control-round").value.toString()+".ogg",false)
     stop_timer = false;
     socket.emit("take_question",{flips:"false"})
-    timer_circle_start()
+    setTimeout(() => {timer_circle_start();}, 1500);
 }
 
 socket.on("question_selected", (data) => {
@@ -1043,6 +1043,7 @@ function next_sum()
 }
 function result_sum_for_player()
 {
+    result_money = parseInt(document.getElementById("control-current-money").value) + parseInt(document.getElementById("control-bank").value);
     playAudio("tpv-result.ogg",false);
-    socket.emit("add_result_player",{sum_player:parseInt(document.getElementById("control-current-money").value),name_player:document.getElementById("display-current-player").textContent})
+    socket.emit("add_result_player",{sum_player:result_money,name_player:document.getElementById("display-current-player").textContent})
 }
