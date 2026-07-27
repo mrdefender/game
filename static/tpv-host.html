@@ -132,11 +132,12 @@
               </div>
             </div>
 
-            <div class="bong-status">
-              <span class="bong-status__label">Статус</span>
-              <output id="bong-game-status" class="bong-status__value">Ожидание</output>
+            <div class="bong-display bong-display--author">
+                <span class="bong-display__label">Выигрыш автора</span>
+                <output id="bong-game-status" class="bong-display__value">0</output>
+              </div>
             </div>
-          </div>
+
         </section>
 
         <section class="tpv-panel room-control-panel" id="section-room-control">
@@ -199,12 +200,12 @@
 
             <label class="field">
               <span>Ответ</span>
-              <input id="question-answer" type="text" readonly>
+              <textarea id="question-answer" type="text" readonly></textarea>
             </label>
 
             <label class="field">
               <span>Автор</span>
-              <input id="question-author" type="text" readonly>
+              <textarea id="question-author" type="text" readonly></textarea>
             </label>
 
             <label class="field field--full">
@@ -303,9 +304,9 @@
                 <button id="action-bong-option-2" class="game-btn game-btn--square" type="button" data-action="bong-option-2" onclick="bong_game_start_var_2()" disabled>2</button>
                 <button id="action-bong-option-3" class="game-btn game-btn--square" type="button" data-action="bong-option-3" onclick="bong_game_start_var_3()" disabled>3</button>
                 <button id="action-bong-stop" class="game-btn game-btn--danger" type="button" data-action="bong-stop" onclick="stop_bong_game()" disabled>Остановить</button>
-                <button id="action-bong-author-win" class="game-btn game-btn--warning" type="button" data-action="bong-author-win" disabled>Выигрыш автора</button>
+                <button id="action-bong-author-win" class="game-btn game-btn--warning" type="button" data-action="bong-author-win" onclick="sum_for_author()" disabled>Выигрыш автора</button>
                 <button id="action-bong-next-sum" class="game-btn" type="button" data-action="bong-next-sum" onclick="next_sum()" disabled>Следующая сумма</button>
-                <button id="action-bong-player-win" class="game-btn game-btn--success" type="button" data-action="bong-player-win" disabled>Выигрыш игрока</button>
+                <button id="action-bong-player-win" class="game-btn game-btn--success" type="button" data-action="bong-player-win" onclick="result_sum_for_player()">Выигрыш игрока</button>
               </div>
             </section>
 

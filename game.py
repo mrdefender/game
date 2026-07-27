@@ -22,7 +22,7 @@ import secrets
 import string
 from pathlib import Path
 
-from sqlalchemy import desc, inspect
+from sqlalchemy import desc, func, inspect
 from sqlalchemy.types import JSON
 from werkzeug.utils import secure_filename
 from flask_login import (
@@ -167,7 +167,7 @@ def ping_test(data):
     
 @socketio.on("room:join_slot")
 def socket_join_room(data):
-    room_code = str(data.get("room") or Room.query.first())
+    room_code = str(data.get("room") or get_room_code() or "")
     role = data.get("role") or "unknown"
     username = data.get("username") or ""
 
@@ -187,7 +187,7 @@ def socket_join_room(data):
     
 @socketio.on("room:join_tpv")
 def socket_join_room(data):
-    room_code = str(data.get("room") or Room.query.first())
+    room_code = str(data.get("room") or get_room_code() or "")
     role = data.get("role") or "unknown"
     username = data.get("username") or ""
 
@@ -214,7 +214,7 @@ def count_interactive(data):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Users.query.get(user_id)
+    return db.session.get(Users, user_id)
 
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
@@ -272,10 +272,21 @@ class Answered(db.Model):
         return '<Answered %r>' %self.id
 
 
+def get_current_room():
+    """Возвращает текущую игровую комнату или None."""
+    return db.session.scalar(db.select(Room).limit(1))
+
+
+def get_room_code():
+    """Возвращает код текущей комнаты строкой."""
+    room = get_current_room()
+    return str(room.id) if room is not None else None
+
+
 def init_game():
-    Task.query.delete()
-    Answered.query.delete()
-    Helps.query.delete()
+    db.session.execute(db.delete(Task))
+    db.session.execute(db.delete(Answered))
+    db.session.execute(db.delete(Helps))
     #if os.path.exists("answered.json"):
     #    os.remove("answered.json")
    # if os.path.exists("task.json"):
@@ -314,7 +325,7 @@ def index():
 
 def check_id_room(room_id):
    # if not os.path.exists("room.json"):
-    room = Room.query.filter(Room.id == int(room_id)).first()
+    room = db.session.scalar(db.select(Room).where(Room.id == int(room_id)))
     if room == None:
             return False
     else:
@@ -322,7 +333,7 @@ def check_id_room(room_id):
 
 
 def give_name_game(game_name):
-    name = Room.query.filter(Room.id==game_name).first()
+    name = db.session.scalar(db.select(Room).where(Room.id==game_name))
     return name.game
 
 
@@ -356,7 +367,7 @@ def join():
                 u.status = "wait"
                 u.main_money = 0
                 u.red_bomb = "false"
-                tmp = Users.query.filter(Users.username==u.username).first()
+                tmp = db.session.scalar(db.select(Users).where(Users.username==u.username))
                 if tmp!=None:
                     if tmp.username == u.username:
                    # if tmp.username in session['username']:
@@ -373,7 +384,7 @@ def join():
                 ch = login_user(u)
                 return render_template("user_slot.html",value=u.username)
             if give_name_game(request.form['room_id']) == 'tpv':
-                find_user = UsersTpv.query.filter(UsersTpv.username==request.form['user_name']).first()
+                find_user = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==request.form['user_name']))
                 # if find_user == None:
                 #    flash ('К сожалению, Ваша заявку на игру не найдена')
                  #   return render_template("login.html")
@@ -382,6 +393,12 @@ def join():
                      #return render_template("login.html")  
                 user_tpv = QueryTpv()
                 user_tpv.username = request.form['user_name']
+                tmp = db.session.scalar(db.select(QueryTpv).where(QueryTpv.username==user_tpv.username))
+                if tmp!=None:
+                    if tmp.username == u.username:
+                   # if tmp.username in session['username']:
+                            print (url_for('join'))
+                            #return render_template("user_slot.html",value=u.username)
                 #user_tpv.money = find_user.money
                 user_tpv.money = 0
                 #user_tpv.flip = find_user.flip
@@ -470,7 +487,7 @@ def invite_user():
     if request.method == 'POST':
         try:
             u = request.json['user_name']
-            tmp = Users.query.filter(Users.id==int(u)).first()
+            tmp = db.session.scalar(db.select(Users).where(Users.id==int(u)))
             u = str(tmp.username)
             if tmp.red_bomb == 'true':
                 return json.dumps("red bomb")
@@ -483,15 +500,15 @@ def invite_user():
         tmp.time = 0
 	#tmp.time = 0
         db.session.commit()
-        socketio.emit("updated_status_user",tmp.status,to=f"{Room.query.first()}:user:{tmp.username}");
-        js = Users.query.all()
+        socketio.emit("updated_status_user",tmp.status,to=f"{get_room_code()}:user:{tmp.username}");
+        js = db.session.scalars(db.select(Users)).all()
         if len(js)!=1:
             for i in range(len(js)):
                 if js[i].status !="main":
                     js[i].status = 'interactive'
                     js[i].answer = '0'
                     js[i].time = 0
-                    socketio.emit("updated_status_user",js[i].status,to=f"{Room.query.first()}:user:{js[i].username}");
+                    socketio.emit("updated_status_user",js[i].status,to=f"{get_room_code()}:user:{js[i].username}");
             db.session.commit()
         update_list_users()    
         return json.dumps(u)
@@ -539,7 +556,7 @@ def generate_string(round_id,is_bombed):
         result = [current_round,a,b,otbor_chislo,md5_hash]
         result_send = [current_round,a,b,None,md5_hash]
         socketio.emit("get_task_otbor",result_send,to=f"{DEFAULT_ROOM_CODE}:spectator")
-        socketio.emit("get_task_otbor",result_send,to=f"{Room.query.first()}:user")
+        socketio.emit("get_task_otbor",result_send,to=f"{get_room_code()}:user")
         js = json.dumps(result)
         with open('task_otbor.json', 'w') as file:
             json.dump(result, file)
@@ -563,8 +580,8 @@ def generate_string(round_id,is_bombed):
         result = [current_round,fatal,md5_hash, count_fatal]
         result_send = [current_round,None,md5_hash, count_fatal]
         socketio.emit("get_task",result_send,to=f"{DEFAULT_ROOM_CODE}:spectator")
-        socketio.emit("get_task",result_send,to=f"{Room.query.first()}")
-        Task.query.delete()
+        socketio.emit("get_task",result_send,to=f"{get_room_code()}")
+        db.session.execute(db.delete(Task))
         task = Task()
         task.round = current_round
         task.fatal = fatal
@@ -590,8 +607,8 @@ def generate_string(round_id,is_bombed):
         result = [current_round,fatal,md5_hash,count_fatal,b_bomb,r_bomb]
         result_send = [current_round,None,md5_hash,count_fatal,None,None]
         socketio.emit("get_task",result_send,to=f"{DEFAULT_ROOM_CODE}:spectator")
-        socketio.emit("get_task",result_send,to=f"{Room.query.first()}")
-        Task.query.delete()
+        socketio.emit("get_task",result_send,to=f"{get_room_code()}")
+        db.session.execute(db.delete(Task))
         task = Task()
         task.round = current_round
         task.fatal = json.dumps(fatal)
@@ -617,7 +634,7 @@ def get_fatal_host():
         r = request.json["answer"]
         r1 = request.json["round"]
         res = [r, r1]
-       # Answered.query.delete()
+       # db.session.execute(db.delete(Answered))
         answered = Answered()
         answered.answer = r
         answered.round = r1
@@ -627,7 +644,7 @@ def get_fatal_host():
         #with open('answered.json', 'w') as file:
         #    json.dump(res, file)
         jsn = []
-        task = Task.query.first()
+        task = db.session.scalar(db.select(Task).limit(1))
         jsn.append(task.round)
         if task.round == 1:
             jsn.append(task.fatal)
@@ -652,7 +669,7 @@ def h50_50():
     if request.method == 'POST':
         secure_rnd = secrets.SystemRandom()
         r = request.json["round"]
-        task = Task.query.first()
+        task = db.session.scalar(db.select(Task).limit(1))
         jsn =[]
             #with open('task.json') as file:
         jsn.append(task.round)
@@ -673,7 +690,7 @@ def h50_50():
         f = jsn[1]
         cf = round(len(f)/2)
         res_f = secure_rnd.sample(f, cf)
-        socketio.emit("response_50_50",res_f,to=f"{Room.query.first()}")
+        socketio.emit("response_50_50",res_f,to=f"{get_room_code()}")
         socketio.emit("response_50_50",res_f,to=f"{DEFAULT_ROOM_CODE}:spectator")
         #with open('50_50.json', 'w') as file:
         #    json.dump(res_f, file)
@@ -686,7 +703,7 @@ def alter():
     if request.method == 'POST':
         secret_rnd = secrets.SystemRandom()
         r = request.json["round"]
-        task = Task.query.first()
+        task = db.session.scalar(db.select(Task).limit(1))
         jsn =[]
             #with open('task.json') as file:
         jsn.append(task.round)
@@ -718,7 +735,7 @@ def alter():
                     break
         
         res = [f[rf],str(j)]
-        socketio.emit("response_alter",res,to=f"{Room.query.first()}")
+        socketio.emit("response_alter",res,to=f"{get_room_code()}")
         socketio.emit("response_alter",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
        # with open('alter.json', 'w') as file:
        #     json.dump(res, file)
@@ -731,7 +748,7 @@ def navi():
     if request.method == 'POST':
         secret_rnd = secrets.SystemRandom()
         r = request.json["round"]
-        task = Task.query.first()
+        task = db.session.scalar(db.select(Task).limit(1))
         jsn =[]
             #with open('task.json') as file:
         jsn.append(task.round)
@@ -842,7 +859,7 @@ def navi():
                 res = ["4","9","14"]
             if tmp==4:
                 res = ["5","10","15"]
-            socketio.emit("response_navi",res,to=f"{Room.query.first()}")
+            socketio.emit("response_navi",res,to=f"{get_room_code()}")
             socketio.emit("response_navi",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             #with open('navi.json','w') as file:
             #    json.dump(res,file)
@@ -861,7 +878,7 @@ def navi():
                 res = ["6","7","8","9","10"]
             if tmp==2:
                 res = ["11","12","13","14","15"]
-            socketio.emit("response_navi",res,to=f"{Room.query.first()}")
+            socketio.emit("response_navi",res,to=f"{get_room_code()}")
             socketio.emit("response_navi",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             #with open('navi.json','w') as file:
             #    json.dump(res,file)
@@ -886,7 +903,7 @@ def navi():
                     res = ["4","9","14"]
                 if tmp==4:
                     res = ["5","10","15"]
-                socketio.emit("response_navi",res,to=f"{Room.query.first()}")
+                socketio.emit("response_navi",res,to=f"{get_room_code()}")
                 socketio.emit("response_navi",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
                 #with open('navi.json','w') as file:
                #     json.dump(res,file)
@@ -905,7 +922,7 @@ def navi():
                     res = ["6","7","8","9","10"]
                 if tmp==2:
                     res = ["11","12","13","14","15"]
-                socketio.emit("response_navi",res,to=f"{Room.query.first()}")
+                socketio.emit("response_navi",res,to=f"{get_room_code()}")
                 socketio.emit("response_navi",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
                 #with open('navi.json','w') as file:
                 #    json.dump(res,file)
@@ -919,7 +936,7 @@ def navi():
 def check_answered():
     if request.method == 'POST':
         r = request.json["check"]
-    if Answered.query.first()!=None:
+    if db.session.scalar(db.select(Answered).limit(1))!=None:
         return "true"
     else:
         return "false"   
@@ -927,11 +944,11 @@ def check_answered():
 @app.route('/show_rights', methods=["POST", "GET"])
 def show_rights():
     if request.method == 'POST':
-        js = Users.query.all()
+        js = db.session.scalars(db.select(Users)).all()
         if len(js)==1:
             js[0].status = "check main"
         else:
-            jjj = Users.query.all()
+            jjj = db.session.scalars(db.select(Users)).all()
             for i in range(0,len(jjj)):
                 if jjj[i].status == "answered interactive":
                     jjj[i].status = "check interactive"
@@ -944,9 +961,9 @@ def show_rights():
             db.session.commit()
         update_list_users()                                       
         r = request.json["round"]
-        ans = Answered.query.first()
+        ans = db.session.scalar(db.select(Answered).limit(1))
         jsn = [ans.answer, ans.round]
-        Answered.query.delete()
+        db.session.execute(db.delete(Answered))
         #if os.path.exists("answered.json"):
          #   with open('answered.json') as file:
          #       jsn = json.load(file)
@@ -995,7 +1012,7 @@ def serve_audio(filename):
 @socketio.on("update_list_users")
 def update_list_users():
     #if request.method == 'POST':
-        js = Users.query.all()
+        js = db.session.scalars(db.select(Users)).all()
         if len(js)==1:
             id = js[0].id
             username = js[0].username
@@ -1008,7 +1025,7 @@ def update_list_users():
             jsn = [id,username,answer,money,time, status,main_money,red_bomb,"true"]
             result = jsn
             socketio.emit("updated_list_user", result, to=DEFAULT_ROOM_CODE)
-            socketio.emit("updated_status_user",js[0].status,to=f"{Room.query.first()}:user:{js[0].username}");
+            socketio.emit("updated_status_user",js[0].status,to=f"{get_room_code()}:user:{js[0].username}");
             update_for_spec()
         else:
             jsn = []
@@ -1022,7 +1039,7 @@ def update_list_users():
                 main_money = js[i].main_money
                 red_bomb = js[i].red_bomb
                 tmp = [id,username,answer,money,time, status,main_money,red_bomb,"false"]
-                socketio.emit("updated_status_user",js[i].status,to=f"{Room.query.first()}:user:{js[i].username}");
+                socketio.emit("updated_status_user",js[i].status,to=f"{get_room_code()}:user:{js[i].username}");
                 jsn.append(tmp)
             result = jsn
             socketio.emit("updated_list_user",result, to=DEFAULT_ROOM_CODE)
@@ -1034,7 +1051,7 @@ def update_list_users():
 @app.route('/open_room', methods=["POST", "GET"])
 def open_room():
     if request.method == 'POST':
-        Room.query.delete()
+        db.session.execute(db.delete(Room))
         db.session.commit()
         game_type = request.json['game_type']
         try:
@@ -1061,7 +1078,7 @@ def game_over():
             main_money = request.json['money']
             u = request.json['user_name']
             rb = request.json['rb']
-            user_u = Users.query.filter(Users.id==u).first()
+            user_u = db.session.scalar(db.select(Users).where(Users.id==u))
             match main_money:
                 case '0': user_u.main_money = user_u.main_money + 0
                 case '1 000': user_u.main_money = user_u.main_money + 1000
@@ -1076,7 +1093,7 @@ def game_over():
             if rb == "true":
                 user_u.red_bomb = "true"
             db.session.commit()
-            jh = Users.query.all()
+            jh = db.session.scalars(db.select(Users)).all()
             for i in range(len(jh)):
                 if lose == "true":
                     jh[i].status = "game over lose"
@@ -1092,7 +1109,7 @@ def game_over():
 @app.route('/close_room', methods=["POST", "GET"])
 def close_room():
     if request.method == 'POST':
-        Room.query.delete()
+        db.session.execute(db.delete(Room))
         db.session.commit()
         socketio.emit("room_code_hide", {}, to=f"{DEFAULT_ROOM_CODE}:spectator")
         return json.dumps("ok")
@@ -1105,7 +1122,7 @@ def get_user_status():
         try:
          tmp = request.json['user']
          user = Users()
-         user = Users.query.filter(Users.username==tmp).first()
+         user = db.session.scalar(db.select(Users).where(Users.username==tmp))
          jsn = user.status
          return json.dumps(jsn)
         except:
@@ -1116,20 +1133,20 @@ def reset_user_to_wait():
     if request.method == 'POST':
          #if os.path.exists('helps.json'):
          #   os.remove('helps.json')
-         Helps.query.delete()
+         db.session.execute(db.delete(Helps))
         # if os.path.exists('answered.json'):
         #    os.remove('answered.json')
-         Answered.query.delete()
-         Task.query.delete()
+         db.session.execute(db.delete(Answered))
+         db.session.execute(db.delete(Task))
        #  if os.path.exists("task.json"):
        #     os.remove("task.json")
-         js = Users.query.all()
+         js = db.session.scalars(db.select(Users)).all()
          for i in range(0,len(js)):
             js[i].status = "wait"
             js[i].answer = "0"
             js[i].time = 0
             db.session.commit()
-            socketio.emit("updated_status_user",js[i].status,to=f"{Room.query.first()}:user:{js[i].username}");
+            socketio.emit("updated_status_user",js[i].status,to=f"{get_room_code()}:user:{js[i].username}");
          init_game()
          update_list_users()
          return json.dumps(" ")
@@ -1140,13 +1157,13 @@ def get_helps():
         #tmp_u = request.json['user']
         try:
             #if os.path.exists("helps.json"):
-            user = Users.query.all()
+            user = db.session.scalars(db.select(Users)).all()
             result = []
             for i in range(len(user)):
                 if (user[i].status == "main") or (user[i].status == "wait task main") or (user[i].status == "given task main"):
-                    help = Helps.query.first()
+                    help = db.session.scalar(db.select(Helps).limit(1))
                     if help == None:
-                       socketio.emit("get_helps", "fail", to=f"{Room.query.first()}:user:{user[i].username}")
+                       socketio.emit("get_helps", "fail", to=f"{get_room_code()}:user:{user[i].username}")
                        socketio.emit("get_helps", "fail",to=f"{DEFAULT_ROOM_CODE}:spectator")
                        return
                     else:
@@ -1162,11 +1179,11 @@ def get_helps():
                             result.append(help.auden)
                         if help.fact == "fact":
                             result.append(help.fact)
-                        socketio.emit("get_helps", result, to=f"{Room.query.first()}:user:{user[i].username}")
+                        socketio.emit("get_helps", result, to=f"{get_room_code()}:user:{user[i].username}")
                         socketio.emit("get_helps", result, to=f"{DEFAULT_ROOM_CODE}:spectator")
                      
             #    user = Users()
-            #    user = Users.query.filter(Users.username==tmp_u).first()
+            #    user = db.session.scalar(db.select(Users).where(Users.username==tmp_u))
             #    if (user.status == "main") or (user.status == "wait task main") or (user.status == "given task main"):
             #        db.session.commit()
             #        with open('helps.json') as file:
@@ -1183,7 +1200,7 @@ def get_helps():
 def send_helps():
     if request.method == 'POST':
         tmp = request.json['helps']
-        Helps.query.delete()
+        db.session.execute(db.delete(Helps))
         help = Helps()
         for i in tmp:
             if i == "50:50":
@@ -1212,7 +1229,7 @@ def send_helps():
 def start_game():
     if request.method == 'POST':
         try:
-            js = Users.query.all()
+            js = db.session.scalars(db.select(Users)).all()
             if len(js)!=1:
                 for i in range(len(js)):
                     if js[i].status =="main":
@@ -1239,8 +1256,8 @@ def get_task_user():
        # if request.json['user']=="spec":
         #    return json.dumps(jsn)
         try:
-            task = Task.query.first_or_404()
-            js = Users.query.all()
+            task = db.first_or_404(db.select(Task))
+            js = db.session.scalars(db.select(Users)).all()
             if len(js)!=1:
                 for i in range(len(js)):
                     if js[i].status =="wait task main":
@@ -1262,14 +1279,14 @@ def check_answered_main():
             #s_tmp = request.json['inter']
             #if not s_tmp:
             #    return json.dumps("fail")
-            user2 = Users.query.filter((Users.status == "answered main")|(Users.status == "answered main x2")).first_or_404()
-            users = Users.query.all()
+            user2 = db.first_or_404(db.select(Users).where((Users.status == "answered main")|(Users.status == "answered main x2")))
+            users = db.session.scalars(db.select(Users)).all()
             for i in range(len(users)):
                 if (users[i].status == "given task interactive"):
                     users[i].status = "interactive no answer"
                     db.session.commit()
             update_list_users()
-            socketio.emit("check_answered_main","ok",to=f"{Room.query.first()}")
+            socketio.emit("check_answered_main","ok",to=f"{get_room_code()}")
             
         except:
             return json.dumps("fail")
@@ -1278,7 +1295,7 @@ def check_answered_main():
 def answered_main_spec():
    # if request.method == 'POST':
         try:
-            ans = Users.query.filter((Users.status == "answered main")|(Users.status == "answered main x2")).first_or_404()
+            ans = db.first_or_404(db.select(Users).where((Users.status == "answered main")|(Users.status == "answered main x2")))
             if ans!=None:
                  #with open('answered.json') as file:
                  jsn = "o"+str(ans.answer)
@@ -1293,7 +1310,7 @@ def answered_main_spec():
 def answered_check_spec():
     #if request.method == 'POST':
         try:
-             task = Task.query.first()
+             task = db.session.scalar(db.select(Task).limit(1))
              jsn =[]
             #with open('task.json') as file:
              jsn.append(task.round)
@@ -1324,7 +1341,7 @@ def send_answer():
             u_tmp = request.json['user']
             a_tnp = request.json['answer_user']
             t_tmp = request.json['time_answer']
-            user = Users.query.filter(Users.username == u_tmp).first()
+            user = db.session.scalar(db.select(Users).where(Users.username == u_tmp))
             if (user.status == "given task main") | (user.status == "check main x2") :
                 user.status = "answered main"
                 user.answer = a_tnp
@@ -1349,7 +1366,7 @@ def send_answer():
                 user.status = "answered interactive"
                 user.answer = a_tnp
                 user.time = t_tmp
-                task = Task.query.first()
+                task = db.session.scalar(db.select(Task).limit(1))
                 jsn =[]
                 jsn.append(task.round)
                 if task.round == 1:
@@ -1408,7 +1425,7 @@ def send_answer():
 def wait_answer_for_host():
     #if request.method == 'POST':
         try:
-            user = Users.query.filter((Users.status == "answered main")|(Users.status == "answered main x2")).first()
+            user = db.session.scalar(db.select(Users).where((Users.status == "answered main")|(Users.status == "answered main x2")))
             if user == None:
                 return json.dumps("fail")
             res = user.answer
@@ -1424,7 +1441,7 @@ def check_answer():
    # if request.method == 'POST':
         try:
             #tmp_u = request.json['user']
-            users = Users.query.all()
+            users = db.session.scalars(db.select(Users)).all()
             for i in range(len(users)):
                 if users[i].status == "check main":
                     users[i].status = "wait next round main"
@@ -1432,7 +1449,7 @@ def check_answer():
                     users[i].status = "wait next round interactive"
             #with open('task.json') as file:
             #        jsn = json.load(file)
-            task = Task.query.first()
+            task = db.session.scalar(db.select(Task).limit(1))
             jsn =[]
             #with open('task.json') as file:
             jsn.append(task.round)
@@ -1452,7 +1469,7 @@ def check_answer():
                 jsn.append(task.r_bomb)
             db.session.commit()
             update_list_users()
-            socketio.emit("checked answer", jsn, to=f"{Room.query.first()}")
+            socketio.emit("checked answer", jsn, to=f"{get_room_code()}")
             #return json.dumps(jsn)
         except:
             return json.dumps("fail")
@@ -1467,7 +1484,7 @@ def check_answer():
 def next_round():
     if request.method == 'POST':
         try:
-            user = Users.query.all()
+            user = db.session.scalars(db.select(Users)).all()
             if len(user)==1:
                 user[0].status = "wait task main"
                 user[0].answer = "0"
@@ -1484,7 +1501,7 @@ def next_round():
             #if os.path.exists('task.json'):
             #    os.remove('task.json')
             db.session.commit()
-            Task.query.delete()
+            db.session.execute(db.delete(Task))
             get_helps()
             update_list_users()
             return json.dumps("ok")
@@ -1499,7 +1516,7 @@ def get_50_50(data=None):
     #if request.method == 'POST':
         try:
          #   tmp_u = request.json['user']
-          #  user = Users.query.filter(Users.username==tmp_u).first()
+          #  user = db.session.scalar(db.select(Users).where(Users.username==tmp_u))
           #  find = False
            # user.status = "50:50"
            # db.session.commit()
@@ -1521,7 +1538,7 @@ def get_alter(data=None):
    # if request.method == 'POST':
         try:
            # tmp_u = request.json['user']
-           # user = Users.query.filter(Users.username==tmp_u).first()
+           # user = db.session.scalar(db.select(Users).where(Users.username==tmp_u))
             #find = False
            # user.status = "alter"
            # db.session.commit()
@@ -1546,7 +1563,7 @@ def get_navi(data=None):
    # if request.method == 'POST':
         try:
            # tmp_u = request.json['user']
-          #  user = Users.query.filter(Users.username==tmp_u).first()
+          #  user = db.session.scalar(db.select(Users).where(Users.username==tmp_u))
            # find = False
             #user.status = "navi"
            # db.session.commit()
@@ -1573,13 +1590,13 @@ def get_x2(data=None):
    # if request.method == 'POST':
         try:
            # tmp_u = request.json['user']
-            user = Users.query.filter(Users.status=="given task main").first()
+            user = db.session.scalar(db.select(Users).where(Users.status=="given task main"))
             user.status = "x2"
             db.session.commit()
             update_list_users()
             socketio.emit("request x2", "ok", to=f"{DEFAULT_ROOM_CODE}:host")
             socketio.emit("response_x2", "ok", to=f"{DEFAULT_ROOM_CODE}:spectator")
-            socketio.emit("response_x2", "ok", to=f"{Room.query.first()}:user:{user.username}")
+            socketio.emit("response_x2", "ok", to=f"{get_room_code()}:user:{user.username}")
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -1589,7 +1606,7 @@ def get_x2(data=None):
 def help_auden():
     if request.method == 'POST':
         try:
-            tmp_u = Users.query.all()
+            tmp_u = db.session.scalars(db.select(Users)).all()
             a1 = 0
             a2 = 0
             a3 = 0
@@ -1640,7 +1657,7 @@ def help_auden():
                         a15 += 1
             col_find_fatal = 0
             col_find_free = 0
-            col_ans = Users.query.filter(Users.status == "answered interactive").count()
+            col_ans = (db.session.scalar(db.select(db.func.count(Users.id)).where(Users.status == "answered interactive")) or 0)
             if col_ans == 0:
                 return jsonify("fail")
             result.append(round(a1/col_ans*100,2))
@@ -1659,7 +1676,7 @@ def help_auden():
             result.append(round(a14/col_ans*100,2))
             result.append(round(a15/col_ans*100,2))
             jsn = []
-            task = Task.query.first()
+            task = db.session.scalar(db.select(Task).limit(1))
             jsn.append(task.round)
             if task.round == 1:
                 jsn.append(task.fatal)
@@ -1703,7 +1720,7 @@ def get_auden(data=None):
    # if request.method == 'POST':
         try:
          #   uu = request.json['user']
-          #  user = Users.query.filter(Users.username==uu).first()
+          #  user = db.session.scalar(db.select(Users).where(Users.username==uu))
             #user.status = "auden"
             #db.session.commit()
             #while (True):
@@ -1726,7 +1743,7 @@ def fact(data=None):
             secret_rnd = secrets.SystemRandom()
             slot = secret_rnd.randint(1,15)
             jsn = []
-            task = Task.query.first()
+            task = db.session.scalar(db.select(Task).limit(1))
             jsn.append(task.round)
             if task.round == 1:
                 jsn.append(task.fatal)
@@ -1752,7 +1769,7 @@ def fact(data=None):
                         slot = secret_rnd.randint(1,15)
                         find = False
                         break
-            facts = Facts.query.filter(Facts.slot==str(slot)).first()
+            facts = db.session.scalar(db.select(Facts).where(Facts.slot==str(slot)))
             result = []
             result.append(facts.slot)
             result.append(facts.des_fact)
@@ -1776,7 +1793,7 @@ def get_fact(data=None):
    # if request.method == 'POST':
         try:
           #  uu = request.json['user']
-          #  user = Users.query.filter(Users.username==uu).first()
+          #  user = db.session.scalar(db.select(Users).where(Users.username==uu))
            # user.status = "fact"
            # db.session.commit()
            # while (True):
@@ -1797,7 +1814,7 @@ def get_fact(data=None):
 @app.route('/clear_table', methods=["POST", "GET"])
 def clear_table():
     if request.method == 'POST':
-        user_all = Users.query.delete()
+        user_all = db.session.execute(db.delete(Users))
         update_list_users()
         db.session.commit()
         return json.dumps("ok")
@@ -1809,160 +1826,160 @@ def clear_table():
 #@app.route('/update_for_spec', methods=["POST", "GET"])
 def update_for_spec():
    # if request.method == 'POST':
-        user_waits = Users.query.filter(Users.status == "wait").count()
-        user_all = Users.query.all()
+        user_waits = (db.session.scalar(db.select(db.func.count(Users.id)).where(Users.status == "wait")) or 0)
+        user_all = db.session.scalars(db.select(Users)).all()
         if len(user_all)==0:
             socketio.emit("updated_list_user_spec","fail",to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps("fail")
         if (len(user_all)==user_waits):
             socketio.emit("updated_list_user_spec","wait",to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps("wait")
-        user_main = Users.query.filter(Users.status == "main").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "main"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "wait task main").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "wait task main"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "given task main").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "given task main"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "answered main").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "answered main"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "answered main x2").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "answered main x2"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             return json.dumps(res)
         
-        user_main = Users.query.filter(Users.status == "check main").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "check main"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "check main x2").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "check main x2"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "game over lose").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "game over lose"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "game over").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "game over"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "50:50").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "50:50"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "alter").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "alter"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "x2").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "x2"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "navi").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "navi"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "auden").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "auden"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "fact").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "fact"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "otbor").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "otbor"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "warning otbor").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "warning otbor"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "start otbor").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "start otbor"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "winner otbor").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "winner otbor"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "otbor end").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "otbor end"))
         if (user_main != None):
             res = []
             res.append(user_main.status)
             res.append(user_main.username)
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res) 
-        user_main = Users.query.filter(Users.status == "show result").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "show result"))
         if (user_main != None):
             res = get_result()
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
             return json.dumps(res)
-        user_main = Users.query.filter(Users.status == "show total result").first()
+        user_main = db.session.scalar(db.select(Users).where(Users.status == "show total result"))
         if (user_main != None):
             res = get_total_result()
             socketio.emit("updated_list_user_spec",res,to=f"{DEFAULT_ROOM_CODE}:spectator")
@@ -1971,7 +1988,7 @@ def update_for_spec():
 
 def get_result():
     result = []
-    tmp = Users.query.order_by(desc(Users.money)).all()
+    tmp = db.session.scalars(db.select(Users).order_by(desc(Users.money))).all()
     for i in range(len(tmp)):
         status = tmp[i].status
         username = tmp[i].username
@@ -1982,7 +1999,7 @@ def get_result():
 
 def get_total_result():
     result = []
-    tmp = Users.query.order_by(desc(Users.money+Users.main_money)).all()
+    tmp = db.session.scalars(db.select(Users).order_by(desc(Users.money+Users.main_money))).all()
     for i in range(len(tmp)):
         status = tmp[i].status
         username = tmp[i].username
@@ -2058,13 +2075,13 @@ def get_tree():
 def otbor():
     if request.method == 'POST':
         try:
-            u_all = Users.query.all()
+            u_all = db.session.scalars(db.select(Users)).all()
             for i in range(len(u_all)):
                 if u_all[i].red_bomb == 'true':
                     continue
                 u_all[i].status = "otbor"
                 u_all[i].time = "0"
-                socketio.emit("updated_status_user",u_all[i].status,to=f"{Room.query.first()}:user:{u_all[i].username}");
+                socketio.emit("updated_status_user",u_all[i].status,to=f"{get_room_code()}:user:{u_all[i].username}");
             db.session.commit()
             update_list_users()
             return json.dumps("ok")
@@ -2075,14 +2092,14 @@ def otbor():
 def warning_otbor():
     if request.method == 'POST':
         try:
-            u_all = Users.query.all()
+            u_all = db.session.scalars(db.select(Users)).all()
             for i in range(len(u_all)):
                 if u_all[i].red_bomb == 'true':
                     continue
                 u_all[i].status = "warning otbor"
                 db.session.commit()
                 update_list_users()
-                socketio.emit("updated_status_user",u_all[i].status,to=f"{Room.query.first()}:user:{u_all[i].username}");
+                socketio.emit("updated_status_user",u_all[i].status,to=f"{get_room_code()}:user:{u_all[i].username}");
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -2091,14 +2108,14 @@ def warning_otbor():
 def start_otbor():
     if request.method == 'POST':
         try:
-            u_all = Users.query.all()
+            u_all = db.session.scalars(db.select(Users)).all()
             for i in range(len(u_all)):
                 if u_all[i].red_bomb == 'true':
                     continue
                 u_all[i].status = "start otbor"
                 db.session.commit()
                 update_list_users()
-                socketio.emit("updated_status_user",u_all[i].status,to=f"{Room.query.first()}:user:{u_all[i].username}");
+                socketio.emit("updated_status_user",u_all[i].status,to=f"{get_room_code()}:user:{u_all[i].username}");
             return json.dumps("ok")
         except:
             return json.dumps("fail")
@@ -2107,7 +2124,7 @@ def start_otbor():
 def show_answer_otbor():
     if request.method == 'POST':
         try:
-            u_all = Users.query.all()
+            u_all = db.session.scalars(db.select(Users)).all()
             with open('task_otbor.json') as file:
                 p = json.load(file)
             for i in range(len(u_all)):
@@ -2116,9 +2133,9 @@ def show_answer_otbor():
                 u_all[i].status = "otbor end"
                 db.session.commit()
                 update_list_users()
-                socketio.emit("updated_status_user",u_all[i].status,to=f"{Room.query.first()}:user:{u_all[i].username}");
+                socketio.emit("updated_status_user",u_all[i].status,to=f"{get_room_code()}:user:{u_all[i].username}");
                 socketio.emit("get_answer_otbor",p,to=f"{DEFAULT_ROOM_CODE}:spectator");
-                socketio.emit("get_answer_otbor",p,to=f"{Room.query.first()}:user:{u_all[i].username}");
+                socketio.emit("get_answer_otbor",p,to=f"{get_room_code()}:user:{u_all[i].username}");
             #os.remove('task_otbor.json')
             return json.dumps(p)
         except:
@@ -2145,7 +2162,7 @@ def send_answer_otbor():
             ans = request.json['ans_otbor']
             user = request.json['user']
             time = request.json['time_answer']
-            user_db = Users.query.filter(Users.username == user).first()
+            user_db = db.session.scalar(db.select(Users).where(Users.username == user))
             user_db.answer = ans
             user_db.time = time
             db.session.commit()
@@ -2159,7 +2176,7 @@ def send_answer_otbor():
 def show_result_otbor():
     if request.method == 'POST':
         try:
-            user_all = Users.query.all()
+            user_all = db.session.scalars(db.select(Users)).all()
             with open('task_otbor.json') as file:
                     p = json.load(file)
             abs_arr = []
@@ -2178,7 +2195,7 @@ def show_result_otbor():
                 if abs_arr[i] == min_abs_arr:
                     users_ans_win.append(i)
             if len(users_ans_win)==1:
-                user_winner = Users.query.filter(Users.id==users_ans_win[0]+1).first()
+                user_winner = db.session.scalar(db.select(Users).where(Users.id==users_ans_win[0]+1))
                 user_winner.status = "winner otbor"
                 db.session.commit()
                 #return json.dumps(user_winner)
@@ -2210,7 +2227,7 @@ def show_result_interactive():
     if request.method == 'POST':
         try:
             action = request.json['action']
-            user_all = Users.query.all()
+            user_all = db.session.scalars(db.select(Users)).all()
             for i in range(len(user_all)):
                 if action == "show":
                     user_all[i].status = "show result"
@@ -2238,9 +2255,11 @@ def host_show_credits():
     "title": "Спасибо за игру!",
     "lines": [
         "Ведущий: Mokaque",
-        "Авторы идеи: Сергей Бойцов,  Игорь Черкасов",
+        "Оригинальные авторы идеи: Сергей Бойцов,  Игорь Черкасов",
         "Композитор: Дмитрий Яковлев",
+        "Адаптация правил и игры: Mokaque",
         "Техническая реализация: Mokaque",
+        "Графика: ChatGPT",
         "Никто из участников создания данной адаптации игры не претендует на авторские права на формат оригинальной игры 'Свободный слот'",
         "Данный проект выпущен исключительно в развлекательных целях и не преследует целей получение материальной выгоды",
         "Оригинальная игра 'Свободный слот' проводится в онлайн формате на https://www.twitch.tv/fighter_kit",
@@ -2366,7 +2385,7 @@ class UsersTpv(db.Model):
             return '<UsersTpv %r>' %self.id
 
 
-class Questions(db.Model):
+class Questions_tpv(db.Model):
 
     id = db.Column(
         db.Integer,
@@ -2380,7 +2399,7 @@ class Questions(db.Model):
     flip = db.Column(db.Text)
     show = db.Column(db.Text)
     def __repr__(self):
-        return '<Questions %r>' %self.id
+        return '<Questions_tpv %r>' %self.id
 
 
 class QueryTpv(db.Model, UserMixin):
@@ -2405,7 +2424,7 @@ class QueryTpv(db.Model, UserMixin):
 
 @socketio.on("update_users_tpv")
 def update_users_tpv():
-        js = QueryTpv.query.all()
+        js = db.session.scalars(db.select(QueryTpv)).all()
         if len(js)==1:
             id = js[0].id
             username = js[0].username
@@ -2424,7 +2443,7 @@ def update_users_tpv():
                 money = js[i].money
                 status = js[i].status
                 tmp = [id,username,flip,money,status,"false"]
-                #socketio.emit("updated_user_tpv",js[i].status,to=f"{Room.query.first()}:user:{js[i].username}");
+                #socketio.emit("updated_user_tpv",js[i].status,to=f"{get_room_code()}:user:{js[i].username}");
                 jsn.append(tmp)
             result = jsn
             socketio.emit("updated_users_tpv",result, to=f"{DEFAULT_ROOM_CODE}:host")
@@ -2432,7 +2451,8 @@ def update_users_tpv():
 
 @socketio.on("clean_db_tpv")
 def clean_db_tpv():
-    QueryTpv.query.delete()
+    db.session.execute(db.delete(QueryTpv))
+    db.session.commit()
     update_users_tpv()
     socketio.emit("DB_clean","ok", to=f"{DEFAULT_ROOM_CODE}:host")
 
@@ -2440,7 +2460,7 @@ def clean_db_tpv():
 @socketio.on("choose_player_random")
 def choose_player_random():
     try:
-        js = QueryTpv.query.filter(QueryTpv.status=="wait").all()
+        js = db.session.scalars(db.select(QueryTpv).where(QueryTpv.status=="wait")).all()
         if len(js)==0:
             return
         if len(js)==1:
@@ -2467,6 +2487,7 @@ def choose_player_random():
             status = js[num].status
             jsn = [id,username,flip,money,status]
             result = jsn
+            update_users_tpv()
             socketio.emit("player_selected", result, to=f"{DEFAULT_ROOM_CODE}:host")
             update_users_tpv()
     except:
@@ -2476,7 +2497,7 @@ def choose_player_random():
 def choose_player_id(data):
     try:
         num = data["id"]
-        js = QueryTpv.query.filter(QueryTpv.id==num).first()
+        js = db.session.scalar(db.select(QueryTpv).where(QueryTpv.id==num))
         if js == None:
             return
         js.status = "selected"
@@ -2496,7 +2517,7 @@ def choose_player_id(data):
 @socketio.on("reset_to_wait_tpv")
 def reset_to_wait_tpv():
     try:
-        js = QueryTpv.query.all()
+        js = db.session.scalars(db.select(QueryTpv)).all()
         if len(js)==1:
             js[0].status = "wait"
             db.session.commit()
@@ -2526,6 +2547,63 @@ def generate_sum_for_bong_game(data):
     result.sort()
     result.append(data['sum'])
     socketio.emit("sum_generated",result,to=f"{DEFAULT_ROOM_CODE}:host")
+
+
+@socketio.on("take_question")
+def take_question(data):
+    if data["flips"]=="false":
+        js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip=="false", Questions_tpv.show=="false").order_by(func.random()).limit(1))
+        if js == None:
+            socketio.emit("question_selected","fail",to=f"{DEFAULT_ROOM_CODE}:host")
+            return
+        question = js.task
+        answer = js.answer
+        comment = js.comment
+        author = js.author
+        result = [question,answer,comment,author]
+        #js.show = "true"
+        #db.session.commit()
+        socketio.emit("question_selected",result,to=f"{DEFAULT_ROOM_CODE}:host")
+    if data["flips"]!="false":
+        js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip==data["flips"], Questions_tpv.show=="false").order_by(func.random()).limit(1))
+        if js == None:
+            socketio.emit("question_selected","fail",to=f"{DEFAULT_ROOM_CODE}:host")
+            return
+        question = js.task
+        answer = js.answer
+        comment = js.comment
+        author = js.author
+        result = [question,answer,comment,author]
+        #js.show = "true"
+        #db.session.commit()        
+        socketio.emit("question_selected",result,to=f"{DEFAULT_ROOM_CODE}:host")
+
+@socketio.on("add_result_author")
+def add_result_author(data):
+    js = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==data["name_author"]))
+    if js == None:
+        u = UsersTpv()
+        u.username = data["name_author"]
+        u.flip = "false"
+        u.money = data["sum_author"]
+        u.approve = "false"
+        u.flip_col = 0
+        db.session.add(u)
+        db.session.flush()
+        db.session.commit()
+    else:
+        js.money = js.money + data["sum_author"]
+        db.session.commit()
+
+@socketio.on("add_result_player")
+def add_result_player(data):
+    #js = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==data["name_player"]))
+   # js.money = js.money + data["sum_player"]
+    js1 = db.session.scalar(db.select(QueryTpv).where(QueryTpv.username==data["name_player"]))
+    js1.money = js1.money + data["sum_player"]
+    #js1.status = "ended"
+    db.session.commit() 
+    update_users_tpv()
 
 
 if __name__ == "__main__":

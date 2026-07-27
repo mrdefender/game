@@ -148,7 +148,7 @@ function cancel_all(){
     document.getElementById("user_id").value = "";
     document.getElementById("in_game").value = "В игре: ";
     reset_user_to_wait();
-    update_list_user();
+    //update_list_user();
     var select = document.querySelector('#select_round');
     var select_fix = document.querySelector('#select_fix');
     document.getElementById("au").value = "";
@@ -1332,7 +1332,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<5;i++)
         {
             stop_current_sound();
-            playAudio("a4-9.ogg",false);
+            playAudio("a4.ogg",false);
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {

@@ -123,14 +123,13 @@ function init_game(){
     document.getElementById("action-answer-wrong").disabled = true;
     document.getElementById("action-answer-pass").disabled = true;
     document.getElementById("action-question-flip").disabled = true;
-    document.getElementById("action-bong-start").disabled = true;
+    //document.getElementById("action-bong-start").disabled = true;
     document.getElementById("action-bong-option-1").disabled = true;
     document.getElementById("action-bong-option-2").disabled = true;
     document.getElementById("action-bong-option-3").disabled = true;
     document.getElementById("action-bong-stop").disabled = true;
     document.getElementById("action-bong-author-win").disabled = true;
     document.getElementById("action-bong-next-sum").disabled = true;
-    document.getElementById("action-bong-player-win").disabled = true; 
     document.getElementById("correct-indicator-1").classList.remove("status-orb-wrong-answer");
     document.getElementById("correct-indicator-2").classList.remove("status-orb-wrong-answer");
     document.getElementById("correct-indicator-3").classList.remove("status-orb-wrong-answer");
@@ -141,6 +140,18 @@ function init_game(){
     document.getElementById("bong-variable-3").classList.remove("bong-option-select");
     document.getElementById("bong-current-sum").textContent = 0;
     document.getElementById("bong-current-sum").classList.remove("bong");
+    document.getElementById("action-bong-author-win").disabled = true;
+    document.getElementById("action-bong-next-sum").disabled = true;
+    document.getElementById("bong-game-status").textContent = "";
+    document.getElementById("bong-question-author").textContent = "— Автор вопроса —";
+    document.getElementById("question-text").textContent = "";
+    document.getElementById("question-answer").textContent = "";
+    document.getElementById("question-author").textContent = "";
+    document.getElementById("question-comment").textContent = "";
+    stop_bong_game_now = false;
+    sum_results = 0;
+    
+
 }
 
 document.getElementById("control-timer-seconds").addEventListener('change', function(){
@@ -588,7 +599,7 @@ function update_list_user(data)
     var cell3 = document.createElement("td")
     cell3.innerHTML = data[2];
     var cell4 = document.createElement("td")
-    cell4.innerHTML = data[3];
+    cell4.innerHTML = data[3].toLocaleString("ru");
     var cell5 = document.createElement("td")
     cell5.innerHTML = data[4];
     tr.appendChild(cell1);
@@ -681,9 +692,28 @@ function start_round(){
     stop_current_sound()
     playAudio("tpv-r"+document.getElementById("control-round").value.toString()+".ogg",false)
     stop_timer = false;
+    socket.emit("take_question",{flips:"false"})
     timer_circle_start()
 }
 
+socket.on("question_selected", (data) => {
+    console.log(data);
+    if (data=="fail")
+    {
+        document.getElementById("question-text").textContent = "";
+        document.getElementById("question-answer").textContent = "";
+        document.getElementById("question-author").textContent = "";
+        document.getElementById("question-comment").textContent = "";
+        return;
+    }
+    
+        document.getElementById("question-text").textContent = data[0];
+        document.getElementById("question-answer").textContent = data[1];
+        document.getElementById("question-author").textContent = data[3];
+        document.getElementById("question-comment").textContent = data[2];
+
+}
+)
 
 function timer_circle_start(){
    if (document.getElementById("control-timer-seconds").value == 0)
@@ -721,7 +751,7 @@ function correct(){
         
         if (document.getElementById("control-round").value==1)
         {
-            setTimeout(() => {stop_current_sound(); playAudio("tpv-e1.ogg",false);}, 4500);
+            setTimeout(() => {stop_current_sound(); playAudio("tpv-e1.ogg",false);}, 3500);
             document.getElementById("control-current-money").value = 10000*Number(document.getElementById("control-circle").value);
             document.getElementById("control-correct-count").value = 0;
             document.getElementById("control-round").value = 2;
@@ -732,7 +762,7 @@ function correct(){
         }
         if (document.getElementById("control-round").value==2)
         {
-            setTimeout(() => {stop_current_sound();playAudio("tpv-e2.ogg",false);}, 4500);
+            setTimeout(() => {stop_current_sound();playAudio("tpv-e2.ogg",false);}, 3500);
             document.getElementById("control-current-money").value = 25000*Number(document.getElementById("control-circle").value);
             document.getElementById("control-correct-count").value = 0;
             document.getElementById("control-round").value = 3;
@@ -743,7 +773,7 @@ function correct(){
         }
         if (document.getElementById("control-round").value==3)
         {
-            setTimeout(() => {stop_current_sound();playAudio("tpv-e3.ogg",false);}, 4500);
+            setTimeout(() => {stop_current_sound();playAudio("tpv-e3.ogg",false);}, 3500);
             document.getElementById("control-current-money").value = 50000*Number(document.getElementById("control-circle").value);
             document.getElementById("control-correct-count").value = 0;
             document.getElementById("control-round").value = 4;
@@ -754,7 +784,7 @@ function correct(){
         }
         if (document.getElementById("control-round").value==4)
         {
-            setTimeout(() => {stop_current_sound();playAudio("tpv-e4.ogg",false);}, 4500);
+            setTimeout(() => {stop_current_sound();playAudio("tpv-e4.ogg",false);}, 3500);
             document.getElementById("control-current-money").value = 150000*Number(document.getElementById("control-circle").value);
             document.getElementById("control-correct-count").value = 0;
             document.getElementById("control-round").value = 5;
@@ -766,7 +796,7 @@ function correct(){
 
         if (document.getElementById("control-round").value==5)
         {
-        setTimeout(() => {stop_current_sound();playAudio("tpv-e5.ogg",false);}, 4500);
+        setTimeout(() => {stop_current_sound();playAudio("tpv-e5.ogg",false);}, 3500);
         document.getElementById("control-bank").value = parseInt(document.getElementById("control-bank").value)+500000*Number(document.getElementById("control-circle").value);
         document.getElementById("control-current-money").value = 0;
         document.getElementById("control-timer-seconds").value = 240;
@@ -781,12 +811,13 @@ function correct(){
         }
         
     }
+    setTimeout(() => {socket.emit("take_question",{flips:"false"});}, 2100);
 
 }
 
 function wrong(){
     if (parseInt(document.getElementById("control-current-money").value)!=0)
-        document.getElementById("action-bong-start".disabled) = false;
+        document.getElementById("action-bong-start").disabled = false;
     stop_current_sound();
     stop_timer = true;
     playAudio("tpv-wrong.ogg",false);
@@ -810,6 +841,18 @@ function wrong(){
     {
        document.getElementById("correct-indicator-5").classList.add("status-orb-wrong-answer");
     }
+    document.getElementById("bong-question-author").textContent = document.getElementById("question-author").textContent;
+    if (parseInt(document.getElementById("control-current-money").value)==0)
+        {
+            sum_bong_game = 1000;
+        document.getElementById("bong-game-status").textContent=sum_bong_game.toLocaleString("ru-RU");
+        document.getElementById("control-current-money").value = 0;
+        update_data();
+        if (document.getElementById("bong-question-author").textContent!="— Автор вопроса —")
+            socket.emit("add_result_author",{sum_author:sum_bong_game,name_author:document.getElementById("bong-question-author").textContent})
+
+    }
+
 }
 
 function pass(){
@@ -826,12 +869,19 @@ function pass(){
         document.getElementById("action-answer-pass").disabled = true;
     }
     update_data();
+    setTimeout(() => {socket.emit("take_question",{flips:"false"});}, 2100);
 }
 
 function flip(){
+    col = parseInt(document.getElementById("control-flips-count").value)
+    if (col==0)
+        return;
     setTimeout(() => {playAudio("tpv-flip.ogg",false);}, 3000);
+    setTimeout(() => {socket.emit("take_question",{flips:document.getElementById("display-current-flip").textContent});}, 3000);
+    
     document.getElementById("control-flips-count").value = Number(parseInt(document.getElementById("control-flips-count").value)) - 1;
     update_data();
+    
     if (parseInt(document.getElementById("control-flips-count").value)==0)
         document.getElementById("action-question-flip").disabled = true;
     else
@@ -913,10 +963,14 @@ socket.on("sum_generated", async(data) => {
     {
         if (stop_bong_game_now)
         {
+            sum_results = 0;
             stop_current_sound();
-            playAudio("tpv-bong-stop.ogg",false);
-            sum_results = sums[i];
-            stop_el = i;
+            //playAudio("tpv-bong-stop.ogg",false);
+            sum_results = sums[i-1];
+            stop_el = i-1;
+            document.getElementById("action-bong-author-win").disabled = false;
+             document.getElementById("action-bong-next-sum").disabled = false;
+            document.getElementById("bong-current-sum").textContent = sum_results.toLocaleString("ru-RU");
             return;
         }
         if (sums[i]=="BONG")
@@ -925,15 +979,17 @@ socket.on("sum_generated", async(data) => {
             stop_current_sound();
             playAudio("tpv-bong-sound.ogg",false);
             document.getElementById("bong-current-sum").classList.add("bong");
+            document.getElementById("action-bong-author-win").disabled = false;
             return;
         }
         document.getElementById("bong-current-sum").textContent = sums[i].toLocaleString("ru-RU");
         await NumberVoice.speak(sums[i],{includeCurrency: true});
-         await delay(1800);
+         await delay(1400);
     }
     stop_current_sound();
     playAudio("tpv-bong-winner.ogg",false);
-    sum_results = sums[length-1];
+    sum_results = sums[sums.length-1];
+    document.getElementById("action-bong-author-win").disabled = false;
 
 }
 
@@ -948,4 +1004,45 @@ function stop_bong_game(){
     stop_current_sound();
     playAudio("tpv-bong-stop.ogg",false);
     stop_bong_game_now = true;
+}
+
+function sum_for_author(){
+    if (document.getElementById("bong-current-sum").textContent == "ГОНГ")
+    {
+        sum_bong_game = parseInt(document.getElementById("control-current-money").value)+1000;
+        document.getElementById("bong-game-status").textContent=sum_bong_game.toLocaleString("ru-RU");
+        document.getElementById("control-current-money").value = 0;
+        update_data();
+        if (document.getElementById("bong-question-author").textContent!="— Автор вопроса —")
+            socket.emit("add_result_author",{sum_author:sum_bong_game,name_author:document.getElementById("bong-question-author").textContent})
+        return;
+    }
+    sum_bong_game = parseInt(document.getElementById("control-current-money").value) - sum_results +1000
+    console.log(sum_bong_game)
+    document.getElementById("bong-game-status").textContent=sum_bong_game.toLocaleString("ru-RU");
+    document.getElementById("control-current-money").value = sum_results;
+    if (document.getElementById("bong-question-author").textContent!="— Автор вопроса —")
+        socket.emit("add_result_author",{sum_author:sum_bong_game,name_author:document.getElementById("bong-question-author").textContent})
+    update_data();
+}
+
+function next_sum()
+{
+    if (stop_el==sums.length)
+        return;
+    stop_el=stop_el+1
+    document.getElementById("bong-current-sum").textContent = sums[stop_el].toLocaleString("ru-RU");
+    if (sums[stop_el]=="BONG")
+        {
+            document.getElementById("bong-current-sum").textContent = "ГОНГ";
+            stop_current_sound();
+            playAudio("tpv-bong-sound.ogg",false);
+            document.getElementById("bong-current-sum").classList.add("bong");
+            return;
+        }
+}
+function result_sum_for_player()
+{
+    playAudio("tpv-result.ogg",false);
+    socket.emit("add_result_player",{sum_player:parseInt(document.getElementById("control-current-money").value),name_player:document.getElementById("display-current-player").textContent})
 }
