@@ -23,9 +23,13 @@
   --muted:#91a8b0;
 }
 
+
+
 html,body{margin:0;min-height:100%;background:#000;color:var(--text)}
 body{
-  font-family:Montserrat,Arial,sans-serif;
+    font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
   background:
     radial-gradient(circle at 80% 10%,rgba(0,119,139,.18),transparent 28%),
     linear-gradient(145deg,#020405,#061118 56%,#020405);

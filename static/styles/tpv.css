@@ -125,6 +125,11 @@ body{
   color:#19072c;
   box-shadow:0 0 0 2px rgba(156,92,255,.16), 0 0 25px rgba(1, 32, 134, 0.993);
 }
+.action-editor{
+  background:linear-gradient(180deg,rgba(209, 10, 60, 0.801),rgba(126, 3, 50, 0.993));
+  color:#e0e0e0;
+  box-shadow:0 0 0 2px rgba(209, 10, 60, 0.801), 0 0 25px rgba(126, 3, 50, 0.993);
+}
 .action-btn:hover{
   transform:translateY(-1px) scale(1.01);
   filter:brightness(1.04);

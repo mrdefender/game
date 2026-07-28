@@ -41,6 +41,10 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="submit" class="action-btn action-spec" value="Режим зрителя" disabled>
                 </form>
+                <form action="/tpv_editor" method="post" class="select_game">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="submit" class="action-btn action-editor" value="Режим редактора" disabled>
+                </form>
             </section>
         </section>
     </main>

@@ -150,7 +150,7 @@ function init_game(){
     document.getElementById("question-comment").textContent = "";
     stop_bong_game_now = false;
     sum_results = 0;
-    
+    update_data();
 
 }
 
@@ -223,6 +223,11 @@ function calc_round(){
         document.getElementById("money-round-3").classList.remove("passed");
         document.getElementById("money-round-4").classList.remove("passed");
         document.getElementById("money-round-5").classList.remove("passed");
+        document.getElementById("money-round-1").classList.add("is-active");
+        document.getElementById("money-round-2").classList.remove("is-active");
+        document.getElementById("money-round-3").classList.remove("is-active");
+        document.getElementById("money-round-4").classList.remove("is-active");
+        document.getElementById("money-round-5").classList.remove("is-active");
 
     }
     if (document.getElementById("display-round").value == 2)
@@ -237,6 +242,11 @@ function calc_round(){
         document.getElementById("money-round-3").classList.remove("passed");
         document.getElementById("money-round-4").classList.remove("passed");
         document.getElementById("money-round-5").classList.remove("passed");
+        document.getElementById("money-round-1").classList.remove("is-active");
+        document.getElementById("money-round-2").classList.add("is-active");
+        document.getElementById("money-round-3").classList.remove("is-active");
+        document.getElementById("money-round-4").classList.remove("is-active");
+        document.getElementById("money-round-5").classList.remove("is-active");
     }
     if (document.getElementById("display-round").value == 3)
     {
@@ -250,6 +260,11 @@ function calc_round(){
         document.getElementById("money-round-3").classList.remove("passed");
         document.getElementById("money-round-4").classList.remove("passed");
         document.getElementById("money-round-5").classList.remove("passed");
+        document.getElementById("money-round-1").classList.remove("is-active");
+        document.getElementById("money-round-2").classList.remove("is-active");
+        document.getElementById("money-round-3").classList.add("is-active");
+        document.getElementById("money-round-4").classList.remove("is-active");
+        document.getElementById("money-round-5").classList.remove("is-active");
     }
     if (document.getElementById("display-round").value == 4)
     {
@@ -263,6 +278,11 @@ function calc_round(){
         document.getElementById("money-round-3").classList.add("passed");
         document.getElementById("money-round-4").classList.remove("passed");
         document.getElementById("money-round-5").classList.remove("passed");
+        document.getElementById("money-round-1").classList.remove("is-active");
+        document.getElementById("money-round-2").classList.remove("is-active");
+        document.getElementById("money-round-3").classList.remove("is-active");
+        document.getElementById("money-round-4").classList.add("is-active");
+        document.getElementById("money-round-5").classList.remove("is-active");
     }
     if (document.getElementById("display-round").value == 5)
     {
@@ -277,6 +297,11 @@ function calc_round(){
         document.getElementById("money-round-4").classList.add("passed");
         document.getElementById("money-round-5").classList.remove("passed");
         document.getElementById("action-answer-pass").disabled = true;
+        document.getElementById("money-round-1").classList.remove("is-active");
+        document.getElementById("money-round-2").classList.remove("is-active");
+        document.getElementById("money-round-3").classList.remove("is-active");
+        document.getElementById("money-round-4").classList.remove("is-active");
+        document.getElementById("money-round-5").classList.add("is-active");
     }
 
 
@@ -515,7 +540,8 @@ function open_room(){
         document.getElementById("room").value = data;
         document.getElementById("open_room").disabled = true;
         document.getElementById("close_room").disabled = false;
-        document.getElementById("display-room-code").textContent = data
+        document.getElementById("display-room-code").textContent = data;
+        playAudio("tpv-show-code.ogg",false);
     
         //document.getElementById('au').textContent = "В игру вступает " + data;
     //document.getElementById('au').innerText = "В игру вступает " + data;
@@ -692,7 +718,8 @@ function start_round(){
     stop_current_sound()
     playAudio("tpv-r"+document.getElementById("control-round").value.toString()+".ogg",false)
     stop_timer = false;
-    socket.emit("take_question",{flips:"false"})
+    name_player = document.getElementById("display-current-player").textContent;
+    socket.emit("take_question",{flips:"false",player:name_player})
     setTimeout(() => {timer_circle_start();}, 1500);
 }
 
@@ -811,7 +838,8 @@ function correct(){
         }
         
     }
-    setTimeout(() => {socket.emit("take_question",{flips:"false"});}, 2100);
+    name_player = document.getElementById("display-current-player").textContent;
+    setTimeout(() => {socket.emit("take_question",{flips:"false",player:name_player});}, 2100);
 
 }
 
@@ -869,15 +897,17 @@ function pass(){
         document.getElementById("action-answer-pass").disabled = true;
     }
     update_data();
-    setTimeout(() => {socket.emit("take_question",{flips:"false"});}, 2100);
+    name_player = document.getElementById("display-current-player").textContent;
+    setTimeout(() => {socket.emit("take_question",{flips:"false",player:name_player});}, 2100);
 }
 
 function flip(){
     col = parseInt(document.getElementById("control-flips-count").value)
     if (col==0)
         return;
+    name_player = document.getElementById("display-current-player").textContent;
     setTimeout(() => {playAudio("tpv-flip.ogg",false);}, 3000);
-    setTimeout(() => {socket.emit("take_question",{flips:document.getElementById("display-current-flip").textContent});}, 3000);
+    setTimeout(() => {socket.emit("take_question",{flips:document.getElementById("display-current-flip").textContent,player:name_player});}, 3000);
     
     document.getElementById("control-flips-count").value = Number(parseInt(document.getElementById("control-flips-count").value)) - 1;
     update_data();
@@ -892,6 +922,7 @@ function flip(){
 function start_bong_game(){
     if (parseInt(document.getElementById("control-current-money").value)==0)
         return;
+    stop_current_sound();
     playAudio("tpv-bong-bg.ogg",true);
     document.getElementById("action-bong-option-1").disabled = false;
     document.getElementById("action-bong-option-2").disabled = false;

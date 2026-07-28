@@ -11,6 +11,7 @@
 {% endif %}
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-host.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/brand-theme.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
@@ -87,7 +88,7 @@
           </div>
 
           <div class="money-tree" id="money-tree">
-            <button id="money-round-1" class="money-row is-active" type="button" data-round="1" data-value="10000">
+            <button id="money-round-1" class="money-row" type="button" data-round="1" data-value="10000">
               <span>1</span><strong>10 000</strong>
             </button>
             <button id="money-round-2" class="money-row" type="button" data-round="2" data-value="25000">

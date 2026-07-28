@@ -2552,7 +2552,7 @@ def generate_sum_for_bong_game(data):
 @socketio.on("take_question")
 def take_question(data):
     if data["flips"]=="false":
-        js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip=="false", Questions_tpv.show=="false").order_by(func.random()).limit(1))
+        js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip=="false", Questions_tpv.author!=data['player'], Questions_tpv.show=="false").order_by(func.random()).limit(1))
         if js == None:
             socketio.emit("question_selected","fail",to=f"{DEFAULT_ROOM_CODE}:host")
             return
@@ -2565,7 +2565,7 @@ def take_question(data):
         #db.session.commit()
         socketio.emit("question_selected",result,to=f"{DEFAULT_ROOM_CODE}:host")
     if data["flips"]!="false":
-        js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip==data["flips"], Questions_tpv.show=="false").order_by(func.random()).limit(1))
+        js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip==data["flips"], Questions_tpv.author!=data['player'], Questions_tpv.show=="false").order_by(func.random()).limit(1))
         if js == None:
             socketio.emit("question_selected","fail",to=f"{DEFAULT_ROOM_CODE}:host")
             return
@@ -2600,6 +2600,8 @@ def add_result_player(data):
     #js = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==data["name_player"]))
    # js.money = js.money + data["sum_player"]
     js1 = db.session.scalar(db.select(QueryTpv).where(QueryTpv.username==data["name_player"]))
+    if js1 == None:
+        return;
     js1.money = js1.money + data["sum_player"]
     #js1.status = "ended"
     db.session.commit() 
