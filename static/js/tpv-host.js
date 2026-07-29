@@ -105,30 +105,46 @@ function getAudio(name) {
     }
     return audioCache[name];
 }
-function playAudio(name, loop) {
+function playAudio(name, loop = false) {
+    const audio = getAudio(name);
 
-    var a = getAudio(name);
-    a.loop = loop;
-    a.currentTime = 0;
+    audio.loop = Boolean(loop);
 
-    var p = a.play();
-    if (p && typeof p.catch === 'function') {
-        p.catch(err => console.log("audio play blocked:", err));
+    /*
+     * При повторном запуске одного файла сначала останавливаем
+     * его текущее воспроизведение.
+     */
+    audio.pause();
+    audio.currentTime = 0;
+
+    /*
+     * Не добавляем один объект Audio в массив несколько раз.
+     */
+    if (!currentAudio.includes(audio)) {
+        currentAudio.push(audio);
     }
 
-    currentAudio.push(a);
+    const playPromise = audio.play();
+
+    if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(error => {
+            console.log(`Не удалось запустить ${name}:`, error);
+        });
+    }
 }
 function stop_current_sound() {
-    if (currentAudio.length==0) return;
-   for (var i =0; i<currentAudio.length; i++)
-   {
-    currentAudio[i].pause();
-    currentAudio[i].currentTime = 0;
-    currentAudio[i].loop = false;
-   }
-    currentAudio = [];
-}
+    for (const audio of currentAudio) {
+        try {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.loop = false;
+        } catch (error) {
+            console.warn("Не удалось остановить звук:", error);
+        }
+    }
 
+    currentAudio.length = 0;
+}
 function init_game(){
     stopRoundTimer();
     document.getElementById("control-timer-seconds").value=240;
@@ -950,6 +966,7 @@ function advanceRoundAfterSuccess(completedRound) {
     /*
      * Музыка завершения раунда.
      */
+    stop_current_sound();
     playAudio(`tpv-e${currentRound}.ogg`, false);
 
     /*
