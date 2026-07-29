@@ -10,6 +10,9 @@ var safe_bong = null;
 var select_bong_game = null;
 var stop_bong_game_now = false;
 var sum_results = 0;
+var bongPlayerName = "";
+var bongLastPresentedValue = 0;
+var bongRunFinished = false;
 
 const tpvGame = window.TPVGame || null;
 
@@ -1141,123 +1144,253 @@ function flip(){
 }
 
 
-function start_bong_game(){
-    if (parseInt(document.getElementById("control-current-money").value)==0)
+function getCurrentBongPlayer() {
+    return document.getElementById("display-current-player").textContent.trim();
+}
+
+function emitBongToPlayer(eventName, payload = {}) {
+    const player = bongPlayerName || getCurrentBongPlayer();
+    if (!player || player === "--") return;
+
+    socket.emit(eventName, {
+        player: player,
+        ...payload
+    });
+}
+
+function resetBongSelection() {
+    for (let option = 1; option <= 3; option += 1) {
+        document
+            .getElementById(`bong-variable-${option}`)
+            ?.classList.remove("bong-option-select");
+    }
+}
+
+function start_bong_game() {
+    const currentMoney = Number(
+        document.getElementById("control-current-money").value
+    ) || 0;
+
+    bongPlayerName = getCurrentBongPlayer();
+
+    if (currentMoney <= 0 || !bongPlayerName || bongPlayerName === "--") {
         return;
+    }
+
     stop_current_sound();
-    playAudio("tpv-bong-bg.ogg",true);
+    playAudio("tpv-bong-bg.ogg", true);
+
+    stop_bong_game_now = false;
+    bongRunFinished = false;
+    bongLastPresentedValue = 0;
+    sum_results = 0;
+    stop_el = null;
+    sums = [];
+
+    resetBongSelection();
+    document.getElementById("bong-current-sum").textContent =
+        currentMoney.toLocaleString("ru-RU");
+    document.getElementById("bong-current-sum").classList.remove("bong");
+
     document.getElementById("action-bong-option-1").disabled = false;
     document.getElementById("action-bong-option-2").disabled = false;
     document.getElementById("action-bong-option-3").disabled = false;
-    socket.emit("generate_safe_bong_game")
-    sum_bong_game = parseInt(document.getElementById("control-current-money").value);
-    document.getElementById("bong-current-sum").textContent = Number(sum_bong_game).toLocaleString("ru-RU");
-    
-}
+    document.getElementById("action-bong-stop").disabled = true;
 
+    sum_bong_game = currentMoney;
+
+    const bongAuthor = document.getElementById("bong-question-author")?.textContent
+        || document.getElementById("question-author")?.textContent
+        || "— Автор вопроса —";
+
+    emitBongToPlayer("tpv_bong_prepare", {
+        currentMoney: currentMoney,
+        author: bongAuthor
+    });
+
+    socket.emit("generate_safe_bong_game");
+}
 
 socket.on("bong_game_safe_var", (data) => {
-    safe_bong = data;
-    console.log("safe bong game: " + data);
-}
+    safe_bong = Number(data);
+    console.log("safe bong game:", safe_bong);
+});
 
-)
+function selectBongVariant(option) {
+    if (bongRunFinished) return;
 
+    select_bong_game = Number(option);
+    stop_bong_game_now = false;
+    bongLastPresentedValue = 0;
 
-function bong_game_start_var_1(){
     stop_current_sound();
-    playAudio("tpv-bong-select.ogg",false);
-    document.getElementById("bong-variable-1").classList.add("bong-option-select");
-    document.getElementById("bong-current-sum").textContent = 0;
+    playAudio("tpv-bong-select.ogg", false);
+
+    resetBongSelection();
+    document
+        .getElementById(`bong-variable-${select_bong_game}`)
+        ?.classList.add("bong-option-select");
+
+    document.getElementById("bong-current-sum").textContent = "0";
+    document.getElementById("action-bong-option-1").disabled = true;
+    document.getElementById("action-bong-option-2").disabled = true;
+    document.getElementById("action-bong-option-3").disabled = true;
     document.getElementById("action-bong-stop").disabled = false;
-    select_bong_game = 1;
-    start_bong_game_selected();
 
+    emitBongToPlayer("tpv_bong_selected", {
+        option: select_bong_game,
+        author: document.getElementById("bong-question-author")?.textContent
+            || document.getElementById("question-author")?.textContent
+            || "— Автор вопроса —"
+    });
+
+    socket.emit("generate_sum_for_bong_game", {
+        sum: sum_bong_game
+    });
 }
 
-
-function bong_game_start_var_2(){
-    stop_current_sound();
-    playAudio("tpv-bong-select.ogg",false);
-    document.getElementById("bong-variable-2").classList.add("bong-option-select");
-    document.getElementById("bong-current-sum").textContent = 0;
-     document.getElementById("action-bong-stop").disabled = false;
-    select_bong_game = 2;
-    start_bong_game_selected();
-
+function bong_game_start_var_1() {
+    selectBongVariant(1);
 }
 
-function bong_game_start_var_3(){
-    stop_current_sound();
-    playAudio("tpv-bong-select.ogg",false);
-    document.getElementById("bong-variable-3").classList.add("bong-option-select");
-    document.getElementById("bong-current-sum").textContent = 0;
-     document.getElementById("action-bong-stop").disabled = false;
-    select_bong_game = 3;
-    start_bong_game_selected();
-
+function bong_game_start_var_2() {
+    selectBongVariant(2);
 }
 
-function start_bong_game_selected(){
-    socket.emit("generate_sum_for_bong_game",{sum:sum_bong_game});
+function bong_game_start_var_3() {
+    selectBongVariant(3);
 }
 
-sums = []
+let sums = [];
 var stop_el = null;
 
-socket.on("sum_generated", async(data) => {
-    sums = data;
-    if (select_bong_game!=safe_bong)
-        sums[sums.length-1] = "BONG";
-    console.log(sums);
-    setTimeout(() => {playAudio("tpv-bong-start.ogg",false);}, 3000);
-     await delay(9000);
-    for (var i=0;i<sums.length;i++)
-    {
-        if (stop_bong_game_now)
-        {
-            sum_results = 0;
-            stop_current_sound();
-            //playAudio("tpv-bong-stop.ogg",false);
-            sum_results = sums[i-1];
-            stop_el = i-1;
-            document.getElementById("action-bong-author-win").disabled = false;
-             document.getElementById("action-bong-next-sum").disabled = false;
-            document.getElementById("bong-current-sum").textContent = sum_results.toLocaleString("ru-RU");
-            return;
-        }
-        if (sums[i]=="BONG")
-        {
-            document.getElementById("bong-current-sum").textContent = "ГОНГ";
-            stop_current_sound();
-            playAudio("tpv-bong-sound.ogg",false);
-            document.getElementById("bong-current-sum").classList.add("bong");
-            document.getElementById("action-bong-author-win").disabled = false;
-            return;
-        }
-        document.getElementById("bong-current-sum").textContent = sums[i].toLocaleString("ru-RU");
-        await NumberVoice.speak(sums[i],{includeCurrency: true});
-         await delay(1400);
-    }
-    stop_current_sound();
-    playAudio("tpv-bong-winner.ogg",false);
-    sum_results = sums[sums.length-1];
+function finishBongRun(result) {
+    if (bongRunFinished) return;
+    bongRunFinished = true;
+
+    document.getElementById("action-bong-stop").disabled = true;
     document.getElementById("action-bong-author-win").disabled = false;
 
+    if (result.status === "stopped") {
+        document.getElementById("action-bong-next-sum").disabled = false;
+    }
+
+    emitBongToPlayer("tpv_bong_result", result);
 }
 
-)
+socket.on("sum_generated", async (data) => {
+    sums = Array.isArray(data) ? [...data] : [];
+
+    if (select_bong_game !== safe_bong && sums.length > 0) {
+        sums[sums.length - 1] = "BONG";
+    }
+
+    console.log("bong sums:", sums);
+
+    setTimeout(() => {
+        if (!bongRunFinished) {
+            playAudio("tpv-bong-start.ogg", false);
+        }
+    }, 3000);
+
+    await delay(9000);
+
+    for (let index = 0; index < sums.length; index += 1) {
+        if (stop_bong_game_now) {
+            stop_current_sound();
+
+            sum_results = Number(bongLastPresentedValue) || 0;
+            stop_el = Math.max(0, index - 1);
+
+            document.getElementById("bong-current-sum").textContent =
+                sum_results.toLocaleString("ru-RU");
+
+            finishBongRun({
+                status: "stopped",
+                value: sum_results,
+                option: select_bong_game
+            });
+            return;
+        }
+
+        const value = sums[index];
+
+        if (value === "BONG") {
+            document.getElementById("bong-current-sum").textContent = "ГОНГ";
+            document.getElementById("bong-current-sum").classList.add("bong");
+
+            stop_current_sound();
+            playAudio("tpv-bong-sound.ogg", false);
+
+            emitBongToPlayer("tpv_bong_value", {
+                value: "BONG"
+            });
+
+            finishBongRun({
+                status: "bong",
+                value: "BONG",
+                option: select_bong_game
+            });
+            return;
+        }
+
+        bongLastPresentedValue = Number(value) || 0;
+        document.getElementById("bong-current-sum").textContent =
+            bongLastPresentedValue.toLocaleString("ru-RU");
+
+        emitBongToPlayer("tpv_bong_value", {
+            value: bongLastPresentedValue
+        });
+
+        await NumberVoice.speak(bongLastPresentedValue, {
+            includeCurrency: true
+        });
+        await delay(1400);
+    }
+
+    stop_current_sound();
+    playAudio("tpv-bong-winner.ogg", false);
+
+    sum_results = Number(bongLastPresentedValue) || 0;
+
+    finishBongRun({
+        status: "winner",
+        value: sum_results,
+        option: select_bong_game
+    });
+});
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function requestBongStop(source = "host") {
+    if (bongRunFinished || stop_bong_game_now) return;
 
-function stop_bong_game(){
-    stop_current_sound();
-    playAudio("tpv-bong-stop.ogg",false);
     stop_bong_game_now = true;
+    document.getElementById("action-bong-stop").disabled = true;
+
+    stop_current_sound();
+    playAudio("tpv-bong-stop.ogg", false);
+
+    emitBongToPlayer("tpv_bong_stop_ack", {
+        source: source
+    });
 }
+
+function stop_bong_game() {
+    requestBongStop("host");
+}
+
+socket.on("tpv_bong_stop_requested", (data) => {
+    const requestedPlayer = String(data?.player || "").trim();
+    const activePlayer = String(bongPlayerName || "").trim();
+    console.log(requestedPlayer);
+    console.log(activePlayer);
+
+    if (requestedPlayer && activePlayer && requestedPlayer !== activePlayer) return;
+    requestBongStop("player");
+});
 
 function sum_for_author(){
     if (document.getElementById("bong-current-sum").textContent == "ГОНГ")
@@ -1279,20 +1412,28 @@ function sum_for_author(){
     update_data();
 }
 
-function next_sum()
-{
-    if (stop_el==sums.length)
+function next_sum() {
+    if (!Array.isArray(sums) || stop_el === null) return;
+    if (stop_el >= sums.length - 1) return;
+
+    stop_el += 1;
+    const value = sums[stop_el];
+
+    if (value === "BONG") {
+        document.getElementById("bong-current-sum").textContent = "ГОНГ";
+        document.getElementById("bong-current-sum").classList.add("bong");
+        stop_current_sound();
+        playAudio("tpv-bong-sound.ogg", false);
+
+        emitBongToPlayer("tpv_bong_value", {value: "BONG"});
         return;
-    stop_el=stop_el+1
-    document.getElementById("bong-current-sum").textContent = sums[stop_el].toLocaleString("ru-RU");
-    if (sums[stop_el]=="BONG")
-        {
-            document.getElementById("bong-current-sum").textContent = "ГОНГ";
-            stop_current_sound();
-            playAudio("tpv-bong-sound.ogg",false);
-            document.getElementById("bong-current-sum").classList.add("bong");
-            return;
-        }
+    }
+
+    sum_results = Number(value) || 0;
+    document.getElementById("bong-current-sum").textContent =
+        sum_results.toLocaleString("ru-RU");
+
+    emitBongToPlayer("tpv_bong_value", {value: sum_results});
 }
 function result_sum_for_player()
 {

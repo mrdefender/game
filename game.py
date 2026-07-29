@@ -2546,6 +2546,66 @@ def reset_to_wait_tpv():
     except:
         return json.dump("fail")
 
+def _emit_tpv_bong_to_player(event_name, data):
+    """Пересылает событие bong-game выбранному TPV-игроку."""
+    player = str((data or {}).get("player") or "").strip()
+    if not player:
+        return
+
+    payload = dict(data or {})
+    payload.pop("player", None)
+
+    socketio.emit(
+        f"{event_name}_user",
+        payload,
+        to=f"{get_room_code()}:user:{player}",
+    )
+
+
+@socketio.on("tpv_bong_prepare")
+def tpv_bong_prepare(data):
+    _emit_tpv_bong_to_player("tpv_bong_prepare", data)
+
+
+@socketio.on("tpv_bong_selected")
+def tpv_bong_selected(data):
+    _emit_tpv_bong_to_player("tpv_bong_selected", data)
+
+
+@socketio.on("tpv_bong_value")
+def tpv_bong_value(data):
+    _emit_tpv_bong_to_player("tpv_bong_value", data)
+
+
+@socketio.on("tpv_bong_stop_ack")
+def tpv_bong_stop_ack(data):
+    _emit_tpv_bong_to_player("tpv_bong_stop_ack", data)
+
+
+@socketio.on("tpv_bong_result")
+def tpv_bong_result(data):
+    _emit_tpv_bong_to_player("tpv_bong_result", data)
+
+
+@socketio.on("tpv_bong_hide")
+def tpv_bong_hide(data):
+    _emit_tpv_bong_to_player("tpv_bong_hide", data)
+
+
+@socketio.on("tpv_bong_stop_request")
+def tpv_bong_stop_request(data):
+    """Игрок нажал STOP. Решение и итог остаются на стороне ведущего."""
+    player = str((data or {}).get("player") or "").strip()
+    if not player:
+        return
+
+    socketio.emit(
+        "tpv_bong_stop_requested",
+        {"player": player},
+        to=f"{DEFAULT_ROOM_CODE}:host",
+    )
+
+
 @socketio.on("generate_safe_bong_game")
 def generate_safe_bong_game():
     secure_rnd = secrets.SystemRandom()

@@ -9,6 +9,8 @@ var previousGameRound = null;
 
 const tpvGame = window.TPVGame || null;
 let replacementQuestionPending = false;
+let bongGameActive = false;
+let bongStopRequested = false;
 
 function normalizeIncomingState(data) {
     if (tpvGame) return tpvGame.setState(data, false);
@@ -485,6 +487,8 @@ function init_game_player(){
     document.getElementById("money-tree").hidden = true;
     document.getElementById("section-question").hidden = true;
     document.getElementById("section-bong-game").hidden = true;
+    const bongStopButton = document.getElementById("action-bong-stop");
+    if (bongStopButton) bongStopButton.disabled = true;
     stop_bong_game_now = false;
     sum_results = 0;
     document.getElementById("welcome3").textContent = "Вы находитесь в комнате ожидания. Дождитесь, когда компьютер выберет именно Вас!";
@@ -706,3 +710,225 @@ socket.on("tpv_flip_user", async(payload) => {
     setQuestionMarker("replacement", data.questionNumber);
     await TPVAnimation.useFlip(4 - parseInt(document.getElementById("control-flips-count").value));
 });
+
+/* =========================================================
+ * BONG-GAME: ведущий управляет игрой, игрок может только STOP
+ * ========================================================= */
+
+function getBongStopButton() {
+    return document.getElementById("action-bong-stop");
+}
+
+function bindBongStopButton() {
+    const stopButton = getBongStopButton();
+    if (!stopButton || stopButton.dataset.bongStopBound === "true") return;
+
+    stopButton.dataset.bongStopBound = "true";
+    stopButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        stop_bong_game_user();
+    });
+}
+
+// Оставляем функцию доступной и для onclick в HTML.
+window.stop_bong_game_user = stop_bong_game_user;
+
+function resetUserBongView() {
+    bongGameActive = false;
+    bongStopRequested = false;
+
+    document.getElementById("section-bong-game")?.setAttribute("hidden", "");
+    document.getElementById("bong-current-sum")?.classList.remove("bong");
+    const bongSum = document.getElementById("bong-current-sum");
+    if (bongSum) {
+        bongSum.style.color = "";
+        bongSum.style.textShadow = "";
+    }
+
+    const sum = document.getElementById("bong-current-sum");
+    if (sum) sum.textContent = "0";
+
+    for (let option = 1; option <= 3; option += 1) {
+        document
+            .getElementById(`bong-variable-${option}`)
+            ?.classList.remove("bong-option-select", "is-selected");
+    }
+
+    const stopButton = getBongStopButton();
+    if (stopButton) stopButton.disabled = true;
+}
+
+function stop_bong_game_user() {
+    if (!bongGameActive || bongStopRequested) return;
+
+    bongStopRequested = true;
+
+    const stopButton = getBongStopButton();
+    if (stopButton) stopButton.disabled = true;
+
+    socket.emit("tpv_bong_stop_request", {
+        player: document.getElementById("user_name")?.value || ""
+    });
+}
+
+socket.on("tpv_bong_prepare_user", async (data) => {
+    bongGameActive = true;
+    bongStopRequested = false;
+
+    const section = document.getElementById("section-bong-game");
+    if (section) section.hidden = false;
+
+    for (let option = 1; option <= 3; option += 1) {
+        document
+            .getElementById(`bong-variable-${option}`)
+            ?.classList.remove("bong-option-select", "is-selected");
+    }
+
+    const currentSum = document.getElementById("bong-current-sum");
+    if (currentSum) {
+        currentSum.classList.remove("bong");
+        currentSum.textContent = Number(data?.currentMoney || 0)
+            .toLocaleString("ru-RU");
+    }
+
+    const status = document.getElementById("bong-game-status");
+    if (status) status.textContent = "Ведущий выбирает вариант";
+
+    const author = document.getElementById("bong-question-author");
+    if (author) {
+        author.textContent = data?.author || "— Автор вопроса —";
+    }
+
+    const stopButton = getBongStopButton();
+    if (stopButton) stopButton.disabled = true;
+
+    if (window.TPVAnimation?.showBong) {
+        await window.TPVAnimation.showBong();
+    }
+});
+
+socket.on("tpv_bong_selected_user", (data) => {
+    const selectedOption = Number(data?.option) || 0;
+
+    for (let option = 1; option <= 3; option += 1) {
+        const optionElement = document.getElementById(`bong-variable-${option}`);
+        if (!optionElement) continue;
+
+        const isSelected = option === selectedOption;
+        optionElement.classList.toggle("bong-option-select", isSelected);
+        optionElement.classList.toggle("is-selected", isSelected);
+        optionElement.setAttribute("aria-pressed", String(isSelected));
+        optionElement.style.outline = isSelected ? "3px solid #ffd34d" : "";
+        optionElement.style.boxShadow = isSelected
+            ? "0 0 22px rgba(255, 211, 77, 0.95)"
+            : "";
+    }
+
+    const currentSum = document.getElementById("bong-current-sum");
+    if (currentSum) {
+        currentSum.classList.remove("bong");
+        currentSum.textContent = "0";
+    }
+
+    const status = document.getElementById("bong-game-status");
+    if (status) status.textContent = `Выбран вариант ${selectedOption}`;
+
+    const author = document.getElementById("bong-question-author");
+    if (author && data?.author) author.textContent = data.author;
+
+    bongGameActive = true;
+    bongStopRequested = false;
+
+    const stopButton = getBongStopButton();
+    if (stopButton) stopButton.disabled = false;
+});
+
+socket.on("tpv_bong_value_user", (data) => {
+    const currentSum = document.getElementById("bong-current-sum");
+    if (!currentSum) return;
+
+    if (data?.value === "BONG") {
+        currentSum.textContent = "ГОНГ";
+        currentSum.classList.add("bong");
+        currentSum.style.color = "#ff2b2b";
+        currentSum.style.textShadow = "0 0 12px rgba(255, 43, 43, 0.95)";
+        return;
+    }
+
+    currentSum.classList.remove("bong");
+    currentSum.style.color = "";
+    currentSum.style.textShadow = "";
+    currentSum.textContent = Number(data?.value || 0).toLocaleString("ru-RU");
+});
+
+socket.on("tpv_bong_stop_ack_user", () => {
+    bongStopRequested = true;
+
+    const stopButton = getBongStopButton();
+    if (stopButton) stopButton.disabled = true;
+
+    const status = document.getElementById("bong-game-status");
+    if (status) status.textContent = "Остановка принята";
+});
+
+socket.on("tpv_bong_result_user", (data) => {
+    bongGameActive = false;
+    bongStopRequested = true;
+
+    const stopButton = getBongStopButton();
+    if (stopButton) stopButton.disabled = true;
+
+    const currentSum = document.getElementById("bong-current-sum");
+    const status = document.getElementById("bong-game-status");
+
+    if (data?.status === "bong") {
+        if (currentSum) {
+            currentSum.textContent = "ГОНГ";
+            currentSum.classList.add("bong");
+            currentSum.style.color = "#ff2b2b";
+            currentSum.style.textShadow = "0 0 12px rgba(255, 43, 43, 0.95)";
+        }
+        if (status) status.textContent = "ГОНГ";
+        return;
+    }
+
+    const value = Number(data?.value || 0);
+    if (currentSum) {
+        currentSum.classList.remove("bong");
+        currentSum.style.color = "";
+        currentSum.style.textShadow = "";
+        currentSum.textContent = value.toLocaleString("ru-RU");
+    }
+
+    if (status) {
+        status.textContent = data?.status === "winner"
+            ? "Максимальная сумма"
+            : "Игра остановлена";
+    }
+});
+
+socket.on("tpv_bong_hide_user", () => {
+    resetUserBongView();
+});
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+        bindBongStopButton();
+        const stopButton = getBongStopButton();
+        if (stopButton) stopButton.disabled = true;
+    }, {once: true});
+} else {
+    bindBongStopButton();
+    const stopButton = getBongStopButton();
+    if (stopButton) stopButton.disabled = true;
+}
+
+// Запасной делегированный обработчик на случай динамической перерисовки кнопки.
+document.addEventListener("click", (event) => {
+    const button = event.target.closest?.("#action-bong-stop");
+    if (!button || button.dataset.bongStopBound === "true") return;
+    event.preventDefault();
+    stop_bong_game_user();
+});
+
