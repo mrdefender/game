@@ -3,11 +3,36 @@ var currentAudio = [];
 var currentUrl = document.URL;
 var ffffff = currentUrl.split('/tpv_host');//адресная строка пользователя без /host_slot http://ip:5000
 var audioUrl = ffffff[0]+'/sounds/tpv/';
-var stop_timer = false;
+var stop_timer = true;
+var roundTimerId = null;
+var roundTimerStartId = null;
 var safe_bong = null;
 var select_bong_game = null;
 var stop_bong_game_now = false;
 var sum_results = 0;
+
+const tpvGame = window.TPVGame || null;
+
+function readGameStateFromControls(extra = {}) {
+    return {
+        timer: Number(document.getElementById("control-timer-seconds").value) || 0,
+        circle: Number(document.getElementById("control-circle").value) || 1,
+        round: Number(document.getElementById("control-round").value) || 1,
+        bank: Number(document.getElementById("control-bank").value) || 0,
+        currentMoney: Number(document.getElementById("control-current-money").value) || 0,
+        question: Number(document.getElementById("control-question-number").value) || 1,
+        correct: Number(document.getElementById("control-correct-count").value) || 0,
+        flips: Number(document.getElementById("control-flips-count").value) || 0,
+        pass: Number(document.getElementById("control-pass-count").value) || 0,
+        ...extra
+    };
+}
+
+function syncEngineFromControls(extra = {}) {
+    const state = readGameStateFromControls(extra);
+    if (tpvGame) tpvGame.setState(state, false);
+    return state;
+}
 
 function getCsrfToken() {
     return document
@@ -105,6 +130,7 @@ function stop_current_sound() {
 }
 
 function init_game(){
+    stopRoundTimer();
     document.getElementById("control-timer-seconds").value=240;
     document.getElementById("control-circle").value=1;
     document.getElementById("control-round").value=1;
@@ -474,7 +500,7 @@ function calc_correct(){
 function cancel_all()
 {
     init_game();
-    stop_timer = true;
+    stopRoundTimer();
     socket.emit("reset_to_wait_tpv")
 }
 
@@ -713,14 +739,20 @@ function start_round(){
     document.getElementById("action-answer-correct").disabled = false;
     document.getElementById("action-answer-wrong").disabled = false;
     document.getElementById("action-answer-pass").disabled = false;
-    if (document.getElementById("control-round").value==5)
+
+    if (Number(document.getElementById("control-round").value) === 5) {
         document.getElementById("action-answer-pass").disabled = true;
-    stop_current_sound()
-    playAudio("tpv-r"+document.getElementById("control-round").value.toString()+".ogg",false)
-    stop_timer = false;
+    }
+
+    stop_current_sound();
+    playAudio(
+        "tpv-r" + document.getElementById("control-round").value + ".ogg",
+        false
+    );
+
     name_player = document.getElementById("display-current-player").textContent;
-    socket.emit("take_question",{flips:"false",player:name_player})
-    setTimeout(() => {timer_circle_start();}, 1500);
+    socket.emit("take_question", {flips: "false", player: name_player});
+    startRoundTimer(1500);
 }
 
 socket.on("question_selected", (data) => {
@@ -742,18 +774,51 @@ socket.on("question_selected", (data) => {
 }
 )
 
+function stopRoundTimer(){
+    stop_timer = true;
+
+    if (roundTimerStartId !== null) {
+        clearTimeout(roundTimerStartId);
+        roundTimerStartId = null;
+    }
+
+    if (roundTimerId !== null) {
+        clearTimeout(roundTimerId);
+        roundTimerId = null;
+    }
+}
+
+function startRoundTimer(delayMs = 0){
+    stopRoundTimer();
+    stop_timer = false;
+
+    roundTimerStartId = setTimeout(() => {
+        roundTimerStartId = null;
+        timer_circle_start();
+    }, delayMs);
+}
+
 function timer_circle_start(){
-   if (document.getElementById("control-timer-seconds").value == 0)
-   {
+    if (stop_timer) return;
+
+    const timerControl = document.getElementById("control-timer-seconds");
+    const seconds = Math.max(0, Number(timerControl.value) || 0);
+
+    if (seconds <= 0) {
+        stopRoundTimer();
         stop_current_sound();
-        playAudio("tpv-timeout.ogg",false);
+        playAudio("tpv-timeout.ogg", false);
+        update_data();
         return;
-   }
-   if (stop_timer)
-    return;
-   document.getElementById("control-timer-seconds").value = document.getElementById("control-timer-seconds").value-1 ;
-   calc_timer();
-   setTimeout(() => {timer_circle_start();}, 1000);
+    }
+
+    timerControl.value = seconds - 1;
+    calc_timer();
+
+    // Периодически отправляем игроку авторитетное значение таймера.
+    update_data();
+
+    roundTimerId = setTimeout(timer_circle_start, 1000);
 }
 
 function update_data(){
@@ -765,89 +830,212 @@ function update_data(){
     calc_flip();
     calc_pass();
     calc_round();
+
+    const state = syncEngineFromControls();
+    socket.emit("tpv_update_data_user_spec", {state: state});
 }
 
-function correct(){
-    playAudio("tpv-correct.ogg",false);
-    document.getElementById("control-correct-count").value = Number(document.getElementById("control-correct-count").value)+1;
-    if (document.getElementById("control-question-number").value<5)
-        document.getElementById("control-question-number").value = Number(document.getElementById("control-question-number").value)+1;
-    calc_correct();
-    if (document.getElementById("control-correct-count").value==document.getElementById("control-round").value){
-        stop_timer = true;
-        
-        if (document.getElementById("control-round").value==1)
-        {
-            setTimeout(() => {stop_current_sound(); playAudio("tpv-e1.ogg",false);}, 3500);
-            document.getElementById("control-current-money").value = 10000*Number(document.getElementById("control-circle").value);
-            document.getElementById("control-correct-count").value = 0;
-            document.getElementById("control-round").value = 2;
-            document.getElementById("control-pass-count").value = 0;
-            document.getElementById("control-question-number").value = 1;
-            update_data();
-            return;
-        }
-        if (document.getElementById("control-round").value==2)
-        {
-            setTimeout(() => {stop_current_sound();playAudio("tpv-e2.ogg",false);}, 3500);
-            document.getElementById("control-current-money").value = 25000*Number(document.getElementById("control-circle").value);
-            document.getElementById("control-correct-count").value = 0;
-            document.getElementById("control-round").value = 3;
-            document.getElementById("control-pass-count").value = 0;
-            document.getElementById("control-question-number").value = 1;
-            update_data();
-            return;
-        }
-        if (document.getElementById("control-round").value==3)
-        {
-            setTimeout(() => {stop_current_sound();playAudio("tpv-e3.ogg",false);}, 3500);
-            document.getElementById("control-current-money").value = 50000*Number(document.getElementById("control-circle").value);
-            document.getElementById("control-correct-count").value = 0;
-            document.getElementById("control-round").value = 4;
-            document.getElementById("control-pass-count").value = 0;
-            document.getElementById("control-question-number").value = 1;
-            update_data();
-            return;
-        }
-        if (document.getElementById("control-round").value==4)
-        {
-            setTimeout(() => {stop_current_sound();playAudio("tpv-e4.ogg",false);}, 3500);
-            document.getElementById("control-current-money").value = 150000*Number(document.getElementById("control-circle").value);
-            document.getElementById("control-correct-count").value = 0;
-            document.getElementById("control-round").value = 5;
-            document.getElementById("control-pass-count").value = 0;
-            document.getElementById("control-question-number").value = 1;
-            update_data();
-            return;
-        }
+function correct() {
+    const namePlayer =
+        document.getElementById("display-current-player").textContent;
 
-        if (document.getElementById("control-round").value==5)
-        {
-        setTimeout(() => {stop_current_sound();playAudio("tpv-e5.ogg",false);}, 3500);
-        document.getElementById("control-bank").value = parseInt(document.getElementById("control-bank").value)+500000*Number(document.getElementById("control-circle").value);
-        document.getElementById("control-current-money").value = 0;
-        document.getElementById("control-timer-seconds").value = 240;
-        document.getElementById("control-correct-count").value = 0;
-        document.getElementById("control-flips-count").value = 3;
-        document.getElementById("control-pass-count").value = 0;
-        document.getElementById("control-circle").value = Number(document.getElementById("control-circle").value) + 1;
-        document.getElementById("control-round").value = 1;
-        document.getElementById("control-question-number").value = 1;
+    const answer =
+        document.getElementById("question-answer").textContent;
+
+    const answeredQuestion =
+        Number(document.getElementById("control-question-number").value) || 1;
+
+    const currentRound =
+        Number(document.getElementById("control-round").value) || 1;
+
+    playAudio("tpv-correct.ogg", false);
+
+    const correctControl =
+        document.getElementById("control-correct-count");
+
+    correctControl.value =
+        (Number(correctControl.value) || 0) + 1;
+
+    const correctCount = Number(correctControl.value);
+    const roundFinished = correctCount >= currentRound;
+
+    if (!roundFinished && answeredQuestion < 5) {
+        document.getElementById(
+            "control-question-number"
+        ).value = answeredQuestion + 1;
+    }
+
+    // Отправляем состояние текущего ответа.
+    update_data();
+
+    socket.emit("tpv_correct", {
+        answer: answer,
+        player: namePlayer,
+        questionNumber: answeredQuestion,
+        correctCount: correctCount,
+        round: currentRound,
+        roundFinished: roundFinished,
+        phase: "answer"
+    });
+
+    if (roundFinished) {
+        stopRoundTimer();
+        
+
+        setTimeout(() => {
+            advanceRoundAfterSuccess(currentRound);
+        }, 3500);
+
+        return;
+    }
+
+    setTimeout(() => {
+        socket.emit("take_question", {
+            flips: "false",
+            player: namePlayer
+        });
+    }, 2100);
+}
+
+function advanceRoundAfterSuccess(completedRound) {
+    stopRoundTimer();
+
+    const currentRound = Math.max(
+        1,
+        Math.min(5, Number(completedRound) || 1)
+    );
+
+    const circleControl =
+        document.getElementById("control-circle");
+
+    const bankControl =
+        document.getElementById("control-bank");
+
+    const currentMoneyControl =
+        document.getElementById("control-current-money");
+
+    const roundControl =
+        document.getElementById("control-round");
+
+    const questionControl =
+        document.getElementById("control-question-number");
+
+    const correctControl =
+        document.getElementById("control-correct-count");
+
+    const passControl =
+        document.getElementById("control-pass-count");
+
+    const circle = Math.max(
+        1,
+        Number(circleControl.value) || 1
+    );
+
+    const roundMoney = {
+        1: 10000,
+        2: 25000,
+        3: 50000,
+        4: 150000,
+        5: 500000
+    };
+
+    const completedRoundMoney =
+        (roundMoney[currentRound] || 0) * circle;
+
+    /*
+     * Сумма за завершённый раунд.
+     */
+    currentMoneyControl.value = completedRoundMoney;
+
+    /*
+     * Музыка завершения раунда.
+     */
+    playAudio(`tpv-e${currentRound}.ogg`, false);
+
+    /*
+     * Завершён пятый раунд — завершаем круг.
+     */
+    if (currentRound === 5) {
+        const currentBank =
+            Number(bankControl.value) || 0;
+
+        /*
+         * Переносим текущую сумму в банк.
+         */
+        const moneyToBank =
+    Number(currentMoneyControl.value) || completedRoundMoney;
+
+        bankControl.value = currentBank + moneyToBank;
+
+        /*
+         * Текущая сумма после переноса обнуляется.
+         */
+        currentMoneyControl.value = 0;
+
+        /*
+         * Начинается новый круг.
+         */
+        circleControl.value = circle + 1;
+
+        /*
+         * Новый круг начинается с первого раунда.
+         */
+        roundControl.value = 1;
+        questionControl.value = 1;
+        correctControl.value = 0;
+        passControl.value = 0;
+
+        /*
+         * Перерисовываем все изменённые значения.
+         */
+        calc_bank();
+        calc_current_money();
+        calc_circle();
+        calc_correct();
+        calc_pass();
+        calc_round();
+
+        /*
+         * Отправляем игроку и зрителю полностью обновлённое
+         * состояние нового круга.
+         */
         update_data();
         return;
-        }
-        
     }
-    name_player = document.getElementById("display-current-player").textContent;
-    setTimeout(() => {socket.emit("take_question",{flips:"false",player:name_player});}, 2100);
 
+    /*
+     * Обычный переход между раундами внутри текущего круга.
+     */
+    roundControl.value = currentRound + 1;
+    questionControl.value = 1;
+    correctControl.value = 0;
+    passControl.value = 0;
+
+    calc_current_money();
+    calc_correct();
+    calc_pass();
+    calc_round();
+
+    update_data();
 }
 
+
 function wrong(){
+    name_player = document.getElementById("display-current-player").textContent;
     if (parseInt(document.getElementById("control-current-money").value)!=0)
         document.getElementById("action-bong-start").disabled = false;
+    const wrongQuestionNumber = Number(document.getElementById("control-question-number").value) || 1;
+    const wrongIndex = (Number(document.getElementById("control-correct-count").value) || 0) + 1;
+    const state = syncEngineFromControls({phase: "wrong", wrong: true, replacement: false});
+    socket.emit("tpv_wrong", {
+        answer: document.getElementById("question-answer").textContent,
+        player: name_player,
+        questionNumber: wrongQuestionNumber,
+        wrongIndex: wrongIndex,
+        state: state
+    });
     stop_current_sound();
-    stop_timer = true;
+    stopRoundTimer();
     playAudio("tpv-wrong.ogg",false);
     if (document.getElementById("control-correct-count").value == 0)
     {
@@ -884,7 +1072,9 @@ function wrong(){
 }
 
 function pass(){
+    name_player = document.getElementById("display-current-player").textContent;
     playAudio("tpv-pass.ogg",false);
+    socket.emit("tpv_pass",{answer:document.getElementById("question-answer").textContent,player:name_player});
     document.getElementById("control-pass-count").value = Number(document.getElementById("control-pass-count").value) + 1;
     console.log(document.getElementById("control-pass-count").value);
     document.getElementById("control-question-number").value = Number(document.getElementById("control-question-number").value)+1;
@@ -897,25 +1087,40 @@ function pass(){
         document.getElementById("action-answer-pass").disabled = true;
     }
     update_data();
-    name_player = document.getElementById("display-current-player").textContent;
+    
     setTimeout(() => {socket.emit("take_question",{flips:"false",player:name_player});}, 2100);
 }
 
 function flip(){
-    col = parseInt(document.getElementById("control-flips-count").value)
-    if (col==0)
-        return;
-    name_player = document.getElementById("display-current-player").textContent;
-    setTimeout(() => {playAudio("tpv-flip.ogg",false);}, 3000);
-    setTimeout(() => {socket.emit("take_question",{flips:document.getElementById("display-current-flip").textContent,player:name_player});}, 3000);
-    
-    document.getElementById("control-flips-count").value = Number(parseInt(document.getElementById("control-flips-count").value)) - 1;
+    const flipsControl = document.getElementById("control-flips-count");
+    const flipsLeft = Number(flipsControl.value) || 0;
+    if (flipsLeft <= 0) return;
+
+    const namePlayer = document.getElementById("display-current-player").textContent;
+    const questionNumber = Number(document.getElementById("control-question-number").value) || 1;
+
+    flipsControl.value = flipsLeft - 1;
+    const state = syncEngineFromControls({phase: "replacement", replacement: true});
+
+    socket.emit("tpv_flip", {
+        answer: document.getElementById("question-answer").textContent,
+        player: namePlayer,
+        questionNumber: questionNumber,
+        state: state
+    });
+
+    setTimeout(() => { playAudio("tpv-flip.ogg", false); }, 3000);
+    setTimeout(() => {
+        socket.emit("take_question", {
+            flips: document.getElementById("display-current-flip").textContent,
+            player: namePlayer,
+            replacement: true,
+            questionNumber: questionNumber
+        });
+    }, 3000);
+
     update_data();
-    
-    if (parseInt(document.getElementById("control-flips-count").value)==0)
-        document.getElementById("action-question-flip").disabled = true;
-    else
-        document.getElementById("action-question-flip").disabled = false;
+    document.getElementById("action-question-flip").disabled = Number(flipsControl.value) <= 0;
 }
 
 
@@ -1077,4 +1282,33 @@ function result_sum_for_player()
     result_money = parseInt(document.getElementById("control-current-money").value) + parseInt(document.getElementById("control-bank").value);
     playAudio("tpv-result.ogg",false);
     socket.emit("add_result_player",{sum_player:result_money,name_player:document.getElementById("display-current-player").textContent})
+}
+
+
+function show_tree()
+{
+    playAudio("tpv-money-tree.ogg",false);
+    update_data();
+    name_player = document.getElementById("display-current-player").textContent;
+    socket.emit("show_tree",{player:name_player});
+}
+
+function hide_tree()
+{
+    name_player = document.getElementById("display-current-player").textContent;
+    socket.emit("hide_tree",{player:name_player});
+}
+
+function show_stats()
+{
+    playAudio("tpv-stats.ogg",false);
+    name_player = document.getElementById("display-current-player").textContent;
+    update_data();
+    socket.emit("show_stats",{player:name_player});
+}
+
+function hide_stats()
+{
+    name_player = document.getElementById("display-current-player").textContent;
+    socket.emit("hide_stats",{player:name_player});
 }

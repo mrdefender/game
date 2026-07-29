@@ -290,10 +290,10 @@
             <section class="action-group">
               <h3>Экран зрителя</h3>
               <div class="action-grid action-grid--4">
-                <button id="action-show-tree" class="game-btn" type="button" data-action="show-tree">Показать дерево</button>
-                <button id="action-hide-tree" class="game-btn" type="button" data-action="hide-tree">Убрать дерево</button>
-                <button id="action-show-stats" class="game-btn" type="button" data-action="show-stats">Показать статистику</button>
-                <button id="action-hide-stats" class="game-btn" type="button" data-action="hide-stats">Убрать статистику</button>
+                <button id="action-show-tree" class="game-btn" type="button" data-action="show-tree" onclick="show_tree()">Показать дерево</button>
+                <button id="action-hide-tree" class="game-btn" type="button" data-action="hide-tree" onclick="hide_tree()">Убрать дерево</button>
+                <button id="action-show-stats" class="game-btn" type="button" data-action="show-stats" onclick="show_stats()">Показать статистику</button>
+                <button id="action-hide-stats" class="game-btn" type="button" data-action="hide-stats" onclick="hide_stats()">Убрать статистику</button>
               </div>
             </section>
 
@@ -429,6 +429,7 @@
   </main>
   <script src="/static/js/socket.io.min.js"></script>
   <script src="/static/js/tpv-host.js"></script>
+  <script src="{{ url_for('static', filename='js/tpv-game-engine.js') }}"></script>
   <script src="/static/js/number_voice.js"></script>
 </body>
 </html>
