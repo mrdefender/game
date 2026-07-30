@@ -60,6 +60,8 @@ csrf = CSRFProtect(app)
 BASE_DIR = Path(__file__).resolve().parent
 BRANDING_FILE = BASE_DIR / "config" / "branding.json"
 
+
+
 with open(
     BASE_DIR / "config" / "branding.json",
     encoding="utf-8"
@@ -283,6 +285,34 @@ def get_room_code():
     return str(room.id) if room is not None else None
 
 
+# ---------------------------------------------------------------------------
+# TPV: централизованная отправка Socket.IO-событий
+# ---------------------------------------------------------------------------
+
+def emit_tpv_host(event, data=None):
+    """Отправляет событие пульту ведущего TPV."""
+    socketio.emit(event, data, to=f"{DEFAULT_ROOM_CODE}:host")
+
+
+def emit_tpv_spectator(event, data=None):
+    """Отправляет событие техническому экрану зрителя TPV."""
+    socketio.emit(event, data, to=f"{DEFAULT_ROOM_CODE}:spectator")
+
+
+def emit_tpv_players(event, data=None):
+    """Отправляет событие всем игрокам текущей игровой комнаты TPV."""
+    room_code = get_room_code()
+    if room_code is not None:
+        socketio.emit(event, data, to=room_code)
+
+
+def emit_tpv_player(username, event, data=None):
+    """Отправляет событие одному конкретному игроку TPV."""
+    room_code = get_room_code()
+    if room_code is not None and username:
+        socketio.emit(event, data, to=f"{room_code}:user:{username}")
+
+
 def init_game():
     db.session.execute(db.delete(Task))
     db.session.execute(db.delete(Answered))
@@ -436,29 +466,52 @@ def slot():
 
 @app.route('/tpv', methods=["POST", "GET"])
 def tpv():
-    if request.method == 'POST':
-        print (url_for('tpv'))
+    # Лаунчер TPV открывается только после POST из общего выбора игр.
+    # Повторный GET разрешён только после успешного входа в TPV-лаунчер.
+    if request.method == "POST":
+        session["tpv_launcher_allowed"] = True
+        session.pop("tpv_role", None)
         return render_template("tpv.html")
+
+    if session.get("tpv_launcher_allowed") is True:
+        return render_template("tpv.html")
+
     abort(403)
-    print (url_for('join'))
-    return render_template("login.html")
 
 
 @app.route('/tpv_host', methods=["POST", "GET"])
 def tpv_host():
-    if request.method == 'POST':
-        print (url_for('tpv_host'))
-        #for i in _users:
-          #  flash (i)
+    # Режим ведущего запускается только кнопкой из tpv.html.
+    if request.method == "POST":
+        if session.get("tpv_launcher_allowed") is not True:
+            return redirect(url_for("tpv"))
+
+        session["tpv_role"] = "host"
         return render_template("tpv-host.html")
-    abort(403)
-    print (url_for('join'))
-    return render_template("login.html")
+
+    # Прямой ввод /tpv_host не открывает пульт.
+    return redirect(url_for("tpv"))
+
+
+@app.route('/tpv_spectator', methods=["POST", "GET"])
+def tpv_spectator():
+    # Экран зрителя запускается только кнопкой из tpv.html.
+    if request.method == "POST":
+        if session.get("tpv_launcher_allowed") is not True:
+            return redirect(url_for("tpv"))
+
+        session["tpv_role"] = "spectator"
+        return render_template("tpv-spectator.html")
+
+    # Прямой ввод /tpv_spectator не открывает экран зрителя.
+    return redirect(url_for("tpv"))
 
 @app.route('/tpv_user', methods=["GET"])
 def tpv_user():
     if request.method == 'GET':
         abort(401)
+
+
 
 
 @app.route('/user_slot', methods=["GET"])
@@ -474,6 +527,8 @@ def spec_slot():
     abort(400)
     print (url_for('join'))
     return render_template("login.html")
+
+
 
 
 @app.route('/host_slot', methods=["POST", "GET"])
@@ -1067,7 +1122,11 @@ def open_room():
             db.session.add(room_code)
             db.session.flush()
             db.session.commit()
-            socketio.emit("room_code_show", {"room":room_code.id}, to=f"{DEFAULT_ROOM_CODE}:spectator")
+            join_url = f"{request.host_url.rstrip('/')}{url_for('join')}?room={room_code.id}"
+            emit_tpv_spectator("room_code_show", {
+                "room": room_code.id,
+                "joinUrl": join_url,
+            })
             return json.dumps(room_code.id)
         except:
             return json.dumps("fail")
@@ -1116,7 +1175,7 @@ def close_room():
     if request.method == 'POST':
         db.session.execute(db.delete(Room))
         db.session.commit()
-        socketio.emit("room_code_hide", {}, to=f"{DEFAULT_ROOM_CODE}:spectator")
+        emit_tpv_spectator("room_code_hide", {})
         return json.dumps("ok")
     else:
         return json.dumps("fail")
@@ -2295,8 +2354,8 @@ def serve_audio_tpv(filename):
     sanitized_filename = secure_filename(filename)
 
     mime_type, _ = mimetypes.guess_type(sanitized_filename)
-    if not mime_type or not mime_type.startswith('audio/'):
-        abort(400, description="Unsupported audio format.")
+    #if not mime_type or not mime_type.startswith('audio/'):
+     #   abort(400, description="Unsupported audio format.")
 
     result = send_from_directory(
         CUSTOM_AUDIO_DIR,
@@ -2432,7 +2491,6 @@ class QueryTpv(db.Model, UserMixin):
 
 
 
-
 @socketio.on("update_users_tpv")
 def update_users_tpv():
         js = db.session.scalars(db.select(QueryTpv)).all()
@@ -2444,7 +2502,7 @@ def update_users_tpv():
             status = js[0].status
             jsn = [id,username,flip,money,status,"true"]
             result = jsn
-            socketio.emit("updated_users_tpv", result, to=f"{DEFAULT_ROOM_CODE}:host")
+            emit_tpv_host("updated_users_tpv", result)
         else:
             jsn = []
             for i in range(0,len(js)):
@@ -2457,7 +2515,7 @@ def update_users_tpv():
                 #socketio.emit("updated_user_tpv",js[i].status,to=f"{get_room_code()}:user:{js[i].username}");
                 jsn.append(tmp)
             result = jsn
-            socketio.emit("updated_users_tpv",result, to=f"{DEFAULT_ROOM_CODE}:host")
+            emit_tpv_host("updated_users_tpv", result)
             return result
 
 @socketio.on("clean_db_tpv")
@@ -2465,7 +2523,37 @@ def clean_db_tpv():
     db.session.execute(db.delete(QueryTpv))
     db.session.commit()
     update_users_tpv()
-    socketio.emit("DB_clean","ok", to=f"{DEFAULT_ROOM_CODE}:host")
+    emit_tpv_host("DB_clean", "ok")
+
+
+@socketio.on("tpv_spectator_ready")
+def tpv_spectator_ready():
+    """Восстанавливает код комнаты после перезагрузки экрана зрителя."""
+    room_code = get_room_code()
+    if room_code is None:
+        emit("room_code_hide", {})
+        return
+
+    join_url = f"{request.host_url.rstrip('/')}{url_for('join')}?room={room_code}"
+    emit("room_code_show", {
+        "room": room_code,
+        "joinUrl": join_url,
+    })
+
+
+@socketio.on("tpv_selection_start")
+def tpv_selection_start():
+    players = db.session.scalars(
+        db.select(QueryTpv).where(QueryTpv.status == "wait")
+    ).all()
+    emit_tpv_spectator("tpv_spectator_select_start", {
+        "players": [player.username for player in players]
+    })
+
+
+@socketio.on("tpv_versus")
+def tpv_versus():
+    emit_tpv_spectator("tpv_versus_spec", {"show": True})
 
 
 @socketio.on("choose_player_random")
@@ -2485,11 +2573,16 @@ def choose_player_random():
             jsn = [id,username,flip,money,status]
             result = jsn
             socketio.emit("player_selected", result, to=f"{get_room_code()}:user:{username}")
-            socketio.emit("player_selected", result, to=f"{DEFAULT_ROOM_CODE}:host")
+            emit_tpv_host("player_selected", result)
+            emit_tpv_spectator("tpv_spectator_player_selected", {
+                "player": username,
+                "topic": flip,
+                "currentMoney": money,
+            })
             update_users_tpv()
         else:
             secure_rnd = secrets.SystemRandom()
-            num = secure_rnd.randint(0,len(js))
+            num = secure_rnd.randrange(len(js))
             js[num].status = "selected"
             db.session.commit()
             id = js[num].id
@@ -2501,7 +2594,12 @@ def choose_player_random():
             result = jsn
             update_users_tpv()
             socketio.emit("player_selected", result, to=f"{get_room_code()}:user:{username}")
-            socketio.emit("player_selected", result, to=f"{DEFAULT_ROOM_CODE}:host")
+            emit_tpv_host("player_selected", result)
+            emit_tpv_spectator("tpv_spectator_player_selected", {
+                "player": username,
+                "topic": flip,
+                "currentMoney": money,
+            })
             update_users_tpv()
     except:
         pass
@@ -2523,7 +2621,12 @@ def choose_player_id(data):
         jsn = [id,username,flip,money,status]
         result = jsn
         socketio.emit("player_selected", result, to=f"{get_room_code()}:user:{username}")
-        socketio.emit("player_selected", result, to=f"{DEFAULT_ROOM_CODE}:host")
+        emit_tpv_host("player_selected", result)
+        emit_tpv_spectator("tpv_spectator_player_selected", {
+                "player": username,
+                "topic": flip,
+                "currentMoney": money,
+            })
         update_users_tpv()
     except:
         pass
@@ -2543,23 +2646,23 @@ def reset_to_wait_tpv():
                     db.session.commit()
                     update_users_tpv()
         socketio.emit("reset", "wait", to=f"{get_room_code()}:user")
+        emit_tpv_spectator("reset", "wait")
     except:
         return json.dump("fail")
 
 def _emit_tpv_bong_to_player(event_name, data):
-    """Пересылает событие bong-game выбранному TPV-игроку."""
-    player = str((data or {}).get("player") or "").strip()
-    if not player:
-        return
-
+    """Пересылает этап гонг-игры выбранному игроку и экрану зрителя."""
     payload = dict(data or {})
-    payload.pop("player", None)
+    player = str(payload.pop("player", "") or "").strip()
 
-    socketio.emit(
-        f"{event_name}_user",
-        payload,
-        to=f"{get_room_code()}:user:{player}",
-    )
+    if player:
+        socketio.emit(
+            f"{event_name}_user",
+            payload,
+            to=f"{get_room_code()}:user:{player}",
+        )
+
+    emit_tpv_spectator(f"{event_name}_spec", payload)
 
 
 @socketio.on("tpv_bong_prepare")
@@ -2624,7 +2727,7 @@ def tpv_bong_stop_request(data):
 def generate_safe_bong_game():
     secure_rnd = secrets.SystemRandom()
     num = secure_rnd.randint(1,3)
-    socketio.emit("bong_game_safe_var",num,to=f"{DEFAULT_ROOM_CODE}:host")
+    emit_tpv_host("bong_game_safe_var", num)
 
 
 @socketio.on("generate_sum_for_bong_game")
@@ -2635,7 +2738,7 @@ def generate_sum_for_bong_game(data):
     result = secure_rnd.sample(range(1,data['sum']),col)
     result.sort()
     result.append(data['sum'])
-    socketio.emit("sum_generated",result,to=f"{DEFAULT_ROOM_CODE}:host")
+    emit_tpv_host("sum_generated", result)
 
 
 @socketio.on("take_question")
@@ -2643,7 +2746,7 @@ def take_question(data):
     if data["flips"]=="false":
         js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip=="false", Questions_tpv.author!=data['player'], Questions_tpv.show=="false").order_by(func.random()).limit(1))
         if js == None:
-            socketio.emit("question_selected","fail",to=f"{DEFAULT_ROOM_CODE}:host")
+            emit_tpv_host("question_selected", "fail")
             return
         question = js.task
         answer = js.answer
@@ -2659,12 +2762,12 @@ def take_question(data):
             "questionNumber": data.get("questionNumber"),
         }
         socketio.emit("question_selected_user", result_user_spec, to=f"{get_room_code()}:user:{data['player']}")
-        socketio.emit("question_selected_spec",result_user_spec,to=f"{DEFAULT_ROOM_CODE}:spectator")
-        socketio.emit("question_selected",result,to=f"{DEFAULT_ROOM_CODE}:host")
+        emit_tpv_spectator("question_selected_spec", result_user_spec)
+        emit_tpv_host("question_selected", result)
     if data["flips"]!="false":
         js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip==data["flips"], Questions_tpv.author!=data['player'], Questions_tpv.show=="false").order_by(func.random()).limit(1))
         if js == None:
-            socketio.emit("question_selected","fail",to=f"{DEFAULT_ROOM_CODE}:host")
+            emit_tpv_host("question_selected", "fail")
             return
         question = js.task
         answer = js.answer
@@ -2675,13 +2778,14 @@ def take_question(data):
             "question": question,
             "author": author,
             "replacement": True,
+            "replacementTopic": data.get("flips"),
             "questionNumber": data.get("questionNumber"),
         }
         #js.show = "true"
         #db.session.commit()
         socketio.emit("question_selected_user", result_user_spec, to=f"{get_room_code()}:user:{data['player']}")
-        socketio.emit("question_selected_spec",result_user_spec,to=f"{DEFAULT_ROOM_CODE}:spectator")        
-        socketio.emit("question_selected",result,to=f"{DEFAULT_ROOM_CODE}:host")
+        emit_tpv_spectator("question_selected_spec", result_user_spec)        
+        emit_tpv_host("question_selected", result)
 
 @socketio.on("add_result_author")
 def add_result_author(data):
@@ -2700,6 +2804,14 @@ def add_result_author(data):
         js.money = js.money + data["sum_author"]
         db.session.commit()
 
+    emit_tpv_spectator(
+        "tpv_author_win_user",
+        {
+            "amount": int(data.get("sum_author", 0) or 0),
+            "author": data.get("name_author", ""),
+        },
+    )
+
 @socketio.on("add_result_player")
 def add_result_player(data):
     #js = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==data["name_player"]))
@@ -2711,14 +2823,16 @@ def add_result_player(data):
     #js1.status = "ended"
     db.session.commit()
 
+    player_win_payload = {
+        "amount": int(data.get("sum_player", 0) or 0),
+        "player": data.get("name_player", ""),
+    }
     socketio.emit(
         "tpv_player_win_user",
-        {
-            "amount": int(data.get("sum_player", 0) or 0),
-            "player": data.get("name_player", ""),
-        },
+        player_win_payload,
         to=f"{get_room_code()}:user:{data['name_player']}"
     )
+    emit_tpv_spectator("tpv_player_win_user", player_win_payload)
     update_users_tpv()
 
 
@@ -2727,29 +2841,29 @@ def tpv_update_data_user_spec(data):
     # v7 передаёт именованный объект состояния. Старый массив exp пока поддерживается.
     result = data.get("state", data.get("exp", {}))
     socketio.emit("update_data_user", result, to=f"{get_room_code()}:user")
-    #socketio.emit("update_data_spec",result,to=f"{DEFAULT_ROOM_CODE}:spectator")    
+    emit_tpv_spectator("update_data_spec", result)
 
 @socketio.on("show_tree")
 def show_tree(data):
     socketio.emit("show_tree_user", "show", to=f"{get_room_code()}:user:{data["player"]}")
-    #socketio.emit("show_tree_spec","show",to=f"{DEFAULT_ROOM_CODE}:spectator") 
+    emit_tpv_spectator("show_tree_spec", "show")
     
 
 @socketio.on("hide_tree")
 def hide_tree(data):
     socketio.emit("hide_tree_user", "hide", to=f"{get_room_code()}:user:{data["player"]}")
-   # socketio.emit("hide_tree_spec","hide",to=f"{DEFAULT_ROOM_CODE}:spectator") 
+    emit_tpv_spectator("hide_tree_spec", "hide")
 
 @socketio.on("show_stats")
 def show_stats(data):
     socketio.emit("show_stats_user", "show", to=f"{get_room_code()}:user:{data["player"]}")
-   # socketio.emit("show_stats_spec","hide",to=f"{DEFAULT_ROOM_CODE}:spectator") 
+    emit_tpv_spectator("show_stats_spec", "show")
     
 
 @socketio.on("hide_stats")
 def hide_stats(data):
     socketio.emit("hide_stats_user", "hide", to=f"{get_room_code()}:user:{data["player"]}")
-   # socketio.emit("hide_stats_spec","hide",to=f"{DEFAULT_ROOM_CODE}:spectator") 
+    emit_tpv_spectator("hide_stats_spec", "hide")
 
 @socketio.on("tpv_correct")
 def tpv_correct(data):
@@ -2765,12 +2879,18 @@ def tpv_correct(data):
         payload,
         to=f"{get_room_code()}:user:{data['player']}"
     )
-   # socketio.emit("tpv_correct_spec",data['answer'],to=f"{DEFAULT_ROOM_CODE}:spectator") 
+    emit_tpv_spectator("tpv_correct_spec", payload)
 
 @socketio.on("tpv_pass")
 def tpv_pass(data):
-    socketio.emit("tpv_pass_user", data['answer'], to=f"{get_room_code()}:user:{data["player"]}")
-   # socketio.emit("tpv_pass_spec",data['answer'],to=f"{DEFAULT_ROOM_CODE}:spectator") 
+    payload = {
+        "answer": data.get("answer", ""),
+        "questionNumber": data.get("questionNumber"),
+        "passCount": data.get("passCount"),
+        "state": data.get("state"),
+    }
+    emit_tpv_player(data["player"], "tpv_pass_user", payload)
+    emit_tpv_spectator("tpv_pass_spec", payload)
 
 @socketio.on("tpv_flip")
 def tpv_flip(data):
@@ -2780,8 +2900,8 @@ def tpv_flip(data):
         "replacement": True,
         "state": data.get("state"),
     }
-    socketio.emit("tpv_flip_user", payload, to=f"{get_room_code()}:user:{data['player']}")
-   # socketio.emit("tpv_flip_spec",data['answer'],to=f"{DEFAULT_ROOM_CODE}:spectator") 
+    emit_tpv_player(data["player"], "tpv_flip_user", payload)
+    emit_tpv_spectator("tpv_flip_spec", payload)
 
 @socketio.on("tpv_wrong")
 def tpv_wrong(data):
@@ -2791,8 +2911,13 @@ def tpv_wrong(data):
         "wrongIndex": data.get("wrongIndex"),
         "state": data.get("state"),
     }
-    socketio.emit("tpv_wrong_user", payload, to=f"{get_room_code()}:user:{data['player']}")
-   # socketio.emit("tpv_wrong_spec",data['answer'],to=f"{DEFAULT_ROOM_CODE}:spectator") 
+    
+    emit_tpv_player(data["player"], "tpv_wrong_user", payload)
+    emit_tpv_spectator("tpv_wrong_spec", payload)
+
+@socketio.on("start_intro")
+def start_intro():
+     emit_tpv_spectator("start_intro",{"":""}),
 
 
 

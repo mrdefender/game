@@ -37,9 +37,9 @@
                     <input type="submit" class="action-btn action-host" value="Режим ведущего">
                 </form>
 
-                <form action="/tpv_spec" method="post" class="select_game">
+                <form action="/tpv_spectator" method="post" class="select_game">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="submit" class="action-btn action-spec" value="Режим зрителя" disabled>
+                    <input type="submit" class="action-btn action-spec" value="Режим зрителя">
                 </form>
                 <form action="/tpv_editor" method="post" class="select_game">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

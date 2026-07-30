@@ -197,109 +197,27 @@ document.getElementById("control-round").addEventListener('change', function(){
 )
 
 function calc_round(){
-    if (document.getElementById("control-round").value > 5)
-    {
-        document.getElementById("control-round").value = 5;
-    }
-    if (document.getElementById("control-round").value < 1)
-    {
-        document.getElementById("control-round").value = 1;
-    }
+    const control = document.getElementById("control-round");
+    const round = Math.max(1, Math.min(5, Number(control?.value) || 1));
 
-    if (document.getElementById("control-round").value == 1)
-    {
-        document.getElementById("correct-indicator-1").textContent = "В";
-        document.getElementById("correct-indicator-2").textContent = "";
-        document.getElementById("correct-indicator-3").textContent = "";
-        document.getElementById("correct-indicator-4").textContent = "";
-        document.getElementById("correct-indicator-5").textContent = "";
-        document.getElementById("money-round-1").classList.remove("passed");
-        document.getElementById("money-round-2").classList.remove("passed");
-        document.getElementById("money-round-3").classList.remove("passed");
-        document.getElementById("money-round-4").classList.remove("passed");
-        document.getElementById("money-round-5").classList.remove("passed");
-        document.getElementById("money-round-1").classList.add("is-active");
-        document.getElementById("money-round-2").classList.remove("is-active");
-        document.getElementById("money-round-3").classList.remove("is-active");
-        document.getElementById("money-round-4").classList.remove("is-active");
-        document.getElementById("money-round-5").classList.remove("is-active");
+    if (control) control.value = round;
 
-    }
-    if (document.getElementById("control-round").value == 2)
-    {
-        document.getElementById("correct-indicator-1").textContent = "В";
-        document.getElementById("correct-indicator-2").textContent = "В";
-        document.getElementById("correct-indicator-3").textContent = "";
-        document.getElementById("correct-indicator-4").textContent = "";
-        document.getElementById("correct-indicator-5").textContent = "";
-        document.getElementById("money-round-1").classList.add("passed");
-        document.getElementById("money-round-2").classList.remove("passed");
-        document.getElementById("money-round-3").classList.remove("passed");
-        document.getElementById("money-round-4").classList.remove("passed");
-        document.getElementById("money-round-5").classList.remove("passed");
-        document.getElementById("money-round-1").classList.remove("is-active");
-        document.getElementById("money-round-2").classList.add("is-active");
-        document.getElementById("money-round-3").classList.remove("is-active");
-        document.getElementById("money-round-4").classList.remove("is-active");
-        document.getElementById("money-round-5").classList.remove("is-active");
-    }
-    if (document.getElementById("control-round").value == 3)
-    {
-        document.getElementById("correct-indicator-1").textContent = "В";
-        document.getElementById("correct-indicator-2").textContent = "В";
-        document.getElementById("correct-indicator-3").textContent = "В";
-        document.getElementById("correct-indicator-4").textContent = "";
-        document.getElementById("correct-indicator-5").textContent = "";
-        document.getElementById("money-round-1").classList.add("passed");
-        document.getElementById("money-round-2").classList.add("passed");
-        document.getElementById("money-round-3").classList.remove("passed");
-        document.getElementById("money-round-4").classList.remove("passed");
-        document.getElementById("money-round-5").classList.remove("passed");
-        document.getElementById("money-round-1").classList.remove("is-active");
-        document.getElementById("money-round-2").classList.remove("is-active");
-        document.getElementById("money-round-3").classList.add("is-active");
-        document.getElementById("money-round-4").classList.remove("is-active");
-        document.getElementById("money-round-5").classList.remove("is-active");
-    }
-    if (document.getElementById("control-round").value == 4)
-    {
-        document.getElementById("correct-indicator-1").textContent = "В";
-        document.getElementById("correct-indicator-2").textContent = "В";
-        document.getElementById("correct-indicator-3").textContent = "В";
-        document.getElementById("correct-indicator-4").textContent = "В";
-        document.getElementById("correct-indicator-5").textContent = "";
-        document.getElementById("money-round-1").classList.add("passed");
-        document.getElementById("money-round-2").classList.add("passed");
-        document.getElementById("money-round-3").classList.add("passed");
-        document.getElementById("money-round-4").classList.remove("passed");
-        document.getElementById("money-round-5").classList.remove("passed");
-        document.getElementById("money-round-1").classList.remove("is-active");
-        document.getElementById("money-round-2").classList.remove("is-active");
-        document.getElementById("money-round-3").classList.remove("is-active");
-        document.getElementById("money-round-4").classList.add("is-active");
-        document.getElementById("money-round-5").classList.remove("is-active");
-    }
-    if (document.getElementById("control-round").value == 5)
-    {
-        document.getElementById("correct-indicator-1").textContent = "В";
-        document.getElementById("correct-indicator-2").textContent = "В";
-        document.getElementById("correct-indicator-3").textContent = "В";
-        document.getElementById("correct-indicator-4").textContent = "В";
-        document.getElementById("correct-indicator-5").textContent = "В";
-        document.getElementById("money-round-1").classList.add("passed");
-        document.getElementById("money-round-2").classList.add("passed");
-        document.getElementById("money-round-3").classList.add("passed");
-        document.getElementById("money-round-4").classList.add("passed");
-        document.getElementById("money-round-5").classList.remove("passed");
-        document.getElementById("money-round-1").classList.remove("is-active");
-        document.getElementById("money-round-2").classList.remove("is-active");
-        document.getElementById("money-round-3").classList.remove("is-active");
-        document.getElementById("money-round-4").classList.remove("is-active");
-        document.getElementById("money-round-5").classList.add("is-active");
-    }
+    for (let index = 1; index <= 5; index += 1) {
+        const row = document.getElementById(`money-round-${index}`);
+        const indicator = document.getElementById(`correct-indicator-${index}`);
 
+        if (row) {
+            row.classList.toggle("passed", index < round);
+            row.classList.toggle("is-active", index === round);
+            row.setAttribute("aria-current", index === round ? "step" : "false");
+        }
 
+        if (indicator) {
+            indicator.textContent = index <= round ? "В" : "";
+        }
+    }
 }
+
 
 document.getElementById("control-bank").addEventListener('change', function(){
     calc_bank();
@@ -498,6 +416,8 @@ function update_data(){
     calc_pass();
     calc_round();
 
+    const displayTime = document.getElementById("display-time");
+    if (displayTime) displayTime.hidden = false;
 }
 
 socket.on("reset", (data) => {
@@ -535,7 +455,7 @@ function init_game_player(){
     document.getElementById("question-text").textContent = "";
     document.getElementById("question-author").textContent = "";
     document.getElementById("section-metrics").hidden = true;
-    document.getElementById("display-time").hidden = true;
+    document.getElementById("section-timer").hidden = true;
     document.getElementById("money-tree").hidden = true;
     document.getElementById("section-question").hidden = true;
     document.getElementById("section-bong-game").hidden = true;
@@ -633,19 +553,36 @@ socket.on("show_stats_user", (data) => {
     const bankCard = document.getElementById("metric-bank");
 
     if (bankCard) bankCard.hidden = bankValue <= 0;
-    metrics.hidden = false;
-    document.getElementById("section-timer").hidden = false;
-}
-
-)
+    if (metrics) metrics.hidden = false;
+    showPlayerTimer({showMetrics: true});
+})
 
 socket.on("hide_stats_user", (data) => {
-    document.getElementById("section-metrics").hidden = true;
-    document.getElementById("section-timer").hidden = true;
-    
+    const metrics = document.getElementById("section-metrics");
+    if (metrics) metrics.hidden = true;
+    hidePlayerTimer();
+})
+
+function getTimerSection() {
+    return document.getElementById("section-timer");
 }
 
-)
+function showPlayerTimer({showMetrics = true} = {}) {
+    const metrics = document.getElementById("section-metrics");
+    const timerSection = getTimerSection();
+    const displayTime = document.getElementById("display-time");
+
+    if (showMetrics && metrics) metrics.hidden = false;
+    if (timerSection) timerSection.hidden = false;
+    if (displayTime) displayTime.hidden = false;
+
+    calc_timer();
+}
+
+function hidePlayerTimer() {
+    const timerSection = getTimerSection();
+    if (timerSection) timerSection.hidden = true;
+}
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -676,6 +613,8 @@ socket.on("question_selected_user", async (payload) => {
     document.getElementById("question-text").textContent = data.question || "";
     document.getElementById("question-author").textContent = data.author || "";
     setQuestionMarker(replacementQuestionPending ? "replacement" : "question", data.questionNumber);
+
+    showPlayerTimer({showMetrics: true});
 
     await Promise.all([
         TPVAnimation.showQuestion(),
@@ -714,6 +653,9 @@ socket.on("tpv_correct_user", async (payload) => {
         await Promise.all([
             TPVAnimation.hideQuestion(),
             TPVAnimation.hideTimer(),
+            hidePlayerTimer(),
+            document.getElementById("section-metrics").hidden = true,
+
         ]);
     }
 });
@@ -749,12 +691,13 @@ socket.on("tpv_wrong_user", async (payload) => {
     await Promise.all([
         TPVAnimation.hideQuestion(),
         TPVAnimation.hideTimer(),
+        document.getElementById("section-metrics").hidden = true,
     ]);
 });
 
 socket.on("tpv_pass_user", (data) => {
     clearAnswerResultState();
-    document.getElementById("question-text").textContent = data;
+    document.getElementById("question-text").textContent = data["answer"];
     replacementQuestionPending = false;
     if (tpvGame) tpvGame.revealAnswer();
     setQuestionMarker("answer");

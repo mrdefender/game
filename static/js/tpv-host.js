@@ -525,6 +525,7 @@ function cancel_all()
 
 
 function intro(){
+    socket.emit("start_intro")
     stop_current_sound();
     playAudio("tpv-begin1.ogg",false);
 }
@@ -718,29 +719,30 @@ socket.on("DB_clean", (data) => {
 
 
 function choose_player_random(){
-    socket.emit("choose_player_random")
-
+    socket.emit("tpv_selection_start");
+    setTimeout(() => socket.emit("choose_player_random"), 2200);
 }
 function choose_player_id(){
-    id_player = document.getElementById("control-player-id").value
-    console.log(id_player)
-    socket.emit("choose_player_id",{id:id_player})
-
+    const id_player = document.getElementById("control-player-id").value;
+    console.log(id_player);
+    socket.emit("tpv_selection_start");
+    setTimeout(() => socket.emit("choose_player_id", {id:id_player}), 2200);
 }
 
 socket.on("player_selected", (data) => {
     document.getElementById("display-current-player").textContent = data[1]
     document.getElementById("display-current-flip").textContent = data[2]
+    stop_current_sound()
     playAudio("tpv-select-player.ogg",false)   
 }
 
 )
 
 function tpv(){
-    stop_current_sound()
-    playAudio("tpv-versus.ogg",false);
+    stop_current_sound();
+    playAudio("tpv-versus.ogg", false);
+    socket.emit("tpv_versus");
     document.getElementById("action-start-circle").disabled = false;
-    
 }
 
 function start_circle(){
@@ -944,6 +946,7 @@ function advanceRoundAfterSuccess(completedRound) {
 
     const passControl =
         document.getElementById("control-pass-count");
+    const timerControl = document.getElementById("control-timer-seconds");
 
     const circle = Math.max(
         1,
@@ -1000,6 +1003,7 @@ function advanceRoundAfterSuccess(completedRound) {
         /*
          * Новый круг начинается с первого раунда.
          */
+        timerControl.value = 240;
         roundControl.value = 1;
         questionControl.value = 1;
         correctControl.value = 0;
