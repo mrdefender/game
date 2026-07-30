@@ -20,14 +20,33 @@ function normalizeIncomingState(data) {
     return data || {};
 }
 
+function restartCssAnimation(element, className) {
+    if (!element) return;
+    element.classList.remove(className);
+    void element.offsetWidth;
+    element.classList.add(className);
+}
+
+function flashQuestionField() {
+    restartCssAnimation(document.getElementById("num_question"), "tpv-field-flash");
+    restartCssAnimation(document.querySelector(".question-text-shell"), "tpv-field-flash");
+}
+
 function setQuestionMarker(mode, questionNumber) {
     const output = document.getElementById("num_question");
-    const number = Number(questionNumber || document.getElementById("control-question-number").value) || 1;
-    if (mode === "replacement") {
-        output.textContent = "↻";
-        return;
+    if (!output) return;
+
+    const number = Number(
+        questionNumber || document.getElementById("control-question-number")?.value
+    ) || 1;
+    const nextText = mode === "replacement"
+        ? "↻"
+        : (mode === "answer" ? "О." : "В.") + number;
+
+    if (output.textContent !== nextText) {
+        output.textContent = nextText;
+        flashQuestionField();
     }
-    output.textContent = (mode === "answer" ? "О." : "В.") + number;
 }
 
 function getCsrfToken() {
@@ -354,6 +373,32 @@ function resetRoundIndicators() {
     }
 }
 
+function clearAnswerResultState() {
+    resetRoundIndicators();
+
+    const questionPanel = document.getElementById("section-question");
+    const textShell = document.querySelector(".question-text-shell");
+    [questionPanel, textShell].forEach(element => {
+        if (!element) return;
+        element.classList.remove(
+            "tpv-answer-wrong",
+            "tpv-answer-correct",
+            "tpv-wrong-flash",
+            "tpv-correct-flash"
+        );
+    });
+}
+
+function markQuestionResult(kind) {
+    const questionPanel = document.getElementById("section-question");
+    const textShell = document.querySelector(".question-text-shell");
+    [questionPanel, textShell].forEach(element => {
+        if (!element) return;
+        element.classList.remove("tpv-answer-wrong", "tpv-answer-correct");
+        element.classList.add(kind === "wrong" ? "tpv-answer-wrong" : "tpv-answer-correct");
+    });
+}
+
 function showCorrectIndicators(value) {
     const count = Math.max(
         0,
@@ -455,9 +500,16 @@ function update_data(){
 
 }
 
+socket.on("reset", (data) => {
+    init_game_player();
+}
+)
+
+
 
 function init_game_player(){
     stopRoundTimer();
+    document.getElementById("tpv-player-win-overlay").hidden = true;
     document.getElementById("control-timer-seconds").value=240;
     document.getElementById("control-circle").value=1;
     document.getElementById("control-round").value=1;
@@ -483,7 +535,7 @@ function init_game_player(){
     document.getElementById("question-text").textContent = "";
     document.getElementById("question-author").textContent = "";
     document.getElementById("section-metrics").hidden = true;
-    document.getElementById("section-timer").hidden = true;
+    document.getElementById("display-time").hidden = true;
     document.getElementById("money-tree").hidden = true;
     document.getElementById("section-question").hidden = true;
     document.getElementById("section-bong-game").hidden = true;
@@ -576,7 +628,12 @@ socket.on("hide_tree_user", (data) => {
 )
 
 socket.on("show_stats_user", (data) => {
-    document.getElementById("section-metrics").hidden = false;
+    const metrics = document.getElementById("section-metrics");
+    const bankValue = Number(document.getElementById("control-bank")?.value) || 0;
+    const bankCard = document.getElementById("metric-bank");
+
+    if (bankCard) bankCard.hidden = bankValue <= 0;
+    metrics.hidden = false;
     document.getElementById("section-timer").hidden = false;
 }
 
@@ -615,6 +672,7 @@ socket.on("question_selected_user", async (payload) => {
 
     if (tpvGame) tpvGame.startQuestion({replacement: replacementQuestionPending});
 
+    clearAnswerResultState();
     document.getElementById("question-text").textContent = data.question || "";
     document.getElementById("question-author").textContent = data.author || "";
     setQuestionMarker(replacementQuestionPending ? "replacement" : "question", data.questionNumber);
@@ -637,7 +695,9 @@ socket.on("tpv_correct_user", async (payload) => {
         ? payload
         : {answer: payload};
 
+    clearAnswerResultState();
     document.getElementById("question-text").textContent = data.answer || "";
+    markQuestionResult("correct");
     replacementQuestionPending = false;
     if (tpvGame) tpvGame.revealAnswer();
     setQuestionMarker("answer", data.questionNumber);
@@ -664,7 +724,9 @@ socket.on("tpv_wrong_user", async (payload) => {
     replacementQuestionPending = false;
     if (tpvGame) tpvGame.registerWrong();
 
+    clearAnswerResultState();
     document.getElementById("question-text").textContent = data.answer || "";
+    markQuestionResult("wrong");
     setQuestionMarker("answer", data.questionNumber);
 
     const wrongIndex = Number(data.wrongIndex) ||
@@ -679,6 +741,8 @@ socket.on("tpv_wrong_user", async (payload) => {
         await TPVAnimation.wrong(wrongIndex);
     } finally {
         showWrongIndicator(wrongIndex);
+        markQuestionResult("wrong");
+        document.getElementById("section-question")?.classList.remove("tpv-wrong-flash");
     }
 
     await delay(2100);
@@ -689,6 +753,7 @@ socket.on("tpv_wrong_user", async (payload) => {
 });
 
 socket.on("tpv_pass_user", (data) => {
+    clearAnswerResultState();
     document.getElementById("question-text").textContent = data;
     replacementQuestionPending = false;
     if (tpvGame) tpvGame.revealAnswer();
@@ -706,9 +771,28 @@ socket.on("tpv_flip_user", async(payload) => {
         else tpvGame.startQuestion({replacement: true});
     }
 
+    clearAnswerResultState();
     document.getElementById("question-text").textContent = data.answer || "";
     setQuestionMarker("replacement", data.questionNumber);
     await TPVAnimation.useFlip(4 - parseInt(document.getElementById("control-flips-count").value));
+});
+
+function showPlayerWinOverlay(amount) {
+    const overlay = document.getElementById("tpv-player-win-overlay");
+    const value = document.getElementById("tpv-player-win-amount");
+    if (!overlay || !value) return;
+
+    const numericAmount = Math.max(0, Number(amount) || 0);
+    value.textContent = numericAmount.toLocaleString("ru-RU");
+    overlay.hidden = false;
+    restartCssAnimation(overlay.querySelector(".tpv-player-win-card"), "tpv-player-win-card--show");
+}
+
+socket.on("tpv_player_win_user", (payload) => {
+    const amount = payload && typeof payload === "object"
+        ? payload.amount
+        : payload;
+    showPlayerWinOverlay(amount);
 });
 
 /* =========================================================

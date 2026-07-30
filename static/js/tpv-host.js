@@ -1385,8 +1385,6 @@ function stop_bong_game() {
 socket.on("tpv_bong_stop_requested", (data) => {
     const requestedPlayer = String(data?.player || "").trim();
     const activePlayer = String(bongPlayerName || "").trim();
-    console.log(requestedPlayer);
-    console.log(activePlayer);
 
     if (requestedPlayer && activePlayer && requestedPlayer !== activePlayer) return;
     requestBongStop("player");
@@ -1439,7 +1437,10 @@ function result_sum_for_player()
 {
     result_money = parseInt(document.getElementById("control-current-money").value) + parseInt(document.getElementById("control-bank").value);
     playAudio("tpv-result.ogg",false);
-    socket.emit("add_result_player",{sum_player:result_money,name_player:document.getElementById("display-current-player").textContent})
+    socket.emit("add_result_player", {
+        sum_player: result_money,
+        name_player: document.getElementById("display-current-player").textContent
+    })
 }
 
 

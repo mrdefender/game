@@ -2594,16 +2594,30 @@ def tpv_bong_hide(data):
 
 @socketio.on("tpv_bong_stop_request")
 def tpv_bong_stop_request(data):
-    """Игрок нажал STOP. Решение и итог остаются на стороне ведущего."""
+    """Игрок нажал STOP. Запрос передаётся в комнату ведущего."""
     player = str((data or {}).get("player") or "").strip()
-    if not player:
-        return
 
-    socketio.emit(
-        "tpv_bong_stop_requested",
-        {"player": player},
-        to=f"{DEFAULT_ROOM_CODE}:host",
-    )
+    if not player:
+        return {"ok": False, "error": "player_required"}
+
+    payload = {"player": player}
+
+    # TPV-host подключается к технической комнате DEFAULT_ROOM_CODE.
+    # Ранее запрос отправлялся только в get_room_code():host, поэтому
+    # ведущий его не получал, а кнопка визуально казалась нерабочей.
+    host_rooms = {
+        f"{DEFAULT_ROOM_CODE}:host",
+        f"{get_room_code()}:host",
+    }
+
+    for host_room in host_rooms:
+        socketio.emit(
+            "tpv_bong_stop_requested",
+            payload,
+            to=host_room,
+        )
+
+    return {"ok": True}
 
 
 @socketio.on("generate_safe_bong_game")
@@ -2695,7 +2709,16 @@ def add_result_player(data):
         return;
     js1.money = js1.money + data["sum_player"]
     #js1.status = "ended"
-    db.session.commit() 
+    db.session.commit()
+
+    socketio.emit(
+        "tpv_player_win_user",
+        {
+            "amount": int(data.get("sum_player", 0) or 0),
+            "player": data.get("name_player", ""),
+        },
+        to=f"{get_room_code()}:user:{data['name_player']}"
+    )
     update_users_tpv()
 
 
