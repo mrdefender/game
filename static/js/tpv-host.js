@@ -555,6 +555,9 @@ function credits()
     
 }
 
+function show_results(){
+    socket.emit("show_results_tpv");
+}
 
 function stop_sounds(){
     stop_current_sound();

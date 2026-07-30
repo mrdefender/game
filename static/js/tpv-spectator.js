@@ -451,6 +451,19 @@ function showAward(data, type) {
 
 function reset() {
     hide_credits();
+const resultsOverlay =
+    document.getElementById("results-overlay");
+
+const resultsList =
+    document.getElementById("results-list");
+
+if (resultsOverlay) {
+    resultsOverlay.hidden = true;
+}
+
+if (resultsList) {
+    resultsList.replaceChildren();
+}
   clearInterval(scanTimer);
   clearTimeout(awardTimer);
 
@@ -555,6 +568,70 @@ onBoth("tpv_bong_hide_spec", "tpv_bong_hide_user", () => {
 socket.on("tpv_author_win_user", data => showAward(data, "author"));
 socket.on("tpv_player_win_user", data => showAward(data, "player"));
 
+socket.on("show_results_tpv", data => {
+    console.log("show_results_tpv:", data);
+
+    const overlay = document.getElementById("results-overlay");
+    const list = document.getElementById("results-list");
+
+    if (!overlay || !list) {
+        console.error("Не найден results-overlay или results-list");
+        return;
+    }
+
+    // Удаляем результаты предыдущего вызова события.
+    list.replaceChildren();
+
+    const results = Array.isArray(data) ? data : [];
+
+    results.forEach((item, index) => {
+        const name = Array.isArray(item)
+            ? item[0]
+            : item?.name;
+
+        const score = Array.isArray(item)
+            ? item[1]
+            : item?.score;
+
+        const row = document.createElement("div");
+
+        row.className = "result-row";
+        row.style.animationDelay = `${index * 90}ms`;
+
+        if (index === 0) {
+            row.classList.add("result-top1");
+        }
+
+        const placeElement = document.createElement("span");
+        placeElement.className = "result-place";
+        placeElement.textContent = `${index + 1}.`;
+
+        const nameElement = document.createElement("span");
+        nameElement.className = "result-name";
+        nameElement.textContent = String(name ?? "—");
+
+        const scoreElement = document.createElement("span");
+        scoreElement.className = "result-score";
+        scoreElement.textContent =
+            Number(score ?? 0).toLocaleString("ru-RU");
+
+        row.append(
+            placeElement,
+            nameElement,
+            scoreElement
+        );
+
+        list.appendChild(row);
+    });
+
+    // Прячем остальные полноэкранные режимы.
+    document.getElementById("waiting-screen").hidden = true;
+    document.getElementById("selection-stage").hidden = true;
+    document.getElementById("game-layout").hidden = true;
+    document.getElementById("award-overlay").hidden = true;
+
+    overlay.hidden = false;
+});
 
 function show_credits_tpv(data){
     const overlay = document.getElementById("credits-overlay");

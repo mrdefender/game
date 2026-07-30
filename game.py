@@ -2938,6 +2938,18 @@ def host_show_credits():
         "До встречи в следующей игре!"
     ]
 }, to=f"{DEFAULT_ROOM_CODE}:spectator")
+   
+   
+@socketio.on("show_results_tpv")
+def show_results_tpv():
+    result = []
+    tmp = db.session.scalars(db.select(UsersTpv).where(UsersTpv.money!=0).order_by(desc(UsersTpv.money))).all()
+    for i in range(len(tmp)):
+        username = tmp[i].username
+        money = tmp[i].money
+        t = [username, money]
+        result.append(t)
+    emit_tpv_spectator("show_results_tpv", result)
     
 
 if __name__ == "__main__":
