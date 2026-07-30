@@ -549,6 +549,7 @@ function final()
 
 function credits()
 {
+    socket.emit("host_show_credits_tpv");
     stop_current_sound();
     playAudio("tpv-final.ogg",false);
     

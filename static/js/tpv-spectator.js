@@ -450,6 +450,7 @@ function showAward(data, type) {
 }
 
 function reset() {
+    hide_credits();
   clearInterval(scanTimer);
   clearTimeout(awardTimer);
 
@@ -553,6 +554,73 @@ onBoth("tpv_bong_hide_spec", "tpv_bong_hide_user", () => {
 
 socket.on("tpv_author_win_user", data => showAward(data, "author"));
 socket.on("tpv_player_win_user", data => showAward(data, "player"));
+
+
+function show_credits_tpv(data){
+    const overlay = document.getElementById("credits-overlay");
+  const roll = overlay?.querySelector(".credits-roll");
+  const title = document.getElementById("credits-title");
+  const linesBox = document.getElementById("credits-lines");
+
+  if (!overlay || !roll || !title || !linesBox) return;
+
+  title.innerText = data.title || "Спасибо за игру!";
+
+  const lines = Array.isArray(data.lines) ? data.lines : [];
+
+  linesBox.innerHTML = lines
+    .map(line => `<div class="credits-line">${line}</div>`)
+    .join("");
+
+  overlay.classList.remove("is-visible", "is-hiding");
+  document.body.classList.remove("credits-mode");
+
+  roll.style.animation = "none";
+  roll.style.transform = "translateY(0)";
+
+  void roll.offsetWidth;
+
+  roll.style.animation = "";
+
+  overlay.classList.add("is-visible");
+  document.body.classList.add("credits-mode");
+}
+socket.on("show_credits_tpv", (data) => {
+
+    setTimeout(() => {
+    show_credits_tpv(data);
+  }, 4000);
+   
+
+});
+function hide_credits(){
+  const overlay = document.getElementById("credits-overlay");
+  const roll = overlay?.querySelector(".credits-roll");
+
+  if (!overlay || !roll) return;
+
+  overlay.classList.add("is-hiding");
+
+  setTimeout(() => {
+    overlay.classList.remove("is-visible", "is-hiding");
+    document.body.classList.remove("credits-mode");
+
+    roll.style.animation = "none";
+    roll.style.transform = "translateY(0)";
+
+    void roll.offsetWidth;
+
+    roll.style.animation = "";
+  }, 700);
+}
+
+
+
+
+socket.on("hide_credits", () => {
+    hide_credits();
+});
+
 socket.on("reset", reset);
 socket.on("start_intro", () => {
     console.log("intro");

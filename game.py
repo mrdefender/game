@@ -2319,7 +2319,7 @@ def host_show_credits():
     "title": "Спасибо за игру!",
     "lines": [
         "Ведущий: Mokaque",
-        "Оригинальные авторы идеи: Сергей Бойцов,  Игорь Черкасов",
+        "Оригинальная идея: Сергей Бойцов,  Игорь Черкасов",
         "Композитор: Дмитрий Яковлев",
         "Адаптация правил и игры: Mokaque",
         "Техническая реализация: Mokaque",
@@ -2919,7 +2919,26 @@ def tpv_wrong(data):
 def start_intro():
      emit_tpv_spectator("start_intro",{"":""}),
 
-
+@socketio.on("host_show_credits_tpv")
+def host_show_credits():
+    socketio.emit("show_credits_tpv", {
+    "title": "Спасибо за игру!",
+    "lines": [
+        "Ведущий: Mokaque",
+        "Редактор вопросов: Mokaque",
+        "Оригинальная идея: David Briggs, Steve Knight, Mike Whitehill",
+        "Голос Гонг Игры: Кирилл (Yandex SpeechKit)",
+        "Техническая реализация: Mokaque",
+        "Композиторы: Keith Strachan, Mattew Strachan",
+        "Адаптация правил: Mokaque",
+        "Графика: ChatGPT",
+        "Оригинальный формат: Sony Pictures Entertainment",
+        "Никто из участников создания данной адаптации игры не претендует на авторские права на формат оригинальной игры 'The People Versus'",
+        "Данный проект выпущен исключительно в развлекательных целях и не преследует целей получение материальной выгоды",
+        "До встречи в следующей игре!"
+    ]
+}, to=f"{DEFAULT_ROOM_CODE}:spectator")
+    
 
 if __name__ == "__main__":
     _users = [' ']
