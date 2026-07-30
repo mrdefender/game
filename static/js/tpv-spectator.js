@@ -161,10 +161,7 @@ function renderState(payload) {
 
 function showRoom(data) {
   const room = String(data?.room ?? "----");
-  const url = String(
-    data?.joinUrl ||
-    `${window.location.origin}/join?room=${encodeURIComponent(room)}`
-  );
+  const url = String(`https://games.mokaque-t.ru`);
 
   $("room-code").textContent = room;
   $("room-url").textContent = url;
