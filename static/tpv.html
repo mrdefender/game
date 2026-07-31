@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <title>Веселые игры</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='img/slot.ico') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
     <link rel="stylesheet" href="/static/styles/tpv.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="/static/js/csrf.js"></script>
@@ -43,7 +43,7 @@
                 </form>
                 <form action="/tpv_editor" method="post" class="select_game">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="submit" class="action-btn action-editor" value="Режим редактора" disabled>
+                    <input type="submit" class="action-btn action-editor" value="Режим редактора">
                 </form>
             </section>
         </section>

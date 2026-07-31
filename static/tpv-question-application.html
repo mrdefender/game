@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Предложить вопрос — TPV</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-question-application.css') }}">
+    <script src="{{ url_for('static', filename='js/csrf.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tpv-question-application.js') }}" defer></script>
+</head>
+<body>
+<main class="application-page">
+    <section class="application-card">
+        <div class="eyebrow">THE PEOPLE VERSUS</div>
+        <h1>Предложить вопрос</h1>
+        <p class="lead">После отправки вопрос попадёт на модерацию и не будет использоваться в игре до утверждения редактором.</p>
+
+        <div id="application-unavailable" class="public-alert public-alert-error" hidden>
+            Приём заявок временно недоступен: таблица заявок ещё не создана.
+        </div>
+
+        <form id="public-application-form">
+            <label>
+                <span>Ваше имя</span>
+                <input id="public-author" type="text" maxlength="100" required>
+            </label>
+
+            <label>
+                <span>Тип вопроса</span>
+                <select id="public-type">
+                    <option value="general">Общий вопрос</option>
+                    <option value="themed">Вопрос по теме замены</option>
+                </select>
+            </label>
+
+            <label id="public-theme-field" hidden>
+                <span>Тема замены</span>
+                <select id="public-theme">
+                    <option value="">Выберите тему</option>
+                </select>
+                <small id="public-theme-empty" hidden>
+                    В базе пока нет доступных тем замены.
+                </small>
+            </label>
+
+            <label>
+                <span>Вопрос</span>
+                <textarea id="public-task" rows="6" maxlength="3000" required></textarea>
+            </label>
+
+            <label>
+                <span>Ответ</span>
+                <textarea id="public-answer" rows="3" maxlength="2000" required></textarea>
+            </label>
+
+            <label>
+                <span>Комментарий или пояснение</span>
+                <textarea id="public-comment" rows="4" maxlength="3000" placeholder="Источник, уточнение ответа или дополнительная информация"></textarea>
+            </label>
+
+            <label class="public-consent">
+                <input id="public-confirm" type="checkbox" required>
+                <span>Подтверждаю, что проверил формулировку вопроса и ответа.</span>
+            </label>
+
+            <button id="public-submit" type="submit">Отправить на модерацию</button>
+        </form>
+
+        <div id="public-result" class="public-result" hidden></div>
+    </section>
+</main>
+</body>
+</html>

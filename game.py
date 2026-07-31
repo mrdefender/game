@@ -415,12 +415,15 @@ def join():
                 return render_template("user_slot.html",value=u.username)
             if give_name_game(request.form['room_id']) == 'tpv':
                 find_user = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==request.form['user_name']))
-                # if find_user == None:
-                #    flash ('К сожалению, Ваша заявку на игру не найдена')
-                 #   return render_template("login.html")
-                # if find_user.flip_col<6:
-                 #   flash ('К сожалению, Ваша заявку на игру не одобрена! Недостаточно вопросов замены')
-                     #return render_template("login.html")  
+                if find_user == None:
+                    flash ('К сожалению, Ваша заявку на игру не найдена')
+                    return render_template("login.html")
+                if find_user.flip=="false" or find_user.flip==None:
+                    flash ('К сожалению, Ваша заявку на игру не одобрена! Отстуствует тема замены')
+                    return render_template("login.html")  
+                if find_user.flip_col<TPV_REQUIRED_FLIP_QUESTIONS:
+                    flash ('К сожалению, Ваша заявку на игру не одобрена! Недостаточно вопросов замены')
+                    return render_template("login.html")  
                 user_tpv = QueryTpv()
                 user_tpv.username = request.form['user_name']
                 tmp = db.session.scalar(db.select(QueryTpv).where(QueryTpv.username==user_tpv.username))
@@ -430,11 +433,11 @@ def join():
                             print (url_for('join'))
                             return render_template("tpv-user.html",value=user_tpv.username)
                             #return render_template("user_slot.html",value=u.username)
-                #user_tpv.money = find_user.money
-                user_tpv.money = 0
-                #user_tpv.flip = find_user.flip
-                user_tpv.flip = "test"
-                user_tpv.status = "wait"
+                user_tpv.money = find_user.money
+                #user_tpv.money = 0
+                user_tpv.flip = find_user.flip
+                #user_tpv.flip = "test"
+                #user_tpv.status = "wait"
                 db.session.add(user_tpv)
                 db.session.flush()
                 db.session.commit()
@@ -510,7 +513,6 @@ def tpv_spectator():
 def tpv_user():
     if request.method == 'GET':
         abort(401)
-
 
 
 
@@ -2488,6 +2490,2761 @@ class QueryTpv(db.Model, UserMixin):
     status = db.Column(db.Text, default="wait")
     def __repr__(self):
             return '<QueryTpv %r>' %self.id
+# Вставить в game.py после объявления UsersTpv и Questions_tpv.
+TPV_REQUIRED_FLIP_QUESTIONS = 5
+TPV_GENERAL_QUESTION_VALUES = {"", "false", "общий"}
+
+
+
+# ============================================================================
+# TPV EDITOR — ЭТАП 9: ИСТОРИЯ ИЗМЕНЕНИЙ
+# ============================================================================
+import json as _tpv_history_json
+from datetime import datetime as _tpv_history_datetime
+from sqlalchemy import inspect as _tpv_history_inspect
+
+
+class TpvEditorHistory(db.Model):
+    __tablename__ = "tpv_editor_history"
+
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=_tpv_history_datetime.utcnow,
+        index=True,
+    )
+    entity_type = db.Column(db.String(24), nullable=False, index=True)
+    entity_id = db.Column(db.String(64), nullable=True, index=True)
+    action = db.Column(db.String(24), nullable=False, index=True)
+    title = db.Column(db.String(255), nullable=False)
+    details = db.Column(db.Text, nullable=True)
+    before_json = db.Column(db.Text, nullable=True)
+    after_json = db.Column(db.Text, nullable=True)
+    can_revert = db.Column(db.Boolean, nullable=False, default=False)
+    reverted_at = db.Column(db.DateTime, nullable=True)
+    revert_history_id = db.Column(db.Integer, nullable=True)
+
+
+def tpv_editor_history_table_exists():
+    try:
+        return "tpv_editor_history" in _tpv_history_inspect(db.engine).get_table_names()
+    except Exception:
+        return False
+
+
+def tpv_editor_history_create_table():
+    TpvEditorHistory.__table__.create(bind=db.engine, checkfirst=True)
+
+
+def tpv_editor_history_json(value):
+    if value is None:
+        return None
+    return _tpv_history_json.dumps(value, ensure_ascii=False, sort_keys=True)
+
+
+def tpv_editor_history_parse(value):
+    if not value:
+        return None
+    try:
+        return _tpv_history_json.loads(value)
+    except (_tpv_history_json.JSONDecodeError, TypeError):
+        return None
+
+
+def tpv_editor_user_snapshot(user):
+    if user is None:
+        return None
+    return {
+        "id": user.id,
+        "username": user.username,
+        "money": int(user.money or 0),
+        "flip": user.flip,
+        "flip_col": int(user.flip_col or 0),
+        "approve": user.approve,
+    }
+
+
+def tpv_editor_question_snapshot(question):
+    if question is None:
+        return None
+    return {
+        "id": question.id,
+        "task": question.task,
+        "answer": question.answer,
+        "comment": question.comment,
+        "author": question.author,
+        "flip": question.flip,
+        "show": question.show,
+    }
+
+
+def tpv_editor_history_add(
+    entity_type,
+    entity_id,
+    action,
+    title,
+    before=None,
+    after=None,
+    details="",
+    can_revert=False,
+):
+    if not tpv_editor_history_table_exists():
+        return None
+
+    row = TpvEditorHistory(
+        entity_type=entity_type,
+        entity_id=str(entity_id) if entity_id is not None else None,
+        action=action,
+        title=title,
+        details=details or "",
+        before_json=tpv_editor_history_json(before),
+        after_json=tpv_editor_history_json(after),
+        can_revert=bool(can_revert),
+    )
+    db.session.add(row)
+    return row
+
+
+def tpv_editor_history_to_dict(row):
+    action_labels = {
+        "create": "Создание",
+        "update": "Изменение",
+        "delete": "Удаление",
+        "reset": "Сброс",
+        "rename": "Переименование",
+        "import": "Импорт",
+        "fix": "Исправление",
+        "revert": "Откат",
+    }
+    entity_labels = {
+        "user": "Пользователь",
+        "question": "Вопрос",
+        "theme": "Тема",
+        "bulk": "Массовая операция",
+    }
+    return {
+        "id": row.id,
+        "created_at": row.created_at.isoformat(timespec="seconds"),
+        "entity_type": row.entity_type,
+        "entity_label": entity_labels.get(row.entity_type, row.entity_type),
+        "entity_id": row.entity_id,
+        "action": row.action,
+        "action_label": action_labels.get(row.action, row.action),
+        "title": row.title,
+        "details": row.details or "",
+        "before": tpv_editor_history_parse(row.before_json),
+        "after": tpv_editor_history_parse(row.after_json),
+        "can_revert": bool(row.can_revert),
+        "reverted": row.reverted_at is not None,
+        "reverted_at": (
+            row.reverted_at.isoformat(timespec="seconds")
+            if row.reverted_at else None
+        ),
+        "revert_history_id": row.revert_history_id,
+    }
+
+
+def tpv_editor_restore_user(snapshot):
+    if not snapshot:
+        return None
+
+    user = db.session.get(UsersTpv, int(snapshot["id"]))
+
+    if user is None:
+        duplicate = db.session.scalar(
+            db.select(UsersTpv).where(
+                func.lower(UsersTpv.username)
+                == str(snapshot["username"]).casefold()
+            )
+        )
+        if duplicate is not None:
+            raise ValueError(
+                "Нельзя восстановить пользователя: имя уже занято."
+            )
+        user = UsersTpv()
+        user.id = int(snapshot["id"])
+        db.session.add(user)
+
+    user.username = snapshot["username"]
+    user.money = int(snapshot.get("money") or 0)
+    user.flip = snapshot.get("flip") or "false"
+    user.flip_col = int(snapshot.get("flip_col") or 0)
+    user.approve = snapshot.get("approve") or "false"
+    return user
+
+
+def tpv_editor_restore_question(snapshot):
+    if not snapshot:
+        return None
+
+    question = db.session.get(Questions_tpv, int(snapshot["id"]))
+
+    if question is None:
+        question = Questions_tpv()
+        question.id = int(snapshot["id"])
+        db.session.add(question)
+
+    question.task = snapshot.get("task") or ""
+    question.answer = snapshot.get("answer") or ""
+    question.comment = snapshot.get("comment") or ""
+    question.author = snapshot.get("author") or ""
+    question.flip = snapshot.get("flip") or "false"
+    question.show = snapshot.get("show") or "false"
+    return question
+
+
+def tpv_editor_revert_history_row(row):
+    before = tpv_editor_history_parse(row.before_json)
+    after = tpv_editor_history_parse(row.after_json)
+
+    if row.entity_type == "user":
+        if row.action == "create":
+            user = db.session.get(UsersTpv, int(row.entity_id))
+            if user is not None:
+                db.session.delete(user)
+        elif row.action in {"update", "reset", "delete"}:
+            tpv_editor_restore_user(before)
+        else:
+            raise ValueError("Эта операция пользователя не поддерживает откат.")
+
+    elif row.entity_type == "question":
+        if row.action == "create":
+            question = db.session.get(Questions_tpv, int(row.entity_id))
+            if question is not None:
+                theme = question.flip
+                db.session.delete(question)
+                db.session.flush()
+                tpv_editor_recalculate_theme(theme)
+        elif row.action in {"update", "delete"}:
+            old_theme = None
+            current = db.session.get(Questions_tpv, int(row.entity_id))
+            if current is not None:
+                old_theme = current.flip
+            restored = tpv_editor_restore_question(before)
+            db.session.flush()
+            if old_theme:
+                tpv_editor_recalculate_theme(old_theme)
+            tpv_editor_recalculate_theme(restored.flip)
+        else:
+            raise ValueError("Эта операция вопроса не поддерживает откат.")
+
+    elif row.entity_type == "theme":
+        if not isinstance(before, dict):
+            raise ValueError("В истории отсутствует снимок темы.")
+
+        for snapshot in before.get("questions", []):
+            tpv_editor_restore_question(snapshot)
+        for snapshot in before.get("users", []):
+            tpv_editor_restore_user(snapshot)
+
+        db.session.flush()
+        for user in db.session.scalars(db.select(UsersTpv)).all():
+            tpv_editor_update_approval(user)
+
+    else:
+        raise ValueError("Для этой операции откат недоступен.")
+
+    row.reverted_at = _tpv_history_datetime.utcnow()
+
+
+@app.get("/tpv_editor/api/history/status")
+def tpv_editor_history_status():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    return jsonify({
+        "ok": True,
+        "table_exists": tpv_editor_history_table_exists(),
+    })
+
+
+@app.post("/tpv_editor/api/history/create-table")
+def tpv_editor_history_create_table_route():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    tpv_editor_history_create_table()
+    return jsonify({
+        "ok": True,
+        "message": "Таблица истории создана.",
+    })
+
+
+@app.get("/tpv_editor/api/history")
+def tpv_editor_history_list():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    if not tpv_editor_history_table_exists():
+        return jsonify({
+            "ok": True,
+            "table_exists": False,
+            "items": [],
+            "stats": {
+                "total": 0,
+                "today": 0,
+                "revertible": 0,
+                "reverted": 0,
+            },
+        })
+
+    rows = db.session.scalars(
+        db.select(TpvEditorHistory)
+        .order_by(TpvEditorHistory.id.desc())
+        .limit(1000)
+    ).all()
+
+    today = _tpv_history_datetime.utcnow().date()
+
+    return jsonify({
+        "ok": True,
+        "table_exists": True,
+        "items": [tpv_editor_history_to_dict(row) for row in rows],
+        "stats": {
+            "total": len(rows),
+            "today": sum(row.created_at.date() == today for row in rows),
+            "revertible": sum(
+                row.can_revert and row.reverted_at is None
+                for row in rows
+            ),
+            "reverted": sum(row.reverted_at is not None for row in rows),
+        },
+    })
+
+
+@app.post("/tpv_editor/api/history/<int:history_id>/revert")
+def tpv_editor_history_revert(history_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    if not tpv_editor_history_table_exists():
+        return tpv_editor_error("Таблица истории не создана.", 409)
+
+    row = db.session.get(TpvEditorHistory, history_id)
+
+    if row is None:
+        return tpv_editor_error("Запись истории не найдена.", 404)
+    if not row.can_revert:
+        return tpv_editor_error("Для этой операции откат недоступен.", 409)
+    if row.reverted_at is not None:
+        return tpv_editor_error("Операция уже была отменена.", 409)
+
+    try:
+        tpv_editor_revert_history_row(row)
+
+        revert_row = tpv_editor_history_add(
+            entity_type=row.entity_type,
+            entity_id=row.entity_id,
+            action="revert",
+            title=f"Отмена операции: {row.title}",
+            before=tpv_editor_history_parse(row.after_json),
+            after=tpv_editor_history_parse(row.before_json),
+            details=f"Отменена запись истории #{row.id}.",
+            can_revert=False,
+        )
+
+        db.session.flush()
+        if revert_row is not None:
+            row.revert_history_id = revert_row.id
+        db.session.commit()
+
+        return jsonify({
+            "ok": True,
+            "message": "Изменение успешно отменено.",
+        })
+    except ValueError as exc:
+        db.session.rollback()
+        return tpv_editor_error(str(exc), 409)
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+# ============================================================================
+# TPV EDITOR — ЭТАП 8: КОНСТРУКТОР ИГРЫ
+# ============================================================================
+import random as _tpv_builder_random
+
+
+class TpvGameBuild(db.Model):
+    __tablename__ = "tpv_game_builds"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    config_json = db.Column(db.Text, nullable=False, default="{}")
+    question_ids_json = db.Column(db.Text, nullable=False, default="[]")
+    is_active = db.Column(db.Boolean, nullable=False, default=False, index=True)
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=_tpv_history_datetime.utcnow,
+    )
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=_tpv_history_datetime.utcnow,
+        onupdate=_tpv_history_datetime.utcnow,
+        index=True,
+    )
+
+
+def tpv_editor_builder_table_exists():
+    try:
+        return "tpv_game_builds" in _tpv_history_inspect(db.engine).get_table_names()
+    except Exception:
+        return False
+
+
+def tpv_editor_builder_create_table():
+    TpvGameBuild.__table__.create(bind=db.engine, checkfirst=True)
+
+
+def tpv_editor_builder_parse_json(value, default):
+    if not value:
+        return default
+    try:
+        result = _tpv_history_json.loads(value)
+        return result if isinstance(result, type(default)) else default
+    except (_tpv_history_json.JSONDecodeError, TypeError):
+        return default
+
+
+def tpv_editor_builder_config(row):
+    return tpv_editor_builder_parse_json(row.config_json, {})
+
+
+def tpv_editor_builder_question_ids(row):
+    values = tpv_editor_builder_parse_json(row.question_ids_json, [])
+    return [int(value) for value in values if str(value).isdigit()]
+
+
+def tpv_editor_builder_normalize_payload(data):
+    name = tpv_editor_normalize_text(data.get("name"))
+    if not name:
+        raise ValueError("Название набора обязательно.")
+    if len(name) > 120:
+        raise ValueError("Название набора должно содержать не более 120 символов.")
+
+    try:
+        limit = int(data.get("limit") or 30)
+    except (TypeError, ValueError):
+        raise ValueError("Количество вопросов должно быть целым числом.")
+
+    if limit < 1 or limit > 1000:
+        raise ValueError("Количество вопросов должно быть от 1 до 1000.")
+
+    general_mode = str(data.get("general_mode") or "include")
+    if general_mode not in {"include", "only", "exclude"}:
+        raise ValueError("Некорректный режим общих вопросов.")
+
+    themes = []
+    seen_themes = set()
+    for value in data.get("themes") or []:
+        theme = tpv_editor_normalize_text(value)
+        key = theme.casefold()
+        if theme and not tpv_editor_is_general_theme(theme) and key not in seen_themes:
+            seen_themes.add(key)
+            themes.append(theme)
+
+    excluded_authors = []
+    seen_authors = set()
+    for value in data.get("excluded_authors") or []:
+        author = tpv_editor_normalize_text(value)
+        key = author.casefold()
+        if author and key not in seen_authors:
+            seen_authors.add(key)
+            excluded_authors.append(author)
+
+    return {
+        "name": name,
+        "limit": limit,
+        "general_mode": general_mode,
+        "unused_only": bool(data.get("unused_only")),
+        "randomize": bool(data.get("randomize", True)),
+        "themes": themes,
+        "excluded_authors": excluded_authors,
+    }
+
+
+def tpv_editor_builder_select_questions(config):
+    questions = db.session.scalars(
+        db.select(Questions_tpv).order_by(Questions_tpv.id)
+    ).all()
+
+    theme_keys = {
+        tpv_editor_normalize_text(value).casefold()
+        for value in config["themes"]
+    }
+    excluded_author_keys = {
+        tpv_editor_normalize_text(value).casefold()
+        for value in config["excluded_authors"]
+    }
+
+    result = []
+
+    for question in questions:
+        is_general = tpv_editor_is_general_theme(question.flip)
+        theme_key = tpv_editor_normalize_text(question.flip).casefold()
+        author_key = tpv_editor_normalize_text(question.author).casefold()
+
+        if config["unused_only"] and str(question.show or "").casefold() == "true":
+            continue
+
+        if author_key in excluded_author_keys:
+            continue
+
+        if config["general_mode"] == "only" and not is_general:
+            continue
+
+        if config["general_mode"] == "exclude" and is_general:
+            continue
+
+        if (
+            not is_general
+            and theme_keys
+            and theme_key not in theme_keys
+        ):
+            continue
+
+        result.append(question)
+
+    available_count = len(result)
+
+    if config["randomize"]:
+        _tpv_builder_random.SystemRandom().shuffle(result)
+
+    return result[: config["limit"]], available_count
+
+
+def tpv_editor_builder_question_dict(question):
+    data = tpv_editor_question_to_dict(question)
+    return {
+        "id": data["id"],
+        "task": data["task"],
+        "author": data["author"],
+        "flip_display": data["flip_display"],
+        "is_general": data["is_general"],
+        "show": data["show"],
+    }
+
+
+def tpv_editor_builder_to_dict(row, include_questions=True):
+    config = tpv_editor_builder_config(row)
+    question_ids = tpv_editor_builder_question_ids(row)
+    questions = []
+
+    if include_questions and question_ids:
+        found = db.session.scalars(
+            db.select(Questions_tpv).where(Questions_tpv.id.in_(question_ids))
+        ).all()
+        by_id = {item.id: item for item in found}
+        questions = [
+            tpv_editor_builder_question_dict(by_id[question_id])
+            for question_id in question_ids
+            if question_id in by_id
+        ]
+
+    return {
+        "id": row.id,
+        "name": row.name,
+        "limit": int(config.get("limit") or len(question_ids) or 30),
+        "general_mode": config.get("general_mode") or "include",
+        "unused_only": bool(config.get("unused_only")),
+        "randomize": bool(config.get("randomize", True)),
+        "themes": config.get("themes") or [],
+        "excluded_authors": config.get("excluded_authors") or [],
+        "question_ids": question_ids,
+        "question_count": len(question_ids),
+        "questions": questions,
+        "is_active": bool(row.is_active),
+        "created_at": row.created_at.isoformat(timespec="seconds"),
+        "updated_at": row.updated_at.isoformat(timespec="seconds"),
+        "updated_at_label": row.updated_at.strftime("%d.%m.%Y %H:%M"),
+    }
+
+
+@app.get("/tpv_editor/api/game-builder")
+def tpv_editor_builder_list():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    themes = tpv_editor_theme_list()
+    authors = [
+        value
+        for value in db.session.scalars(
+            db.select(Questions_tpv.author)
+            .where(Questions_tpv.author.is_not(None))
+            .distinct()
+        ).all()
+        if tpv_editor_normalize_text(value)
+    ]
+    authors = sorted(
+        {tpv_editor_normalize_text(value) for value in authors},
+        key=str.casefold,
+    )
+
+    unused_questions = int(db.session.scalar(
+        db.select(func.count(Questions_tpv.id)).where(
+            func.lower(Questions_tpv.show) != "true"
+        )
+    ) or 0)
+
+    if not tpv_editor_builder_table_exists():
+        return jsonify({
+            "ok": True,
+            "table_exists": False,
+            "items": [],
+            "themes": themes,
+            "authors": authors,
+            "stats": {
+                "total": 0,
+                "active_name": None,
+                "unused_questions": unused_questions,
+            },
+        })
+
+    rows = db.session.scalars(
+        db.select(TpvGameBuild)
+        .order_by(TpvGameBuild.is_active.desc(), TpvGameBuild.updated_at.desc())
+    ).all()
+
+    active = next((row for row in rows if row.is_active), None)
+
+    return jsonify({
+        "ok": True,
+        "table_exists": True,
+        "items": [tpv_editor_builder_to_dict(row) for row in rows],
+        "themes": themes,
+        "authors": authors,
+        "stats": {
+            "total": len(rows),
+            "active_name": active.name if active else None,
+            "unused_questions": unused_questions,
+        },
+    })
+
+
+@app.post("/tpv_editor/api/game-builder/create-table")
+def tpv_editor_builder_create_table_route():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    tpv_editor_builder_create_table()
+    return jsonify({
+        "ok": True,
+        "message": "Таблица конструктора игры создана.",
+    })
+
+
+@app.post("/tpv_editor/api/game-builder/preview")
+def tpv_editor_builder_preview():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    data = request.get_json(silent=True) or {}
+
+    try:
+        config = tpv_editor_builder_normalize_payload(data)
+    except ValueError as exc:
+        return tpv_editor_error(str(exc))
+
+    questions, available_count = tpv_editor_builder_select_questions(config)
+
+    return jsonify({
+        "ok": True,
+        "available_count": available_count,
+        "questions": [
+            tpv_editor_builder_question_dict(question)
+            for question in questions
+        ],
+    })
+
+
+@app.post("/tpv_editor/api/game-builder")
+def tpv_editor_builder_create():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    if not tpv_editor_builder_table_exists():
+        return tpv_editor_error("Таблица конструктора не создана.", 409)
+
+    data = request.get_json(silent=True) or {}
+
+    try:
+        config = tpv_editor_builder_normalize_payload(data)
+    except ValueError as exc:
+        return tpv_editor_error(str(exc))
+
+    question_ids = [
+        int(value)
+        for value in data.get("question_ids") or []
+        if str(value).isdigit()
+    ]
+
+    if not question_ids:
+        return tpv_editor_error("Сначала сформируйте выборку вопросов.")
+
+    row = TpvGameBuild(
+        name=config["name"],
+        config_json=tpv_editor_history_json(config),
+        question_ids_json=tpv_editor_history_json(question_ids),
+        is_active=False,
+    )
+    db.session.add(row)
+    db.session.flush()
+
+    tpv_editor_history_add(
+        "bulk",
+        row.id,
+        "create",
+        f"Создан игровой набор «{row.name}»",
+        after=tpv_editor_builder_to_dict(row),
+        details=f"Вопросов в наборе: {len(question_ids)}.",
+        can_revert=False,
+    )
+
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "message": "Игровой набор сохранён.",
+        "item": tpv_editor_builder_to_dict(row),
+    }), 201
+
+
+@app.put("/tpv_editor/api/game-builder/<int:build_id>")
+def tpv_editor_builder_update(build_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    row = db.session.get(TpvGameBuild, build_id)
+    if row is None:
+        return tpv_editor_error("Игровой набор не найден.", 404)
+
+    data = request.get_json(silent=True) or {}
+
+    try:
+        config = tpv_editor_builder_normalize_payload(data)
+    except ValueError as exc:
+        return tpv_editor_error(str(exc))
+
+    question_ids = [
+        int(value)
+        for value in data.get("question_ids") or []
+        if str(value).isdigit()
+    ]
+
+    if not question_ids:
+        return tpv_editor_error("Сначала сформируйте выборку вопросов.")
+
+    before = tpv_editor_builder_to_dict(row)
+
+    row.name = config["name"]
+    row.config_json = tpv_editor_history_json(config)
+    row.question_ids_json = tpv_editor_history_json(question_ids)
+    row.updated_at = _tpv_history_datetime.utcnow()
+
+    db.session.flush()
+
+    tpv_editor_history_add(
+        "bulk",
+        row.id,
+        "update",
+        f"Обновлён игровой набор «{row.name}»",
+        before=before,
+        after=tpv_editor_builder_to_dict(row),
+        can_revert=False,
+    )
+
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "message": "Игровой набор обновлён.",
+        "item": tpv_editor_builder_to_dict(row),
+    })
+
+
+@app.delete("/tpv_editor/api/game-builder/<int:build_id>")
+def tpv_editor_builder_delete(build_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    row = db.session.get(TpvGameBuild, build_id)
+    if row is None:
+        return tpv_editor_error("Игровой набор не найден.", 404)
+
+    snapshot = tpv_editor_builder_to_dict(row)
+    name = row.name
+    db.session.delete(row)
+
+    tpv_editor_history_add(
+        "bulk",
+        build_id,
+        "delete",
+        f"Удалён игровой набор «{name}»",
+        before=snapshot,
+        can_revert=False,
+    )
+
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "message": "Игровой набор удалён. Вопросы из базы не изменены.",
+    })
+
+
+@app.post("/tpv_editor/api/game-builder/<int:build_id>/activate")
+def tpv_editor_builder_activate(build_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    row = db.session.get(TpvGameBuild, build_id)
+    if row is None:
+        return tpv_editor_error("Игровой набор не найден.", 404)
+
+    active_rows = db.session.scalars(
+        db.select(TpvGameBuild).where(TpvGameBuild.is_active.is_(True))
+    ).all()
+
+    for active in active_rows:
+        active.is_active = False
+
+    row.is_active = True
+    row.updated_at = _tpv_history_datetime.utcnow()
+
+    tpv_editor_history_add(
+        "bulk",
+        row.id,
+        "update",
+        f"Активирован игровой набор «{row.name}»",
+        details=f"Вопросов в наборе: {len(tpv_editor_builder_question_ids(row))}.",
+        can_revert=False,
+    )
+
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "message": f"Набор «{row.name}» сделан активным.",
+    })
+
+
+@app.get("/tpv_editor/api/game-builder/active")
+def tpv_editor_builder_active():
+    if not tpv_editor_builder_table_exists():
+        return jsonify({
+            "ok": True,
+            "active": None,
+        })
+
+    row = db.session.scalar(
+        db.select(TpvGameBuild)
+        .where(TpvGameBuild.is_active.is_(True))
+        .order_by(TpvGameBuild.updated_at.desc())
+        .limit(1)
+    )
+
+    return jsonify({
+        "ok": True,
+        "active": tpv_editor_builder_to_dict(row) if row else None,
+    })
+
+
+
+# ============================================================================
+# TPV EDITOR — ЭТАП 9: ЗАЯВКИ НА ВОПРОСЫ
+# ============================================================================
+
+
+class TpvQuestionApplication(db.Model):
+    __tablename__ = "tpv_question_applications"
+
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.String(100), nullable=False, index=True)
+    task = db.Column(db.Text, nullable=False)
+    answer = db.Column(db.Text, nullable=False)
+    comment = db.Column(db.Text, nullable=True)
+    flip = db.Column(db.String(200), nullable=False, default="false", index=True)
+    status = db.Column(db.String(16), nullable=False, default="pending", index=True)
+    reject_reason = db.Column(db.Text, nullable=True)
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=_tpv_history_datetime.utcnow,
+        index=True,
+    )
+    reviewed_at = db.Column(db.DateTime, nullable=True)
+    reviewed_by = db.Column(db.String(100), nullable=True)
+    question_id = db.Column(db.Integer, nullable=True, index=True)
+
+
+def tpv_editor_applications_table_exists():
+    try:
+        return (
+            "tpv_question_applications"
+            in _tpv_history_inspect(db.engine).get_table_names()
+        )
+    except Exception:
+        return False
+
+
+def tpv_editor_applications_create_table():
+    TpvQuestionApplication.__table__.create(
+        bind=db.engine,
+        checkfirst=True,
+    )
+
+
+def tpv_editor_application_validate(data):
+    author = tpv_editor_normalize_text(data.get("author"))
+    task = tpv_editor_normalize_text(data.get("task"))
+    answer = tpv_editor_normalize_text(data.get("answer"))
+    comment = tpv_editor_normalize_text(data.get("comment"))
+    flip = tpv_editor_normalize_theme(data.get("flip"))
+
+    if not author:
+        raise ValueError("Укажите имя автора.")
+    if len(author) > 100:
+        raise ValueError("Имя автора слишком длинное.")
+    if not task:
+        raise ValueError("Введите текст вопроса.")
+    if not answer:
+        raise ValueError("Введите ответ.")
+    if len(task) > 3000:
+        raise ValueError("Текст вопроса слишком длинный.")
+    if len(answer) > 2000:
+        raise ValueError("Ответ слишком длинный.")
+    if len(comment) > 3000:
+        raise ValueError("Комментарий слишком длинный.")
+
+    if not tpv_editor_is_general_theme(flip):
+        available_theme_values = db.session.scalars(
+            db.select(Questions_tpv.flip)
+            .where(Questions_tpv.flip.is_not(None))
+            .distinct()
+        ).all()
+
+        available_themes = {
+            tpv_editor_normalize_text(value).casefold()
+            for value in available_theme_values
+            if (
+                tpv_editor_normalize_text(value)
+                and not tpv_editor_is_general_theme(value)
+            )
+        }
+
+        if tpv_editor_normalize_text(flip).casefold() not in available_themes:
+            raise ValueError("Выбранная тема замены отсутствует в базе.")
+
+    return {
+        "author": author,
+        "task": task,
+        "answer": answer,
+        "comment": comment,
+        "flip": flip,
+    }
+
+
+def tpv_editor_application_to_dict(row):
+    is_general = tpv_editor_is_general_theme(row.flip)
+    author_exists = db.session.scalar(
+        db.select(UsersTpv.id).where(
+            func.lower(UsersTpv.username) == row.author.casefold()
+        )
+    ) is not None
+
+    status_labels = {
+        "pending": "На рассмотрении",
+        "approved": "Утверждена",
+        "rejected": "Отклонена",
+    }
+
+    return {
+        "id": row.id,
+        "author": row.author,
+        "task": row.task,
+        "answer": row.answer,
+        "comment": row.comment or "",
+        "flip": row.flip,
+        "flip_display": "Общий" if is_general else row.flip,
+        "is_general": is_general,
+        "status": row.status,
+        "status_label": status_labels.get(row.status, row.status),
+        "reject_reason": row.reject_reason or "",
+        "created_at": row.created_at.isoformat(timespec="seconds"),
+        "created_at_label": row.created_at.strftime("%d.%m.%Y %H:%M"),
+        "reviewed_at": (
+            row.reviewed_at.isoformat(timespec="seconds")
+            if row.reviewed_at else None
+        ),
+        "reviewed_by": row.reviewed_by or "",
+        "question_id": row.question_id,
+        "author_exists": author_exists,
+    }
+
+
+@app.get("/tpv_questions")
+def tpv_question_application_page():
+    return render_template("tpv-question-application.html")
+
+
+@app.get("/api/tpv-question-applications/status")
+def tpv_question_application_status():
+    theme_values = db.session.scalars(
+        db.select(Questions_tpv.flip)
+        .where(Questions_tpv.flip.is_not(None))
+        .distinct()
+    ).all()
+
+    themes = sorted(
+        {
+            tpv_editor_normalize_text(value)
+            for value in theme_values
+            if (
+                tpv_editor_normalize_text(value)
+                and not tpv_editor_is_general_theme(value)
+            )
+        },
+        key=str.casefold,
+    )
+
+    return jsonify({
+        "ok": True,
+        "table_exists": tpv_editor_applications_table_exists(),
+        "themes": themes,
+    })
+
+
+@app.post("/api/tpv-question-applications")
+def tpv_question_application_submit():
+    if not tpv_editor_applications_table_exists():
+        return tpv_editor_error(
+            "Приём заявок временно недоступен.",
+            503,
+        )
+
+    data = request.get_json(silent=True) or {}
+
+    try:
+        values = tpv_editor_application_validate(data)
+    except ValueError as exc:
+        return tpv_editor_error(str(exc))
+
+    duplicate = db.session.scalar(
+        db.select(TpvQuestionApplication).where(
+            func.lower(TpvQuestionApplication.task)
+            == values["task"].casefold(),
+            TpvQuestionApplication.status == "pending",
+        )
+    )
+
+    if duplicate is not None:
+        return tpv_editor_error(
+            f"Похожая заявка уже ожидает модерации под номером {duplicate.id}.",
+            409,
+        )
+
+    row = TpvQuestionApplication(
+        author=values["author"],
+        task=values["task"],
+        answer=values["answer"],
+        comment=values["comment"],
+        flip=values["flip"],
+        status="pending",
+    )
+    db.session.add(row)
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "message": "Заявка отправлена на модерацию.",
+        "application_id": row.id,
+    }), 201
+
+
+@app.get("/tpv_editor/api/question-applications")
+def tpv_editor_application_list():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    if not tpv_editor_applications_table_exists():
+        return jsonify({
+            "ok": True,
+            "table_exists": False,
+            "items": [],
+            "stats": {
+                "total": 0,
+                "pending": 0,
+                "approved": 0,
+                "rejected": 0,
+            },
+        })
+
+    rows = db.session.scalars(
+        db.select(TpvQuestionApplication)
+        .order_by(TpvQuestionApplication.id.desc())
+        .limit(2000)
+    ).all()
+
+    return jsonify({
+        "ok": True,
+        "table_exists": True,
+        "items": [tpv_editor_application_to_dict(row) for row in rows],
+        "stats": {
+            "total": len(rows),
+            "pending": sum(row.status == "pending" for row in rows),
+            "approved": sum(row.status == "approved" for row in rows),
+            "rejected": sum(row.status == "rejected" for row in rows),
+        },
+    })
+
+
+@app.post("/tpv_editor/api/question-applications/create-table")
+def tpv_editor_application_create_table_route():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    tpv_editor_applications_create_table()
+
+    return jsonify({
+        "ok": True,
+        "message": "Таблица заявок создана.",
+    })
+
+
+@app.post("/tpv_editor/api/question-applications/<int:application_id>/approve")
+def tpv_editor_application_approve(application_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    row = db.session.get(TpvQuestionApplication, application_id)
+
+    if row is None:
+        return tpv_editor_error("Заявка не найдена.", 404)
+    if row.status != "pending":
+        return tpv_editor_error("Заявка уже обработана.", 409)
+
+    data = request.get_json(silent=True) or {}
+
+    try:
+        values = tpv_editor_application_validate(data)
+    except ValueError as exc:
+        return tpv_editor_error(str(exc))
+
+    existing_question = db.session.scalar(
+        db.select(Questions_tpv).where(
+            func.lower(Questions_tpv.task)
+            == values["task"].casefold()
+        )
+    )
+
+    if existing_question is not None:
+        return tpv_editor_error(
+            f"Вопрос с такой формулировкой уже существует: #{existing_question.id}.",
+            409,
+        )
+
+    user = db.session.scalar(
+        db.select(UsersTpv).where(
+            func.lower(UsersTpv.username)
+            == values["author"].casefold()
+        )
+    )
+
+    if user is None and bool(data.get("create_user")):
+        if len(values["author"]) > 10:
+            return tpv_editor_error(
+                "Нельзя создать пользователя: текущая модель допускает имя до 10 символов.",
+                409,
+            )
+
+        user = UsersTpv()
+        user.username = values["author"]
+        user.money = 0
+        user.flip = "false"
+        user.flip_col = 0
+        user.approve = "false"
+        db.session.add(user)
+        db.session.flush()
+
+        tpv_editor_history_add(
+            "user",
+            user.id,
+            "create",
+            f"Создан пользователь «{user.username}» при утверждении заявки",
+            after=tpv_editor_user_snapshot(user),
+            can_revert=True,
+        )
+
+    question = Questions_tpv()
+    question.task = values["task"]
+    question.answer = values["answer"]
+    question.comment = values["comment"]
+    question.author = values["author"]
+    question.flip = values["flip"]
+    question.show = "false"
+
+    db.session.add(question)
+    db.session.flush()
+
+    row.author = values["author"]
+    row.task = values["task"]
+    row.answer = values["answer"]
+    row.comment = values["comment"]
+    row.flip = values["flip"]
+    row.status = "approved"
+    row.reject_reason = ""
+    row.reviewed_at = _tpv_history_datetime.utcnow()
+    row.reviewed_by = "TPV Editor"
+    row.question_id = question.id
+
+    tpv_editor_recalculate_theme(question.flip)
+
+    tpv_editor_history_add(
+        "question",
+        question.id,
+        "create",
+        f"Утверждена заявка #{row.id}; создан вопрос #{question.id}",
+        after=tpv_editor_question_snapshot(question),
+        details=f"Автор заявки: {row.author}.",
+        can_revert=True,
+    )
+
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "message": f"Заявка утверждена. Создан вопрос #{question.id}.",
+        "question_id": question.id,
+    })
+
+
+@app.post("/tpv_editor/api/question-applications/<int:application_id>/reject")
+def tpv_editor_application_reject(application_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    row = db.session.get(TpvQuestionApplication, application_id)
+
+    if row is None:
+        return tpv_editor_error("Заявка не найдена.", 404)
+    if row.status != "pending":
+        return tpv_editor_error("Заявка уже обработана.", 409)
+
+    data = request.get_json(silent=True) or {}
+    reason = tpv_editor_normalize_text(data.get("reject_reason"))
+
+    if not reason:
+        return tpv_editor_error("Укажите причину отклонения.")
+
+    row.status = "rejected"
+    row.reject_reason = reason
+    row.reviewed_at = _tpv_history_datetime.utcnow()
+    row.reviewed_by = "TPV Editor"
+
+    tpv_editor_history_add(
+        "bulk",
+        row.id,
+        "update",
+        f"Отклонена заявка #{row.id}",
+        details=f"Причина: {reason}",
+        can_revert=False,
+    )
+
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "message": "Заявка отклонена.",
+    })
+
+
+@app.delete("/tpv_editor/api/question-applications/<int:application_id>")
+def tpv_editor_application_delete(application_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    row = db.session.get(TpvQuestionApplication, application_id)
+
+    if row is None:
+        return tpv_editor_error("Заявка не найдена.", 404)
+
+    snapshot = tpv_editor_application_to_dict(row)
+    db.session.delete(row)
+
+    tpv_editor_history_add(
+        "bulk",
+        application_id,
+        "delete",
+        f"Удалена заявка #{application_id}",
+        before=snapshot,
+        can_revert=False,
+    )
+
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "message": "Заявка удалена.",
+    })
+
+
+
+def tpv_editor_normalize_text(value):
+    return " ".join(str(value or "").strip().split())
+
+
+def tpv_editor_is_general_theme(value):
+    return tpv_editor_normalize_text(value).casefold() in TPV_GENERAL_QUESTION_VALUES
+
+
+def tpv_editor_normalize_theme(value):
+    theme = tpv_editor_normalize_text(value)
+    return "false" if tpv_editor_is_general_theme(theme) else theme
+
+
+def tpv_editor_theme_key(value):
+    """Ключ темы с поддержкой кириллицы, регистра и лишних пробелов."""
+    return tpv_editor_normalize_text(value).casefold()
+
+
+def tpv_editor_matching_questions(theme):
+    """Возвращает вопросы темы. Сравнение выполняется в Python, не SQLite lower()."""
+    key = tpv_editor_theme_key(theme)
+    if not key or tpv_editor_is_general_theme(theme):
+        return []
+
+    questions = db.session.scalars(
+        db.select(Questions_tpv).where(Questions_tpv.flip.is_not(None))
+    ).all()
+
+    return [
+        question
+        for question in questions
+        if tpv_editor_theme_key(question.flip) == key
+    ]
+
+
+def tpv_editor_matching_users(theme):
+    """Возвращает пользователей темы с корректной обработкой кириллицы."""
+    key = tpv_editor_theme_key(theme)
+    if not key or tpv_editor_is_general_theme(theme):
+        return []
+
+    users = db.session.scalars(
+        db.select(UsersTpv).where(UsersTpv.flip.is_not(None))
+    ).all()
+
+    return [
+        user
+        for user in users
+        if tpv_editor_theme_key(user.flip) == key
+    ]
+
+
+def tpv_editor_count_questions(theme):
+    theme = tpv_editor_normalize_theme(theme)
+    if tpv_editor_is_general_theme(theme):
+        return 0
+    return len(tpv_editor_matching_questions(theme))
+
+
+def tpv_editor_update_approval(user):
+    user.flip = tpv_editor_normalize_theme(user.flip)
+    if tpv_editor_is_general_theme(user.flip):
+        user.flip_col = 0
+        user.approve = "false"
+        return
+    user.flip_col = tpv_editor_count_questions(user.flip)
+    user.approve = "true" if user.flip_col >= TPV_REQUIRED_FLIP_QUESTIONS else "false"
+
+
+def tpv_editor_author_question_count(username):
+    return int(db.session.scalar(
+        db.select(func.count(Questions_tpv.id)).where(Questions_tpv.author == username)
+    ) or 0)
+
+
+def tpv_editor_user_to_dict(user):
+    flip_display = "" if tpv_editor_is_general_theme(user.flip) else (user.flip or "")
+    approved = str(user.approve).lower() == "true"
+    if not flip_display:
+        label = "Тема не выбрана"
+    elif approved:
+        label = "Допущен"
+    else:
+        label = f"Недостаточно вопросов: {int(user.flip_col or 0)}/{TPV_REQUIRED_FLIP_QUESTIONS}"
+    return {
+        "id": user.id,
+        "username": user.username,
+        "money": int(user.money or 0),
+        "flip": user.flip or "false",
+        "flip_display": flip_display,
+        "flip_col": int(user.flip_col or 0),
+        "approve": "true" if approved else "false",
+        "approve_label": label,
+        "authored_questions": tpv_editor_author_question_count(user.username),
+    }
+
+
+def tpv_editor_allowed():
+    return session.get("tpv_launcher_allowed") is True and session.get("tpv_role") == "editor"
+
+
+def tpv_editor_error(message, status=400):
+    return jsonify({"ok": False, "message": message}), status
+
+
+@app.route("/tpv_editor", methods=["POST", "GET"])
+def tpv_editor():
+    if request.method == "POST":
+        if session.get("tpv_launcher_allowed") is not True:
+            return redirect(url_for("tpv"))
+        session["tpv_role"] = "editor"
+        return render_template("tpv-editor.html")
+    if tpv_editor_allowed():
+        return render_template("tpv-editor.html")
+    return redirect(url_for("tpv"))
+
+
+@app.get("/tpv_editor/api/users")
+def tpv_editor_get_users():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    users = db.session.scalars(db.select(UsersTpv).order_by(UsersTpv.id)).all()
+    return jsonify({"ok": True, "users": [tpv_editor_user_to_dict(u) for u in users]})
+
+
+def tpv_editor_theme_list():
+    """Возвращает список уникальных тематических значений Questions_tpv.flip."""
+    raw = db.session.scalars(
+        db.select(Questions_tpv.flip)
+        .where(Questions_tpv.flip.is_not(None))
+        .distinct()
+    ).all()
+
+    unique = {}
+
+    for value in raw:
+        theme = tpv_editor_normalize_text(value)
+
+        if theme and not tpv_editor_is_general_theme(theme):
+            unique.setdefault(theme.casefold(), theme)
+
+    return sorted(unique.values(), key=str.casefold)
+
+
+@app.get("/tpv_editor/api/themes")
+def tpv_editor_get_themes():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    return jsonify({
+        "ok": True,
+        "themes": tpv_editor_theme_list(),
+    })
+
+
+@app.post("/tpv_editor/api/users")
+def tpv_editor_create_user():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    data = request.get_json(silent=True) or {}
+    username = tpv_editor_normalize_text(data.get("username"))
+    if not username:
+        return tpv_editor_error("Имя пользователя обязательно.")
+    if len(username) > 10:
+        return tpv_editor_error("Имя должно содержать не более 10 символов.")
+    duplicate = db.session.scalar(db.select(UsersTpv).where(func.lower(UsersTpv.username) == username.casefold()))
+    if duplicate:
+        return tpv_editor_error("Пользователь с таким именем уже существует.", 409)
+    try:
+        money = int(data.get("money", 0) or 0)
+    except (TypeError, ValueError):
+        return tpv_editor_error("Баланс должен быть целым числом.")
+    user = UsersTpv(username=username, money=money, flip=tpv_editor_normalize_theme(data.get("flip")), flip_col=0, approve="false")
+    tpv_editor_update_approval(user)
+    db.session.add(user)
+    db.session.flush()
+    tpv_editor_history_add(
+        "user",
+        user.id,
+        "create",
+        f"Создан пользователь «{user.username}»",
+        after=tpv_editor_user_snapshot(user),
+        can_revert=True,
+    )
+    db.session.commit()
+    return jsonify({"ok": True, "message": "Пользователь создан.", "user": tpv_editor_user_to_dict(user)}), 201
+
+
+@app.put("/tpv_editor/api/users/<int:user_id>")
+def tpv_editor_update_user(user_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    user = db.session.get(UsersTpv, user_id)
+    if not user:
+        return tpv_editor_error("Пользователь не найден.", 404)
+    data = request.get_json(silent=True) or {}
+    username = tpv_editor_normalize_text(data.get("username"))
+    if not username or len(username) > 10:
+        return tpv_editor_error("Имя обязательно и должно быть не длиннее 10 символов.")
+    duplicate = db.session.scalar(db.select(UsersTpv).where(func.lower(UsersTpv.username) == username.casefold(), UsersTpv.id != user_id))
+    if duplicate:
+        return tpv_editor_error("Пользователь с таким именем уже существует.", 409)
+    try:
+        money = int(data.get("money", 0) or 0)
+    except (TypeError, ValueError):
+        return tpv_editor_error("Баланс должен быть целым числом.")
+    before_snapshot = tpv_editor_user_snapshot(user)
+    old_username = user.username
+    user.username = username
+    user.money = money
+    user.flip = tpv_editor_normalize_theme(data.get("flip"))
+    tpv_editor_update_approval(user)
+    tpv_editor_history_add(
+        "user",
+        user.id,
+        "update",
+        f"Изменён пользователь «{user.username}»",
+        before=before_snapshot,
+        after=tpv_editor_user_snapshot(user),
+        can_revert=True,
+    )
+    db.session.commit()
+    message = "Изменения сохранены."
+    if old_username != username and tpv_editor_author_question_count(old_username):
+        message += " Автор в существующих вопросах не переименован."
+    return jsonify({"ok": True, "message": message, "user": tpv_editor_user_to_dict(user)})
+
+
+@app.delete("/tpv_editor/api/users/<int:user_id>")
+def tpv_editor_delete_user(user_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    user = db.session.get(UsersTpv, user_id)
+    if not user:
+        return tpv_editor_error("Пользователь не найден.", 404)
+    before_snapshot = tpv_editor_user_snapshot(user)
+    username = user.username
+    count = tpv_editor_author_question_count(username)
+    db.session.delete(user)
+    tpv_editor_history_add(
+        "user",
+        user_id,
+        "delete",
+        f"Удалён пользователь «{username}»",
+        before=before_snapshot,
+        details=f"Связанных вопросов автора: {count}.",
+        can_revert=True,
+    )
+    db.session.commit()
+    message = f"Пользователь «{username}» удалён."
+    if count:
+        message += f" Его вопросы ({count}) сохранены."
+    return jsonify({"ok": True, "message": message})
+
+
+@app.post("/tpv_editor/api/users/<int:user_id>/reset-money")
+def tpv_editor_reset_money(user_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    user = db.session.get(UsersTpv, user_id)
+    if not user:
+        return tpv_editor_error("Пользователь не найден.", 404)
+    before_snapshot = tpv_editor_user_snapshot(user)
+    user.money = 0
+    tpv_editor_history_add(
+        "user",
+        user.id,
+        "reset",
+        f"Обнулён баланс пользователя «{user.username}»",
+        before=before_snapshot,
+        after=tpv_editor_user_snapshot(user),
+        can_revert=True,
+    )
+    db.session.commit()
+    return jsonify({"ok": True, "message": f"Баланс пользователя «{user.username}» обнулён."})
+
+
+@app.post("/tpv_editor/api/users/recalculate-all")
+def tpv_editor_recalculate_all():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    users = db.session.scalars(db.select(UsersTpv)).all()
+    for user in users:
+        tpv_editor_update_approval(user)
+    db.session.commit()
+    return jsonify({"ok": True, "message": f"Пересчитано пользователей: {len(users)}."})
+
+
+# ============================================================================
+# TPV EDITOR — ЭТАП 2: ВОПРОСЫ
+# Добавить после блока первого этапа.
+# ============================================================================
+
+def tpv_editor_normalize_question_theme(value):
+    theme = tpv_editor_normalize_text(value)
+    return "false" if tpv_editor_is_general_theme(theme) else theme
+
+
+def tpv_editor_question_to_dict(question):
+    is_general = tpv_editor_is_general_theme(question.flip)
+    return {
+        "id": question.id,
+        "task": question.task or "",
+        "answer": question.answer or "",
+        "comment": question.comment or "",
+        "author": question.author or "",
+        "flip": question.flip or "false",
+        "flip_display": "общий" if is_general else question.flip,
+        "is_general": is_general,
+        "show": "true" if str(question.show).lower() == "true" else "false",
+    }
+
+
+def tpv_editor_recalculate_theme(theme):
+    if tpv_editor_is_general_theme(theme):
+        return 0
+
+    users = tpv_editor_matching_users(theme)
+
+    for user in users:
+        tpv_editor_update_approval(user)
+
+    return len(users)
+
+
+def tpv_editor_question_duplicate(task, exclude_id=None):
+    normalized = tpv_editor_normalize_text(task).casefold()
+    if not normalized:
+        return None
+    query = db.select(Questions_tpv).where(
+        func.lower(func.trim(Questions_tpv.task)) == normalized
+    )
+    if exclude_id is not None:
+        query = query.where(Questions_tpv.id != exclude_id)
+    return db.session.scalar(query.limit(1))
+
+
+def tpv_editor_question_payload(data):
+    task = tpv_editor_normalize_text(data.get("task"))
+    answer = tpv_editor_normalize_text(data.get("answer"))
+    author = tpv_editor_normalize_text(data.get("author"))
+    comment = str(data.get("comment") or "").strip()
+    flip = tpv_editor_normalize_question_theme(data.get("flip"))
+    show = "true" if str(data.get("show")).lower() == "true" else "false"
+    if not task:
+        raise ValueError("Текст вопроса обязателен.")
+    if not answer:
+        raise ValueError("Ответ обязателен.")
+    if not author:
+        raise ValueError("Автор обязателен.")
+    return task, answer, comment, author, flip, show
+
+
+@app.get("/tpv_editor/api/questions")
+def tpv_editor_get_questions():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    questions = db.session.scalars(
+        db.select(Questions_tpv).order_by(Questions_tpv.id)
+    ).all()
+    raw_authors = db.session.scalars(
+        db.select(Questions_tpv.author).where(Questions_tpv.author.is_not(None)).distinct()
+    ).all()
+    raw_themes = db.session.scalars(
+        db.select(Questions_tpv.flip).where(Questions_tpv.flip.is_not(None)).distinct()
+    ).all()
+    authors = sorted({tpv_editor_normalize_text(x) for x in raw_authors if tpv_editor_normalize_text(x)}, key=str.casefold)
+    themes = sorted({tpv_editor_normalize_text(x) for x in raw_themes if not tpv_editor_is_general_theme(x)}, key=str.casefold)
+    return jsonify({"ok": True, "questions": [tpv_editor_question_to_dict(q) for q in questions], "authors": authors, "themes": themes})
+
+
+@app.post("/tpv_editor/api/questions")
+def tpv_editor_create_question():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    data = request.get_json(silent=True) or {}
+    try:
+        task, answer, comment, author, flip, show = tpv_editor_question_payload(data)
+    except ValueError as exc:
+        return tpv_editor_error(str(exc))
+    duplicate = tpv_editor_question_duplicate(task)
+    if duplicate:
+        return tpv_editor_error(f"Такой вопрос уже существует: ID {duplicate.id}.", 409)
+    question = Questions_tpv(task=task, answer=answer, comment=comment, author=author, flip=flip, show=show)
+    db.session.add(question)
+    db.session.flush()
+    tpv_editor_recalculate_theme(flip)
+    tpv_editor_history_add(
+        "question",
+        question.id,
+        "create",
+        f"Создан вопрос #{question.id}",
+        after=tpv_editor_question_snapshot(question),
+        can_revert=True,
+    )
+    db.session.commit()
+    return jsonify({"ok": True, "message": "Вопрос создан.", "question": tpv_editor_question_to_dict(question)}), 201
+
+
+@app.put("/tpv_editor/api/questions/<int:question_id>")
+def tpv_editor_update_question(question_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    question = db.session.get(Questions_tpv, question_id)
+    if not question:
+        return tpv_editor_error("Вопрос не найден.", 404)
+    data = request.get_json(silent=True) or {}
+    try:
+        task, answer, comment, author, flip, show = tpv_editor_question_payload(data)
+    except ValueError as exc:
+        return tpv_editor_error(str(exc))
+    duplicate = tpv_editor_question_duplicate(task, exclude_id=question_id)
+    if duplicate:
+        return tpv_editor_error(f"Такой вопрос уже существует: ID {duplicate.id}.", 409)
+    before_snapshot = tpv_editor_question_snapshot(question)
+    old_theme = question.flip
+    question.task, question.answer, question.comment = task, answer, comment
+    question.author, question.flip, question.show = author, flip, show
+    db.session.flush()
+    tpv_editor_recalculate_theme(old_theme)
+    if tpv_editor_normalize_text(old_theme).casefold() != tpv_editor_normalize_text(flip).casefold():
+        tpv_editor_recalculate_theme(flip)
+    tpv_editor_history_add(
+        "question",
+        question.id,
+        "update",
+        f"Изменён вопрос #{question.id}",
+        before=before_snapshot,
+        after=tpv_editor_question_snapshot(question),
+        can_revert=True,
+    )
+    db.session.commit()
+    return jsonify({"ok": True, "message": "Вопрос сохранён.", "question": tpv_editor_question_to_dict(question)})
+
+
+@app.delete("/tpv_editor/api/questions/<int:question_id>")
+def tpv_editor_delete_question(question_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    question = db.session.get(Questions_tpv, question_id)
+    if not question:
+        return tpv_editor_error("Вопрос не найден.", 404)
+    before_snapshot = tpv_editor_question_snapshot(question)
+    theme = question.flip
+    db.session.delete(question)
+    db.session.flush()
+    tpv_editor_recalculate_theme(theme)
+    tpv_editor_history_add(
+        "question",
+        question_id,
+        "delete",
+        f"Удалён вопрос #{question_id}",
+        before=before_snapshot,
+        can_revert=True,
+    )
+    db.session.commit()
+    return jsonify({"ok": True, "message": f"Вопрос #{question_id} удалён."})
+
+
+@app.post("/tpv_editor/api/questions/<int:question_id>/duplicate")
+def tpv_editor_duplicate_question(question_id):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    source = db.session.get(Questions_tpv, question_id)
+    if not source:
+        return tpv_editor_error("Вопрос не найден.", 404)
+    copy = Questions_tpv(task=f"{source.task} (копия)", answer=source.answer, comment=source.comment, author=source.author, flip=source.flip, show="false")
+    db.session.add(copy)
+    db.session.flush()
+    tpv_editor_recalculate_theme(copy.flip)
+    tpv_editor_history_add(
+        "question",
+        copy.id,
+        "create",
+        f"Создана копия вопроса #{source.id}",
+        after=tpv_editor_question_snapshot(copy),
+        details=f"Исходный вопрос: #{source.id}.",
+        can_revert=True,
+    )
+    db.session.commit()
+    return jsonify({"ok": True, "message": f"Создана копия вопроса #{copy.id}.", "question": tpv_editor_question_to_dict(copy)}), 201
+
+
+@app.post("/tpv_editor/api/questions/reset-shown")
+def tpv_editor_reset_question_show():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    questions = db.session.scalars(
+        db.select(Questions_tpv).where(func.lower(Questions_tpv.show) == "true")
+    ).all()
+    for question in questions:
+        question.show = "false"
+    tpv_editor_history_add(
+        "bulk",
+        None,
+        "reset",
+        "Сброшены использованные вопросы",
+        details=f"Обновлено вопросов: {len(questions)}.",
+        can_revert=False,
+    )
+    db.session.commit()
+    return jsonify({"ok": True, "message": f"Сброшено использованных вопросов: {len(questions)}.", "updated": len(questions)})
+
+# ============================================================================
+# КОНЕЦ БЛОКА TPV EDITOR — ЭТАП 2 (ЭТАП 3 НИЖЕ)
+# ============================================================================
+
+
+# ============================================================================
+# TPV EDITOR — ЭТАП 3: ТЕМЫ
+# Темы являются значениями Questions_tpv.flip и UsersTpv.flip.
+# Отдельная таблица тем не создаётся.
+# ============================================================================
+
+def tpv_editor_theme_rows():
+    questions_all = db.session.scalars(
+        db.select(Questions_tpv).where(Questions_tpv.flip.is_not(None))
+    ).all()
+    users_all = db.session.scalars(
+        db.select(UsersTpv).where(UsersTpv.flip.is_not(None))
+    ).all()
+
+    groups = {}
+
+    for question in questions_all:
+        value = tpv_editor_normalize_text(question.flip)
+        if not value or tpv_editor_is_general_theme(value):
+            continue
+
+        key = tpv_editor_theme_key(value)
+        group = groups.setdefault(key, {
+            "variants": set(),
+            "questions": [],
+            "users": [],
+        })
+        group["variants"].add(value)
+        group["questions"].append(question)
+
+    for user in users_all:
+        value = tpv_editor_normalize_text(user.flip)
+        if not value or tpv_editor_is_general_theme(value):
+            continue
+
+        key = tpv_editor_theme_key(value)
+        group = groups.setdefault(key, {
+            "variants": set(),
+            "questions": [],
+            "users": [],
+        })
+        group["variants"].add(value)
+        group["users"].append(user)
+
+    result = []
+
+    for group in groups.values():
+        variants = sorted(group["variants"], key=str.casefold)
+        questions = group["questions"]
+        users = group["users"]
+        question_count = len(questions)
+        shown_count = sum(str(question.show).lower() == "true" for question in questions)
+        approved_count = sum(str(user.approve).lower() == "true" for user in users)
+
+        result.append({
+            "name": variants[0],
+            "variants": variants,
+            "question_count": question_count,
+            "shown_count": shown_count,
+            "user_count": len(users),
+            "approved_count": approved_count,
+            "required_questions": TPV_REQUIRED_FLIP_QUESTIONS,
+            "ready": question_count >= TPV_REQUIRED_FLIP_QUESTIONS,
+        })
+
+    return sorted(result, key=lambda item: item["name"].casefold())
+
+
+@app.get("/tpv_editor/api/themes-dashboard")
+def tpv_editor_themes_dashboard():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    return jsonify({"ok": True, "themes": tpv_editor_theme_rows()})
+
+
+@app.post("/tpv_editor/api/themes/rename")
+def tpv_editor_rename_theme():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    data = request.get_json(silent=True) or {}
+    old_name = tpv_editor_normalize_text(data.get("old_name"))
+    new_name = tpv_editor_normalize_text(data.get("new_name"))
+
+    if not old_name or tpv_editor_is_general_theme(old_name):
+        return tpv_editor_error("Исходная тема не указана.")
+    if not new_name or tpv_editor_is_general_theme(new_name):
+        return tpv_editor_error("Название темы не может быть пустым или общим.")
+    if old_name.casefold() == new_name.casefold() and old_name == new_name:
+        return tpv_editor_error("Название темы не изменилось.")
+
+    questions = tpv_editor_matching_questions(old_name)
+    users = tpv_editor_matching_users(old_name)
+    history_before = {
+        "questions": [tpv_editor_question_snapshot(item) for item in questions],
+        "users": [tpv_editor_user_snapshot(item) for item in users],
+    }
+
+    if not questions and not users:
+        return tpv_editor_error("Тема не найдена.", 404)
+
+    for question in questions:
+        question.flip = new_name
+    for user in users:
+        user.flip = new_name
+
+    db.session.flush()
+    # Пересчитываются пользователи целевой темы, включая тех, кто уже был в ней.
+    affected_users = tpv_editor_matching_users(new_name)
+    for user in affected_users:
+        tpv_editor_update_approval(user)
+
+    history_after = {
+        "questions": [tpv_editor_question_snapshot(item) for item in questions],
+        "users": [tpv_editor_user_snapshot(item) for item in users],
+    }
+    tpv_editor_history_add(
+        "theme",
+        old_name,
+        "rename",
+        f"Тема «{old_name}» переименована в «{new_name}»",
+        before=history_before,
+        after=history_after,
+        can_revert=True,
+    )
+    db.session.commit()
+    return jsonify({
+        "ok": True,
+        "message": (
+            f"Тема «{old_name}» перенесена в «{new_name}». "
+            f"Вопросов: {len(questions)}, пользователей: {len(users)}."
+        ),
+    })
+
+
+@app.post("/tpv_editor/api/themes/delete")
+def tpv_editor_delete_theme():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    data = request.get_json(silent=True) or {}
+    name = tpv_editor_normalize_text(data.get("name"))
+    target_raw = data.get("target")
+    target = "false" if tpv_editor_is_general_theme(target_raw) else tpv_editor_normalize_text(target_raw)
+
+    if not name or tpv_editor_is_general_theme(name):
+        return tpv_editor_error("Удаляемая тема не указана.")
+    if not target:
+        target = "false"
+    if not tpv_editor_is_general_theme(target) and name.casefold() == target.casefold():
+        return tpv_editor_error("Нельзя перенести тему саму в себя.")
+
+    questions = tpv_editor_matching_questions(name)
+    users = tpv_editor_matching_users(name)
+    history_before = {
+        "questions": [tpv_editor_question_snapshot(item) for item in questions],
+        "users": [tpv_editor_user_snapshot(item) for item in users],
+    }
+
+    if not questions and not users:
+        return tpv_editor_error("Тема не найдена.", 404)
+
+    for question in questions:
+        question.flip = target
+    for user in users:
+        user.flip = target
+
+    db.session.flush()
+
+    # Если перенос в общие — пользователи теряют тему. Иначе пересчитывается цель.
+    if tpv_editor_is_general_theme(target):
+        for user in users:
+            tpv_editor_update_approval(user)
+        target_label = "общие вопросы / без темы"
+    else:
+        affected_users = tpv_editor_matching_users(target)
+        for user in affected_users:
+            tpv_editor_update_approval(user)
+        target_label = f"тему «{target}»"
+
+    history_after = {
+        "questions": [tpv_editor_question_snapshot(item) for item in questions],
+        "users": [tpv_editor_user_snapshot(item) for item in users],
+    }
+    tpv_editor_history_add(
+        "theme",
+        name,
+        "delete",
+        f"Удалена тема «{name}»",
+        before=history_before,
+        after=history_after,
+        details=f"Перенос выполнен в: {target_label}.",
+        can_revert=True,
+    )
+    db.session.commit()
+    return jsonify({
+        "ok": True,
+        "message": (
+            f"Тема «{name}» удалена. Связанные записи перенесены в {target_label}. "
+            f"Вопросов: {len(questions)}, пользователей: {len(users)}."
+        ),
+    })
+
+
+# ============================================================================
+# ЭТАП 4 — ПРОВЕРКА БАЗЫ
+# ============================================================================
+import re as _tpv_re
+
+_TPV_HTML_RE = _tpv_re.compile(r"<[^>]+>")
+_TPV_CONTROL_RE = _tpv_re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
+
+def tpv_editor_compact_text(value):
+    return " ".join(str(value or "").strip().split())
+
+
+def tpv_editor_quality_issue(code, level, entity, record_id, title, details, recommendation, fixable=False):
+    return {
+        "key": f"{entity}:{record_id}:{code}",
+        "code": code,
+        "level": level,
+        "entity": entity,
+        "record_id": record_id,
+        "title": title,
+        "details": details,
+        "recommendation": recommendation,
+        "fixable": bool(fixable),
+    }
+
+
+def tpv_editor_build_quality_report():
+    questions = db.session.scalars(db.select(Questions_tpv).order_by(Questions_tpv.id)).all()
+    users = db.session.scalars(db.select(UsersTpv).order_by(UsersTpv.id)).all()
+    issues = []
+
+    user_names = {tpv_editor_normalize_text(user.username).casefold() for user in users if user.username}
+    duplicate_groups = {}
+
+    for question in questions:
+        task = str(question.task or "")
+        answer = str(question.answer or "")
+        author = str(question.author or "")
+        comment = str(question.comment or "")
+        flip = str(question.flip or "")
+        show = str(question.show or "").casefold()
+
+        if not task.strip():
+            issues.append(tpv_editor_quality_issue("empty_task", "critical", "question", question.id, "Пустой текст вопроса", f"Вопрос #{question.id} не содержит формулировку.", "Откройте вопрос и заполните поле «Вопрос»."))
+        if not answer.strip():
+            issues.append(tpv_editor_quality_issue("empty_answer", "critical", "question", question.id, "Пустой ответ", f"Вопрос #{question.id} не содержит ответа.", "Откройте вопрос и заполните поле «Ответ»."))
+        if not author.strip():
+            issues.append(tpv_editor_quality_issue("empty_author", "warning", "question", question.id, "Не указан автор", f"У вопроса #{question.id} отсутствует автор.", "Назначьте автора вручную."))
+        elif tpv_editor_normalize_text(author).casefold() not in user_names:
+            issues.append(tpv_editor_quality_issue("unknown_author", "warning", "question", question.id, "Автор отсутствует в UsersTpv", f"Автор «{author}» не найден среди пользователей.", "Создайте пользователя либо исправьте имя автора."))
+
+        fields = {"вопрос": task, "ответ": answer, "комментарий": comment, "автор": author, "тема": flip}
+        dirty_fields = [name for name, value in fields.items() if value != tpv_editor_compact_text(value)]
+        if dirty_fields:
+            issues.append(tpv_editor_quality_issue("whitespace", "warning", "question", question.id, "Лишние пробелы", "Поля: " + ", ".join(dirty_fields) + ".", "Можно безопасно удалить пробелы по краям и повторяющиеся пробелы.", True))
+
+        html_fields = [name for name, value in fields.items() if _TPV_HTML_RE.search(value)]
+        if html_fields:
+            issues.append(tpv_editor_quality_issue("html", "warning", "question", question.id, "Обнаружены HTML-теги", "Поля: " + ", ".join(html_fields) + ".", "Проверьте разметку вручную: автоматическое удаление может изменить смысл."))
+
+        control_fields = [name for name, value in fields.items() if _TPV_CONTROL_RE.search(value)]
+        if control_fields:
+            issues.append(tpv_editor_quality_issue("control_chars", "warning", "question", question.id, "Управляющие символы", "Поля: " + ", ".join(control_fields) + ".", "Можно безопасно удалить непечатные управляющие символы.", True))
+
+        if show not in {"true", "false"}:
+            issues.append(tpv_editor_quality_issue("invalid_show", "warning", "question", question.id, "Некорректный статус show", f"Сохранено значение «{question.show}».", "Статус будет приведён к false.", True))
+
+        if len(task.strip()) < 10 and task.strip():
+            issues.append(tpv_editor_quality_issue("short_task", "info", "question", question.id, "Очень короткий вопрос", f"Длина формулировки: {len(task.strip())} символов.", "Проверьте, достаточно ли информации для игрока."))
+        if len(task) > 500:
+            issues.append(tpv_editor_quality_issue("long_task", "warning", "question", question.id, "Очень длинный вопрос", f"Длина формулировки: {len(task)} символов.", "Сократите формулировку или проверьте лимиты интерфейса."))
+
+        duplicate_key = (tpv_editor_compact_text(task).casefold(), tpv_editor_compact_text(answer).casefold())
+        if duplicate_key[0] and duplicate_key[1]:
+            duplicate_groups.setdefault(duplicate_key, []).append(question)
+
+    for group in duplicate_groups.values():
+        if len(group) > 1:
+            ids = [question.id for question in group]
+            for question in group:
+                others = [str(item) for item in ids if item != question.id]
+                issues.append(tpv_editor_quality_issue("duplicate", "warning", "question", question.id, "Точный дубликат вопроса", "Совпадает с вопросами: " + ", ".join(others) + ".", "Сравните записи и удалите лишние вручную."))
+
+    for user in users:
+        theme = tpv_editor_normalize_theme(user.flip)
+        expected_count = tpv_editor_count_questions(theme)
+        expected_approve = "true" if (not tpv_editor_is_general_theme(theme) and expected_count >= TPV_REQUIRED_FLIP_QUESTIONS) else "false"
+        actual_count = int(user.flip_col or 0)
+        actual_approve = str(user.approve or "false").casefold()
+
+        if actual_count != expected_count or actual_approve != expected_approve:
+            issues.append(tpv_editor_quality_issue("stale_approval", "warning", "user", user.id, "Устаревший допуск пользователя", f"{user.username}: сохранено вопросов {actual_count}, должно быть {expected_count}; approve={actual_approve}, должно быть {expected_approve}.", "Можно безопасно пересчитать flip_col и approve.", True))
+
+        username = str(user.username or "")
+        if username != tpv_editor_compact_text(username):
+            issues.append(tpv_editor_quality_issue("user_whitespace", "warning", "user", user.id, "Лишние пробелы в имени", f"Имя сохранено как «{username}».", "Исправьте имя вручную, чтобы не нарушить связь с author."))
+
+    return {
+        "issues": issues,
+        "stats": {
+            "total": len(issues),
+            "critical": sum(item["level"] == "critical" for item in issues),
+            "warning": sum(item["level"] == "warning" for item in issues),
+            "info": sum(item["level"] == "info" for item in issues),
+            "fixable": sum(item["fixable"] for item in issues),
+            "scanned": len(questions) + len(users),
+        },
+    }
+
+
+@app.get("/tpv_editor/api/quality-report")
+def tpv_editor_quality_report():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    report = tpv_editor_build_quality_report()
+    return jsonify({"ok": True, **report})
+
+
+@app.post("/tpv_editor/api/quality/fix")
+def tpv_editor_quality_fix():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    data = request.get_json(silent=True) or {}
+    code = str(data.get("code") or "")
+    entity = str(data.get("entity") or "")
+    record_id = data.get("record_id")
+
+    if entity == "question":
+        question = db.session.get(Questions_tpv, int(record_id))
+        if question is None:
+            return tpv_editor_error("Вопрос не найден.", 404)
+
+        if code == "whitespace":
+            question.task = tpv_editor_compact_text(question.task)
+            question.answer = tpv_editor_compact_text(question.answer)
+            question.comment = tpv_editor_compact_text(question.comment)
+            question.author = tpv_editor_compact_text(question.author)
+            question.flip = tpv_editor_normalize_theme(question.flip)
+        elif code == "control_chars":
+            for field in ("task", "answer", "comment", "author", "flip"):
+                setattr(question, field, _TPV_CONTROL_RE.sub("", str(getattr(question, field) or "")))
+        elif code == "invalid_show":
+            question.show = "false"
+        else:
+            return tpv_editor_error("Для этой проблемы нет безопасного автоматического исправления.")
+
+        db.session.commit()
+        return jsonify({"ok": True, "message": f"Вопрос #{question.id} исправлен."})
+
+    if entity == "user" and code == "stale_approval":
+        user = db.session.get(UsersTpv, int(record_id))
+        if user is None:
+            return tpv_editor_error("Пользователь не найден.", 404)
+        tpv_editor_update_approval(user)
+        db.session.commit()
+        return jsonify({"ok": True, "message": f"Допуск пользователя «{user.username}» пересчитан."})
+
+    return tpv_editor_error("Автоматическое исправление недоступно.")
+
+
+@app.post("/tpv_editor/api/quality/fix-all-safe")
+def tpv_editor_quality_fix_all_safe():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    questions = db.session.scalars(db.select(Questions_tpv)).all()
+    users = db.session.scalars(db.select(UsersTpv)).all()
+    fixed = 0
+
+    for question in questions:
+        original = (question.task, question.answer, question.comment, question.author, question.flip, question.show)
+        question.task = _TPV_CONTROL_RE.sub("", tpv_editor_compact_text(question.task))
+        question.answer = _TPV_CONTROL_RE.sub("", tpv_editor_compact_text(question.answer))
+        question.comment = _TPV_CONTROL_RE.sub("", tpv_editor_compact_text(question.comment))
+        question.author = _TPV_CONTROL_RE.sub("", tpv_editor_compact_text(question.author))
+        question.flip = tpv_editor_normalize_theme(_TPV_CONTROL_RE.sub("", str(question.flip or "")))
+        if str(question.show or "").casefold() not in {"true", "false"}:
+            question.show = "false"
+        current = (question.task, question.answer, question.comment, question.author, question.flip, question.show)
+        if current != original:
+            fixed += 1
+
+    for user in users:
+        before = (int(user.flip_col or 0), str(user.approve or "false"))
+        tpv_editor_update_approval(user)
+        after = (int(user.flip_col or 0), str(user.approve or "false"))
+        if before != after:
+            fixed += 1
+
+    db.session.commit()
+    return jsonify({"ok": True, "message": f"Безопасно исправлено записей: {fixed}.", "fixed": fixed})
+
+
+
+@app.get("/tpv_editor/api/statistics")
+def tpv_editor_statistics():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+
+    users = db.session.scalars(
+        db.select(UsersTpv).order_by(UsersTpv.username)
+    ).all()
+
+    questions = db.session.scalars(
+        db.select(Questions_tpv).order_by(Questions_tpv.id)
+    ).all()
+
+    theme_rows = tpv_editor_theme_rows()
+
+    total_questions = len(questions)
+    general_questions = sum(
+        tpv_editor_is_general_theme(question.flip)
+        for question in questions
+    )
+    themed_questions = total_questions - general_questions
+    shown_questions = sum(
+        str(question.show or "").casefold() == "true"
+        for question in questions
+    )
+    unused_questions = total_questions - shown_questions
+    usage_percent = round(
+        shown_questions * 100 / total_questions,
+        1,
+    ) if total_questions else 0
+
+    approved_users = sum(
+        str(user.approve or "").casefold() == "true"
+        for user in users
+    )
+    users_without_theme = sum(
+        tpv_editor_is_general_theme(user.flip)
+        for user in users
+    )
+    users_not_approved = len(users) - approved_users
+
+    ready_themes = sum(row["ready"] for row in theme_rows)
+    shortage_themes = sum(
+        not row["ready"]
+        for row in theme_rows
+    )
+
+    author_groups = {}
+
+    for question in questions:
+        author_name = tpv_editor_normalize_text(question.author)
+        author_key = author_name.casefold()
+
+        group = author_groups.setdefault(author_key, {
+            "name": author_name or "Без автора",
+            "total": 0,
+            "general": 0,
+            "themed": 0,
+            "shown": 0,
+        })
+
+        group["total"] += 1
+
+        if tpv_editor_is_general_theme(question.flip):
+            group["general"] += 1
+        else:
+            group["themed"] += 1
+
+        if str(question.show or "").casefold() == "true":
+            group["shown"] += 1
+
+    authors = sorted(
+        author_groups.values(),
+        key=lambda item: (-item["total"], item["name"].casefold()),
+    )
+
+    themes = sorted(
+        [
+            {
+                "name": row["name"],
+                "question_count": row["question_count"],
+                "shown_count": row["shown_count"],
+                "user_count": row["user_count"],
+                "approved_count": row["approved_count"],
+                "ready": row["ready"],
+                "missing": max(
+                    0,
+                    TPV_REQUIRED_FLIP_QUESTIONS - row["question_count"],
+                ),
+            }
+            for row in theme_rows
+        ],
+        key=lambda item: (-item["question_count"], item["name"].casefold()),
+    )
+
+    user_rows = []
+
+    for user in users:
+        theme = "" if tpv_editor_is_general_theme(user.flip) else (
+            tpv_editor_normalize_text(user.flip)
+        )
+
+        user_rows.append({
+            "id": user.id,
+            "username": user.username,
+            "money": int(user.money or 0),
+            "theme": theme,
+            "question_count": int(user.flip_col or 0),
+            "approved": str(user.approve or "").casefold() == "true",
+        })
+
+    return jsonify({
+        "ok": True,
+        "statistics": {
+            "summary": {
+                "users": len(users),
+                "questions": total_questions,
+                "themes": len(theme_rows),
+                "approved_users": approved_users,
+                "total_money": sum(int(user.money or 0) for user in users),
+            },
+            "questions": {
+                "total": total_questions,
+                "general": general_questions,
+                "themed": themed_questions,
+                "shown": shown_questions,
+                "unused": unused_questions,
+                "usage_percent": usage_percent,
+            },
+            "readiness": {
+                "ready_themes": ready_themes,
+                "shortage_themes": shortage_themes,
+                "users_without_theme": users_without_theme,
+                "users_not_approved": users_not_approved,
+            },
+            "themes": themes[:15],
+            "authors": authors[:20],
+            "users": user_rows,
+        },
+    })
+
+
+
+# ---------------------------------------------------------------------------
+# ЭТАП 6 — ИМПОРТ / ЭКСПОРТ
+# Для XLSX нужен пакет: pip install openpyxl
+# ---------------------------------------------------------------------------
+
+import csv as tpv_csv
+import io as tpv_io
+import json as tpv_json
+import os as tpv_os
+import sqlite3 as tpv_sqlite3
+import tempfile as tpv_tempfile
+from datetime import datetime as tpv_datetime
+from flask import send_file as tpv_send_file
+
+
+def tpv_editor_export_users_rows():
+    users = db.session.scalars(db.select(UsersTpv).order_by(UsersTpv.id)).all()
+    return [
+        {
+            "id": user.id,
+            "username": user.username or "",
+            "money": int(user.money or 0),
+            "flip": "false" if tpv_editor_is_general_theme(user.flip) else tpv_editor_normalize_text(user.flip),
+            "flip_col": int(user.flip_col or 0),
+            "approve": "true" if str(user.approve or "").casefold() == "true" else "false",
+        }
+        for user in users
+    ]
+
+
+def tpv_editor_export_questions_rows():
+    questions = db.session.scalars(db.select(Questions_tpv).order_by(Questions_tpv.id)).all()
+    return [
+        {
+            "id": question.id,
+            "task": question.task or "",
+            "answer": question.answer or "",
+            "comment": question.comment or "",
+            "author": question.author or "",
+            "flip": "false" if tpv_editor_is_general_theme(question.flip) else tpv_editor_normalize_text(question.flip),
+            "show": "true" if str(question.show or "").casefold() == "true" else "false",
+        }
+        for question in questions
+    ]
+
+
+def tpv_editor_download_bytes(content, filename, mimetype):
+    buffer = tpv_io.BytesIO(content)
+    buffer.seek(0)
+    return tpv_send_file(buffer, as_attachment=True, download_name=filename, mimetype=mimetype)
+
+
+def tpv_editor_csv_bytes(rows, fields):
+    stream = tpv_io.StringIO(newline="")
+    writer = tpv_csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
+    writer.writeheader()
+    writer.writerows(rows)
+    return ("\ufeff" + stream.getvalue()).encode("utf-8")
+
+
+def tpv_editor_xlsx_bytes(users=None, questions=None):
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment
+    except ImportError as exc:
+        raise RuntimeError("Для Excel установите пакет openpyxl: pip install openpyxl") from exc
+
+    workbook = Workbook()
+    default = workbook.active
+    workbook.remove(default)
+    header_fill = PatternFill("solid", fgColor="12354A")
+    header_font = Font(color="FFFFFF", bold=True)
+
+    def add_sheet(name, rows, fields):
+        sheet = workbook.create_sheet(name)
+        sheet.append(fields)
+        for row in rows:
+            sheet.append([row.get(field, "") for field in fields])
+        for cell in sheet[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal="center")
+        sheet.freeze_panes = "A2"
+        for column in sheet.columns:
+            width = min(55, max(12, max(len(str(cell.value or "")) for cell in column) + 2))
+            sheet.column_dimensions[column[0].column_letter].width = width
+
+    if users is not None:
+        add_sheet("Users", users, ["id", "username", "money", "flip", "flip_col", "approve"])
+    if questions is not None:
+        add_sheet("Questions", questions, ["id", "task", "answer", "comment", "author", "flip", "show"])
+
+    output = tpv_io.BytesIO()
+    workbook.save(output)
+    return output.getvalue()
+
+
+@app.get("/tpv_editor/export/users.<fmt>")
+def tpv_editor_export_users(fmt):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    rows = tpv_editor_export_users_rows()
+    stamp = tpv_datetime.now().strftime("%Y%m%d_%H%M%S")
+    if fmt == "csv":
+        return tpv_editor_download_bytes(tpv_editor_csv_bytes(rows, ["id", "username", "money", "flip", "flip_col", "approve"]), f"tpv_users_{stamp}.csv", "text/csv; charset=utf-8")
+    if fmt == "json":
+        data = tpv_json.dumps({"users": rows}, ensure_ascii=False, indent=2).encode("utf-8")
+        return tpv_editor_download_bytes(data, f"tpv_users_{stamp}.json", "application/json")
+    if fmt == "xlsx":
+        try:
+            data = tpv_editor_xlsx_bytes(users=rows)
+        except RuntimeError as exc:
+            return tpv_editor_error(str(exc), 500)
+        return tpv_editor_download_bytes(data, f"tpv_users_{stamp}.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    return tpv_editor_error("Неизвестный формат.", 404)
+
+
+@app.get("/tpv_editor/export/questions.<fmt>")
+def tpv_editor_export_questions(fmt):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    rows = tpv_editor_export_questions_rows()
+    stamp = tpv_datetime.now().strftime("%Y%m%d_%H%M%S")
+    if fmt == "csv":
+        return tpv_editor_download_bytes(tpv_editor_csv_bytes(rows, ["id", "task", "answer", "comment", "author", "flip", "show"]), f"tpv_questions_{stamp}.csv", "text/csv; charset=utf-8")
+    if fmt == "json":
+        data = tpv_json.dumps({"questions": rows}, ensure_ascii=False, indent=2).encode("utf-8")
+        return tpv_editor_download_bytes(data, f"tpv_questions_{stamp}.json", "application/json")
+    if fmt == "xlsx":
+        try:
+            data = tpv_editor_xlsx_bytes(questions=rows)
+        except RuntimeError as exc:
+            return tpv_editor_error(str(exc), 500)
+        return tpv_editor_download_bytes(data, f"tpv_questions_{stamp}.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    return tpv_editor_error("Неизвестный формат.", 404)
+
+
+@app.get("/tpv_editor/export/full.<fmt>")
+def tpv_editor_export_full(fmt):
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    users = tpv_editor_export_users_rows()
+    questions = tpv_editor_export_questions_rows()
+    stamp = tpv_datetime.now().strftime("%Y%m%d_%H%M%S")
+    if fmt == "json":
+        payload = {
+            "format": "tpv-editor-backup",
+            "version": 1,
+            "created_at": tpv_datetime.now().isoformat(timespec="seconds"),
+            "users": users,
+            "questions": questions,
+        }
+        return tpv_editor_download_bytes(tpv_json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"), f"tpv_backup_{stamp}.json", "application/json")
+    if fmt == "xlsx":
+        try:
+            data = tpv_editor_xlsx_bytes(users=users, questions=questions)
+        except RuntimeError as exc:
+            return tpv_editor_error(str(exc), 500)
+        return tpv_editor_download_bytes(data, f"tpv_backup_{stamp}.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    return tpv_editor_error("Неизвестный формат.", 404)
+
+
+@app.get("/tpv_editor/export/database.sqlite")
+def tpv_editor_export_database():
+    if not tpv_editor_allowed():
+        return tpv_editor_error("Нет доступа к редактору.", 403)
+    database_path = db.engine.url.database
+    if not database_path:
+        return tpv_editor_error("Не удалось определить файл SQLite.", 500)
+    source_path = tpv_os.path.abspath(database_path)
+    if not tpv_os.path.exists(source_path):
+        return tpv_editor_error("Файл SQLite не найден.", 404)
+    temp = tpv_tempfile.NamedTemporaryFile(prefix="tpv_backup_", suffix=".sqlite", delete=False)
+    temp.close()
+    try:
+        with tpv_sqlite3.connect(source_path) as source, tpv_sqlite3.connect(temp.name) as target:
+            source.backup(target)
+        stamp = tpv_datetime.now().strftime("%Y%m%d_%H%M%S")
+        return tpv_send_file(temp.name, as_attachment=True, download_name=f"tpv_database_{stamp}.sqlite", mimetype="application/vnd.sqlite3")
+    except Exception:
+        if tpv_os.path.exists(temp.name):
+            tpv_os.unlink(temp.name)
+        raise
+
+
+def tpv_editor_read_import_file(upload, requested_entity="auto"):
+    filename = (upload.filename or "").lower()
+    raw = upload.read()
+    users, questions = [], []
+
+    if filename.endswith(".json"):
+        payload = tpv_json.loads(raw.decode("utf-8-sig"))
+        if isinstance(payload, list):
+            if requested_entity == "users": users = payload
+            elif requested_entity == "questions": questions = payload
+            else: raise ValueError("Для JSON-массива явно выберите раздел импорта.")
+        elif isinstance(payload, dict):
+            users = payload.get("users") or []
+            questions = payload.get("questions") or []
+        else:
+            raise ValueError("Некорректная структура JSON.")
+
+    elif filename.endswith(".csv"):
+        text = raw.decode("utf-8-sig")
+        rows = list(tpv_csv.DictReader(tpv_io.StringIO(text)))
+        entity = requested_entity
+        if entity == "auto":
+            headers = {str(name or "").strip().casefold() for name in (rows[0].keys() if rows else [])}
+            entity = "questions" if "task" in headers or "answer" in headers else "users"
+        if entity == "users": users = rows
+        elif entity == "questions": questions = rows
+        else: raise ValueError("CSV может содержать только один раздел.")
+
+    elif filename.endswith(".xlsx"):
+        try:
+            from openpyxl import load_workbook
+        except ImportError as exc:
+            raise RuntimeError("Для Excel установите пакет openpyxl: pip install openpyxl") from exc
+        workbook = load_workbook(tpv_io.BytesIO(raw), read_only=True, data_only=True)
+
+        def sheet_rows(sheet):
+            values = list(sheet.iter_rows(values_only=True))
+            if not values: return []
+            headers = [tpv_editor_normalize_text(value).casefold() for value in values[0]]
+            return [dict(zip(headers, row)) for row in values[1:] if any(value is not None and str(value).strip() for value in row)]
+
+        names = {name.casefold(): name for name in workbook.sheetnames}
+        if "users" in names: users = sheet_rows(workbook[names["users"]])
+        if "questions" in names: questions = sheet_rows(workbook[names["questions"]])
+        if not users and not questions and len(workbook.sheetnames) == 1:
+            rows = sheet_rows(workbook[workbook.sheetnames[0]])
+            entity = requested_entity
+            if entity == "auto":
+                keys = set(rows[0].keys()) if rows else set()
+                entity = "questions" if "task" in keys or "answer" in keys else "users"
+            if entity == "users": users = rows
+            elif entity == "questions": questions = rows
+    else:
+        raise ValueError("Поддерживаются только CSV, JSON и XLSX.")
+
+    return users, questions
+
+
+def tpv_editor_validate_import(users, questions):
+    errors, warnings = [], []
+    clean_users, clean_questions = [], []
+
+    for index, row in enumerate(users, start=2):
+        normalized = {str(key or "").strip().casefold(): value for key, value in dict(row).items()}
+        username = tpv_editor_normalize_text(normalized.get("username"))
+        if not username:
+            errors.append(f"Пользователь, строка {index}: отсутствует username.")
+            continue
+        if len(username) > 10:
+            errors.append(f"Пользователь «{username}»: имя длиннее 10 символов.")
+            continue
+        try:
+            money = int(normalized.get("money") or 0)
+        except (TypeError, ValueError):
+            errors.append(f"Пользователь «{username}»: некорректный баланс.")
+            continue
+        clean_users.append({"username": username, "money": money, "flip": tpv_editor_normalize_theme(normalized.get("flip"))})
+
+    seen_users = set()
+    for row in clean_users:
+        key = row["username"].casefold()
+        if key in seen_users: warnings.append(f"Повтор пользователя в файле: {row['username']}.")
+        seen_users.add(key)
+
+    for index, row in enumerate(questions, start=2):
+        normalized = {str(key or "").strip().casefold(): value for key, value in dict(row).items()}
+        task = tpv_editor_normalize_text(normalized.get("task"))
+        answer = tpv_editor_normalize_text(normalized.get("answer"))
+        if not task:
+            errors.append(f"Вопрос, строка {index}: отсутствует task.")
+            continue
+        if not answer:
+            errors.append(f"Вопрос, строка {index}: отсутствует answer.")
+            continue
+        show = "true" if str(normalized.get("show") or "false").casefold() == "true" else "false"
+        clean_questions.append({
+            "task": task,
+            "answer": answer,
+            "comment": tpv_editor_normalize_text(normalized.get("comment")),
+            "author": tpv_editor_normalize_text(normalized.get("author")),
+            "flip": tpv_editor_normalize_theme(normalized.get("flip")),
+            "show": show,
+        })
+
+    return clean_users, clean_questions, errors, warnings
+
+
+def tpv_editor_parse_import_request():
+    upload = request.files.get("file")
+    if upload is None or not upload.filename:
+        raise ValueError("Файл не выбран.")
+    entity = request.form.get("entity", "auto")
+    mode = request.form.get("mode", "merge")
+    if entity not in {"auto", "users", "questions", "all"}: raise ValueError("Некорректный раздел импорта.")
+    if mode not in {"merge", "replace"}: raise ValueError("Некорректный режим импорта.")
+    users, questions = tpv_editor_read_import_file(upload, entity)
+    clean_users, clean_questions, errors, warnings = tpv_editor_validate_import(users, questions)
+    if entity == "users": clean_questions = []
+    elif entity == "questions": clean_users = []
+    return entity, mode, clean_users, clean_questions, errors, warnings
+
+
+@app.post("/tpv_editor/api/import-preview")
+def tpv_editor_import_preview():
+    if not tpv_editor_allowed(): return tpv_editor_error("Нет доступа к редактору.", 403)
+    try:
+        entity, mode, users, questions, errors, warnings = tpv_editor_parse_import_request()
+    except (ValueError, RuntimeError, tpv_json.JSONDecodeError, UnicodeDecodeError) as exc:
+        return tpv_editor_error(str(exc))
+    if not users and not questions and not errors:
+        errors.append("В файле не найдено данных для импорта.")
+    return jsonify({"ok": True, "preview": {"valid": not errors, "entity": entity, "mode": mode, "users_count": len(users), "questions_count": len(questions), "errors": errors, "warnings": warnings}})
+
+
+@app.post("/tpv_editor/api/import")
+def tpv_editor_import_apply():
+    if not tpv_editor_allowed(): return tpv_editor_error("Нет доступа к редактору.", 403)
+    try:
+        entity, mode, users_data, questions_data, errors, warnings = tpv_editor_parse_import_request()
+        if errors: return tpv_editor_error("Импорт отменён: " + "; ".join(errors))
+
+        if mode == "replace":
+            if users_data and (entity in {"users", "all", "auto"}):
+                db.session.execute(db.delete(UsersTpv))
+            if questions_data and (entity in {"questions", "all", "auto"}):
+                db.session.execute(db.delete(Questions_tpv))
+            db.session.flush()
+
+        existing_users = db.session.scalars(db.select(UsersTpv)).all()
+        user_map = {tpv_editor_normalize_text(user.username).casefold(): user for user in existing_users}
+        users_added = users_updated = 0
+        for row in users_data:
+            key = row["username"].casefold()
+            user = user_map.get(key)
+            if user is None:
+                user = UsersTpv()
+                user.username = row["username"]
+                user.flip_col = 0
+                user.approve = "false"
+                db.session.add(user)
+                user_map[key] = user
+                users_added += 1
+            else:
+                users_updated += 1
+            user.money = row["money"]
+            user.flip = row["flip"]
+
+        existing_questions = db.session.scalars(db.select(Questions_tpv)).all()
+        question_keys = {
+            (tpv_editor_normalize_text(q.task).casefold(), tpv_editor_normalize_text(q.answer).casefold(), tpv_editor_normalize_text(q.author).casefold(), tpv_editor_theme_key(q.flip))
+            for q in existing_questions
+        }
+        questions_added = questions_skipped = 0
+        for row in questions_data:
+            key = (row["task"].casefold(), row["answer"].casefold(), row["author"].casefold(), tpv_editor_theme_key(row["flip"]))
+            if mode == "merge" and key in question_keys:
+                questions_skipped += 1
+                continue
+            question = Questions_tpv()
+            question.task = row["task"]
+            question.answer = row["answer"]
+            question.comment = row["comment"]
+            question.author = row["author"]
+            question.flip = row["flip"]
+            question.show = row["show"]
+            db.session.add(question)
+            question_keys.add(key)
+            questions_added += 1
+
+        db.session.flush()
+        for user in db.session.scalars(db.select(UsersTpv)).all():
+            tpv_editor_update_approval(user)
+        tpv_editor_history_add(
+            "bulk",
+            None,
+            "import",
+            "Выполнен импорт данных",
+            details=(
+                f"Режим: {mode}; пользователей добавлено: {users_added}; "
+                f"обновлено: {users_updated}; вопросов добавлено: "
+                f"{questions_added}; дублей пропущено: {questions_skipped}."
+            ),
+            can_revert=False,
+        )
+        db.session.commit()
+
+        return jsonify({"ok": True, "message": f"Импорт завершён. Пользователи: добавлено {users_added}, обновлено {users_updated}. Вопросы: добавлено {questions_added}, пропущено дублей {questions_skipped}."})
+    except (ValueError, RuntimeError, tpv_json.JSONDecodeError, UnicodeDecodeError) as exc:
+        db.session.rollback()
+        return tpv_editor_error(str(exc))
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+# ============================================================================
+# КОНЕЦ БЛОКА TPV EDITOR — ЭТАП 9
+# ============================================================================
 
 
 
@@ -2506,14 +5263,15 @@ def update_users_tpv():
         else:
             jsn = []
             for i in range(0,len(js)):
-                id = js[i].id
-                username = js[i].username
-                flip = js[i].flip
-                money = js[i].money
-                status = js[i].status
-                tmp = [id,username,flip,money,status,"false"]
+                if js[i].status != "ended":
+                    id = js[i].id
+                    username = js[i].username
+                    flip = js[i].flip
+                    money = js[i].money
+                    status = js[i].status
+                    tmp = [id,username,flip,money,status,"false"]
                 #socketio.emit("updated_user_tpv",js[i].status,to=f"{get_room_code()}:user:{js[i].username}");
-                jsn.append(tmp)
+                    jsn.append(tmp)
             result = jsn
             emit_tpv_host("updated_users_tpv", result)
             return result
@@ -2753,8 +5511,8 @@ def take_question(data):
         comment = js.comment
         author = js.author
         result = [question,answer,comment,author]
-        #js.show = "true"
-        #db.session.commit()
+        js.show = "true"
+        db.session.commit()
         result_user_spec = {
             "question": question,
             "author": author,
@@ -2781,8 +5539,8 @@ def take_question(data):
             "replacementTopic": data.get("flips"),
             "questionNumber": data.get("questionNumber"),
         }
-        #js.show = "true"
-        #db.session.commit()
+        js.show = "true"
+        db.session.commit()
         socketio.emit("question_selected_user", result_user_spec, to=f"{get_room_code()}:user:{data['player']}")
         emit_tpv_spectator("question_selected_spec", result_user_spec)        
         emit_tpv_host("question_selected", result)
@@ -2814,13 +5572,13 @@ def add_result_author(data):
 
 @socketio.on("add_result_player")
 def add_result_player(data):
-    #js = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==data["name_player"]))
-   # js.money = js.money + data["sum_player"]
+    js = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==data["name_player"]))
+    js.money = js.money + data["sum_player"]
     js1 = db.session.scalar(db.select(QueryTpv).where(QueryTpv.username==data["name_player"]))
     if js1 == None:
         return;
     js1.money = js1.money + data["sum_player"]
-    #js1.status = "ended"
+    js1.status = "ended"
     db.session.commit()
 
     player_win_payload = {

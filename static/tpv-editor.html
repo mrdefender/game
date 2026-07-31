@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPV Editor</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-editor.css') }}">
+    <script src="{{ url_for('static', filename='js/csrf.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tpv-editor.js') }}" defer></script>
+</head>
+<body>
+<main class="editor-shell">
+    <header class="editor-header">
+        <div>
+            <div class="eyebrow">TPV EDITOR</div>
+            <h1 id="page-title">Пользователи</h1>
+            <p id="page-subtitle">Постоянная база игроков и авторов из UsersTpv.</p>
+        </div>
+        <div class="header-actions">
+            <a class="button button-muted" href="{{ url_for('tpv') }}">К выбору режима</a>
+            <button class="button button-secondary users-action" id="recalculate-all-button" type="button">Пересчитать допуски</button>
+            <button class="button button-primary users-action" id="new-user-button" type="button">Новый пользователь</button>
+            <button class="button button-secondary questions-action" id="reset-shown-button" type="button" hidden>Сбросить использованные</button>
+            <button class="button button-primary questions-action" id="new-question-button" type="button" hidden>Новый вопрос</button>
+            <button class="button button-secondary themes-action" id="themes-recalculate-button" type="button" hidden>Пересчитать допуски</button>
+        </div>
+    </header>
+
+    <nav class="editor-tabs" aria-label="Разделы редактора">
+        <button class="editor-tab is-active" type="button" data-tab="users">Пользователи</button>
+        <button class="editor-tab" type="button" data-tab="questions">Вопросы</button>
+        <button class="editor-tab" type="button" data-tab="themes">Темы</button>
+        <button class="editor-tab" type="button" data-tab="quality">Проверка базы</button>
+        <button class="editor-tab" type="button" data-tab="statistics">Статистика</button>
+        <button class="editor-tab" type="button" data-tab="transfer">Импорт / экспорт</button>
+        <button class="editor-tab" type="button" data-tab="history">История</button>
+        <button class="editor-tab" type="button" data-tab="builder">Конструктор игры</button>
+        <button class="editor-tab" type="button" data-tab="applications">Заявки</button>
+    </nav>
+
+    <section id="users-section" class="editor-section">
+        <section class="stats-grid">
+            <article><span>Всего</span><strong id="stat-total">0</strong></article>
+            <article><span>Допущено</span><strong id="stat-approved">0</strong></article>
+            <article><span>Без темы</span><strong id="stat-without-theme">0</strong></article>
+            <article><span>Общий баланс</span><strong id="stat-money">0</strong></article>
+        </section>
+        <section class="editor-panel">
+            <div class="toolbar users-toolbar">
+                <label><span>Поиск</span><input id="search-input" type="search" placeholder="Имя или тема"></label>
+                <label><span>Допуск</span><select id="approve-filter"><option value="all">Все</option><option value="true">Допущены</option><option value="false">Не допущены</option></select></label>
+                <label><span>Сортировка</span><select id="sort-select"><option value="id-asc">ID по возрастанию</option><option value="username-asc">Имя А–Я</option><option value="username-desc">Имя Я–А</option><option value="money-desc">Баланс: больше</option><option value="money-asc">Баланс: меньше</option><option value="flip-asc">Тема А–Я</option><option value="flip_col-desc">Вопросов: больше</option></select></label>
+                <button class="button button-muted" id="reload-button" type="button">Обновить</button>
+            </div>
+            <div class="table-wrap">
+                <table><thead><tr><th>ID</th><th>Пользователь</th><th>Баланс</th><th>Тема замены</th><th>Вопросов</th><th>Допуск</th><th></th></tr></thead><tbody id="users-table-body"></tbody></table>
+                <div class="empty-state" id="empty-state" hidden>Пользователи не найдены.</div>
+            </div>
+        </section>
+    </section>
+
+    <section id="questions-section" class="editor-section" hidden>
+        <section class="stats-grid stats-grid-five">
+            <article><span>Всего вопросов</span><strong id="q-stat-total">0</strong></article>
+            <article><span>Общие</span><strong id="q-stat-general">0</strong></article>
+            <article><span>Замены</span><strong id="q-stat-themed">0</strong></article>
+            <article><span>Использовано</span><strong id="q-stat-shown">0</strong></article>
+            <article><span>Тем</span><strong id="q-stat-themes">0</strong></article>
+        </section>
+        <section class="editor-panel">
+            <div class="toolbar questions-toolbar">
+                <label class="toolbar-search"><span>Поиск</span><input id="question-search" type="search" placeholder="Вопрос, ответ, комментарий или автор"></label>
+                <label><span>Тема</span><select id="question-theme-filter"><option value="all">Все темы</option><option value="general">Общие</option></select></label>
+                <label><span>Автор</span><select id="question-author-filter"><option value="all">Все авторы</option></select></label>
+                <label><span>Использование</span><select id="question-show-filter"><option value="all">Все</option><option value="false">Не использованы</option><option value="true">Использованы</option></select></label>
+                <label><span>Сортировка</span><select id="question-sort"><option value="id-asc">ID по возрастанию</option><option value="id-desc">ID по убыванию</option><option value="task-asc">Вопрос А–Я</option><option value="author-asc">Автор А–Я</option><option value="flip-asc">Тема А–Я</option></select></label>
+                <button class="button button-muted" id="questions-reload" type="button">Обновить</button>
+            </div>
+            <div class="table-wrap question-table-wrap">
+                <table class="questions-table"><thead><tr><th>ID</th><th>Вопрос</th><th>Ответ</th><th>Автор</th><th>Тема</th><th>Статус</th><th></th></tr></thead><tbody id="questions-table-body"></tbody></table>
+                <div class="empty-state" id="questions-empty" hidden>Вопросы не найдены.</div>
+            </div>
+        </section>
+    </section>
+
+
+    <section id="themes-section" class="editor-section" hidden>
+        <section class="stats-grid stats-grid-five">
+            <article><span>Всего тем</span><strong id="t-stat-total">0</strong></article>
+            <article><span>Вопросов в темах</span><strong id="t-stat-questions">0</strong></article>
+            <article><span>Используют игроки</span><strong id="t-stat-users">0</strong></article>
+            <article><span>Достаточно вопросов</span><strong id="t-stat-ready">0</strong></article>
+            <article><span>Пустые темы</span><strong id="t-stat-empty">0</strong></article>
+        </section>
+        <section class="editor-panel">
+            <div class="toolbar themes-toolbar">
+                <label class="toolbar-search"><span>Поиск</span><input id="theme-search" type="search" placeholder="Название темы"></label>
+                <label><span>Состояние</span><select id="theme-state-filter"><option value="all">Все темы</option><option value="ready">Достаточно вопросов</option><option value="shortage">Недостаточно вопросов</option><option value="unused">Никто не использует</option><option value="empty">Нет вопросов</option></select></label>
+                <label><span>Сортировка</span><select id="theme-sort"><option value="name-asc">Название А–Я</option><option value="questions-desc">Вопросов: больше</option><option value="questions-asc">Вопросов: меньше</option><option value="users-desc">Пользователей: больше</option></select></label>
+                <button class="button button-muted" id="themes-reload" type="button">Обновить</button>
+            </div>
+            <div class="table-wrap">
+                <table class="themes-table"><thead><tr><th>Тема</th><th>Вопросов</th><th>Использовано</th><th>Пользователей</th><th>Допущено</th><th>Состояние</th><th></th></tr></thead><tbody id="themes-table-body"></tbody></table>
+                <div class="empty-state" id="themes-empty" hidden>Темы не найдены.</div>
+            </div>
+        </section>
+    </section>
+
+
+    <section id="quality-section" class="editor-section" hidden>
+        <section class="stats-grid stats-grid-five">
+            <article><span>Всего проблем</span><strong id="c-stat-total">0</strong></article>
+            <article><span>Критические</span><strong id="c-stat-critical">0</strong></article>
+            <article><span>Предупреждения</span><strong id="c-stat-warning">0</strong></article>
+            <article><span>Автоисправление</span><strong id="c-stat-fixable">0</strong></article>
+            <article><span>Проверено записей</span><strong id="c-stat-scanned">0</strong></article>
+        </section>
+        <section class="editor-panel">
+            <div class="toolbar quality-toolbar">
+                <label class="toolbar-search"><span>Поиск</span><input id="quality-search" type="search" placeholder="Тип проблемы, пользователь, вопрос или тема"></label>
+                <label><span>Уровень</span><select id="quality-level-filter"><option value="all">Все уровни</option><option value="critical">Критические</option><option value="warning">Предупреждения</option><option value="info">Информация</option></select></label>
+                <label><span>Раздел</span><select id="quality-entity-filter"><option value="all">Все разделы</option><option value="question">Вопросы</option><option value="user">Пользователи</option><option value="theme">Темы</option></select></label>
+                <label><span>Исправление</span><select id="quality-fix-filter"><option value="all">Все</option><option value="fixable">Можно исправить</option><option value="manual">Требует проверки</option></select></label>
+                <button class="button button-secondary" id="quality-fix-all" type="button">Исправить безопасные</button>
+                <button class="button button-muted" id="quality-reload" type="button">Запустить проверку</button>
+            </div>
+            <div class="table-wrap">
+                <table class="quality-table"><thead><tr><th>Уровень</th><th>Раздел</th><th>Проблема</th><th>Запись</th><th>Рекомендация</th><th></th></tr></thead><tbody id="quality-table-body"></tbody></table>
+                <div class="empty-state" id="quality-empty" hidden>Проблемы не обнаружены.</div>
+            </div>
+        </section>
+    </section>
+
+
+    <section id="statistics-section" class="editor-section" hidden>
+        <section class="stats-grid stats-grid-five">
+            <article><span>Пользователей</span><strong id="s-stat-users">0</strong></article>
+            <article><span>Вопросов</span><strong id="s-stat-questions">0</strong></article>
+            <article><span>Тем</span><strong id="s-stat-themes">0</strong></article>
+            <article><span>Допущено</span><strong id="s-stat-approved">0</strong></article>
+            <article><span>Использование базы</span><strong id="s-stat-usage">0%</strong></article>
+        </section>
+
+        <section class="statistics-layout">
+            <article class="editor-panel statistics-card">
+                <header class="statistics-card-header">
+                    <div>
+                        <h2>Состояние вопросов</h2>
+                        <p>Общие, тематические и использованные вопросы.</p>
+                    </div>
+                    <button class="button button-muted" id="statistics-reload" type="button">Обновить</button>
+                </header>
+                <div class="statistics-metrics">
+                    <div><span>Общие</span><strong id="s-general">0</strong></div>
+                    <div><span>Тематические</span><strong id="s-themed">0</strong></div>
+                    <div><span>Использовано</span><strong id="s-shown">0</strong></div>
+                    <div><span>Не использовано</span><strong id="s-unused">0</strong></div>
+                </div>
+                <div class="progress-block">
+                    <div class="progress-label"><span>Использование базы</span><strong id="s-usage-label">0%</strong></div>
+                    <div class="progress-track"><span id="s-usage-bar"></span></div>
+                </div>
+            </article>
+
+            <article class="editor-panel statistics-card">
+                <header class="statistics-card-header">
+                    <div>
+                        <h2>Готовность базы</h2>
+                        <p>Допуски пользователей и наполнение тем.</p>
+                    </div>
+                </header>
+                <div class="statistics-metrics">
+                    <div><span>Готовых тем</span><strong id="s-ready-themes">0</strong></div>
+                    <div><span>Тем с дефицитом</span><strong id="s-shortage-themes">0</strong></div>
+                    <div><span>Без темы</span><strong id="s-without-theme">0</strong></div>
+                    <div><span>Без допуска</span><strong id="s-not-approved">0</strong></div>
+                </div>
+            </article>
+        </section>
+
+        <section class="statistics-grid">
+            <article class="editor-panel">
+                <header class="statistics-card-header">
+                    <div>
+                        <h2>Темы по количеству вопросов</h2>
+                        <p>Первые 15 тем, отсортированных по наполненности.</p>
+                    </div>
+                </header>
+                <div class="table-wrap statistics-table-wrap">
+                    <table class="statistics-table">
+                        <thead><tr><th>Тема</th><th>Вопросов</th><th>Использовано</th><th>Пользователей</th><th>Состояние</th></tr></thead>
+                        <tbody id="statistics-themes-body"></tbody>
+                    </table>
+                    <div class="empty-state" id="statistics-themes-empty" hidden>Тематических вопросов нет.</div>
+                </div>
+            </article>
+
+            <article class="editor-panel">
+                <header class="statistics-card-header">
+                    <div>
+                        <h2>Авторы вопросов</h2>
+                        <p>Количество вопросов и доля использованных.</p>
+                    </div>
+                </header>
+                <div class="table-wrap statistics-table-wrap">
+                    <table class="statistics-table">
+                        <thead><tr><th>Автор</th><th>Вопросов</th><th>Общие</th><th>Тематические</th><th>Использовано</th></tr></thead>
+                        <tbody id="statistics-authors-body"></tbody>
+                    </table>
+                    <div class="empty-state" id="statistics-authors-empty" hidden>Авторы не найдены.</div>
+                </div>
+            </article>
+        </section>
+
+        <section class="editor-panel">
+            <header class="statistics-card-header">
+                <div>
+                    <h2>Пользователи и готовность</h2>
+                    <p>Баланс, тема, количество вопросов и статус допуска.</p>
+                </div>
+            </header>
+            <div class="table-wrap">
+                <table class="statistics-table">
+                    <thead><tr><th>Пользователь</th><th>Баланс</th><th>Тема</th><th>Вопросов</th><th>Допуск</th></tr></thead>
+                    <tbody id="statistics-users-body"></tbody>
+                </table>
+                <div class="empty-state" id="statistics-users-empty" hidden>Пользователи не найдены.</div>
+            </div>
+        </section>
+    </section>
+
+
+    <section id="transfer-section" class="editor-section" hidden>
+        <section class="transfer-grid">
+            <article class="editor-panel transfer-card">
+                <header class="statistics-card-header">
+                    <div>
+                        <h2>Экспорт данных</h2>
+                        <p>Выгрузка пользователей, вопросов или всей базы редактора.</p>
+                    </div>
+                </header>
+
+                <div class="transfer-groups">
+                    <section class="transfer-group">
+                        <h3>Пользователи</h3>
+                        <div class="transfer-actions">
+                            <a class="button button-muted" href="/tpv_editor/export/users.csv">CSV</a>
+                            <a class="button button-muted" href="/tpv_editor/export/users.json">JSON</a>
+                            <a class="button button-secondary" href="/tpv_editor/export/users.xlsx">Excel</a>
+                        </div>
+                    </section>
+
+                    <section class="transfer-group">
+                        <h3>Вопросы</h3>
+                        <div class="transfer-actions">
+                            <a class="button button-muted" href="/tpv_editor/export/questions.csv">CSV</a>
+                            <a class="button button-muted" href="/tpv_editor/export/questions.json">JSON</a>
+                            <a class="button button-secondary" href="/tpv_editor/export/questions.xlsx">Excel</a>
+                        </div>
+                    </section>
+
+                    <section class="transfer-group">
+                        <h3>Полный комплект</h3>
+                        <div class="transfer-actions">
+                            <a class="button button-muted" href="/tpv_editor/export/full.json">JSON</a>
+                            <a class="button button-secondary" href="/tpv_editor/export/full.xlsx">Excel</a>
+                            <a class="button button-primary" href="/tpv_editor/export/database.sqlite">SQLite</a>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="dialog-note">
+                    Резервная копия SQLite создаётся через безопасный SQLite Backup API и не останавливает приложение.
+                </div>
+            </article>
+
+            <article class="editor-panel transfer-card">
+                <header class="statistics-card-header">
+                    <div>
+                        <h2>Импорт данных</h2>
+                        <p>Сначала выполните анализ файла. До нажатия «Применить» база не изменяется.</p>
+                    </div>
+                </header>
+
+                <div class="transfer-form">
+                    <label>
+                        <span>Раздел</span>
+                        <select id="import-entity">
+                            <option value="auto">Определить автоматически</option>
+                            <option value="users">Пользователи</option>
+                            <option value="questions">Вопросы</option>
+                            <option value="all">Пользователи и вопросы</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        <span>Режим</span>
+                        <select id="import-mode">
+                            <option value="merge">Объединить с базой</option>
+                            <option value="replace">Полностью заменить раздел</option>
+                        </select>
+                    </label>
+
+                    <label class="field-wide">
+                        <span>Файл CSV, JSON или XLSX</span>
+                        <input id="import-file" type="file" accept=".csv,.json,.xlsx">
+                    </label>
+
+                    <div class="transfer-actions field-wide">
+                        <button class="button button-secondary" id="import-preview-button" type="button">Проверить файл</button>
+                        <button class="button button-primary" id="import-apply-button" type="button" disabled>Применить импорт</button>
+                    </div>
+                </div>
+
+                <div id="import-preview" class="import-preview" hidden>
+                    <h3>Результат проверки</h3>
+                    <div class="statistics-metrics">
+                        <div><span>Пользователей</span><strong id="import-users-count">0</strong></div>
+                        <div><span>Вопросов</span><strong id="import-questions-count">0</strong></div>
+                        <div><span>Ошибок</span><strong id="import-errors-count">0</strong></div>
+                        <div><span>Предупреждений</span><strong id="import-warnings-count">0</strong></div>
+                    </div>
+                    <ul id="import-messages" class="import-messages"></ul>
+                </div>
+            </article>
+        </section>
+
+        <section class="editor-panel transfer-help">
+            <header class="statistics-card-header">
+                <div>
+                    <h2>Форматы колонок</h2>
+                    <p>Названия колонок нечувствительны к регистру.</p>
+                </div>
+            </header>
+            <div class="transfer-format-grid">
+                <div><strong>Пользователи</strong><code>username, money, flip</code></div>
+                <div><strong>Вопросы</strong><code>task, answer, comment, author, flip, show</code></div>
+                <div><strong>Excel</strong><code>Листы Users и Questions</code></div>
+                <div><strong>JSON</strong><code>{ "users": [...], "questions": [...] }</code></div>
+            </div>
+        </section>
+    </section>
+
+
+    <section id="history-section" class="editor-section" hidden>
+        <section id="history-missing-table" class="editor-panel history-missing" hidden>
+            <div>
+                <h2>Таблица истории не создана</h2>
+                <p>Создайте таблицу <code>tpv_editor_history</code> или выполните SQL-скрипт из архива.</p>
+            </div>
+            <button id="history-create-table" class="button button-primary" type="button">
+                Создать таблицу
+            </button>
+        </section>
+
+        <section id="history-content">
+            <section class="stats-grid stats-grid-four">
+                <article><span>Всего записей</span><strong id="h-stat-total">0</strong></article>
+                <article><span>Сегодня</span><strong id="h-stat-today">0</strong></article>
+                <article><span>Можно откатить</span><strong id="h-stat-revertible">0</strong></article>
+                <article><span>Уже отменено</span><strong id="h-stat-reverted">0</strong></article>
+            </section>
+
+            <section class="editor-panel">
+                <div class="toolbar history-toolbar">
+                    <label>
+                        <span>Поиск</span>
+                        <input id="history-search" type="search" placeholder="Объект, действие или описание">
+                    </label>
+                    <label>
+                        <span>Объект</span>
+                        <select id="history-entity-filter">
+                            <option value="all">Все</option>
+                            <option value="user">Пользователи</option>
+                            <option value="question">Вопросы</option>
+                            <option value="theme">Темы</option>
+                            <option value="bulk">Массовые операции</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Действие</span>
+                        <select id="history-action-filter">
+                            <option value="all">Все</option>
+                            <option value="create">Создание</option>
+                            <option value="update">Изменение</option>
+                            <option value="delete">Удаление</option>
+                            <option value="reset">Сброс</option>
+                            <option value="rename">Переименование</option>
+                            <option value="import">Импорт</option>
+                            <option value="fix">Исправление</option>
+                            <option value="revert">Откат</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Статус</span>
+                        <select id="history-status-filter">
+                            <option value="all">Все</option>
+                            <option value="active">Активные</option>
+                            <option value="reverted">Отменённые</option>
+                            <option value="revertible">Доступен откат</option>
+                        </select>
+                    </label>
+                    <button id="history-reload" class="button button-muted" type="button">Обновить</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Действие</th>
+                                <th>Объект</th>
+                                <th>Описание</th>
+                                <th>Изменения</th>
+                                <th>Статус</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body"></tbody>
+                    </table>
+                    <div id="history-empty" class="empty-state" hidden>История изменений пуста.</div>
+                </div>
+            </section>
+        </section>
+    </section>
+
+
+    <section id="builder-section" class="editor-section" hidden>
+        <section id="builder-missing-table" class="editor-panel history-missing" hidden>
+            <div>
+                <h2>Таблица конструктора не создана</h2>
+                <p>Создайте таблицу <code>tpv_game_builds</code> или выполните SQL-скрипт из архива.</p>
+            </div>
+            <button id="builder-create-table" class="button button-primary" type="button">
+                Создать таблицу
+            </button>
+        </section>
+
+        <section id="builder-content">
+            <section class="stats-grid stats-grid-five">
+                <article><span>Сохранённых наборов</span><strong id="b-stat-total">0</strong></article>
+                <article><span>Активный набор</span><strong id="b-stat-active">Нет</strong></article>
+                <article><span>Доступно вопросов</span><strong id="b-stat-available">0</strong></article>
+                <article><span>Выбрано</span><strong id="b-stat-selected">0</strong></article>
+                <article><span>Неиспользованных</span><strong id="b-stat-unused">0</strong></article>
+            </section>
+
+            <section class="builder-layout">
+                <article class="editor-panel builder-settings">
+                    <header class="statistics-card-header">
+                        <div>
+                            <h2>Параметры набора</h2>
+                            <p>Настройте фильтры и сформируйте список вопросов для конкретной игры.</p>
+                        </div>
+                        <button id="builder-new" class="button button-muted" type="button">Новый</button>
+                    </header>
+
+                    <input id="builder-id" type="hidden">
+
+                    <div class="builder-form">
+                        <label class="field-wide">
+                            <span>Название набора</span>
+                            <input id="builder-name" type="text" maxlength="120" placeholder="Например: Финал 01.08.2026">
+                        </label>
+
+                        <label>
+                            <span>Количество вопросов</span>
+                            <input id="builder-limit" type="number" min="1" max="1000" value="30">
+                        </label>
+
+                        <label>
+                            <span>Общие вопросы</span>
+                            <select id="builder-general">
+                                <option value="include">Включать</option>
+                                <option value="only">Только общие</option>
+                                <option value="exclude">Исключить</option>
+                            </select>
+                        </label>
+
+                        <label class="builder-checkbox">
+                            <input id="builder-unused-only" type="checkbox" checked>
+                            <span>Только неиспользованные вопросы</span>
+                        </label>
+
+                        <label class="builder-checkbox">
+                            <input id="builder-randomize" type="checkbox" checked>
+                            <span>Перемешивать результат</span>
+                        </label>
+
+                        <fieldset class="builder-fieldset">
+                            <legend>Разрешённые темы</legend>
+                            <div class="builder-list-actions">
+                                <button id="builder-themes-all" class="link-button" type="button">Выбрать все</button>
+                                <button id="builder-themes-none" class="link-button" type="button">Снять все</button>
+                            </div>
+                            <div id="builder-themes-list" class="builder-check-list"></div>
+                            <small>Если темы не выбраны, тематические вопросы не ограничиваются.</small>
+                        </fieldset>
+
+                        <fieldset class="builder-fieldset">
+                            <legend>Исключить авторов</legend>
+                            <div class="builder-list-actions">
+                                <button id="builder-authors-none" class="link-button" type="button">Снять исключения</button>
+                            </div>
+                            <div id="builder-authors-list" class="builder-check-list"></div>
+                        </fieldset>
+                    </div>
+
+                    <div class="builder-actions">
+                        <button id="builder-preview" class="button button-secondary" type="button">Предпросмотр</button>
+                        <button id="builder-save" class="button button-primary" type="button">Сохранить набор</button>
+                        <button id="builder-activate" class="button button-secondary" type="button" disabled>Сделать активным</button>
+                        <button id="builder-delete" class="button button-danger-soft" type="button" disabled>Удалить</button>
+                    </div>
+                </article>
+
+                <article class="editor-panel builder-preview">
+                    <header class="statistics-card-header">
+                        <div>
+                            <h2>Предпросмотр выборки</h2>
+                            <p id="builder-preview-summary">Укажите параметры и нажмите «Предпросмотр».</p>
+                        </div>
+                        <button id="builder-regenerate" class="button button-muted" type="button" disabled>Пересобрать</button>
+                    </header>
+                    <div class="table-wrap builder-preview-table-wrap">
+                        <table class="questions-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>ID</th>
+                                    <th>Вопрос</th>
+                                    <th>Автор</th>
+                                    <th>Тема</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody id="builder-preview-body"></tbody>
+                        </table>
+                        <div id="builder-preview-empty" class="empty-state">Предпросмотр ещё не сформирован.</div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="editor-panel">
+                <header class="statistics-card-header">
+                    <div>
+                        <h2>Сохранённые наборы</h2>
+                        <p>Активный набор доступен игре через API <code>/tpv_editor/api/game-builder/active</code>.</p>
+                    </div>
+                    <button id="builder-reload" class="button button-muted" type="button">Обновить</button>
+                </header>
+                <div class="table-wrap">
+                    <table class="builder-table">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Вопросов</th>
+                                <th>Фильтры</th>
+                                <th>Обновлён</th>
+                                <th>Статус</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="builder-table-body"></tbody>
+                    </table>
+                    <div id="builder-empty" class="empty-state" hidden>Сохранённых наборов пока нет.</div>
+                </div>
+            </section>
+        </section>
+    </section>
+
+
+    <section id="applications-section" class="editor-section" hidden>
+        <section id="applications-missing-table" class="editor-panel history-missing" hidden>
+            <div>
+                <h2>Таблица заявок не создана</h2>
+                <p>Создайте таблицу <code>tpv_question_applications</code> или выполните SQL-скрипт из архива.</p>
+            </div>
+            <button id="applications-create-table" class="button button-primary" type="button">
+                Создать таблицу
+            </button>
+        </section>
+
+        <section id="applications-content">
+            <section class="stats-grid stats-grid-four">
+                <article><span>Всего заявок</span><strong id="a-stat-total">0</strong></article>
+                <article><span>На рассмотрении</span><strong id="a-stat-pending">0</strong></article>
+                <article><span>Утверждено</span><strong id="a-stat-approved">0</strong></article>
+                <article><span>Отклонено</span><strong id="a-stat-rejected">0</strong></article>
+            </section>
+
+            <section class="editor-panel">
+                <div class="toolbar applications-toolbar">
+                    <label>
+                        <span>Поиск</span>
+                        <input id="applications-search" type="search" placeholder="Автор, вопрос, ответ или тема">
+                    </label>
+                    <label>
+                        <span>Статус</span>
+                        <select id="applications-status-filter">
+                            <option value="pending">На рассмотрении</option>
+                            <option value="all">Все</option>
+                            <option value="approved">Утверждённые</option>
+                            <option value="rejected">Отклонённые</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Тип</span>
+                        <select id="applications-type-filter">
+                            <option value="all">Все</option>
+                            <option value="general">Общие</option>
+                            <option value="themed">Темы замены</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Сортировка</span>
+                        <select id="applications-sort">
+                            <option value="new-desc">Сначала новые</option>
+                            <option value="new-asc">Сначала старые</option>
+                            <option value="author-asc">Автор А–Я</option>
+                        </select>
+                    </label>
+                    <button id="applications-reload" class="button button-muted" type="button">Обновить</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="applications-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Дата</th>
+                                <th>Автор</th>
+                                <th>Вопрос</th>
+                                <th>Тема</th>
+                                <th>Статус</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="applications-table-body"></tbody>
+                    </table>
+                    <div id="applications-empty" class="empty-state" hidden>Заявки не найдены.</div>
+                </div>
+            </section>
+        </section>
+    </section>
+
+</main>
+
+<dialog id="user-dialog">
+<form id="user-form" method="dialog">
+    <div class="dialog-header"><div><div class="eyebrow">КАРТОЧКА ПОЛЬЗОВАТЕЛЯ</div><h2 id="dialog-title">Новый пользователь</h2></div><button class="icon-button" id="dialog-close" type="button">×</button></div>
+    <input id="user-id" type="hidden">
+    <div class="form-grid">
+        <label class="field-wide"><span>Имя</span><input id="user-username" type="text" maxlength="10" required><small>До 10 символов — ограничение модели UsersTpv.</small></label>
+        <label><span>Баланс</span><input id="user-money" type="number" step="1" value="0" required></label>
+        <label><span>Тема замены</span><input id="user-flip" type="text" list="theme-options"><datalist id="theme-options"></datalist></label>
+        <label><span>Количество вопросов</span><input id="user-flip-count" type="number" readonly></label>
+        <label><span>Статус допуска</span><input id="user-approve" type="text" readonly></label>
+    </div>
+    <div class="dialog-note"><code>flip_col</code> и <code>approve</code> рассчитываются автоматически.</div>
+    <div class="dialog-actions"><button class="button button-danger" id="delete-user-button" type="button" hidden>Удалить</button><button class="button button-danger-soft" id="reset-money-button" type="button" hidden>Обнулить баланс</button><span class="spacer"></span><button class="button button-muted" id="cancel-button" type="button">Отмена</button><button class="button button-primary" type="submit">Сохранить</button></div>
+</form>
+</dialog>
+
+<dialog id="question-dialog" class="question-dialog">
+<form id="question-form" method="dialog">
+    <div class="dialog-header"><div><div class="eyebrow">КАРТОЧКА ВОПРОСА</div><h2 id="question-dialog-title">Новый вопрос</h2></div><button class="icon-button" id="question-dialog-close" type="button">×</button></div>
+    <input id="question-id" type="hidden">
+    <div class="question-form-grid">
+        <label class="field-wide"><span>Вопрос</span><textarea id="question-task" rows="5" required></textarea></label>
+        <label class="field-wide"><span>Ответ</span><textarea id="question-answer" rows="3" required></textarea></label>
+        <label><span>Автор</span><input id="question-author" type="text" list="author-options" required><datalist id="author-options"></datalist></label>
+        <label><span>Тема</span><input id="question-flip" type="text" list="question-theme-options" placeholder="общий"><datalist id="question-theme-options"></datalist><small>Для общего вопроса оставьте пустым или укажите «общий».</small></label>
+        <label><span>Использован</span><select id="question-show"><option value="false">Нет</option><option value="true">Да</option></select></label>
+        <label class="field-wide"><span>Комментарий</span><textarea id="question-comment" rows="4" placeholder="Необязательное пояснение"></textarea></label>
+    </div>
+    <div class="dialog-note">После сохранения, изменения темы или удаления вопроса допуски пользователей пересчитываются автоматически.</div>
+    <div class="dialog-actions"><button class="button button-danger" id="delete-question-button" type="button" hidden>Удалить</button><button class="button button-secondary" id="duplicate-question-button" type="button" hidden>Дублировать</button><span class="spacer"></span><button class="button button-muted" id="question-cancel" type="button">Отмена</button><button class="button button-primary" type="submit">Сохранить</button></div>
+</form>
+</dialog>
+
+
+<dialog id="theme-dialog" class="theme-dialog">
+<form id="theme-form" method="dialog">
+    <div class="dialog-header"><div><div class="eyebrow">КАРТОЧКА ТЕМЫ</div><h2 id="theme-dialog-title">Тема</h2></div><button class="icon-button" id="theme-dialog-close" type="button">×</button></div>
+    <input id="theme-original-name" type="hidden">
+    <div class="theme-summary-grid">
+        <article><span>Вопросов</span><strong id="theme-dialog-questions">0</strong></article>
+        <article><span>Пользователей</span><strong id="theme-dialog-users">0</strong></article>
+        <article><span>Допущено</span><strong id="theme-dialog-approved">0</strong></article>
+        <article><span>Использовано</span><strong id="theme-dialog-shown">0</strong></article>
+    </div>
+    <label><span>Новое название</span><input id="theme-new-name" type="text" required></label>
+    <div class="dialog-note">Переименование обновляет тему во всех вопросах и у всех пользователей. Если новое название уже существует, темы будут объединены.</div>
+    <div class="theme-danger-zone">
+        <label><span>При удалении перенести вопросы и пользователей в</span><select id="theme-delete-target"><option value="false">Общие вопросы / тема не выбрана</option></select></label>
+        <button class="button button-danger" id="delete-theme-button" type="button">Удалить тему</button>
+    </div>
+    <div class="dialog-actions"><span class="spacer"></span><button class="button button-muted" id="theme-cancel" type="button">Отмена</button><button class="button button-primary" type="submit">Переименовать / объединить</button></div>
+</form>
+</dialog>
+
+
+<dialog id="application-dialog" class="editor-dialog application-dialog">
+    <form id="application-form" method="dialog">
+        <div class="dialog-header">
+            <div>
+                <div class="eyebrow">МОДЕРАЦИЯ ЗАЯВКИ</div>
+                <h2 id="application-dialog-title">Заявка</h2>
+            </div>
+            <button id="application-dialog-close" class="icon-button" type="button">×</button>
+        </div>
+
+        <input id="application-id" type="hidden">
+
+        <div class="form-grid">
+            <label>
+                <span>Автор</span>
+                <input id="application-author" type="text" maxlength="100">
+            </label>
+
+            <label>
+                <span>Тема</span>
+                <input id="application-flip" type="text" list="question-theme-options">
+            </label>
+
+            <label class="field-wide">
+                <span>Вопрос</span>
+                <textarea id="application-task" rows="5"></textarea>
+            </label>
+
+            <label class="field-wide">
+                <span>Ответ</span>
+                <textarea id="application-answer" rows="3"></textarea>
+            </label>
+
+            <label class="field-wide">
+                <span>Комментарий / пояснение</span>
+                <textarea id="application-comment" rows="4"></textarea>
+            </label>
+
+            <label class="field-wide">
+                <span>Причина отклонения</span>
+                <textarea
+                    id="application-reject-reason"
+                    rows="3"
+                    placeholder="Заполняется при отклонении"
+                ></textarea>
+            </label>
+
+            <label class="builder-checkbox field-wide">
+                <input id="application-create-user" type="checkbox">
+                <span>Создать пользователя, если автора нет в UsersTpv</span>
+            </label>
+        </div>
+
+        <div id="application-meta" class="dialog-note"></div>
+
+        <div class="dialog-actions">
+            <button
+                id="application-delete"
+                class="button button-danger-soft"
+                type="button"
+            >
+                Удалить заявку
+            </button>
+
+            <span class="spacer"></span>
+
+            <button
+                id="application-reject"
+                class="button button-danger"
+                type="button"
+            >
+                Отклонить
+            </button>
+
+            <button
+                id="application-approve"
+                class="button button-primary"
+                type="button"
+            >
+                Утвердить
+            </button>
+
+            <button
+                id="application-cancel"
+                class="button button-muted"
+                type="button"
+            >
+                Закрыть
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<div class="toast-region" id="toast-region"></div>
+</body>
+</html>

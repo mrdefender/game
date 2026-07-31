@@ -277,7 +277,7 @@ function showQuestion(payload) {
   $("section-metrics").hidden = false;
   $("section-timer").hidden = false;
   $("round-stage").hidden = false;
-  $("money-tree").hidden = false;
+  $("money-tree").hidden = true;
   $("section-question").hidden = false;
 
   $("question-text").textContent = data.question || "";
