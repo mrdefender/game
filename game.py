@@ -416,13 +416,13 @@ def join():
             if give_name_game(request.form['room_id']) == 'tpv':
                 find_user = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==request.form['user_name']))
                 if find_user == None:
-                    flash ('К сожалению, Ваша заявку на игру не найдена')
+                    flash ('К сожалению, Ваша заявку на игру не найдена.')
                     return render_template("login.html")
                 if find_user.flip=="false" or find_user.flip==None:
-                    flash ('К сожалению, Ваша заявку на игру не одобрена! Отстуствует тема замены')
+                    flash ('К сожалению, Ваша заявку на игру не одобрена! Отстуствует тема замены.')
                     return render_template("login.html")  
                 if find_user.flip_col<TPV_REQUIRED_FLIP_QUESTIONS:
-                    flash ('К сожалению, Ваша заявку на игру не одобрена! Недостаточно вопросов замены')
+                    flash ('К сожалению, Ваша заявку на игру не одобрена! Недостаточно вопросов замены.')
                     return render_template("login.html")  
                 user_tpv = QueryTpv()
                 user_tpv.username = request.form['user_name']
