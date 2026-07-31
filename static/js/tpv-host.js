@@ -723,21 +723,24 @@ socket.on("DB_clean", (data) => {
 
 
 function choose_player_random(){
+    stop_current_sound()
+    playAudio("tpv-select-player.ogg",false)   
     socket.emit("tpv_selection_start");
-    setTimeout(() => socket.emit("choose_player_random"), 2200);
+    setTimeout(() => socket.emit("choose_player_random"), 2000);
 }
 function choose_player_id(){
+    stop_current_sound()
+    playAudio("tpv-select-player.ogg",false)   
     const id_player = document.getElementById("control-player-id").value;
     console.log(id_player);
     socket.emit("tpv_selection_start");
-    setTimeout(() => socket.emit("choose_player_id", {id:id_player}), 2200);
+    setTimeout(() => socket.emit("choose_player_id", {id:id_player}), 2000);
 }
 
 socket.on("player_selected", (data) => {
     document.getElementById("display-current-player").textContent = data[1]
     document.getElementById("display-current-flip").textContent = data[2]
-    stop_current_sound()
-    playAudio("tpv-select-player.ogg",false)   
+
 }
 
 )
@@ -1479,3 +1482,4 @@ function hide_stats()
     name_player = document.getElementById("display-current-player").textContent;
     socket.emit("hide_stats",{player:name_player});
 }
+

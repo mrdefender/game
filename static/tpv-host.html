@@ -292,7 +292,6 @@
                 <button id="action-hide-tree" class="game-btn" type="button" data-action="hide-tree" onclick="hide_tree()">Убрать дерево</button>
                 <button id="action-show-stats" class="game-btn" type="button" data-action="show-stats" onclick="show_stats()">Показать статистику</button>
                 <button id="action-hide-stats" class="game-btn" type="button" data-action="hide-stats" onclick="hide_stats()">Убрать статистику</button>
-                <button id="action-hide-stats" class="game-btn" type="button" data-action="hide-stats" onclick="show_results()">Показать результаты</button>
               </div>
             </section>
 
@@ -325,8 +324,7 @@
             <section class="action-group">
               <h3>Завершение</h3>
               <div class="action-grid action-grid--3">
-                <button id="action-finish-game" class="game-btn game-btn--danger" type="button" data-action="finish-game">Завершить игру</button>
-                <button id="action-show-results" class="game-btn" type="button" data-action="show-results">Результаты игры</button>
+                <button id="action-show-results" class="game-btn" type="button" data-action="show-results" onclick="show_results()">Результаты игры</button>
                 <button id="action-reset-game" class="game-btn game-btn--warning" type="button" data-action="reset-game" onclick="cancel_all()">Сброс</button>
                 <button id="action-reset-game" class="game-btn game-btn--warning" type="button" data-action="reset-game" onclick="clear_db()">Очистить БД</button>
               </div>

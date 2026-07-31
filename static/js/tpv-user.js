@@ -743,17 +743,19 @@ socket.on("tpv_player_win_user", (payload) => {
  * ========================================================= */
 
 function getBongStopButton() {
-    return document.getElementById("action-bong-stop");
+    return document.getElementById("bong-stop");
 }
 
 function bindBongStopButton() {
     const stopButton = getBongStopButton();
-    if (!stopButton || stopButton.dataset.bongStopBound === "true") return;
-
-    stopButton.dataset.bongStopBound = "true";
+    console.log(stopButton);
+   if (!stopButton || stopButton.dataset.bongStopBound === "true") return;
+    console.log(stopButton.dataset.bongStopBound)
+   // stopButton.dataset.bongStopBound = "true";
     stopButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+      console.log(stopButton.dataset.bongStopBound)
         stop_bong_game_user();
     });
 }
@@ -790,7 +792,7 @@ function stop_bong_game_user() {
     if (!bongGameActive || bongStopRequested) return;
 
     bongStopRequested = true;
-
+    console.log(bongStopRequested);
     const stopButton = getBongStopButton();
     if (stopButton) stopButton.disabled = true;
 

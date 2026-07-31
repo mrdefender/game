@@ -61,7 +61,6 @@ BASE_DIR = Path(__file__).resolve().parent
 BRANDING_FILE = BASE_DIR / "config" / "branding.json"
 
 
-
 with open(
     BASE_DIR / "config" / "branding.json",
     encoding="utf-8"
@@ -421,7 +420,7 @@ def join():
                 if find_user.flip=="false" or find_user.flip==None:
                     flash ('К сожалению, Ваша заявку на игру не одобрена! Отстуствует тема замены.')
                     return render_template("login.html")  
-                if find_user.flip_col<TPV_REQUIRED_FLIP_QUESTIONS:
+                if int(find_user.flip_col) < TPV_REQUIRED_FLIP_QUESTIONS:
                     flash ('К сожалению, Ваша заявку на игру не одобрена! Недостаточно вопросов замены.')
                     return render_template("login.html")  
                 user_tpv = QueryTpv()
@@ -5394,9 +5393,10 @@ def reset_to_wait_tpv():
     try:
         js = db.session.scalars(db.select(QueryTpv)).all()
         if len(js)==1:
-            js[0].status = "wait"
-            db.session.commit()
-            update_users_tpv()
+            if js[0].status != "ended":
+                js[0].status = "wait"
+                db.session.commit()
+                update_users_tpv()
         else:
             for i in range(0,len(js)):
                 if js[i].status != "ended":
