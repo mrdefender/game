@@ -31,7 +31,7 @@
 
   <section class="selection" id="selection-stage" hidden>
     <div class="brand-logo brand-logo--small">
-      <span>THE PEOPLE</span><strong>VERSUS</strong>
+      <strong>{{ game_name|default('The People Versus') }}</strong>
     </div>
     <div class="selection-caption">В ИГРУ ВСТУПАЕТ</div>
     <div class="selection-name" id="selection-name">—</div>
@@ -41,7 +41,7 @@
   <section class="game" id="game-layout" hidden>
     <header class="game-header">
       <div class="brand-logo brand-logo--header">
-        <span>THE PEOPLE</span><strong>VERSUS</strong>
+        <strong>{{ game_name|default('The People Versus') }}</strong>
       </div>
       <div class="player-name">ИГРОК: <strong id="current-player">—</strong></div>
       <div class="socket-status" id="socket-status"><i></i><span id="socket-status-text">Отключено</span></div>
@@ -111,7 +111,6 @@
         <div class="money-row" id="money-round-3"><span>Р.3</span><strong>50 000</strong></div>
         <div class="money-row" id="money-round-4"><span>Р.4</span><strong>150 000</strong></div>
         <div class="money-row" id="money-round-5"><span>Р.5</span><strong>500 000</strong></div>
-
       </aside>
 
       
