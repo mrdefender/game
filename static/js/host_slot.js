@@ -45,7 +45,7 @@ var audioCache = {};
 var currentAudio = [];
 var currentUrl = document.URL;
 var ffffff = currentUrl.split('/host_slot');//адресная строка пользователя без /host_slot http://ip:5000
-var audioUrl = ffffff[0]+'/sounds/';
+var audioUrl = ffffff[0]+'/sounds/slot/';
 
 const socket = io();
 function setSocketStatus(isOnline) {
@@ -79,7 +79,7 @@ socket.on("pong:test", (data) => {
 socket.on("connect", () => {
   console.log("Socket connected:", socket.id);
 setSocketStatus(true);
-  socket.emit("room:join", {
+  socket.emit("room:join_slot", {
     room: "99999999",
     role: "host",
     username: "admin"
@@ -1332,7 +1332,7 @@ function show_fatal_to_host_panel(n_r,fatal,b_bomb,r_bomb)
         for (i=0;i<5;i++)
         {
             stop_current_sound();
-            playAudio("a4-9.ogg",false);
+            playAudio("a4.ogg",false);
             document.getElementById(get_btn(fatal[i])).style.backgroundColor = "red";
             if ((b_bomb != "false") && (r_bomb!=false))
             {

@@ -1,0 +1,95 @@
+/* TPV animations v4 */
+
+@keyframes tpvEnter{
+  from{opacity:0;transform:translateY(10px) scale(.985)}
+  to{opacity:1;transform:none}
+}
+@keyframes tpvLeave{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:translateY(8px) scale(.99)}
+}
+.tpv-enter{animation:tpvEnter .42s cubic-bezier(.2,.75,.2,1) both}
+.tpv-leave{animation:tpvLeave .34s ease both}
+
+@keyframes tpvQuestionShow{
+  0%{opacity:0;transform:translateX(28px) scale(.985)}
+  100%{opacity:1;transform:none}
+}
+@keyframes tpvQuestionHide{
+  0%{opacity:1;transform:none}
+  100%{opacity:0;transform:translateX(-26px) scale(.99)}
+}
+.tpv-question-show{animation:tpvQuestionShow .62s cubic-bezier(.18,.78,.18,1) both}
+.tpv-question-hide{animation:tpvQuestionHide .5s ease both}
+
+@keyframes tpvTimerShow{
+  0%{opacity:0;transform:translateY(-7px);filter:blur(2px)}
+  100%{opacity:1;transform:none;filter:none}
+}
+@keyframes tpvTimerHide{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:translateY(-5px)}
+}
+.tpv-timer-show{animation:tpvTimerShow .32s ease-out both}
+.tpv-timer-hide{animation:tpvTimerHide .24s ease both}
+
+@keyframes tpvTreeShow{
+  from{opacity:0;transform:translateX(-46px) scaleX(.82);filter:blur(5px)}
+  to{opacity:1;transform:none;filter:none}
+}
+@keyframes tpvTreeHide{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:translateX(-40px) scaleX(.86)}
+}
+@keyframes tpvTreeRowShow{
+  0%{opacity:0;transform:translateX(-26px)}
+  70%{opacity:1;transform:translateX(3px)}
+  100%{opacity:1;transform:none}
+}
+@keyframes tpvTreeRowHide{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:translateX(-22px)}
+}
+.tpv-tree-show{animation:tpvTreeShow .48s cubic-bezier(.16,.8,.2,1) both}
+.tpv-tree-hide{animation:tpvTreeHide .27s ease both}
+.tpv-tree-row-show{animation:tpvTreeRowShow .42s cubic-bezier(.18,.8,.2,1) both}
+.tpv-tree-row-hide{animation:tpvTreeRowHide .2s ease both}
+
+@keyframes tpvRoundFocus{
+  0%{transform:scale(.96);filter:brightness(.8)}
+  55%{transform:scale(1.035);filter:brightness(1.35)}
+  100%{transform:none}
+}
+.tpv-round-focus{animation:tpvRoundFocus .52s ease both}
+
+@keyframes tpvTimerTick{
+  0%{transform:scale(1);text-shadow:0 0 0 transparent}
+  45%{transform:scale(1.08);text-shadow:0 0 18px rgba(97,223,240,.7)}
+  100%{transform:scale(1)}
+}
+.tpv-timer-tick{animation:tpvTimerTick .24s ease}
+
+@keyframes tpvOrbPop{
+  0%{transform:scale(.75)}
+  65%{transform:scale(1.14)}
+  100%{transform:none}
+}
+.tpv-orb-pop{animation:tpvOrbPop .32s ease}
+
+@keyframes tpvCorrectFlash{
+  0%,100%{filter:none}
+  45%{filter:brightness(1.35);box-shadow:0 0 30px rgba(38,199,116,.5)}
+}
+.tpv-correct-flash{animation:tpvCorrectFlash .65s ease}
+
+@keyframes tpvWrongFlash{
+  0%,100%{filter:none}
+  45%{filter:brightness(1.25);box-shadow:0 0 30px rgba(236,51,74,.55)}
+}
+.tpv-wrong-flash{animation:tpvWrongFlash .65s ease}
+
+@keyframes tpvBongShow{
+  from{opacity:0;transform:translateY(20px) scale(.97)}
+  to{opacity:1;transform:none}
+}
+.tpv-bong-show{animation:tpvBongShow .48s ease both}

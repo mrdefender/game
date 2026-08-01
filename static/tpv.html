@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Веселые игры</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
+    <link rel="stylesheet" href="/static/styles/tpv.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="/static/js/csrf.js"></script>
+</head>
+<body>
+    <div class="stage-bg stage-bg-slot"></div>
+
+    <main class="screen-shell">
+        <section class="screen-card panel-glow">
+            <header class="screen-header">
+                <div class="eyebrow">ADMIN MODE</div>
+                <h1>Веселые игры</h1>
+                <div class="subline">The People Versus</div>
+            </header>
+
+            <section class="screen-intro panel-inner">
+                <div class="intro-title">Добро пожаловать на игру</div>
+                <div class="intro-text">Выберите режим запуска для текущей комнаты.</div>
+            </section>
+
+            <section class="screen-actions panel-inner">
+                <div class="section-title">Режимы</div>
+
+                <form action="/tpv_host" method="post" class="select_game">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="submit" class="action-btn action-host" value="Режим ведущего">
+                </form>
+
+                <form action="/tpv_spectator" method="post" class="select_game">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="submit" class="action-btn action-spec" value="Режим зрителя">
+                </form>
+                <form action="/tpv_editor" method="post" class="select_game">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="submit" class="action-btn action-editor" value="Режим редактора">
+                </form>
+            </section>
+        </section>
+    </main>
+
+    <footer class="copyrights">
+        Здесь могло бы быть ваше имя и ваша реклама.
+    </footer>
+</body>
+</html>

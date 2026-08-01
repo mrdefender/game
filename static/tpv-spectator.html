@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>The People Versus — экран зрителя</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-spectator.css') }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+<main class="spectator" id="tpv-spectator">
+
+
+
+    <section class="room-card" id="room-card" hidden>
+      <div class="room-copy">
+        <span>КОД КОМНАТЫ</span>
+        <strong id="room-code">----</strong>
+        <span id="room-url"></span>
+      </div>
+      <div id="room-qr" class="room-qr"></div>
+    </section>
+
+  <section class="waiting" id="waiting-screen">
+    <div class="brand-logo" id="versus-logo">
+      <span>THE PEOPLE</span>
+      <strong>VERSUS</strong>
+      <strong id="vs-player"></strong>
+    </div>
+  </section>
+
+  <section class="selection" id="selection-stage" hidden>
+    <div class="brand-logo brand-logo--small">
+      <span>THE PEOPLE</span><strong>VERSUS</strong>
+    </div>
+    <div class="selection-caption">В ИГРУ ВСТУПАЕТ</div>
+    <div class="selection-name" id="selection-name">—</div>
+    <div class="selection-list" id="players-list"></div>
+  </section>
+
+  <section class="game" id="game-layout" hidden>
+    <header class="game-header">
+      <div class="brand-logo brand-logo--header">
+        <span>THE PEOPLE</span><strong>VERSUS</strong>
+      </div>
+      <div class="player-name">ИГРОК: <strong id="current-player">—</strong></div>
+      <div class="socket-status" id="socket-status"><i></i><span id="socket-status-text">Отключено</span></div>
+    </header>
+
+    <section class="public-stats" id="section-metrics" hidden>
+      <article class="public-stat timer-stat" id="section-timer">
+        <span>ВРЕМЯ</span>
+        <output id="display-time">4:00</output>
+      </article>
+
+      <article class="public-stat">
+        <span>ТЕКУЩАЯ СУММА</span>
+        <output id="display-current-money">0</output>
+      </article>
+
+      <article class="public-stat bank-stat" id="bank-stat" hidden>
+        <span>БАНК</span>
+        <output id="display-bank">0</output>
+      </article>
+
+      <article class="public-stat topic-stat">
+        <span>ТЕМА ЗАМЕНЫ</span>
+        <output id="display-replacement-topic">—</output>
+      </article>
+
+      <article class="public-stat flips-stat">
+        <span>ЗАМЕНЫ</span>
+        <div class="replacement-orbs" id="replacement-orbs" aria-label="Оставшиеся замены">
+          <i id="replacement-orb-1">→</i>
+          <i id="replacement-orb-2">→</i>
+          <i id="replacement-orb-3">→</i>
+        </div>
+      </article>
+    </section>
+    <section class="question-card" id="section-question" hidden>
+        <div class="question-number" id="num_question">В.1</div>
+
+        <div class="question-body">
+          <span class="field-caption">ВОПРОС</span>
+          <div class="question-text" id="question-text"></div>
+
+          <span class="field-caption">АВТОР ВОПРОСА</span>
+          <div class="question-author" id="question-author">— Автор вопроса —</div>
+
+          <div class="indicators">
+            <div class="answer-indicators">
+              <i id="correct-indicator-1">В</i>
+              <i id="correct-indicator-2"></i>
+              <i id="correct-indicator-3"></i>
+              <i id="correct-indicator-4"></i>
+              <i id="correct-indicator-5"></i>
+            </div>
+            <div class="flip-indicators">
+              <i id="flip-indicator-1">→</i>
+              <i id="flip-indicator-2">→</i>
+              <i id="flip-indicator-3">→</i>
+            </div>
+          </div>
+        </div>
+      </section>
+    <section class="round-stage" id="round-stage" hidden aria-label="Раунд">
+      <aside class="money-tree" id="money-tree" hidden>
+        <div class="tree-title">ДЕРЕВО ИГРЫ</div>
+        <div class="money-row" id="money-round-5"><span>Р.5</span><strong>500 000</strong></div>
+        <div class="money-row" id="money-round-4"><span>Р.4</span><strong>150 000</strong></div>
+        <div class="money-row" id="money-round-3"><span>Р.3</span><strong>50 000</strong></div>
+        <div class="money-row" id="money-round-2"><span>Р.2</span><strong>25 000</strong></div>
+        <div class="money-row" id="money-round-1"><span>Р.1</span><strong>10 000</strong></div>
+      </aside>
+
+      
+    </section>
+
+
+
+    <section class="bong-panel" id="section-bong-game" hidden>
+      <h2>ГОНГ-ИГРА</h2>
+      <div class="bong-options">
+        <button id="bong-variable-1">1</button>
+        <button id="bong-variable-2">2</button>
+        <button id="bong-variable-3">3</button>
+      </div>
+      <div class="bong-result">
+        <span>ТЕКУЩАЯ СУММА</span>
+        <output id="bong-current-sum">0</output>
+      </div>
+      <div class="question-author" id="bong-question-author">— Автор вопроса —</div>
+      <div class="bong-status" id="bong-status"></div>
+    </section>
+  </section>
+
+  <section class="results-overlay" id="results-overlay" hidden>
+    <div class="results-panel">
+        <div class="results-logo">
+            <span>THE PEOPLE</span>
+            <strong>VERSUS</strong>
+        </div>
+
+        <h2>ОБЩИЙ РЕЗУЛЬТАТ ИГРЫ</h2>
+
+        <div class="results-list" id="results-list"></div>
+    </div>
+</section>
+
+  <section class="award-overlay" id="award-overlay" hidden>
+    <span id="award-caption">ВЫИГРЫШ</span>
+    <strong id="award-name">—</strong>
+    <output id="award-sum">0</output>
+  </section>
+  <input type="submit" onclick="start_video()" hidden>
+
+</main>
+<div id="videoOverlay" class="video-overlay">
+    <video
+        id="gameVideo"
+        preload="metadata"
+        playsinline
+    >
+        <source id="gameVideoSource" type="video/mp4">
+    </video>
+</div>
+<div id="credits-overlay" class="credits-overlay">
+  <div class="credits-vignette"></div>
+
+  <div class="credits-roll">
+    <div id="credits-title" class="credits-title">Спасибо за игру!</div>
+    <div id="credits-lines" class="credits-lines"></div>
+  </div>
+</div>
+<script src="/static/js/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+        integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ url_for('static', filename='js/tpv-game-engine.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tpv-spectator.js') }}"></script>
+</body>
+</html>

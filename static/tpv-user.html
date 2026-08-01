@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The People Versus — пульт игрока</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-user.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/brand-theme.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-animations.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles/tpv-user.css">
+  <link rel="stylesheet" href="/static/styles/brand-theme.css">
+  <link rel="stylesheet" href="/static/styles/tpv-animations.css">
+
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body class="tpv-player-page">
+<main class="tpv-player-shell" id="tpv-player-shell">
+                    <section class="welcome-panel panel-inner tpv-player-header">
+                    <div class="welcome-copy">
+                        <label class="welcome-title" id="welcome">Добро пожаловать на игру</label>
+                        <label class="welcome-title" id="welcome2">{{ game_name|default('The People Versus') }}</label>
+                        <label class="welcome-subtitle game-status wait" id="welcome3">Вы находитесь в комнате ожидания. Дождитесь, когда компьютер выберет именно Вас!</label>
+                    </div>
+
+                    <div class="player-meta">
+                        <input type="submit" class="message user-chip" id="user_name" value="{{value}}">
+
+                    </div>
+                </section>
+    <section class="metrics-strip tpv-player-metrics" id="section-metrics" aria-label="Показатели игры" hidden>
+    <article class="metric-shell metric-shell--wide" id="section-timer">
+        <span>Время</span>
+        <output id="display-time" class="metric-value">4:00</output>
+      </article>
+      <article class="metric-shell metric-shell--red" id="metric-bank">
+        <span>Банк</span>
+        <output id="display-bank" class="metric-value">0</output>
+      </article>
+
+      <article class="metric-shell">
+        <span>В круге</span>
+        <output id="display-current-money" class="metric-value">0</output>
+      </article>
+      <article class="metric-shell metric-shell--name">
+        <span>Замена</span>
+        <output id="display-current-flip" class="metric-value metric-value--text">—</output>
+      </article>
+      <div class="status-orbs" id="flip-indicators_stats">
+                <output id="flip-indicator-1_stats" class="status-orb status-orb--flip">→</output>
+                <output id="flip-indicator-2_stats" class="status-orb status-orb--flip">→</output>
+                <output id="flip-indicator-3_stats" class="status-orb status-orb--flip">→</output>
+              </div>
+</section>
+
+    <aside class="money-tree tpv-player-money-tree" id="money-tree" aria-label="Дерево игры" hidden>
+            <button id="money-round-1" class="money-row" type="button" data-round="1" data-value="10000">
+              <span>Р.1</span><strong>10 000</strong>
+            </button>
+            <button id="money-round-2" class="money-row" type="button" data-round="2" data-value="25000">
+              <span>Р.2</span><strong>25 000</strong>
+            </button>
+            <button id="money-round-3" class="money-row" type="button" data-round="3" data-value="50000">
+              <span>Р.3</span><strong>50 000</strong>
+            </button>
+            <button id="money-round-4" class="money-row" type="button" data-round="4" data-value="150000">
+              <span>Р.4</span><strong>150 000</strong>
+            </button>
+            <button id="money-round-5" class="money-row" type="button" data-round="5" data-value="500000">
+              <span>Р.5</span><strong>500 000</strong>
+            </button>
+          </aside>
+
+<section class="tpv-player-question-panel" id="section-question" hidden>
+  <div class="question-stage">
+    <div class="question-number-shell" aria-label="Номер вопроса">
+      <output id="num_question" class="question-number">---</output>
+    </div>
+
+    <div class="question-main">
+      <div class="question-topline">
+        <div class="question-caption">Вопрос</div>
+
+        <div class="question-author-shell">
+          <span class="question-author-label">Автор вопроса</span>
+          <output id="question-author" class="question-author">—</output>
+        </div>
+      </div>
+
+      <div class="question-text-shell">
+        <textarea id="question-text" readonly></textarea>
+      </div>
+
+      <div class="status-orbs-wrap">
+        <div class="status-orb-group">
+          <div class="status-orbs" id="correct-answer-indicators">
+            <output id="correct-indicator-1" class="status-orb status-orb--correct">В</output>
+            <output id="correct-indicator-2" class="status-orb status-orb--correct"></output>
+            <output id="correct-indicator-3" class="status-orb status-orb--correct"></output>
+            <output id="correct-indicator-4" class="status-orb status-orb--correct"></output>
+            <output id="correct-indicator-5" class="status-orb status-orb--correct"></output>
+          </div>
+        </div>
+
+        <div class="status-orb-group">
+          <div class="status-orbs" id="flip-indicators">
+            <output id="flip-indicator-1" class="status-orb status-orb--flip">→</output>
+            <output id="flip-indicator-2" class="status-orb status-orb--flip">→</output>
+            <output id="flip-indicator-3" class="status-orb status-orb--flip">→</output>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tpv-panel params-panel" id="section-parameters" hidden>
+
+    <div class="params-grid">
+            <label>
+              <span>Время, сек.</span>
+              <input id="control-timer-seconds" type="number" min="0" value="240">
+            </label>
+            <label>
+              <span>Текущий круг</span>
+              <input id="control-circle" type="number" min="1" value="1">
+            </label>
+            <label>
+              <span>Текущий раунд</span>
+              <input id="control-round" type="number" min="1" value="1">
+            </label>
+            <label>
+              <span>В банке</span>
+              <input id="control-bank" type="number" min="0" value="0">
+            </label>
+            <label>
+              <span>В круге</span>
+              <input id="control-current-money" type="number" min="0" value="0">
+            </label>
+            <label>
+              <span>№ вопроса</span>
+              <input id="control-question-number" type="number" min="1" max="5" value="1">
+            </label>
+            <label>
+              <span>Верных ответов</span>
+              <input id="control-correct-count" type="number" min="0" max="5" value="0">
+            </label>
+            <label>
+              <span>Замены</span>
+              <input id="control-flips-count" type="number" min="0" max="3" value="3">
+            </label>
+            <label>
+              <span>Пас</span>
+              <input id="control-pass-count" type="number" min="0" max="4" value="0">
+            </label>
+          </div>
+
+ </section>
+
+ <section class="tpv-panel bong-game-panel tpv-player-bong" id="section-bong-game" hidden>
+          <div class="panel-heading">
+            <div>
+              <h2>Гонг-игра</h2>
+            </div>
+          </div>
+
+          <div class="bong-game-console">
+            <div class="bong-options" role="group" aria-label="">
+              <button id="bong-variable-1" class="bong-option-button" type="button" data-bong-option="1" aria-pressed="false">1</button>
+              <button id="bong-variable-2" class="bong-option-button" type="button" data-bong-option="2" aria-pressed="false">2</button>
+              <button id="bong-variable-3" class="bong-option-button" type="button" data-bong-option="3" aria-pressed="false">3</button>
+            </div>
+
+            <button id="bong-stop" class="bong-stop-button" onclick="bindBongStopButton()" type="button">
+              <span class="bong-stop-icon" aria-hidden="true"></span>
+              Остановить
+            </button>
+
+            <div class="bong-info-grid">
+              <div class="bong-display bong-display--sum">
+                <span class="bong-display__label">Сумма Гонг-игры</span>
+                <output id="bong-current-sum" class="bong-display__value">0</output>
+              </div>
+
+              <div class="bong-display bong-display--author">
+                <span class="bong-display__label"></span>
+                <output id="bong-question-author" class="bong-display__value bong-display__value--text">— Автор вопроса —</output>
+              </div>
+            </div>
+
+            <div class="bong-display bong-display--author">
+                <span class="bong-display__label"></span>
+                <output id="bong-game-status" class="bong-display__value">0</output>
+              </div>
+            </div>
+
+        </section>
+
+
+
+  
+    <section id="tpv-player-win-overlay" class="tpv-player-win-overlay" hidden aria-live="assertive">
+      <div class="tpv-player-win-card" role="status">
+        <span class="tpv-player-win-kicker">Итоговый выигрыш</span>
+        <strong id="tpv-player-win-amount">0</strong>
+      </div>
+    </section>
+
+    <div id="socket-status" class="socket-status socket-offline" aria-live="polite">
+          <span class="socket-dot" aria-hidden="true"></span>
+          <span id="socket-status-text">Сервер отключён</span>
+        </div>
+      </div>
+
+
+
+</main>
+  <script src="/static/js/socket.io.min.js"></script>
+  <script src="/static/js/tpv-game-engine.js"></script>
+  <script src="/static/js/tpv-animations.js"></script>
+  <script src="/static/js/tpv-user.js"></script>
+</body>
+</html>
