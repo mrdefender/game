@@ -475,10 +475,6 @@ def tpv():
         session["tpv_launcher_allowed"] = True
         session.pop("tpv_role", None)
         return render_template("tpv.html")
-
-    if session.get("tpv_launcher_allowed") is True:
-        return render_template("tpv.html")
-
     abort(403)
 
 
@@ -493,7 +489,7 @@ def tpv_host():
         return render_template("tpv-host.html")
 
     # Прямой ввод /tpv_host не открывает пульт.
-    return redirect(url_for("tpv"))
+    abort(403)
 
 
 @app.route('/tpv_spectator', methods=["POST", "GET"])
@@ -507,7 +503,7 @@ def tpv_spectator():
         return render_template("tpv-spectator.html")
 
     # Прямой ввод /tpv_spectator не открывает экран зрителя.
-    return redirect(url_for("tpv"))
+    abort(403)
 
 @app.route('/tpv_user', methods=["GET"])
 def tpv_user():
@@ -3905,7 +3901,7 @@ def tpv_editor():
         return render_template("tpv-editor.html")
     if tpv_editor_allowed():
         return render_template("tpv-editor.html")
-    return redirect(url_for("tpv"))
+    abort(403)
 
 
 @app.get("/tpv_editor/api/users")
