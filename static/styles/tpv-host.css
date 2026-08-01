@@ -1,4 +1,4 @@
-*{box-sizing:border-box}
+*{box-sizing:border-box;text-wrap:inherit;}
 :root{
   --bg:#020507;
   --panel:#071218;
@@ -33,6 +33,7 @@ body{
   background:
     radial-gradient(circle at 80% 10%,rgba(0,119,139,.18),transparent 28%),
     linear-gradient(145deg,#020405,#061118 56%,#020405);
+    
 }
 button,input,textarea{font:inherit}
 button{cursor:pointer;touch-action:manipulation}
@@ -458,7 +459,7 @@ textarea{resize:vertical}
 .game-btn:hover{filter:brightness(1.14)}
 .game-btn:active{transform:translateY(1px)}
 
-.game-btn--primary{background:linear-gradient(180deg,#0aa8b6,#00636c)}
+.game-btn--primary{background:linear-gradient(180deg,#0aa8b6,#00636c);text-wrap-style: auto;;}
 .game-btn--danger{border-color:#a01823;background:linear-gradient(180deg,var(--red1),var(--red2))}
 .game-btn--success{border-color:#1a8651;background:linear-gradient(180deg,var(--green1),var(--green2))}
 .game-btn--warning{border-color:#9b5d0e;background:linear-gradient(180deg,var(--amber1),var(--amber2))}
@@ -1272,6 +1273,7 @@ body{
 .game-btn--primary{
   border-color:var(--host-brand-accent);
   background:linear-gradient(180deg,var(--host-brand-accent),var(--host-brand-accent-dark));
+  text-wrap-style: auto;
 }
 
 #action-start-game{

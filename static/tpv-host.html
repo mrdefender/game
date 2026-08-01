@@ -249,8 +249,8 @@
             <section class="action-group action-group--primary">
               <h3>Игра и раунд</h3>
               <div class="action-grid action-grid--5">
-                <button id="action-start-game" class="game-btn game-btn--primary" type="button" data-action="start-game" onclick="tpv()">
-                  <span id="action-start-game-label">{{ game_name|default('The People Versus') }}</span>
+                <button id="action-start-game" class="game-btn game-btn--primary" type="button" data-action="start-game" onclick="tpv()">{{ game_name|default('The People Versus') }}
+                  <span id="action-start-game-label"></span>
                 </button>
                 <button id="action-start-circle" class="game-btn" type="button" data-action="start-circle" onclick="start_circle()" disabled>
                   Начать круг
