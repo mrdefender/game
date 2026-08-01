@@ -22,6 +22,7 @@ import secrets
 import string
 from pathlib import Path
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, func, inspect
 from sqlalchemy.types import JSON
 from werkzeug.utils import secure_filename
@@ -36,9 +37,8 @@ from flask_login import (
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from dotenv import load_dotenv
 
-from extensions import db, socketio
 from number_voice import number_to_audio
-from flask_socketio import emit, join_room
+from flask_socketio import SocketIO, emit, join_room
 
 
 
@@ -50,7 +50,8 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") #убрать в пер�
 if app.config['SECRET_KEY'] is None:
     raise ValueError("ОШИБКА: Переменная окружения SECRET_KEY не установлена!")
 app.secret_key = app.config["SECRET_KEY"] #os.urandom(32).hex
-
+db = SQLAlchemy()
+socketio = SocketIO()
 # CSRF-защита обычных HTTP-запросов. Проверка запускается вручную ниже,
 # чтобы служебный транспорт Socket.IO (/socket.io) не блокировался.
 app.config["WTF_CSRF_CHECK_DEFAULT"] = False
