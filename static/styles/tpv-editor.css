@@ -135,3 +135,11 @@ textarea{width:100%;resize:vertical;border:1px solid var(--line);border-radius:8
 .application-dialog textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:11px 12px;color:var(--text);background:#091723;font:inherit;resize:vertical}
 @media(max-width:900px){.applications-toolbar{grid-template-columns:1fr 1fr}}
 @media(max-width:580px){.applications-toolbar{grid-template-columns:1fr}}
+
+/* ДОПОЛНЕНИЕ — СТАТИСТИКА ОБЩИХ ВОПРОСОВ */
+.general-statistics-panel{margin-bottom:14px}
+.general-statistics-metrics{grid-template-columns:repeat(5,minmax(0,1fr));padding:18px}
+.general-statistics-panel .progress-block{padding:0 18px 18px}
+@media(max-width:1050px){.general-statistics-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.general-statistics-metrics{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.general-statistics-metrics{grid-template-columns:1fr}}

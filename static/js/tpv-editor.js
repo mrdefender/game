@@ -1010,6 +1010,17 @@ function renderStatistics(){
         e["s-usage-bar"].style.width=`${Math.min(100,Math.max(0,questions.usage_percent||0))}%`;
     }
 
+    const generalQuestions=data.general_questions||{};
+    setText("s-general-total",generalQuestions.total);
+    setText("s-general-used",generalQuestions.used);
+    setText("s-general-unused",generalQuestions.unused);
+    setText("s-general-available",generalQuestions.available);
+    setText("s-general-usage",`${generalQuestions.usage_percent||0}%`);
+    setText("s-general-usage-label",`${generalQuestions.usage_percent||0}%`);
+    if(e["s-general-usage-bar"]){
+        e["s-general-usage-bar"].style.width=`${Math.min(100,Math.max(0,generalQuestions.usage_percent||0))}%`;
+    }
+
     setText("s-ready-themes",readiness.ready_themes);
     setText("s-shortage-themes",readiness.shortage_themes);
     setText("s-without-theme",readiness.users_without_theme);

@@ -6,7 +6,6 @@
     <title>TPV Editor</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-editor.css') }}">
@@ -17,7 +16,7 @@
 <main class="editor-shell">
     <header class="editor-header">
         <div>
-            <div class="eyebrow">TPV EDITOR</div>
+            <div class="eyebrow">TPV EDITOR · ЭТАП 9</div>
             <h1 id="page-title">Пользователи</h1>
             <p id="page-subtitle">Постоянная база игроков и авторов из UsersTpv.</p>
         </div>
@@ -144,6 +143,27 @@
             <article><span>Тем</span><strong id="s-stat-themes">0</strong></article>
             <article><span>Допущено</span><strong id="s-stat-approved">0</strong></article>
             <article><span>Использование базы</span><strong id="s-stat-usage">0%</strong></article>
+        </section>
+
+
+        <section class="editor-panel general-statistics-panel">
+            <header class="statistics-card-header">
+                <div>
+                    <h2>Общие вопросы</h2>
+                    <p>Статистика только по вопросам, которые не относятся к темам замены.</p>
+                </div>
+            </header>
+            <div class="statistics-metrics general-statistics-metrics">
+                <div><span>Всего</span><strong id="s-general-total">0</strong></div>
+                <div><span>Использовано</span><strong id="s-general-used">0</strong></div>
+                <div><span>Не использовано</span><strong id="s-general-unused">0</strong></div>
+                <div><span>Доступно к игре</span><strong id="s-general-available">0</strong></div>
+                <div><span>Использование</span><strong id="s-general-usage">0%</strong></div>
+            </div>
+            <div class="progress-block">
+                <div class="progress-label"><span>Использование общих вопросов</span><strong id="s-general-usage-label">0%</strong></div>
+                <div class="progress-track"><span id="s-general-usage-bar"></span></div>
+            </div>
         </section>
 
         <section class="statistics-layout">

@@ -2493,7 +2493,7 @@ TPV_GENERAL_QUESTION_VALUES = {"", "false", "общий"}
 
 
 # ============================================================================
-# TPV EDITOR — ЭТАП 9: ИСТОРИЯ ИЗМЕНЕНИЙ
+# TPV EDITOR
 # ============================================================================
 import json as _tpv_history_json
 from datetime import datetime as _tpv_history_datetime
@@ -3415,19 +3415,9 @@ def tpv_editor_application_validate(data):
         raise ValueError("Комментарий слишком длинный.")
 
     if not tpv_editor_is_general_theme(flip):
-        available_theme_values = db.session.scalars(
-            db.select(Questions_tpv.flip)
-            .where(Questions_tpv.flip.is_not(None))
-            .distinct()
-        ).all()
-
         available_themes = {
-            tpv_editor_normalize_text(value).casefold()
-            for value in available_theme_values
-            if (
-                tpv_editor_normalize_text(value)
-                and not tpv_editor_is_general_theme(value)
-            )
+            value.casefold()
+            for value in tpv_question_application_available_themes()
         }
 
         if tpv_editor_normalize_text(flip).casefold() not in available_themes:
@@ -3485,30 +3475,39 @@ def tpv_question_application_page():
     return render_template("tpv-question-application.html")
 
 
-@app.get("/api/tpv-question-applications/status")
-def tpv_question_application_status():
-    theme_values = db.session.scalars(
+def tpv_question_application_available_themes():
+    """Возвращает темы замены из игроков и уже существующих вопросов."""
+    question_themes = db.session.scalars(
         db.select(Questions_tpv.flip)
         .where(Questions_tpv.flip.is_not(None))
         .distinct()
     ).all()
 
-    themes = sorted(
-        {
-            tpv_editor_normalize_text(value)
-            for value in theme_values
-            if (
-                tpv_editor_normalize_text(value)
-                and not tpv_editor_is_general_theme(value)
-            )
-        },
-        key=str.casefold,
-    )
+    user_themes = db.session.scalars(
+        db.select(UsersTpv.flip)
+        .where(UsersTpv.flip.is_not(None))
+        .distinct()
+    ).all()
 
+    themes_by_key = {}
+
+    for raw_value in [*question_themes, *user_themes]:
+        value = tpv_editor_normalize_text(raw_value)
+
+        if not value or tpv_editor_is_general_theme(value):
+            continue
+
+        themes_by_key.setdefault(value.casefold(), value)
+
+    return sorted(themes_by_key.values(), key=str.casefold)
+
+
+@app.get("/api/tpv-question-applications/status")
+def tpv_question_application_status():
     return jsonify({
         "ok": True,
         "table_exists": tpv_editor_applications_table_exists(),
-        "themes": themes,
+        "themes": tpv_question_application_available_themes(),
     })
 
 
@@ -4711,10 +4710,12 @@ def tpv_editor_statistics():
     theme_rows = tpv_editor_theme_rows()
 
     total_questions = len(questions)
-    general_questions = sum(
-        tpv_editor_is_general_theme(question.flip)
+    general_question_rows = [
+        question
         for question in questions
-    )
+        if tpv_editor_is_general_theme(question.flip)
+    ]
+    general_questions = len(general_question_rows)
     themed_questions = total_questions - general_questions
     shown_questions = sum(
         str(question.show or "").casefold() == "true"
@@ -4725,6 +4726,16 @@ def tpv_editor_statistics():
         shown_questions * 100 / total_questions,
         1,
     ) if total_questions else 0
+
+    general_used = sum(
+        str(question.show or "").casefold() == "true"
+        for question in general_question_rows
+    )
+    general_unused = general_questions - general_used
+    general_usage_percent = round(
+        general_used * 100 / general_questions,
+        1,
+    ) if general_questions else 0
 
     approved_users = sum(
         str(user.approve or "").casefold() == "true"
@@ -4823,6 +4834,13 @@ def tpv_editor_statistics():
                 "shown": shown_questions,
                 "unused": unused_questions,
                 "usage_percent": usage_percent,
+            },
+            "general_questions": {
+                "total": general_questions,
+                "used": general_used,
+                "unused": general_unused,
+                "available": general_unused,
+                "usage_percent": general_usage_percent,
             },
             "readiness": {
                 "ready_themes": ready_themes,
