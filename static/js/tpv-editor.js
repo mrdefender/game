@@ -1,5 +1,5 @@
 (()=>{"use strict";
-const s={users:[],themes:[],questions:[],authors:[],current:null,currentQuestion:null,currentTheme:null,themeRows:[],qualityIssues:[],qualityStats:{},statistics:null,importPreview:null,historyItems:[],historyStats:{},builderItems:[],builderPreview:[],currentBuild:null,applications:[],currentApplication:null,tab:"users"},e={};
+const s={users:[],themes:[],questions:[],authors:[],current:null,currentQuestion:null,currentTheme:null,themeRows:[],qualityIssues:[],qualityStats:{},statistics:null,importPreview:null,historyItems:[],historyStats:{},builderItems:[],builderPreview:[],currentBuild:null,applications:[],currentApplication:null,dashboard:null,games:[],gameStats:{},currentGame:null,gamesView:"archive",tab:"dashboard",replayEvents:[],replayIndex:0,replayTimer:null,replayPlaying:false,replaySpeed:1,records:null,appearanceThemes:[],appearanceTheme:null,appearanceDraft:null,appearanceSavedVariables:null,appearancePreviewDirty:false},e={};
 document.addEventListener("DOMContentLoaded",init);
 function init(){
     document.querySelectorAll("[id]").forEach(node=>{
@@ -140,6 +140,85 @@ function init(){
     bind("application-reject","click",rejectApplication);
     bind("application-delete","click",deleteApplication);
 
+    bind("dashboard-refresh","click",loadDashboard);
+    bind("maintenance-clear-history","click",clearHistoryFromDashboard);
+    bind("maintenance-clear-applications","click",clearApplicationsFromDashboard);
+    bind("dashboard-backup","click",createDashboardBackup);
+    bind("maintenance-backup","click",createDashboardBackup);
+    bind("dashboard-recalculate","click",recalculateDashboardApprovals);
+    bind("maintenance-vacuum","click",()=>runMaintenanceAction("vacuum"));
+    bind("maintenance-analyze","click",()=>runMaintenanceAction("analyze"));
+    bind("maintenance-integrity","click",()=>runMaintenanceAction("integrity"));
+    bind("maintenance-full","click",runFullMaintenance);
+    bind("games-create-table","click",createGamesTables);
+    bind("games-reload","click",loadGames);
+    bind("records-reload","click",loadRecords);
+    bind("appearance-create","click",createAppearanceEngine);
+    bind("appearance-reload","click",loadAppearanceThemes);
+    bind("appearance-reset","click",resetAppearanceTheme);
+    bind("appearance-copy-theme","click",copyAppearanceTheme);
+    bind("appearance-save-theme","click",saveAppearanceTheme);
+    bind("appearance-cancel-preview","click",cancelAppearancePreview);
+    bind("appearance-export-theme","click",exportAppearanceTheme);
+    bind("appearance-delete-theme","click",deleteAppearanceTheme);
+    bind("appearance-import-theme","click",()=>e["appearance-import-file"]?.click());
+    bind("appearance-import-file","change",importAppearanceTheme);
+    bind("appearance-color-fields","input",handleAppearanceDesignerInput);
+    bind("appearance-theme-name","input",markAppearanceDraftDirty);
+    bind("appearance-theme-slug","input",markAppearanceDraftDirty);
+    bind("appearance-theme-description","input",markAppearanceDraftDirty);
+    bind("appearance-theme-grid","click",event=>{
+        const card=event.target.closest("[data-appearance-theme]");
+        if(card)selectAppearanceTheme(card.dataset.appearanceTheme);
+    });
+    bind("games-export-all","click",exportGamesArchive);
+    bind("games-import","click",()=>e["games-import-file"]?.click());
+    bind("games-import-file","change",importGamesArchive);
+    bind("games-new","click",()=>openGame(null));
+    bind("games-welcome-new","click",()=>openGame(null));
+    bind("games-search","input",renderGames);
+    bind("games-season-filter","change",renderGames);
+    bind("games-status-filter","change",renderGames);
+    bind("games-sort","change",renderGames);
+    bind("games-table-body","click",event=>{const button=event.target.closest("[data-open-game]");if(button)openGame(Number(button.dataset.openGame));});
+    bind("game-dialog-close","click",closeGame);
+    bind("game-edit","click",()=>setGameEditMode(true));
+    bind("game-cancel-edit","click",()=>setGameEditMode(false));
+    document.querySelectorAll("[data-game-card-tab]").forEach(button=>{
+        button.addEventListener("click",()=>switchGameCardTab(button.dataset.gameCardTab));
+    });
+    bind("game-replay-play","click",toggleGameReplay);
+    bind("game-replay-prev","click",()=>stepGameReplay(-1));
+    bind("game-replay-next","click",()=>stepGameReplay(1));
+    bind("game-replay-first","click",()=>setGameReplayIndex(0));
+    bind("game-replay-last","click",()=>setGameReplayIndex(Math.max(0,s.replayEvents.length-1)));
+    bind("game-replay-progress","input",event=>{
+        setGameReplayIndex(Number(event.target.value||0),false);
+    });
+    bind("game-replay-speed","change",event=>{
+        s.replaySpeed=Number(event.target.value||1);
+        if(s.replayPlaying){
+            stopGameReplayTimer();
+            startGameReplayTimer();
+        }
+    });
+    bind("game-cancel","click",closeGame);
+    bind("game-save","click",saveGame);
+    bind("game-delete","click",deleteGame);
+    bind("game-export-json","click",exportGameJson);
+    document.querySelectorAll("[data-games-view]").forEach(button=>button.addEventListener("click",()=>switchGamesView(button.dataset.gamesView)));
+    document.querySelectorAll("[data-analytics-tab]").forEach(button=>button.addEventListener("click",()=>switchGamesAnalyticsTab(button.dataset.analyticsTab)));
+
+    document.querySelectorAll("[data-dashboard-tab]").forEach(button=>{
+        button.addEventListener("click",()=>{
+            const tab=button.dataset.dashboardTab;
+            const action=button.dataset.dashboardAction;
+            switchTab(tab);
+            if(action==="new-question")setTimeout(()=>openQuestion(null),0);
+            if(action==="new-user")setTimeout(()=>openUser(null),0);
+        });
+    });
+
     bind("quality-table-body","click",event=>{
         const button=event.target.closest("[data-fix-issue]");
         if(!button)return;
@@ -147,6 +226,7 @@ function init(){
         fixQualityIssue(button.dataset.fixIssue);
     });
 
+    loadCurrentAppearanceTheme();
     loadAll();
 }
 
@@ -162,7 +242,7 @@ function bind(id,eventName,handler){
 }
 
 async function api(url,o={}){const h=new Headers(o.headers||{}),t=document.querySelector('meta[name="csrf-token"]')?.content;h.set("X-Requested-With","XMLHttpRequest");if(t)h.set("X-CSRFToken",t);let body=o.body;if(body&&typeof body!=="string"){h.set("Content-Type","application/json");body=JSON.stringify(body)}const r=await fetch(url,{credentials:"same-origin",...o,headers:h,body});let d={};try{d=await r.json()}catch{}if(!r.ok||d.ok===false)throw new Error(d.message||`HTTP ${r.status}`);return d}
-async function loadAll(){await Promise.all([loadUsers(),loadQuestions(),loadThemes()])}
+async function loadAll(){await Promise.all([loadUsers(),loadQuestions(),loadThemes()]);if(s.tab==="dashboard")await loadDashboard()}
 async function loadUsers(){try{const[u,t]=await Promise.all([api("/tpv_editor/api/users"),api("/tpv_editor/api/themes")]);s.users=u.users||[];s.themes=t.themes||[];fillLists();renderUsers()}catch(x){toast(x.message,true)}}
 async function loadQuestions(){try{const r=await api("/tpv_editor/api/questions");s.questions=r.questions||[];s.authors=r.authors||[];s.themes=r.themes||s.themes;fillLists();renderQuestions()}catch(x){toast(x.message,true)}}
 async function loadThemes(){try{const r=await api("/tpv_editor/api/themes-dashboard");s.themeRows=r.themes||[];renderThemes()}catch(x){toast(x.message,true)}}
@@ -170,6 +250,10 @@ function fillLists(){e["theme-options"].innerHTML=s.themes.map(v=>`<option value
  const themeValue=e["question-theme-filter"].value,authorValue=e["question-author-filter"].value;e["question-theme-filter"].innerHTML='<option value="all">Все темы</option><option value="general">Общие</option>'+s.themes.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");e["question-author-filter"].innerHTML='<option value="all">Все авторы</option>'+s.authors.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");if([...e["question-theme-filter"].options].some(o=>o.value===themeValue))e["question-theme-filter"].value=themeValue;if([...e["question-author-filter"].options].some(o=>o.value===authorValue))e["question-author-filter"].value=authorValue;}
 function switchTab(tab){
     const titles={
+        dashboard:[
+            "Центр управления",
+            "Сводка состояния базы, готовности игры и быстрые действия."
+        ],
         users:[
             "Пользователи",
             "Постоянная база игроков и авторов из UsersTpv."
@@ -205,6 +289,14 @@ function switchTab(tab){
         applications:[
             "Заявки на вопросы",
             "Модерация вопросов, отправленных через отдельную публичную форму."
+        ],
+        games:[
+            "Игры",
+            "Архив проведённых игр, сезоны, рекорды и аналитика."
+        ],
+        appearance:[
+            "Оформление",
+            "Системные темы и инфраструктура Theme Engine."
         ]
     };
 
@@ -221,6 +313,7 @@ function switchTab(tab){
         button.setAttribute("aria-selected",String(active));
     });
 
+    setHidden("dashboard-section",tab!=="dashboard");
     setHidden("users-section",tab!=="users");
     setHidden("questions-section",tab!=="questions");
     setHidden("themes-section",tab!=="themes");
@@ -230,6 +323,8 @@ function switchTab(tab){
     setHidden("history-section",tab!=="history");
     setHidden("builder-section",tab!=="builder");
     setHidden("applications-section",tab!=="applications");
+    setHidden("games-section",tab!=="games");
+    setHidden("appearance-section",tab!=="appearance");
 
     document.querySelectorAll(".users-action").forEach(
         node=>node.hidden=tab!=="users"
@@ -255,6 +350,10 @@ function switchTab(tab){
         e["page-subtitle"].textContent=titles[tab][1];
     }
 
+    if(tab==="dashboard"){
+        loadDashboard();
+    }
+
     if(tab==="themes"){
         loadThemes();
     }
@@ -278,11 +377,394 @@ function switchTab(tab){
     if(tab==="applications"){
         loadApplications();
     }
+
+    if(tab==="games"){
+        loadGames();
+    }
+    if(tab==="appearance"){
+        loadAppearanceThemes();
+    }
 }
 
 function setHidden(id,hidden){
     if(e[id]){
         e[id].hidden=hidden;
+    }
+}
+
+
+function applyAppearanceTheme(theme){
+    if(!theme?.variables)return;
+    Object.entries(theme.variables).forEach(([name,value])=>{
+        document.documentElement.style.setProperty(name,String(value));
+    });
+    s.appearanceTheme=theme;
+    if(e["appearance-current-name"]){
+        e["appearance-current-name"].textContent=theme.name||"TPV Dark";
+    }
+    renderAppearanceThemes();
+    openAppearanceDesigner(theme);
+}
+
+async function loadCurrentAppearanceTheme(){
+    try{
+        const response=await api("/tpv_editor/api/interface-themes/current");
+        applyAppearanceTheme(response.theme);
+    }catch(error){
+        console.warn("Theme Engine:",error.message);
+    }
+}
+
+async function loadAppearanceThemes(){
+    try{
+        const response=await api("/tpv_editor/api/interface-themes");
+        const ready=response.table_exists!==false;
+        if(e["appearance-missing"])e["appearance-missing"].hidden=ready;
+        if(e["appearance-content"])e["appearance-content"].hidden=!ready;
+        s.appearanceThemes=response.themes||[];
+        if(response.theme)applyAppearanceTheme(response.theme);
+        renderAppearanceThemes();
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+async function createAppearanceEngine(){
+    try{
+        const response=await api(
+            "/tpv_editor/api/interface-themes/create-tables",
+            {method:"POST"}
+        );
+        toast(response.message);
+        applyAppearanceTheme(response.theme);
+        await loadAppearanceThemes();
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+function renderAppearanceThemes(){
+    if(!e["appearance-theme-grid"])return;
+    const current=s.appearanceTheme?.slug;
+    e["appearance-theme-grid"].innerHTML=(s.appearanceThemes||[]).map(theme=>{
+        const colors=Object.values(theme.variables||{}).slice(0,7);
+        return `<article
+            class="appearance-theme-card ${theme.slug===current?"is-active":""} ${theme.is_system?"":"is-custom"}"
+            data-appearance-theme="${esc(theme.slug)}"
+        >
+            <div>
+                <h4>${esc(theme.name)}</h4>
+                <p>${esc(theme.description||"")}</p>
+            </div>
+            <div class="appearance-palette">
+                ${colors.map(color=>`<span style="background:${esc(color)}"></span>`).join("")}
+            </div>
+            <button class="button ${theme.slug===current?"button-secondary":"button-muted"}" type="button">
+                ${theme.slug===current?"Выбрана":"Применить"}
+            </button>
+        </article>`;
+    }).join("");
+}
+
+async function selectAppearanceTheme(slug){
+    if(!slug||slug===s.appearanceTheme?.slug)return;
+    try{
+        const response=await api(
+            "/tpv_editor/api/interface-themes/select",
+            {method:"POST",body:{slug}}
+        );
+        applyAppearanceTheme(response.theme);
+        toast(response.message);
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+async function resetAppearanceTheme(){
+    if(!confirm("Вернуть стандартную тему TPV Dark?"))return;
+    try{
+        const response=await api(
+            "/tpv_editor/api/interface-themes/reset",
+            {method:"POST"}
+        );
+        applyAppearanceTheme(response.theme);
+        toast(response.message);
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+
+const APPEARANCE_VARIABLES=[
+    ["--bg","Основной фон"],
+    ["--panel","Фон панелей"],
+    ["--line","Границы"],
+    ["--text","Основной текст"],
+    ["--muted","Вторичный текст"],
+    ["--cyan","Главный акцент"],
+    ["--green","Успех"],
+    ["--red","Ошибка"]
+];
+
+function cssColorForPicker(value){
+    const text=String(value||"").trim();
+    if(/^#[0-9a-f]{6}$/i.test(text))return text;
+    if(/^#[0-9a-f]{3}$/i.test(text)){
+        return "#"+text.slice(1).split("").map(char=>char+char).join("");
+    }
+    const canvas=document.createElement("canvas");
+    const context=canvas.getContext("2d");
+    context.fillStyle="#000000";
+    context.fillStyle=text;
+    return /^#[0-9a-f]{6}$/i.test(context.fillStyle)
+        ?context.fillStyle
+        :"#000000";
+}
+
+function setAppearanceDesignerStatus(text,state=""){
+    if(!e["appearance-designer-status"])return;
+    e["appearance-designer-status"].textContent=text;
+    e["appearance-designer-status"].className=
+        `appearance-designer-status ${state?`is-${state}`:""}`;
+}
+
+function openAppearanceDesigner(theme){
+    if(!e["appearance-designer"]||!theme)return;
+
+    e["appearance-designer"].hidden=false;
+    e["appearance-theme-name"].value=theme.name||"";
+    e["appearance-theme-slug"].value=theme.slug||"";
+    e["appearance-theme-description"].value=theme.description||"";
+
+    s.appearanceDraft=JSON.parse(JSON.stringify(theme));
+    s.appearanceSavedVariables={...(theme.variables||{})};
+    s.appearancePreviewDirty=false;
+
+    e["appearance-color-fields"].innerHTML=APPEARANCE_VARIABLES.map(
+        ([variable,label])=>{
+            const value=theme.variables?.[variable]||"";
+            return `<article class="appearance-color-field">
+                <label>
+                    <span>${esc(label)} · ${esc(variable)}</span>
+                    <input
+                        type="text"
+                        data-theme-variable="${esc(variable)}"
+                        value="${esc(value)}"
+                    >
+                </label>
+                <input
+                    type="color"
+                    data-theme-color="${esc(variable)}"
+                    value="${cssColorForPicker(value)}"
+                    title="${esc(label)}"
+                >
+            </article>`;
+        }
+    ).join("");
+
+    const editable=!theme.is_system;
+    [
+        "appearance-theme-name",
+        "appearance-theme-slug",
+        "appearance-theme-description"
+    ].forEach(id=>{
+        if(e[id])e[id].disabled=!editable;
+    });
+
+    e["appearance-save-theme"].hidden=!editable;
+    e["appearance-delete-theme"].hidden=!editable;
+    e["appearance-export-theme"].hidden=false;
+    e["appearance-cancel-preview"].hidden=false;
+
+    setAppearanceDesignerStatus(
+        editable?"Пользовательская тема":"Системная тема — только просмотр",
+        editable?"saved":""
+    );
+}
+
+function markAppearanceDraftDirty(){
+    if(!s.appearanceDraft||s.appearanceDraft.is_system)return;
+    s.appearancePreviewDirty=true;
+    setAppearanceDesignerStatus("Изменения не сохранены","dirty");
+}
+
+function handleAppearanceDesignerInput(event){
+    const textInput=event.target.closest("[data-theme-variable]");
+    const colorInput=event.target.closest("[data-theme-color]");
+    const variable=textInput?.dataset.themeVariable||colorInput?.dataset.themeColor;
+    if(!variable||!s.appearanceDraft)return;
+
+    let value;
+    if(colorInput){
+        value=colorInput.value;
+        const related=e["appearance-color-fields"].querySelector(
+            `[data-theme-variable="${CSS.escape(variable)}"]`
+        );
+        if(related)related.value=value;
+    }else{
+        value=textInput.value.trim();
+        const related=e["appearance-color-fields"].querySelector(
+            `[data-theme-color="${CSS.escape(variable)}"]`
+        );
+        if(related)related.value=cssColorForPicker(value);
+    }
+
+    s.appearanceDraft.variables[variable]=value;
+    document.documentElement.style.setProperty(variable,value);
+    markAppearanceDraftDirty();
+}
+
+async function copyAppearanceTheme(){
+    const source=s.appearanceTheme;
+    if(!source)return;
+
+    const name=prompt(
+        "Название пользовательской темы:",
+        `${source.name} — копия`
+    );
+    if(!name?.trim())return;
+
+    try{
+        const response=await api(
+            "/tpv_editor/api/interface-themes/copy",
+            {
+                method:"POST",
+                body:{
+                    source_slug:source.slug,
+                    name:name.trim()
+                }
+            }
+        );
+        applyAppearanceTheme(response.theme);
+        toast(response.message);
+        await loadAppearanceThemes();
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+function appearanceDesignerPayload(){
+    return {
+        id:s.appearanceDraft?.id,
+        name:e["appearance-theme-name"].value.trim(),
+        slug:e["appearance-theme-slug"].value.trim(),
+        description:e["appearance-theme-description"].value.trim(),
+        variables:{...(s.appearanceDraft?.variables||{})}
+    };
+}
+
+async function saveAppearanceTheme(){
+    if(!s.appearanceDraft||s.appearanceDraft.is_system){
+        toast("Сначала создайте копию системной темы.",true);
+        return;
+    }
+
+    try{
+        const response=await api(
+            "/tpv_editor/api/interface-themes/save",
+            {
+                method:"POST",
+                body:appearanceDesignerPayload()
+            }
+        );
+        applyAppearanceTheme(response.theme);
+        s.appearancePreviewDirty=false;
+        setAppearanceDesignerStatus("Тема сохранена","saved");
+        toast(response.message);
+        await loadAppearanceThemes();
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+function cancelAppearancePreview(){
+    if(!s.appearanceSavedVariables)return;
+    Object.entries(s.appearanceSavedVariables).forEach(([name,value])=>{
+        document.documentElement.style.setProperty(name,String(value));
+    });
+    if(s.appearanceTheme)openAppearanceDesigner(s.appearanceTheme);
+    toast("Предпросмотр отменён.");
+}
+
+function downloadAppearanceJson(data,filename){
+    const blob=new Blob(
+        [JSON.stringify(data,null,2)],
+        {type:"application/json;charset=utf-8"}
+    );
+    const link=document.createElement("a");
+    link.href=URL.createObjectURL(blob);
+    link.download=filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+}
+
+async function exportAppearanceTheme(){
+    const theme=s.appearanceTheme;
+    if(!theme?.id){
+        toast("Сначала создайте Theme Engine.",true);
+        return;
+    }
+    try{
+        const response=await api(
+            `/tpv_editor/api/interface-themes/${theme.id}/export`
+        );
+        downloadAppearanceJson(
+            response.document,
+            `tpv_editor_theme_${theme.slug||theme.id}.json`
+        );
+        toast("Тема экспортирована.");
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+async function importAppearanceTheme(event){
+    const input=event.currentTarget;
+    const file=input.files?.[0];
+    input.value="";
+    if(!file)return;
+
+    if(file.size>1024*1024){
+        toast("Файл темы не должен превышать 1 МБ.",true);
+        return;
+    }
+
+    try{
+        const document=JSON.parse(await file.text());
+        const response=await api(
+            "/tpv_editor/api/interface-themes/import",
+            {method:"POST",body:document}
+        );
+        applyAppearanceTheme(response.theme);
+        toast(response.message);
+        await loadAppearanceThemes();
+    }catch(error){
+        toast(
+            error instanceof SyntaxError
+                ?"Файл содержит некорректный JSON."
+                :error.message,
+            true
+        );
+    }
+}
+
+async function deleteAppearanceTheme(){
+    const theme=s.appearanceTheme;
+    if(!theme||theme.is_system)return;
+    if(!confirm(`Удалить тему «${theme.name}»?`))return;
+
+    try{
+        const response=await api(
+            `/tpv_editor/api/interface-themes/${theme.id}`,
+            {method:"DELETE"}
+        );
+        applyAppearanceTheme(response.theme);
+        toast(response.message);
+        await loadAppearanceThemes();
+    }catch(error){
+        toast(error.message,true);
     }
 }
 
@@ -296,6 +778,188 @@ async function deleteTheme(){if(!s.currentTheme)return;const target=e["theme-del
 
 
 
+
+
+async function loadDashboard(){
+    try{
+        const data=await api("/tpv_editor/api/dashboard");
+        s.dashboard=data;
+
+        setText("d-users",data.users.total||0);
+        setText("d-users-note",`${data.users.approved||0} допущено · ${data.users.without_theme||0} без темы`);
+        setText("d-general",data.questions.general_total||0);
+        setText("d-general-note",`${data.questions.general_available||0} доступно · ${data.questions.general_used||0} использовано`);
+        setText("d-themes",data.themes.total||0);
+        setText("d-themes-note",`${data.themes.ready||0} готовы · ${data.themes.shortage||0} требуют внимания`);
+        setText("d-applications",data.applications.pending||0);
+        setText("d-applications-note",`${data.applications.approved||0} утверждено · ${data.applications.rejected||0} отклонено`);
+        setText("d-builder",data.builder.active_name||"Вся база");
+        setText("d-builder-note",data.builder.active_name?`${data.builder.question_count||0} вопросов`:"Активный набор не выбран");
+        setText("d-history",data.history.total||0);
+        setText("d-history-note",`${data.history.today||0} сегодня`);
+
+        setText("maintenance-history-count",`${data.history.total||0} записей`);
+        setText("maintenance-applications-count",`${data.applications.total||0} записей`);
+
+        setText("dashboard-readiness-score",`${data.readiness.score||0}%`);
+        setText("dashboard-health-score",`${data.health.score||0}%`);
+        setText("dashboard-health-text",`${data.readiness.label||""}. ${data.health.label||""}`);
+        setText("dashboard-last-check",`Последняя проверка: ${data.generated_at_label||"—"}`);
+        setText("dashboard-response-time",`Ответ сервера: ${data.performance.response_ms||0} мс`);
+
+        setText("d-reserve-general",`${data.reserve.general_games||0} игр`);
+        setText("d-reserve-general-note",`${data.reserve.general_available||0} доступно`);
+        setText("d-reserve-theme-average",`${data.reserve.theme_average_games||0} игр`);
+        setText("d-reserve-theme-min",`${data.reserve.theme_min_games||0} игр`);
+
+        setText("d-resource-games",`${data.resource.games||0} игр`);
+        setText("d-resource-limit",data.resource.limiting_label||"—");
+        setText("d-resource-general-rate",`${data.reserve.general_per_game||0} вопросов`);
+        setText("d-resource-theme",data.resource.limiting_theme||"—");
+
+        setText("d-builder-large",data.builder.active_name||"Вся база");
+        setText("d-builder-count",data.builder.active_name?(data.builder.question_count||0):data.questions.total||0);
+        setText("d-builder-updated",data.builder.updated_at_label||"—");
+        setText("d-builder-mode",data.builder.active_name?"Активный набор":"Полная база");
+
+        setText("d-database-size",data.database.size_label||"—");
+        setText("d-database-integrity",data.database.integrity_label||"—");
+        setText("d-last-backup",data.database.last_backup_label||"Нет");
+        setText("d-database-name",data.database.filename||"—");
+
+        setText("d-growth-today",`+${data.growth.today||0}`);
+        setText("d-growth-week",`+${data.growth.week||0}`);
+        setText("d-growth-month",`+${data.growth.month||0}`);
+
+        setText("status-db",`SQLite: ${data.database.integrity_label||"—"}`);
+        setText("status-api","API: OK");
+        setText("status-builder",`Источник вопросов: ${data.builder.active_name||"вся база"}`);
+        setText("status-checked",`Проверено: ${data.generated_at_label||"—"}`);
+
+        renderDashboardAlerts(data.alerts||[]);
+        renderDashboardEvents(data.events||[]);
+        renderDashboardTopAuthors(data.top_authors||[]);
+        renderDashboardReadiness(data.readiness.components||[]);
+    }catch(error){
+        toast(error.message,true);
+        setText("dashboard-health-text","Не удалось загрузить сводку.");
+    }
+}
+
+function renderDashboardAlerts(alerts){
+    if(e["dashboard-alerts"]){
+        e["dashboard-alerts"].innerHTML=alerts.map(item=>`
+            <div class="dashboard-alert ${item.level==="critical"?"is-critical":item.level==="info"?"is-info":""}">
+                <div>
+                    <strong>${esc(item.title)}</strong>
+                    <small>${esc(item.details||"")}</small>
+                </div>
+                <button class="row-edit" type="button" data-alert-tab="${esc(item.tab||"quality")}">Открыть</button>
+            </div>
+        `).join("");
+        e["dashboard-alerts"].querySelectorAll("[data-alert-tab]").forEach(button=>{
+            button.addEventListener("click",()=>switchTab(button.dataset.alertTab));
+        });
+    }
+    if(e["dashboard-alerts-empty"])e["dashboard-alerts-empty"].hidden=alerts.length>0;
+}
+
+function renderDashboardEvents(items){
+    if(e["dashboard-events"]){
+        e["dashboard-events"].innerHTML=items.map(item=>`
+            <div class="dashboard-compact-item">
+                <div><strong>${esc(item.title)}</strong><small>${esc(item.created_at_label||"")}</small></div>
+                <b>${esc(item.action_label||"")}</b>
+            </div>
+        `).join("");
+    }
+    if(e["dashboard-events-empty"])e["dashboard-events-empty"].hidden=items.length>0;
+}
+
+function renderDashboardTopAuthors(items){
+    if(e["dashboard-top-authors"]){
+        e["dashboard-top-authors"].innerHTML=items.map((item,index)=>`
+            <div class="dashboard-compact-item">
+                <div><strong>${index+1}. ${esc(item.author)}</strong><small>Автор вопросов</small></div>
+                <b>${item.count}</b>
+            </div>
+        `).join("");
+    }
+    if(e["dashboard-top-authors-empty"])e["dashboard-top-authors-empty"].hidden=items.length>0;
+}
+
+function renderDashboardReadiness(items){
+    if(!e["dashboard-readiness-components"])return;
+    e["dashboard-readiness-components"].innerHTML=items.map(item=>`
+        <article class="readiness-component">
+            <header><span>${esc(item.label)}</span><strong>${item.score}%</strong></header>
+            <div class="readiness-track"><span style="width:${Math.max(0,Math.min(100,item.score))}%"></span></div>
+        </article>
+    `).join("");
+}
+
+function showMaintenanceReport(lines){
+    const node=e["maintenance-report"];
+    if(!node)return;
+    node.textContent=Array.isArray(lines)?lines.join("\n"):String(lines||"");
+    node.hidden=false;
+}
+
+async function createDashboardBackup(){
+    if(!confirm("Создать резервную копию текущей базы SQLite?"))return;
+    try{
+        const response=await api("/tpv_editor/api/maintenance/backup",{method:"POST"});
+        toast(response.message);
+        showMaintenanceReport([`✔ ${response.message}`,`Файл: ${response.filename||"—"}`]);
+        await loadDashboard();
+    }catch(error){toast(error.message,true)}
+}
+
+async function recalculateDashboardApprovals(){
+    if(!confirm("Пересчитать количество вопросов и допуски всех пользователей?"))return;
+    try{
+        const response=await api("/tpv_editor/api/recalculate",{method:"POST"});
+        toast(response.message||"Допуски пересчитаны.");
+        await loadAll();
+    }catch(error){toast(error.message,true)}
+}
+
+async function runMaintenanceAction(action){
+    const labels={vacuum:"Выполнить VACUUM SQLite?",analyze:"Выполнить ANALYZE SQLite?",integrity:"Проверить целостность SQLite?"};
+    if(!confirm(labels[action]||"Выполнить операцию?"))return;
+    try{
+        const response=await api(`/tpv_editor/api/maintenance/${action}`,{method:"POST"});
+        toast(response.message);
+        showMaintenanceReport(response.report||[response.message]);
+        await loadDashboard();
+    }catch(error){toast(error.message,true)}
+}
+
+async function runFullMaintenance(){
+    if(!confirm("Выполнить полное обслуживание: backup, очистка обработанных заявок, очистка истории старше года, ANALYZE, VACUUM и проверка целостности?"))return;
+    if(!confirm("Подтвердите полное обслуживание TPV ещё раз."))return;
+    try{
+        const response=await api("/tpv_editor/api/maintenance/full",{method:"POST"});
+        toast(response.message);
+        showMaintenanceReport(response.report||[response.message]);
+        await loadAll();
+    }catch(error){toast(error.message,true)}
+}
+
+async function clearHistoryFromDashboard(){
+    const mode=e["maintenance-history-mode"]?.value||"older30";
+    const labels={older30:"историю старше 30 дней",older365:"историю старше года",all:"ВСЮ историю изменений"};
+    if(!confirm(`Удалить ${labels[mode]}? Откат удалённых записей станет невозможен.`))return;
+    if(mode==="all"&&!confirm("Подтвердите полную очистку истории ещё раз."))return;
+    try{const response=await api("/tpv_editor/api/history/clear",{method:"POST",body:{mode}});toast(response.message);await loadDashboard();if(s.tab==="history")await loadHistory()}catch(error){toast(error.message,true)}
+}
+async function clearApplicationsFromDashboard(){
+    const mode=e["maintenance-applications-mode"]?.value||"processed";
+    const labels={processed:"все обработанные заявки",approved:"все утверждённые заявки",rejected:"все отклонённые заявки",all:"ВСЕ заявки, включая ожидающие"};
+    if(!confirm(`Удалить ${labels[mode]}?`))return;
+    if(mode==="all"&&!confirm("Внимание: ожидающие заявки также будут удалены. Подтвердите ещё раз."))return;
+    try{const response=await api("/tpv_editor/api/question-applications/clear",{method:"POST",body:{mode}});toast(response.message);await loadDashboard();if(s.tab==="applications")await loadApplications()}catch(error){toast(error.message,true)}
+}
 
 async function loadApplications(){
     try{
@@ -1199,4 +1863,890 @@ async function saveQuestion(x){x.preventDefault();const id=+e["question-id"].val
 async function removeQuestion(){if(!s.currentQuestion||!confirm(`Удалить вопрос #${s.currentQuestion.id}?`))return;try{const r=await api(`/tpv_editor/api/questions/${s.currentQuestion.id}`,{method:"DELETE"});toast(r.message);closeQuestion();await loadAll()}catch(z){toast(z.message,true)}}
 async function duplicateQuestion(){if(!s.currentQuestion)return;try{const r=await api(`/tpv_editor/api/questions/${s.currentQuestion.id}/duplicate`,{method:"POST"});toast(r.message);closeQuestion();await loadAll()}catch(z){toast(z.message,true)}}
 async function resetShown(){const count=s.questions.filter(q=>q.show==="true").length;if(!count){toast("Использованных вопросов нет.");return}if(!confirm(`Сбросить признак использования у ${count} вопросов?`))return;try{const r=await api("/tpv_editor/api/questions/reset-shown",{method:"POST"});toast(r.message);await loadQuestions()}catch(z){toast(z.message,true)}}
-function money(v){return Number(v||0).toLocaleString("ru-RU")}function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}function toast(m,err=false){const d=document.createElement("div");d.className=`toast${err?" toast-error":""}`;d.textContent=m;e["toast-region"].append(d);setTimeout(()=>d.remove(),4000)}})();
+function money(v){return Number(v||0).toLocaleString("ru-RU")}function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}function toast(m,err=false){const d=document.createElement("div");d.className=`toast${err?" toast-error":""}`;d.textContent=m;e["toast-region"].append(d);setTimeout(()=>d.remove(),4000)}
+async function loadGames(){
+ try{const data=await api("/tpv_editor/api/games");const exists=data.table_exists!==false;if(e["games-missing-table"])e["games-missing-table"].hidden=exists;if(e["games-content"])e["games-content"].hidden=!exists;s.games=data.items||[];s.gameStats=data.stats||{};fillGameFilters(data.seasons||[]);renderGames();renderGameViews(data)}catch(error){toast(error.message,true)}
+}
+async function createGamesTables(){if(!confirm("Создать таблицы архива игр?"))return;try{const r=await api("/tpv_editor/api/games/create-tables",{method:"POST"});toast(r.message);await loadGames()}catch(error){toast(error.message,true)}}
+function fillGameFilters(seasons){const current=e["games-season-filter"]?.value||"all";if(e["games-season-filter"]){e["games-season-filter"].innerHTML='<option value="all">Все сезоны</option>'+seasons.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");if([...e["games-season-filter"].options].some(o=>o.value===current))e["games-season-filter"].value=current}}
+function renderGames(){
+    const q=(e["games-search"]?.value||"").trim().toLowerCase();
+    const season=e["games-season-filter"]?.value||"all";
+    const status=e["games-status-filter"]?.value||"all";
+    const sort=e["games-sort"]?.value||"new-desc";
+
+    let list=s.games.filter(g=>
+        (!q||[g.title,g.winner,g.players_text].join(" ").toLowerCase().includes(q))&&
+        (season==="all"||g.season===season)&&
+        (status==="all"||g.status===status)
+    );
+
+    list.sort((a,b)=>
+        sort==="new-asc"?a.id-b.id:
+        sort==="prize-desc"?(b.winner_money||b.prize||0)-(a.winner_money||a.prize||0):
+        b.id-a.id
+    );
+
+    if(e["games-welcome"])e["games-welcome"].hidden=s.games.length>0;
+    if(e["games-table-body"])e["games-table-body"].innerHTML=list.map(g=>`
+        <tr>
+            <td>${g.id}</td>
+            <td>${esc(g.started_at_label)}</td>
+            <td>${esc(g.season||"—")}</td>
+            <td><strong>${esc(g.title)}</strong><small>Builder ID: ${g.builder_id??"—"}</small></td>
+            <td>${g.players_count??g.player_count??0}</td>
+            <td>${esc(g.winner||"—")}</td>
+            <td>${Number(g.winner_money??g.prize??0).toLocaleString("ru-RU")}</td>
+            <td>${esc(g.duration_label||"—")}</td>
+            <td><button class="row-edit" type="button" data-open-game="${g.id}">Открыть</button></td>
+        </tr>
+    `).join("");
+
+    if(e["games-empty"])e["games-empty"].hidden=list.length>0||s.games.length===0;
+}
+
+async function loadRecords(){
+    try{
+        const response=await api("/tpv_editor/api/games/records");
+        s.records=response.records||null;
+        renderRecords();
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+function recordDuration(seconds){
+    const value=Number(seconds||0);
+    if(!value)return "—";
+    const hours=Math.floor(value/3600);
+    const minutes=Math.floor((value%3600)/60);
+    return hours?`${hours}:${String(minutes).padStart(2,"0")}`:`${minutes} мин`;
+}
+
+function renderRecords(){
+    const data=s.records;
+    if(!data)return;
+
+    const project=data.project||{};
+    const projectCards=[
+        ["Завершённых игр",project.games_completed||0],
+        ["Уникальных игроков",project.players_unique||0],
+        ["Вопросов задано",project.questions_total||0],
+        ["Событий Replay",project.events_total||0],
+        ["Правильных ответов",project.correct_total||0],
+        ["Ошибок",project.wrong_total||0],
+        ["Общий выигрыш",money(project.prize_total||0)],
+        ["Средняя длительность",project.average_duration_label||"—"],
+        ["Средняя точность",`${project.average_accuracy||0}%`],
+        ["Средний выигрыш",money(project.average_prize||0)],
+        ["Авторов",project.authors_unique||0],
+        ["Тем",project.themes_unique||0]
+    ];
+    e["records-project-grid"].innerHTML=projectCards.map(([label,value])=>`
+        <article class="records-project-card">
+            <span>${esc(label)}</span>
+            <strong>${esc(value)}</strong>
+        </article>
+    `).join("");
+
+    const labels={
+        longest:["Самая длинная игра",v=>recordDuration(v)],
+        shortest:["Самая короткая игра",v=>recordDuration(v)],
+        largest_prize:["Самый большой выигрыш",v=>money(v)],
+        smallest_prize:["Минимальный выигрыш победителя",v=>money(v)],
+        highest_accuracy:["Максимальная точность",v=>`${v||0}%`],
+        lowest_accuracy:["Минимальная точность",v=>`${v||0}%`],
+        most_players:["Максимум игроков",v=>String(v||0)],
+        most_questions:["Максимум вопросов",v=>String(v||0)],
+        most_theme_questions:["Максимум тем замены",v=>String(v||0)],
+        most_correct:["Максимум правильных",v=>String(v||0)],
+        most_wrong:["Максимум ошибок",v=>String(v||0)]
+    };
+    const gameRecords=Object.entries(data.games||{})
+        .filter(([,item])=>item&&item.game_id);
+    e["records-games-grid"].innerHTML=gameRecords.map(([key,item])=>{
+        const [label,formatter]=labels[key]||[key,v=>v];
+        return `<article class="record-game-card" data-record-game="${item.game_id}">
+            <small>${esc(label)}</small>
+            <strong>${esc(formatter(item.value))}</strong>
+            <span>${esc(item.title||`Игра #${item.game_id}`)}</span>
+        </article>`;
+    }).join("");
+    e["records-games-empty"].hidden=gameRecords.length>0;
+    e["records-games-grid"].querySelectorAll("[data-record-game]").forEach(card=>{
+        card.addEventListener("click",()=>openGame(Number(card.dataset.recordGame)));
+    });
+
+    const players=data.players||[];
+    e["records-players-body"].innerHTML=players.map((item,index)=>`
+        <tr>
+            <td>${index+1}</td>
+            <td><strong>${esc(item.name)}</strong></td>
+            <td>${item.games}</td>
+            <td>${item.wins}</td>
+            <td>${item.win_percent}%</td>
+            <td>${money(item.total_money)}</td>
+            <td>${money(item.average_money)}</td>
+            <td>${money(item.best_money)}</td>
+            <td>${item.best_win_streak}</td>
+        </tr>
+    `).join("");
+    e["records-players-empty"].hidden=players.length>0;
+
+    const authors=data.authors||[];
+    e["records-authors-list"].innerHTML=authors.slice(0,20).map((item,index)=>`
+        <article class="records-list-item">
+            <div>
+                <strong>${index+1}. ${esc(item.name)}</strong>
+                <small>${item.used} вопросов · ${item.correct} верно · ${item.wrong} ошибок</small>
+            </div>
+            <div class="records-list-value">${item.accuracy}%</div>
+        </article>
+    `).join("");
+    e["records-authors-empty"].hidden=authors.length>0;
+
+    const themes=data.themes||[];
+    e["records-themes-list"].innerHTML=themes.slice(0,20).map((item,index)=>`
+        <article class="records-list-item">
+            <div>
+                <strong>${index+1}. ${esc(item.name)}</strong>
+                <small>${item.used} использований · сложность ${item.difficulty}%</small>
+            </div>
+            <div class="records-list-value">${item.accuracy}%</div>
+        </article>
+    `).join("");
+    e["records-themes-empty"].hidden=themes.length>0;
+
+    const icons={
+        first_game:"🎯",ten_games:"🎮",hundred_games:"🏆",
+        thousand_questions:"❓",first_million:"💰",
+        hundred_players:"👥",hundred_themes:"🎭",hundred_replays:"🎬"
+    };
+    e["records-achievements-grid"].innerHTML=(data.achievements||[]).map(item=>`
+        <article class="record-achievement ${item.unlocked?"is-unlocked":""}">
+            <div class="record-achievement-icon">${icons[item.code]||"⭐"}</div>
+            <strong>${esc(item.title)}</strong>
+            <small>${esc(item.progress||"")}</small>
+        </article>
+    `).join("");
+}
+
+function renderGameViews(data){
+    const st=data.stats||{};
+    setText("g-stat-total",st.total||0);
+    setText("g-stat-players",st.average_players||0);
+    setText("g-stat-general",st.average_general||0);
+    setText("g-stat-duration",st.average_duration_label||"—");
+    renderGamesAnalytics(data.analytics||{});
+
+    if(s.gamesView==="records"&&!s.records)loadRecords();
+}
+
+function switchGamesAnalyticsTab(tab){
+    const valid=["games","players","questions","themes","authors"];
+    if(!valid.includes(tab))tab="games";
+    document.querySelectorAll("[data-analytics-tab]").forEach(button=>{
+        button.classList.toggle("is-active",button.dataset.analyticsTab===tab);
+    });
+    valid.forEach(name=>setHidden(`games-analytics-${name}`,name!==tab));
+}
+
+function analyticsPercent(value){
+    return `<span class="games-analytics-percent">${Number(value||0)}%</span>`;
+}
+
+function renderGamesAnalytics(analytics){
+    const summary=analytics.summary||{};
+    const hasData=analytics.has_data===true;
+    if(e["games-analytics-empty"])e["games-analytics-empty"].hidden=hasData;
+    if(e["games-analytics-content"])e["games-analytics-content"].hidden=!hasData;
+
+    setText("ga-completed",summary.completed_games||0);
+    setText("ga-unique-players",summary.unique_players||0);
+    setText("ga-correct-percent",`${summary.correct_percent||0}%`);
+    setText("ga-duration",summary.average_duration_label||"—");
+    setText("ga-average-questions",summary.average_questions||0);
+    setText("ga-average-prize",money(summary.average_prize||0));
+    setText("ga-all-games",summary.all_games||0);
+    setText("ga-status-completed",summary.completed_games||0);
+    setText("ga-status-draft",summary.draft_games||0);
+    setText("ga-status-cancelled",summary.cancelled_games||0);
+    setText("ga-average-players",summary.average_players||0);
+    setText("ga-average-general",summary.average_general||0);
+    setText("ga-average-themes",summary.average_themes||0);
+    setText("ga-total-questions",summary.total_questions||0);
+    setText("ga-total-correct",summary.total_correct||0);
+    setText("ga-total-wrong",summary.total_wrong||0);
+
+    const games=analytics.games||[];
+    if(e["ga-games-body"])e["ga-games-body"].innerHTML=games.map(item=>`
+        <tr>
+            <td><strong>${esc(item.title)}</strong><small>#${item.id}</small></td>
+            <td>${esc(item.date)}</td>
+            <td>${item.players||0}</td>
+            <td>${item.questions||0}</td>
+            <td>${analyticsPercent(item.correct_percent)}</td>
+            <td>${money(item.prize||0)}</td>
+            <td>${esc(item.duration_label||"—")}</td>
+        </tr>
+    `).join("");
+
+    const players=analytics.players||[];
+    if(e["ga-players-body"])e["ga-players-body"].innerHTML=players.map(item=>`
+        <tr>
+            <td><strong>${esc(item.name)}</strong></td>
+            <td>${item.games||0}</td>
+            <td>${item.wins||0}</td>
+            <td>${analyticsPercent(item.win_percent)}</td>
+            <td>${money(item.total||0)}</td>
+            <td>${money(item.average||0)}</td>
+            <td>${money(item.best||0)}</td>
+            <td>${analyticsPercent(item.correct_percent)}</td>
+        </tr>
+    `).join("");
+    if(e["ga-players-empty"])e["ga-players-empty"].hidden=players.length>0;
+
+    const questions=analytics.questions||[];
+    if(e["ga-questions-body"])e["ga-questions-body"].innerHTML=questions.map(item=>`
+        <tr>
+            <td>${item.question_id??"—"}</td>
+            <td>${item.type==="theme"?"Тема замены":"Общий"}</td>
+            <td>${esc(item.theme||"—")}</td>
+            <td>${esc(item.author||"—")}</td>
+            <td>${item.used||0}</td>
+            <td>${item.correct||0}</td>
+            <td>${item.wrong||0}</td>
+            <td>${analyticsPercent(item.correct_percent)}</td>
+            <td>${esc(item.last_used_label||"—")}</td>
+        </tr>
+    `).join("");
+    if(e["ga-questions-empty"])e["ga-questions-empty"].hidden=questions.length>0;
+
+    const themes=analytics.themes||[];
+    if(e["ga-themes-grid"])e["ga-themes-grid"].innerHTML=themes.map(item=>`
+        <article class="games-analytics-card">
+            <h3>${esc(item.name)}</h3>
+            <dl>
+                <div><dt>Игр</dt><dd>${item.games||0}</dd></div>
+                <div><dt>Использовано</dt><dd>${item.used||0}</dd></div>
+                <div><dt>Правильных</dt><dd>${item.correct||0}</dd></div>
+                <div><dt>Ошибок</dt><dd>${item.wrong||0}</dd></div>
+                <div><dt>Точность</dt><dd>${item.correct_percent||0}%</dd></div>
+            </dl>
+        </article>
+    `).join("");
+    if(e["ga-themes-empty"])e["ga-themes-empty"].hidden=themes.length>0;
+
+    const authors=analytics.authors||[];
+    if(e["ga-authors-body"])e["ga-authors-body"].innerHTML=authors.map(item=>`
+        <tr>
+            <td><strong>${esc(item.name)}</strong></td>
+            <td>${item.games||0}</td>
+            <td>${item.used||0}</td>
+            <td>${item.correct||0}</td>
+            <td>${item.wrong||0}</td>
+            <td>${analyticsPercent(item.correct_percent)}</td>
+        </tr>
+    `).join("");
+    if(e["ga-authors-empty"])e["ga-authors-empty"].hidden=authors.length>0;
+
+    switchGamesAnalyticsTab("games");
+}
+
+function renderCompact(id,items,mapper){if(!e[id])return;e[id].innerHTML=items.map(x=>{const [a,b]=mapper(x);return `<div class="dashboard-compact-item"><div><strong>${esc(a)}</strong><small>${esc(b)}</small></div></div>`}).join("")}
+function switchGamesView(view){s.gamesView=view;document.querySelectorAll("[data-games-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.gamesView===view));["archive","seasons","records","analytics"].forEach(v=>setHidden(`games-${v}-view`,v!==view))}
+function parsePipeLines(value,keys){return String(value||"").split(/\r?\n/).map(v=>v.trim()).filter(Boolean).map(line=>{const parts=line.split("|").map(v=>v.trim()),obj={};keys.forEach((k,i)=>obj[k]=parts[i]||"");return obj})}
+function gamePayload(){
+    return{
+        title:e["game-title"].value.trim(),
+        season:e["game-season"].value.trim(),
+        started_at:e["game-started-at"].value,
+        ended_at:e["game-ended-at"].value,
+        status:e["game-status"].value,
+        winner:e["game-winner"].value.trim(),
+        winner_money:Number(e["game-prize"].value||0),
+        general_questions:Number(e["game-general-count"].value||0),
+        theme_questions:Number(e["game-themed-count"].value||0),
+        correct_answers:Number(e["game-correct-count"].value||0),
+        wrong_answers:Number(e["game-wrong-count"].value||0),
+        ended_normally:e["game-status"].value==="completed",
+        editor_version:"10.2.1",
+        players:parsePipeLines(
+            e["game-players"].value,
+            ["username","money","correct_answers","wrong_answers","theme"]
+        ),
+        themes:parsePipeLines(
+            e["game-themes"].value,
+            ["theme","used_count","correct_count","wrong_count"]
+        ),
+        questions:String(e["game-question-ids"].value||"")
+            .split(/[,\s]+/)
+            .filter(v=>/^\d+$/.test(v))
+            .map(v=>({question_id:Number(v),question_type:"general"})),
+        events:parsePipeLines(
+            e["game-events"].value,
+            ["time","event_type","description"]
+        ),
+        notes:e["game-notes"].value.trim()
+    }
+}
+function toLocalInput(value){return value?String(value).slice(0,16):""}
+function gameStatusLabel(status){
+    return status==="completed"?"Завершена":status==="cancelled"?"Отменена":"Черновик";
+}
+
+function setGameEditMode(editing){
+    const exists=!!s.currentGame;
+    if(e["game-card-view"])e["game-card-view"].hidden=editing||!exists;
+    if(e["game-edit-view"])e["game-edit-view"].hidden=!editing;
+    if(e["game-edit"])e["game-edit"].hidden=editing||!exists;
+    if(e["game-save"])e["game-save"].hidden=!editing;
+    if(e["game-cancel-edit"])e["game-cancel-edit"].hidden=!editing||!exists;
+    if(e["game-delete"])e["game-delete"].hidden=!exists;
+    if(e["game-export-json"])e["game-export-json"].hidden=!exists;
+    if(e["game-cancel"])e["game-cancel"].textContent=editing&&!exists?"Отмена":"Закрыть";
+}
+
+function switchGameCardTab(tab){
+    const valid=["overview","players","questions","themes","events","replay","snapshot"];
+    if(!valid.includes(tab))tab="overview";
+    document.querySelectorAll("[data-game-card-tab]").forEach(button=>{
+        button.classList.toggle("is-active",button.dataset.gameCardTab===tab);
+    });
+    valid.forEach(name=>{
+        const node=e[`game-card-${name}`];
+        if(node)node.hidden=name!==tab;
+    });
+    if(tab!=="replay")pauseGameReplay();
+}
+
+function fillGameForm(g){
+    e["game-id"].value=g?.id||"";
+    e["game-title"].value=g?.title||"";
+    e["game-season"].value=g?.season||new Date().getFullYear();
+    e["game-started-at"].value=toLocalInput(g?.started_at);
+    e["game-ended-at"].value=toLocalInput(g?.ended_at);
+    e["game-builder-name"].value=g?.builder_id??"";
+    e["game-status"].value=g?.status||"completed";
+    e["game-winner"].value=g?.winner||"";
+    e["game-prize"].value=g?.winner_money??g?.prize??0;
+    e["game-general-count"].value=g?.general_questions??g?.general_count??0;
+    e["game-themed-count"].value=g?.theme_questions??g?.themed_count??0;
+    e["game-correct-count"].value=g?.correct_answers??g?.correct_count??0;
+    e["game-wrong-count"].value=g?.wrong_answers??g?.wrong_count??0;
+    e["game-players"].value=(g?.players||[]).map(x=>[
+        x.username||x.name,
+        x.money??x.result??0,
+        x.correct_answers??x.correct??0,
+        x.wrong_answers??x.wrong??0,
+        x.theme||""
+    ].join(" | ")).join("\n");
+    e["game-themes"].value=(g?.themes||[]).map(x=>[
+        x.theme||x.name,
+        x.used_count??x.used??0,
+        x.correct_count??x.correct??0,
+        x.wrong_count??x.wrong??0
+    ].join(" | ")).join("\n");
+    e["game-question-ids"].value=(g?.question_ids||[]).join(", ");
+    e["game-events"].value=(g?.events||[]).map(x=>[
+        x.time,
+        x.event_type||x.type,
+        x.description||""
+    ].join(" | ")).join("\n");
+    e["game-notes"].value=g?.notes||"";
+    e["game-detail-summary"].textContent=g
+        ?`${g.players_count??g.player_count??0} игроков · ${g.total_questions||0} вопросов · ${g.duration_label||"—"}`
+        :"Запись можно заполнить вручную.";
+}
+
+
+function stopGameReplayTimer(){
+    if(s.replayTimer){
+        clearInterval(s.replayTimer);
+        s.replayTimer=null;
+    }
+}
+
+function pauseGameReplay(){
+    stopGameReplayTimer();
+    s.replayPlaying=false;
+    if(e["game-replay-play"])e["game-replay-play"].textContent="▶ Старт";
+}
+
+function replayDelay(){
+    const current=s.replayEvents[s.replayIndex];
+    const next=s.replayEvents[s.replayIndex+1];
+    if(!current||!next)return 1200;
+    const delta=Math.max(1,Number(next.event_time||0)-Number(current.event_time||0));
+    return Math.max(350,Math.min(2500,(delta*1000)/Math.max(.5,s.replaySpeed)));
+}
+
+function startGameReplayTimer(){
+    if(!s.replayEvents.length)return;
+    stopGameReplayTimer();
+    s.replayPlaying=true;
+    if(e["game-replay-play"])e["game-replay-play"].textContent="⏸ Пауза";
+
+    const schedule=()=>{
+        stopGameReplayTimer();
+        if(!s.replayPlaying)return;
+        s.replayTimer=setTimeout(()=>{
+            if(s.replayIndex>=s.replayEvents.length-1){
+                pauseGameReplay();
+                return;
+            }
+            setGameReplayIndex(s.replayIndex+1,false);
+            schedule();
+        },replayDelay());
+    };
+    schedule();
+}
+
+function toggleGameReplay(){
+    if(!s.replayEvents.length)return;
+    if(s.replayPlaying){
+        pauseGameReplay();
+        return;
+    }
+    if(s.replayIndex>=s.replayEvents.length-1)setGameReplayIndex(0,false);
+    startGameReplayTimer();
+}
+
+function stepGameReplay(delta){
+    pauseGameReplay();
+    setGameReplayIndex(s.replayIndex+delta);
+}
+
+function replayEventTitle(event){
+    const labels={
+        game_start:"Игра началась",
+        question:"Выбран вопрос",
+        answer_correct:"Правильный ответ",
+        answer_wrong:"Неправильный ответ",
+        answer_pass:"Вопрос пропущен",
+        answer_flip:"Переход к теме замены",
+        player_result:"Результат игрока",
+        author_result:"Результат автора",
+        game_end:"Игра завершена",
+        game_cancel:"Игра отменена"
+    };
+    return labels[event?.event_type||event?.type]||event?.description||"Событие";
+}
+
+function replayPayloadEntries(event){
+    const payload=event?.payload&&typeof event.payload==="object"?event.payload:{};
+    return Object.entries(payload)
+        .filter(([key,value])=>key!=="description"&&value!==null&&value!=="")
+        .map(([key,value])=>[
+            key,
+            typeof value==="object"?JSON.stringify(value):String(value)
+        ]);
+}
+
+function setGameReplayIndex(index,scroll=true){
+    if(!s.replayEvents.length){
+        s.replayIndex=0;
+        renderGameReplay();
+        return;
+    }
+    const max=s.replayEvents.length-1;
+    s.replayIndex=Math.max(0,Math.min(max,Number(index||0)));
+    renderGameReplay();
+
+    if(scroll){
+        const active=e["game-replay-timeline"]?.querySelector(".is-active");
+        active?.scrollIntoView({block:"nearest",behavior:"smooth"});
+    }
+}
+
+function renderGameReplay(){
+    const events=s.replayEvents||[];
+    const current=events[s.replayIndex]||null;
+    const totalTime=events.length
+        ?Number(events[events.length-1].event_time||0)
+        :0;
+
+    if(e["game-replay-empty"])e["game-replay-empty"].hidden=events.length>0;
+    if(e["game-replay-player"])e["game-replay-player"].hidden=events.length===0;
+    if(!events.length)return;
+
+    setText("game-replay-step-label",`Шаг ${s.replayIndex+1} из ${events.length}`);
+    setText("game-replay-title",replayEventTitle(current));
+    setText("game-replay-time",current.time||"00:00");
+    setText(
+        "game-replay-description",
+        current.description||
+        current.payload?.description||
+        "Событие без дополнительного описания."
+    );
+
+    e["game-replay-details"].innerHTML=replayPayloadEntries(current)
+        .map(([key,value])=>`
+            <span class="game-replay-detail">
+                ${esc(key)}: ${esc(value)}
+            </span>
+        `).join("");
+
+    const progress=e["game-replay-progress"];
+    progress.max=Math.max(0,events.length-1);
+    progress.value=s.replayIndex;
+
+    setText("game-replay-current",current.time||"00:00");
+    setText("game-replay-total",formatReplaySeconds(totalTime));
+
+    e["game-replay-timeline"].innerHTML=events.map((event,index)=>`
+        <article
+            class="game-replay-timeline-item ${index===s.replayIndex?"is-active":""}"
+            data-replay-index="${index}"
+        >
+            <div class="game-replay-timeline-time">${esc(event.time||"00:00")}</div>
+            <div class="game-replay-timeline-type">${esc(event.event_type||event.type||"event")}</div>
+            <div class="game-replay-timeline-description">${esc(
+                event.description||
+                event.payload?.description||
+                replayEventTitle(event)
+            )}</div>
+        </article>
+    `).join("");
+
+    e["game-replay-timeline"]
+        .querySelectorAll("[data-replay-index]")
+        .forEach(node=>{
+            node.addEventListener("click",()=>{
+                pauseGameReplay();
+                setGameReplayIndex(Number(node.dataset.replayIndex||0));
+            });
+        });
+}
+
+function formatReplaySeconds(seconds){
+    const value=Math.max(0,Number(seconds||0));
+    const hours=Math.floor(value/3600);
+    const minutes=Math.floor((value%3600)/60);
+    const secs=Math.floor(value%60);
+    return hours
+        ?`${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(secs).padStart(2,"0")}`
+        :`${String(minutes).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+}
+
+function initializeGameReplay(events){
+    pauseGameReplay();
+    s.replayEvents=[...(events||[])].sort((a,b)=>
+        Number(a.event_time||0)-Number(b.event_time||0)
+    );
+    s.replayIndex=0;
+    s.replaySpeed=Number(e["game-replay-speed"]?.value||1);
+    renderGameReplay();
+}
+
+function renderGameCard(g){
+    const players=g.players||[];
+    const questions=g.questions||[];
+    const themes=g.themes||[];
+    const events=g.events||[];
+    const snapshot=g.snapshot||null;
+    initializeGameReplay(events);
+
+    e["game-card-name"].textContent=g.title||`Игра #${g.id}`;
+    e["game-card-meta"].textContent=[
+        g.started_at_label||"Дата не указана",
+        g.season?`сезон ${g.season}`:"",
+        `игра #${g.id}`
+    ].filter(Boolean).join(" · ");
+    e["game-card-winner"].textContent=g.winner||"Победитель не определён";
+    e["game-card-prize"].textContent=`${money(g.winner_money??g.prize??0)} очков`;
+
+    const badge=e["game-card-status"];
+    badge.textContent=gameStatusLabel(g.status);
+    badge.className=`game-status-badge is-${g.status||"draft"}`;
+
+    setText("game-tab-players-count",players.length);
+    setText("game-tab-questions-count",questions.length);
+    setText("game-tab-themes-count",themes.length);
+    setText("game-tab-events-count",events.length);
+
+    setText("game-view-players",g.players_count??g.player_count??players.length);
+    setText("game-view-duration",g.duration_label||"—");
+    setText("game-view-general",g.general_questions??g.general_count??0);
+    setText("game-view-themed",g.theme_questions??g.themed_count??0);
+    setText("game-view-correct",g.correct_answers??g.correct_count??0);
+    setText("game-view-wrong",g.wrong_answers??g.wrong_count??0);
+    setText("game-view-percent",`${g.correct_percent||0}%`);
+    setText("game-view-builder",g.builder_id??"—");
+    setText("game-view-season",g.season||"—");
+    setText("game-view-started",g.started_at_label||g.started_at||"—");
+    setText("game-view-ended",g.ended_at?String(g.ended_at).replace("T"," "):"—");
+    setText("game-view-normal",g.ended_normally?"Да":"Нет");
+    setText("game-view-tpv-version",g.tpv_version||"—");
+    setText("game-view-editor-version",g.editor_version||"—");
+    setText("game-view-notes",g.notes||"Примечание отсутствует.");
+
+    e["game-view-players-body"].innerHTML=players.map((item,index)=>`
+        <tr>
+            <td>${item.place??index+1}</td>
+            <td><strong>${esc(item.username||item.name||"—")}</strong></td>
+            <td>${esc(item.theme||"—")}</td>
+            <td>${money(item.money??item.result??0)}</td>
+            <td>${item.correct_answers??item.correct??0}</td>
+            <td>${item.wrong_answers??item.wrong??0}</td>
+        </tr>
+    `).join("");
+    e["game-view-players-empty"].hidden=players.length>0;
+
+    e["game-view-questions-body"].innerHTML=questions.map((item,index)=>{
+        const result=item.correct===true
+            ?'<span class="game-result-correct">Верно</span>'
+            :item.correct===false
+                ?'<span class="game-result-wrong">Ошибка</span>'
+                :'<span class="game-result-empty">Не зафиксирован</span>';
+        return `<tr>
+            <td>${index+1}</td>
+            <td>${item.question_id??"—"}</td>
+            <td>${item.question_type==="theme"?"Тема замены":"Общий"}</td>
+            <td>${esc(item.theme||"—")}</td>
+            <td>${esc(item.author||"—")}</td>
+            <td>${result}</td>
+        </tr>`;
+    }).join("");
+    e["game-view-questions-empty"].hidden=questions.length>0;
+
+    e["game-view-themes-grid"].innerHTML=themes.map(item=>{
+        const used=Number(item.used_count??item.used??0);
+        const correct=Number(item.correct_count??item.correct??0);
+        const wrong=Number(item.wrong_count??item.wrong??0);
+        const percent=correct+wrong?Math.round(correct*100/(correct+wrong)):0;
+        return `<article class="game-theme-card">
+            <h4>${esc(item.theme||item.name||"Без темы")}</h4>
+            <dl>
+                <div><dt>Использовано</dt><dd>${used}</dd></div>
+                <div><dt>Правильных</dt><dd>${correct}</dd></div>
+                <div><dt>Ошибок</dt><dd>${wrong}</dd></div>
+                <div><dt>Точность</dt><dd>${percent}%</dd></div>
+            </dl>
+        </article>`;
+    }).join("");
+    e["game-view-themes-empty"].hidden=themes.length>0;
+
+    e["game-view-events-list"].innerHTML=events.map(item=>{
+        const payload=item.payload&&typeof item.payload==="object"?item.payload:{};
+        const details=Object.entries(payload)
+            .filter(([key,value])=>key!=="description"&&value!==null&&value!=="")
+            .map(([key,value])=>`${key}: ${typeof value==="object"?JSON.stringify(value):value}`)
+            .join(" · ");
+        return `<article class="game-event-item">
+            <div class="game-event-time">${esc(item.time||"00:00")}</div>
+            <div class="game-event-type">${esc(item.event_type||item.type||"event")}</div>
+            <div>
+                <div class="game-event-description">${esc(item.description||payload.description||"Событие")}</div>
+                ${details?`<div class="game-event-payload">${esc(details)}</div>`:""}
+            </div>
+        </article>`;
+    }).join("");
+    e["game-view-events-empty"].hidden=events.length>0;
+
+    const snapshotItems=snapshot?[
+        ["Вопросов в базе",snapshot.questions_total||0],
+        ["Тем в базе",snapshot.themes_total||0],
+        ["Размер БД",formatBytes(snapshot.database_size||0)],
+        ["Ресурс базы",`${snapshot.resource_games||0} игр`],
+        ["Builder ID",snapshot.builder_id??"—"]
+    ]:[];
+    e["game-view-snapshot"].innerHTML=snapshotItems.map(([label,value])=>`
+        <article class="game-snapshot-card">
+            <span>${esc(label)}</span>
+            <strong>${esc(value)}</strong>
+        </article>
+    `).join("");
+    e["game-view-snapshot-empty"].hidden=!!snapshot;
+
+    switchGameCardTab("overview");
+}
+
+function formatBytes(value){
+    const bytes=Number(value||0);
+    if(bytes>=1024*1024)return `${(bytes/(1024*1024)).toFixed(1)} МБ`;
+    if(bytes>=1024)return `${(bytes/1024).toFixed(1)} КБ`;
+    return `${bytes} Б`;
+}
+
+async function openGame(id){
+    if(!id){
+        s.currentGame=null;
+        fillGameForm(null);
+        e["game-dialog-title"].textContent="Новая запись игры";
+        setGameEditMode(true);
+        e["game-dialog"].showModal();
+        return;
+    }
+
+    try{
+        const response=await api(`/tpv_editor/api/games/${id}`);
+        const g=response.game;
+        s.currentGame=g;
+        e["game-dialog-title"].textContent=`Игра #${g.id}`;
+        fillGameForm(g);
+        renderGameCard(g);
+        setGameEditMode(false);
+        e["game-dialog"].showModal();
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+function closeGame(){
+    pauseGameReplay();
+    if(e["game-dialog"]?.open)e["game-dialog"].close();
+    s.currentGame=null;
+}
+
+async function saveGame(){
+    const payload=gamePayload();
+    if(!payload.title){
+        toast("Укажите название игры.",true);
+        return;
+    }
+    try{
+        const url=s.currentGame
+            ?`/tpv_editor/api/games/${s.currentGame.id}`
+            :"/tpv_editor/api/games";
+        const response=await api(url,{
+            method:s.currentGame?"PUT":"POST",
+            body:payload
+        });
+        toast(response.message);
+        await loadGames();
+        await loadDashboard();
+
+        if(response.game){
+            s.currentGame=response.game;
+            fillGameForm(response.game);
+            renderGameCard(response.game);
+            e["game-dialog-title"].textContent=`Игра #${response.game.id}`;
+            setGameEditMode(false);
+        }else{
+            closeGame();
+        }
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+async function deleteGame(){
+    if(!s.currentGame||!confirm(`Удалить игру #${s.currentGame.id}?`))return;
+    try{
+        const response=await api(`/tpv_editor/api/games/${s.currentGame.id}`,{
+            method:"DELETE"
+        });
+        toast(response.message);
+        closeGame();
+        await loadGames();
+        await loadDashboard();
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+function downloadJsonFile(data,filename){
+    const blob=new Blob(
+        [JSON.stringify(data,null,2)],
+        {type:"application/json;charset=utf-8"}
+    );
+    const link=document.createElement("a");
+    link.href=URL.createObjectURL(blob);
+    link.download=filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+}
+
+function archiveFileStamp(){
+    const now=new Date();
+    const part=value=>String(value).padStart(2,"0");
+    return [
+        now.getFullYear(),
+        part(now.getMonth()+1),
+        part(now.getDate()),
+        "_",
+        part(now.getHours()),
+        part(now.getMinutes())
+    ].join("");
+}
+
+async function exportGameJson(){
+    if(!s.currentGame)return;
+    try{
+        const response=await api(
+            `/tpv_editor/api/games/${s.currentGame.id}/export`
+        );
+        downloadJsonFile(
+            response.archive,
+            `tpv_game_${s.currentGame.id}_${archiveFileStamp()}.json`
+        );
+        toast("Игра экспортирована.");
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+async function exportGamesArchive(){
+    try{
+        const response=await api("/tpv_editor/api/games/export-all");
+        const archive=response.archive;
+        downloadJsonFile(
+            archive,
+            `tpv_games_archive_${archiveFileStamp()}.json`
+        );
+        toast(`Экспортировано игр: ${archive.count||0}.`);
+    }catch(error){
+        toast(error.message,true);
+    }
+}
+
+async function importGamesArchive(event){
+    const input=event.currentTarget;
+    const file=input.files?.[0];
+    input.value="";
+    if(!file)return;
+
+    if(file.size>25*1024*1024){
+        toast("JSON-файл превышает допустимый размер 25 МБ.",true);
+        return;
+    }
+
+    try{
+        const text=await file.text();
+        let document;
+        try{
+            document=JSON.parse(text);
+        }catch{
+            throw new Error("Выбранный файл содержит некорректный JSON.");
+        }
+
+        const possibleCount=Array.isArray(document)
+            ?document.length
+            :Array.isArray(document?.games)
+                ?document.games.length
+                :1;
+
+        if(!confirm(
+            `Импортировать записей: ${possibleCount}?\n\n`+
+            "Существующие игры не будут перезаписаны. "+
+            "Импортированные записи получат новые ID."
+        ))return;
+
+        const response=await api("/tpv_editor/api/games/import",{
+            method:"POST",
+            body:document
+        });
+
+        toast(response.message);
+        await loadGames();
+        await loadDashboard();
+    }catch(error){
+        toast(error.message||"Не удалось импортировать архив.",true);
+    }
+}
+
+
+})();

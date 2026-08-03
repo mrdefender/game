@@ -16,9 +16,9 @@
 <main class="editor-shell">
     <header class="editor-header">
         <div>
-            <div class="eyebrow">TPV EDITOR</div>
-            <h1 id="page-title">Пользователи</h1>
-            <p id="page-subtitle">Постоянная база игроков и авторов из UsersTpv.</p>
+            <div class="eyebrow">TPV CONTROL CENTER · ЭТАП 10.1</div>
+            <h1 id="page-title">Центр управления</h1>
+            <p id="page-subtitle">Сводка состояния базы, готовности игры и быстрые действия.</p>
         </div>
         <div class="header-actions">
             <a class="button button-muted" href="{{ url_for('tpv') }}">К выбору режима</a>
@@ -31,7 +31,8 @@
     </header>
 
     <nav class="editor-tabs" aria-label="Разделы редактора">
-        <button class="editor-tab is-active" type="button" data-tab="users">Пользователи</button>
+        <button class="editor-tab is-active" type="button" data-tab="dashboard">Главная</button>
+        <button class="editor-tab" type="button" data-tab="users">Пользователи</button>
         <button class="editor-tab" type="button" data-tab="questions">Вопросы</button>
         <button class="editor-tab" type="button" data-tab="themes">Темы</button>
         <button class="editor-tab" type="button" data-tab="quality">Проверка базы</button>
@@ -40,9 +41,404 @@
         <button class="editor-tab" type="button" data-tab="history">История</button>
         <button class="editor-tab" type="button" data-tab="builder">Конструктор игры</button>
         <button class="editor-tab" type="button" data-tab="applications">Заявки</button>
+        <button class="editor-tab" type="button" data-tab="games">Игры</button>
+        <button class="editor-tab" type="button" data-tab="appearance">Оформление</button>
     </nav>
 
-    <section id="users-section" class="editor-section">
+    <section id="dashboard-section" class="editor-section">
+        <section class="dashboard-hero editor-panel">
+            <div>
+                <div class="eyebrow">TPV CONTROL CENTER · 10.1</div>
+                <h2>Центр управления TPV</h2>
+                <p id="dashboard-health-text">Загрузка данных…</p>
+                <div class="dashboard-hero-meta">
+                    <span id="dashboard-last-check">Последняя проверка: —</span>
+                    <span id="dashboard-response-time">Ответ сервера: —</span>
+                </div>
+            </div>
+            <div class="dashboard-score-group">
+                <div>
+                    <small>Готовность к игре</small>
+                    <div id="dashboard-readiness-score" class="dashboard-health-score">—</div>
+                </div>
+                <div>
+                    <small>Здоровье системы</small>
+                    <div id="dashboard-health-score" class="dashboard-health-score dashboard-health-score--secondary">—</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-kpi-grid">
+            <button type="button" class="dashboard-kpi" data-dashboard-tab="users">
+                <span>Пользователи</span><strong id="d-users">0</strong><small id="d-users-note">—</small>
+            </button>
+            <button type="button" class="dashboard-kpi" data-dashboard-tab="questions">
+                <span>Общие вопросы</span><strong id="d-general">0</strong><small id="d-general-note">—</small>
+            </button>
+            <button type="button" class="dashboard-kpi" data-dashboard-tab="themes">
+                <span>Темы замены</span><strong id="d-themes">0</strong><small id="d-themes-note">—</small>
+            </button>
+            <button type="button" class="dashboard-kpi" data-dashboard-tab="applications">
+                <span>Заявки</span><strong id="d-applications">0</strong><small id="d-applications-note">—</small>
+            </button>
+            <button type="button" class="dashboard-kpi" data-dashboard-tab="builder">
+                <span>Игровой набор</span><strong id="d-builder">Нет</strong><small id="d-builder-note">Используется вся база</small>
+            </button>
+            <button type="button" class="dashboard-kpi" data-dashboard-tab="history">
+                <span>История</span><strong id="d-history">0</strong><small id="d-history-note">записей</small>
+            </button>
+        </section>
+
+        <section class="dashboard-analytics-grid">
+            <article class="editor-panel dashboard-analytic-card">
+                <span>Запас вопросов</span>
+                <strong id="d-reserve-general">0 игр</strong>
+                <dl>
+                    <div><dt>Общие</dt><dd id="d-reserve-general-note">—</dd></div>
+                    <div><dt>Темы, средний запас</dt><dd id="d-reserve-theme-average">—</dd></div>
+                    <div><dt>Темы, минимальный запас</dt><dd id="d-reserve-theme-min">—</dd></div>
+                </dl>
+            </article>
+
+            <article class="editor-panel dashboard-analytic-card dashboard-resource-card">
+                <span>Ресурс базы</span>
+                <strong id="d-resource-games">0 игр</strong>
+                <dl>
+                    <div><dt>Ограничение</dt><dd id="d-resource-limit">—</dd></div>
+                    <div><dt>Расход общих за игру</dt><dd id="d-resource-general-rate">—</dd></div>
+                    <div><dt>Минимальная тема</dt><dd id="d-resource-theme">—</dd></div>
+                </dl>
+            </article>
+
+            <article class="editor-panel dashboard-analytic-card">
+                <span>Активный Builder</span>
+                <strong id="d-builder-large">Вся база</strong>
+                <dl>
+                    <div><dt>Вопросов</dt><dd id="d-builder-count">—</dd></div>
+                    <div><dt>Обновлён</dt><dd id="d-builder-updated">—</dd></div>
+                    <div><dt>Режим</dt><dd id="d-builder-mode">Полная база</dd></div>
+                </dl>
+            </article>
+
+            <article class="editor-panel dashboard-analytic-card">
+                <span>Размер и состояние БД</span>
+                <strong id="d-database-size">—</strong>
+                <dl>
+                    <div><dt>SQLite</dt><dd id="d-database-integrity">—</dd></div>
+                    <div><dt>Последний backup</dt><dd id="d-last-backup">—</dd></div>
+                    <div><dt>Файл</dt><dd id="d-database-name">—</dd></div>
+                </dl>
+            </article>
+        </section>
+
+        <section class="dashboard-layout">
+            <article class="editor-panel dashboard-attention">
+                <header class="statistics-card-header">
+                    <div><h2>Требует внимания</h2><p>Проблемы и рекомендации перед следующей игрой.</p></div>
+                    <button id="dashboard-refresh" class="button button-muted" type="button">Обновить</button>
+                </header>
+                <div id="dashboard-alerts" class="dashboard-alert-list"></div>
+                <div id="dashboard-alerts-empty" class="empty-state" hidden>Проблем и рекомендаций не обнаружено.</div>
+            </article>
+
+            <article class="editor-panel dashboard-actions-panel">
+                <header class="statistics-card-header"><div><h2>Быстрые действия</h2><p>Основные операции без поиска нужной вкладки.</p></div></header>
+                <div class="dashboard-actions-grid">
+                    <button class="button button-primary" type="button" data-dashboard-tab="questions" data-dashboard-action="new-question">Новый вопрос</button>
+                    <button class="button button-secondary" type="button" data-dashboard-tab="users" data-dashboard-action="new-user">Новый пользователь</button>
+                    <button class="button button-muted" type="button" data-dashboard-tab="themes">Новая тема / темы</button>
+                    <button class="button button-muted" type="button" data-dashboard-tab="quality">Проверка базы</button>
+                    <button class="button button-muted" type="button" data-dashboard-tab="builder">Конструктор игры</button>
+                    <button class="button button-muted" type="button" data-dashboard-tab="applications">Открыть заявки</button>
+                    <button id="dashboard-backup" class="button button-muted" type="button">Создать backup</button>
+                    <button id="dashboard-recalculate" class="button button-muted" type="button">Пересчитать допуски</button>
+                </div>
+            </article>
+        </section>
+
+        <section class="dashboard-three-column">
+            <article class="editor-panel dashboard-list-panel">
+                <header class="statistics-card-header"><div><h2>Последние события</h2><p>Последние действия редактора.</p></div></header>
+                <div id="dashboard-events" class="dashboard-compact-list"></div>
+                <div id="dashboard-events-empty" class="empty-state" hidden>История пока пуста.</div>
+            </article>
+
+            <article class="editor-panel dashboard-list-panel">
+                <header class="statistics-card-header"><div><h2>Рост базы</h2><p>Создание вопросов по журналу изменений.</p></div></header>
+                <div class="dashboard-growth-grid">
+                    <div><span>Сегодня</span><strong id="d-growth-today">0</strong></div>
+                    <div><span>7 дней</span><strong id="d-growth-week">0</strong></div>
+                    <div><span>30 дней</span><strong id="d-growth-month">0</strong></div>
+                </div>
+            </article>
+
+            <article class="editor-panel dashboard-list-panel">
+                <header class="statistics-card-header"><div><h2>Топ авторов</h2><p>По количеству вопросов в базе.</p></div></header>
+                <div id="dashboard-top-authors" class="dashboard-compact-list"></div>
+                <div id="dashboard-top-authors-empty" class="empty-state" hidden>Авторы не найдены.</div>
+            </article>
+        </section>
+
+        <section class="editor-panel dashboard-readiness-panel">
+            <header class="statistics-card-header"><div><h2>Готовность к эфиру</h2><p>Сводная оценка ключевых компонентов игры.</p></div></header>
+            <div id="dashboard-readiness-components" class="dashboard-readiness-components"></div>
+        </section>
+
+        <section class="editor-panel dashboard-maintenance">
+            <header class="statistics-card-header">
+                <div><h2>Обслуживание TPV</h2><p>Служебные операции. Игроки, вопросы, темы и игровые наборы не удаляются.</p></div>
+                <button id="maintenance-full" class="button button-primary" type="button">Обслужить TPV</button>
+            </header>
+            <div class="maintenance-grid">
+                <article class="maintenance-card">
+                    <div><span>История изменений</span><strong id="maintenance-history-count">0 записей</strong></div>
+                    <label><span>Режим очистки</span><select id="maintenance-history-mode"><option value="older30">Старше 30 дней</option><option value="older365">Старше года</option><option value="all">Полностью</option></select></label>
+                    <button id="maintenance-clear-history" class="button button-danger-soft" type="button">Очистить историю</button>
+                </article>
+                <article class="maintenance-card">
+                    <div><span>Заявки на вопросы</span><strong id="maintenance-applications-count">0 записей</strong></div>
+                    <label><span>Что удалить</span><select id="maintenance-applications-mode"><option value="processed">Все обработанные</option><option value="approved">Только утверждённые</option><option value="rejected">Только отклонённые</option><option value="all">Все, включая ожидающие</option></select></label>
+                    <button id="maintenance-clear-applications" class="button button-danger-soft" type="button">Очистить заявки</button>
+                </article>
+            </div>
+            <div class="maintenance-action-grid">
+                <button id="maintenance-backup" class="button button-muted" type="button">Создать backup</button>
+                <button id="maintenance-vacuum" class="button button-muted" type="button">VACUUM</button>
+                <button id="maintenance-analyze" class="button button-muted" type="button">ANALYZE</button>
+                <button id="maintenance-integrity" class="button button-muted" type="button">Проверить целостность</button>
+            </div>
+            <pre id="maintenance-report" class="maintenance-report" hidden></pre>
+        </section>
+
+        <footer class="dashboard-statusbar">
+            <span>TPV Editor 10.1</span>
+            <span id="status-db">SQLite: —</span>
+            <span id="status-api">API: OK</span>
+            <span id="status-builder">Источник вопросов: —</span>
+            <span id="status-checked">Проверено: —</span>
+        </footer>
+    </section>
+
+
+    <section id="games-section" class="editor-section" hidden>
+        <section id="games-missing-table" class="editor-panel history-missing" hidden>
+            <div><h2>Таблицы архива не созданы</h2><p>Создайте структуру архива игр или выполните SQL-скрипт из архива.</p></div>
+            <button id="games-create-table" class="button button-primary" type="button">Создать таблицы</button>
+        </section>
+        <section id="games-content">
+            <div class="games-subtabs">
+                <button class="games-subtab is-active" type="button" data-games-view="archive">Архив</button>
+                <button class="games-subtab" type="button" disabled title="Будет реализовано в следующих подэтапах 10.2">Сезоны</button>
+                <button class="games-subtab" type="button" data-games-view="records">Рекорды</button>
+                <button class="games-subtab" type="button" data-games-view="analytics">Аналитика</button>
+            </div>
+            <section id="games-archive-view">
+                <section id="games-welcome" class="editor-panel games-welcome" hidden>
+                    <div class="games-welcome-icon">🎮</div>
+                    <div>
+                        <div class="eyebrow">TPV GAME ARCHIVE · 10.2.1</div>
+                        <h2>Архив игр пока пуст</h2>
+                        <p>Создайте тестовую запись вручную. Автоматическое сохранение из игрового движка будет подключено на следующем подэтапе.</p>
+                        <div class="games-welcome-features">
+                            <span>Связанные таблицы</span>
+                            <span>REST API</span>
+                            <span>Каскадное удаление</span>
+                            <span>Готово к Replay</span>
+                        </div>
+                        <button id="games-welcome-new" class="button button-primary" type="button">Создать первую запись</button>
+                    </div>
+                </section>
+                <section class="stats-grid stats-grid-four">
+                    <article><span>Всего игр</span><strong id="g-stat-total">0</strong></article>
+                    <article><span>Игроков в среднем</span><strong id="g-stat-players">0</strong></article>
+                    <article><span>Общих за игру</span><strong id="g-stat-general">0</strong></article>
+                    <article><span>Средняя длительность</span><strong id="g-stat-duration">—</strong></article>
+                </section>
+                <section class="editor-panel">
+                    <div class="toolbar games-toolbar">
+                        <label><span>Поиск</span><input id="games-search" type="search" placeholder="Название, победитель, игрок, Builder"></label>
+                        <label><span>Сезон</span><select id="games-season-filter"><option value="all">Все сезоны</option></select></label>
+                        <label><span>Статус</span><select id="games-status-filter"><option value="all">Все</option><option value="completed">Завершённые</option><option value="cancelled">Отменённые</option><option value="draft">Черновики</option></select></label>
+                        <label><span>Сортировка</span><select id="games-sort"><option value="new-desc">Сначала новые</option><option value="new-asc">Сначала старые</option><option value="prize-desc">По выигрышу</option></select></label>
+                        <button id="games-reload" class="button button-muted" type="button">Обновить</button>
+                        <button id="games-export-all" class="button button-muted" type="button">Экспорт архива</button>
+                        <button id="games-import" class="button button-muted" type="button">Импорт JSON</button>
+                        <input id="games-import-file" type="file" accept=".json,application/json" hidden>
+                        <button id="games-new" class="button button-primary" type="button">Новая запись</button>
+                    </div>
+                    <div class="table-wrap"><table class="games-table"><thead><tr><th>№</th><th>Дата</th><th>Сезон</th><th>Игра / Builder</th><th>Игроков</th><th>Победитель</th><th>Выигрыш</th><th>Время</th><th></th></tr></thead><tbody id="games-table-body"></tbody></table><div id="games-empty" class="empty-state" hidden>Игры не найдены.</div></div>
+                </section>
+            </section>
+            <section id="games-seasons-view" hidden><section id="games-seasons-grid" class="games-card-grid"></section></section>
+            <section id="games-records-view" hidden>
+                <section class="editor-panel records-hero">
+                    <div>
+                        <div class="eyebrow">TPV HALL OF FAME · 10.2.7</div>
+                        <h2>Рекорды и статистика проекта</h2>
+                        <p>Рейтинги строятся по завершённым штатно играм и обновляются автоматически.</p>
+                    </div>
+                    <button id="records-reload" class="button button-muted" type="button">Обновить</button>
+                </section>
+
+                <section id="records-project-grid" class="records-project-grid"></section>
+
+                <section class="editor-panel records-section">
+                    <div class="panel-heading">
+                        <div>
+                            <div class="eyebrow">РЕКОРДЫ ИГР</div>
+                            <h3>Лучшие показатели выпусков</h3>
+                        </div>
+                    </div>
+                    <div id="records-games-grid" class="records-games-grid"></div>
+                    <div id="records-games-empty" class="empty-state" hidden>Недостаточно завершённых игр для расчёта рекордов.</div>
+                </section>
+
+                <section class="editor-panel records-section">
+                    <div class="panel-heading">
+                        <div>
+                            <div class="eyebrow">HALL OF FAME</div>
+                            <h3>Игроки</h3>
+                        </div>
+                    </div>
+                    <div class="game-detail-table-wrap">
+                        <table class="editor-table game-detail-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th><th>Игрок</th><th>Игр</th><th>Побед</th>
+                                    <th>% побед</th><th>Суммарно</th><th>Среднее</th>
+                                    <th>Лучший</th><th>Серия побед</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-players-body"></tbody>
+                        </table>
+                        <div id="records-players-empty" class="empty-state" hidden>Данные игроков пока отсутствуют.</div>
+                    </div>
+                </section>
+
+                <div class="records-two-columns">
+                    <section class="editor-panel records-section">
+                        <div class="panel-heading">
+                            <div>
+                                <div class="eyebrow">АВТОРЫ</div>
+                                <h3>Вопросы в эфире</h3>
+                            </div>
+                        </div>
+                        <div id="records-authors-list" class="records-list"></div>
+                        <div id="records-authors-empty" class="empty-state" hidden>Данные авторов пока отсутствуют.</div>
+                    </section>
+
+                    <section class="editor-panel records-section">
+                        <div class="panel-heading">
+                            <div>
+                                <div class="eyebrow">ТЕМЫ</div>
+                                <h3>Популярность и сложность</h3>
+                            </div>
+                        </div>
+                        <div id="records-themes-list" class="records-list"></div>
+                        <div id="records-themes-empty" class="empty-state" hidden>Данные тем пока отсутствуют.</div>
+                    </section>
+                </div>
+
+                <section class="editor-panel records-section">
+                    <div class="panel-heading">
+                        <div>
+                            <div class="eyebrow">ДОСТИЖЕНИЯ</div>
+                            <h3>Развитие проекта TPV</h3>
+                        </div>
+                    </div>
+                    <div id="records-achievements-grid" class="records-achievements-grid"></div>
+                </section>
+            </section>
+
+            <section id="games-analytics-view" hidden>
+                <section id="games-analytics-empty" class="editor-panel games-analytics-empty" hidden>
+                    <div class="games-analytics-empty-icon">📊</div>
+                    <div>
+                        <div class="eyebrow">TPV ARCHIVE ANALYTICS · 10.2.6</div>
+                        <h2>Недостаточно данных для аналитики</h2>
+                        <p>Завершите хотя бы одну игру штатно. Черновики и отменённые игры не участвуют в средних показателях.</p>
+                    </div>
+                </section>
+
+                <section id="games-analytics-content">
+                    <section class="stats-grid games-analytics-stats">
+                        <article><span>Завершено игр</span><strong id="ga-completed">0</strong></article>
+                        <article><span>Уникальных игроков</span><strong id="ga-unique-players">0</strong></article>
+                        <article><span>Точность ответов</span><strong id="ga-correct-percent">0%</strong></article>
+                        <article><span>Средняя длительность</span><strong id="ga-duration">—</strong></article>
+                        <article><span>Вопросов за игру</span><strong id="ga-average-questions">0</strong></article>
+                        <article><span>Средний выигрыш</span><strong id="ga-average-prize">0</strong></article>
+                    </section>
+
+                    <section class="editor-panel games-analytics-status-panel">
+                        <div class="panel-header compact">
+                            <div><div class="eyebrow">Состояние архива</div><h2>Какие записи участвуют в расчётах</h2></div>
+                        </div>
+                        <div class="games-analytics-status-grid">
+                            <div><span>Всего записей</span><strong id="ga-all-games">0</strong></div>
+                            <div><span>Завершённые</span><strong id="ga-status-completed">0</strong></div>
+                            <div><span>Черновики</span><strong id="ga-status-draft">0</strong></div>
+                            <div><span>Отменённые</span><strong id="ga-status-cancelled">0</strong></div>
+                        </div>
+                    </section>
+
+                    <nav class="games-analytics-tabs" aria-label="Разделы аналитики">
+                        <button class="games-analytics-tab is-active" type="button" data-analytics-tab="games">Игры</button>
+                        <button class="games-analytics-tab" type="button" data-analytics-tab="players">Игроки</button>
+                        <button class="games-analytics-tab" type="button" data-analytics-tab="questions">Вопросы</button>
+                        <button class="games-analytics-tab" type="button" data-analytics-tab="themes">Темы</button>
+                        <button class="games-analytics-tab" type="button" data-analytics-tab="authors">Авторы</button>
+                    </nav>
+
+                    <section id="games-analytics-games" class="games-analytics-pane">
+                        <div class="games-analytics-kpi-grid">
+                            <article><span>Игроков за игру</span><strong id="ga-average-players">0</strong></article>
+                            <article><span>Общих за игру</span><strong id="ga-average-general">0</strong></article>
+                            <article><span>Тем за игру</span><strong id="ga-average-themes">0</strong></article>
+                            <article><span>Всего вопросов</span><strong id="ga-total-questions">0</strong></article>
+                            <article><span>Правильных</span><strong id="ga-total-correct">0</strong></article>
+                            <article><span>Ошибок</span><strong id="ga-total-wrong">0</strong></article>
+                        </div>
+                        <div class="editor-panel games-analytics-table-panel">
+                            <div class="panel-header compact"><div><h2>Динамика игр</h2><p>Основные показатели завершённых выпусков.</p></div></div>
+                            <div class="table-wrap"><table class="games-analytics-table"><thead><tr><th>Игра</th><th>Дата</th><th>Игроков</th><th>Вопросов</th><th>Точность</th><th>Выигрыш</th><th>Время</th></tr></thead><tbody id="ga-games-body"></tbody></table></div>
+                        </div>
+                    </section>
+
+                    <section id="games-analytics-players" class="games-analytics-pane" hidden>
+                        <div class="editor-panel games-analytics-table-panel">
+                            <div class="panel-header compact"><div><h2>Аналитика игроков</h2><p>Участия, победы и накопленные результаты.</p></div></div>
+                            <div class="table-wrap"><table class="games-analytics-table"><thead><tr><th>Игрок</th><th>Игр</th><th>Побед</th><th>% побед</th><th>Сумма</th><th>Средний</th><th>Лучший</th><th>Точность</th></tr></thead><tbody id="ga-players-body"></tbody></table></div>
+                            <div id="ga-players-empty" class="empty-state" hidden>Нет сохранённых данных по игрокам.</div>
+                        </div>
+                    </section>
+
+                    <section id="games-analytics-questions" class="games-analytics-pane" hidden>
+                        <div class="editor-panel games-analytics-table-panel">
+                            <div class="panel-header compact"><div><h2>Аналитика вопросов</h2><p>Использование и результативность вопросов из архива.</p></div></div>
+                            <div class="table-wrap"><table class="games-analytics-table"><thead><tr><th>ID</th><th>Тип</th><th>Тема</th><th>Автор</th><th>Показов</th><th>Верно</th><th>Ошибок</th><th>Точность</th><th>Последний раз</th></tr></thead><tbody id="ga-questions-body"></tbody></table></div>
+                            <div id="ga-questions-empty" class="empty-state" hidden>История использования вопросов пока пуста.</div>
+                        </div>
+                    </section>
+
+                    <section id="games-analytics-themes" class="games-analytics-pane" hidden>
+                        <div id="ga-themes-grid" class="games-analytics-card-grid"></div>
+                        <div id="ga-themes-empty" class="empty-state" hidden>Темы замены в завершённых играх не использовались.</div>
+                    </section>
+
+                    <section id="games-analytics-authors" class="games-analytics-pane" hidden>
+                        <div class="editor-panel games-analytics-table-panel">
+                            <div class="panel-header compact"><div><h2>Аналитика авторов</h2><p>Сколько архивных вопросов каждого автора было использовано.</p></div></div>
+                            <div class="table-wrap"><table class="games-analytics-table"><thead><tr><th>Автор</th><th>Игр</th><th>Вопросов</th><th>Верно</th><th>Ошибок</th><th>Точность</th></tr></thead><tbody id="ga-authors-body"></tbody></table></div>
+                            <div id="ga-authors-empty" class="empty-state" hidden>В архиве пока нет вопросов с указанными авторами.</div>
+                        </div>
+                    </section>
+                </section>
+            </section>
+        </section>
+    </section>
+
+    <section id="users-section" class="editor-section" hidden>
         <section class="stats-grid">
             <article><span>Всего</span><strong id="stat-total">0</strong></article>
             <article><span>Допущено</span><strong id="stat-approved">0</strong></article>
@@ -671,12 +1067,141 @@
 
 </main>
 
+
+    <section id="appearance-section" class="editor-section" hidden>
+        <section id="appearance-missing" class="editor-panel appearance-missing" hidden>
+            <div>
+                <div class="eyebrow">TPV THEME ENGINE · 10.2.8.1</div>
+                <h2>Theme Engine не создан</h2>
+                <p>Создайте отдельные таблицы настроек оформления.</p>
+            </div>
+            <button id="appearance-create" class="button button-primary" type="button">
+                Создать Theme Engine
+            </button>
+        </section>
+
+        <section id="appearance-content" hidden>
+            <section class="editor-panel appearance-hero">
+                <div>
+                    <div class="eyebrow">TPV THEME ENGINE · 10.2.8.1</div>
+                    <h2>Оформление TPV Editor</h2>
+                    <p>Выбор темы меняет только существующие базовые CSS-переменные.</p>
+                </div>
+                <div class="appearance-current">
+                    <span>Текущая тема</span>
+                    <strong id="appearance-current-name">TPV Dark</strong>
+                </div>
+            </section>
+
+            <section class="editor-panel appearance-panel">
+                <div class="appearance-panel-head">
+                    <div>
+                        <div class="eyebrow">СИСТЕМНЫЕ ТЕМЫ</div>
+                        <h3>Готовые палитры</h3>
+                    </div>
+                    <div class="header-actions">
+                        <button id="appearance-reload" class="button button-muted" type="button">Обновить</button>
+                        <button id="appearance-reset" class="button button-danger-soft" type="button">Сбросить</button>
+                    </div>
+                </div>
+                <div id="appearance-theme-grid" class="appearance-theme-grid"></div>
+            </section>
+
+            <section id="appearance-designer" class="editor-panel appearance-designer" hidden>
+                <div class="appearance-panel-head">
+                    <div>
+                        <div class="eyebrow">THEME DESIGNER · 10.2.8.2</div>
+                        <h3>Редактор пользовательской темы</h3>
+                    </div>
+                    <span id="appearance-designer-status" class="appearance-designer-status">
+                        Изменения не сохранены
+                    </span>
+                </div>
+
+                <div class="appearance-designer-layout">
+                    <div class="appearance-designer-form">
+                        <div class="form-grid">
+                            <label>
+                                <span>Название темы</span>
+                                <input id="appearance-theme-name" type="text" maxlength="120">
+                            </label>
+                            <label>
+                                <span>Slug</span>
+                                <input id="appearance-theme-slug" type="text" maxlength="80">
+                            </label>
+                            <label class="field-wide">
+                                <span>Описание</span>
+                                <textarea id="appearance-theme-description" rows="3" maxlength="300"></textarea>
+                            </label>
+                        </div>
+
+                        <div id="appearance-color-fields" class="appearance-color-fields"></div>
+                    </div>
+
+                    <aside class="appearance-preview">
+                        <div class="eyebrow">LIVE PREVIEW</div>
+                        <h4>Предпросмотр компонентов</h4>
+
+                        <div class="appearance-preview-panel">
+                            <strong>Панель TPV Editor</strong>
+                            <small>Текст, границы и основной акцент.</small>
+                            <div class="appearance-preview-actions">
+                                <button class="button button-primary" type="button">Primary</button>
+                                <button class="button button-secondary" type="button">Secondary</button>
+                            </div>
+                            <div class="appearance-preview-statuses">
+                                <span class="status status-approved">Успех</span>
+                                <span class="status status-rejected">Ошибка</span>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+                <div class="appearance-designer-actions">
+                    <button id="appearance-save-theme" class="button button-primary" type="button">
+                        Сохранить тему
+                    </button>
+                    <button id="appearance-cancel-preview" class="button button-muted" type="button">
+                        Отменить изменения
+                    </button>
+                    <button id="appearance-export-theme" class="button button-muted" type="button">
+                        Экспорт theme.json
+                    </button>
+                    <button id="appearance-delete-theme" class="button button-danger-soft" type="button">
+                        Удалить тему
+                    </button>
+                </div>
+            </section>
+
+            <section class="editor-panel appearance-tools">
+                <div>
+                    <strong>Пользовательские темы</strong>
+                    <p>Создайте копию активной темы или импортируйте готовый theme.json.</p>
+                </div>
+                <div class="header-actions">
+                    <button id="appearance-copy-theme" class="button button-secondary" type="button">
+                        Создать копию
+                    </button>
+                    <button id="appearance-import-theme" class="button button-muted" type="button">
+                        Импорт theme.json
+                    </button>
+                    <input
+                        id="appearance-import-file"
+                        type="file"
+                        accept=".json,application/json"
+                        hidden
+                    >
+                </div>
+            </section>
+        </section>
+    </section>
+
 <dialog id="user-dialog">
 <form id="user-form" method="dialog">
     <div class="dialog-header"><div><div class="eyebrow">КАРТОЧКА ПОЛЬЗОВАТЕЛЯ</div><h2 id="dialog-title">Новый пользователь</h2></div><button class="icon-button" id="dialog-close" type="button">×</button></div>
     <input id="user-id" type="hidden">
     <div class="form-grid">
-        <label class="field-wide"><span>Имя</span><input id="user-username" type="text" maxlength="10" required><small>До 10 символов — ограничение модели UsersTpv.</small></label>
+        <label class="field-wide"><span>Имя</span><input id="user-username" type="text" maxlength="64" required><small>До 64 символов. Ограничение применяется к UsersTpv и QueryTpv.</small></label>
         <label><span>Баланс</span><input id="user-money" type="number" step="1" value="0" required></label>
         <label><span>Тема замены</span><input id="user-flip" type="text" list="theme-options"><datalist id="theme-options"></datalist></label>
         <label><span>Количество вопросов</span><input id="user-flip-count" type="number" readonly></label>
@@ -725,6 +1250,204 @@
 </form>
 </dialog>
 
+
+
+<dialog id="game-dialog" class="editor-dialog game-dialog game-card-dialog">
+<form id="game-form" method="dialog">
+    <div class="dialog-header">
+        <div>
+            <div class="eyebrow">TPV GAME ARCHIVE · 10.2.3</div>
+            <h2 id="game-dialog-title">Карточка игры</h2>
+        </div>
+        <button id="game-dialog-close" class="icon-button" type="button">×</button>
+    </div>
+
+    <input id="game-id" type="hidden">
+
+    <section id="game-card-view">
+        <div class="game-card-hero">
+            <div>
+                <span id="game-card-status" class="game-status-badge">—</span>
+                <h3 id="game-card-name">—</h3>
+                <p id="game-card-meta">—</p>
+            </div>
+            <div class="game-card-winner">
+                <small>Победитель</small>
+                <strong id="game-card-winner">—</strong>
+                <span id="game-card-prize">0</span>
+            </div>
+        </div>
+
+        <nav class="game-card-tabs" aria-label="Разделы карточки игры">
+            <button class="game-card-tab is-active" type="button" data-game-card-tab="overview">Обзор</button>
+            <button class="game-card-tab" type="button" data-game-card-tab="players">Игроки <span id="game-tab-players-count">0</span></button>
+            <button class="game-card-tab" type="button" data-game-card-tab="questions">Вопросы <span id="game-tab-questions-count">0</span></button>
+            <button class="game-card-tab" type="button" data-game-card-tab="themes">Темы <span id="game-tab-themes-count">0</span></button>
+            <button class="game-card-tab" type="button" data-game-card-tab="events">События <span id="game-tab-events-count">0</span></button>
+            <button class="game-card-tab" type="button" data-game-card-tab="replay">Replay</button>
+            <button class="game-card-tab" type="button" data-game-card-tab="snapshot">Snapshot</button>
+        </nav>
+
+        <section id="game-card-overview" class="game-card-section">
+            <div class="game-card-metrics">
+                <article><span>Игроков</span><strong id="game-view-players">0</strong></article>
+                <article><span>Продолжительность</span><strong id="game-view-duration">—</strong></article>
+                <article><span>Общих вопросов</span><strong id="game-view-general">0</strong></article>
+                <article><span>Тем замены</span><strong id="game-view-themed">0</strong></article>
+                <article><span>Правильных</span><strong id="game-view-correct">0</strong></article>
+                <article><span>Ошибок</span><strong id="game-view-wrong">0</strong></article>
+                <article><span>Точность</span><strong id="game-view-percent">0%</strong></article>
+                <article><span>Builder ID</span><strong id="game-view-builder">—</strong></article>
+            </div>
+            <div class="game-card-info-grid">
+                <article>
+                    <h4>Сведения об игре</h4>
+                    <dl>
+                        <div><dt>Сезон</dt><dd id="game-view-season">—</dd></div>
+                        <div><dt>Начало</dt><dd id="game-view-started">—</dd></div>
+                        <div><dt>Завершение</dt><dd id="game-view-ended">—</dd></div>
+                        <div><dt>Завершена штатно</dt><dd id="game-view-normal">—</dd></div>
+                        <div><dt>Версия TPV</dt><dd id="game-view-tpv-version">—</dd></div>
+                        <div><dt>Версия Editor</dt><dd id="game-view-editor-version">—</dd></div>
+                    </dl>
+                </article>
+                <article>
+                    <h4>Примечание</h4>
+                    <p id="game-view-notes" class="game-card-notes">Примечание отсутствует.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="game-card-players" class="game-card-section" hidden>
+            <div class="game-detail-table-wrap">
+                <table class="editor-table game-detail-table">
+                    <thead><tr><th>Место</th><th>Игрок</th><th>Тема</th><th>Результат</th><th>Верно</th><th>Ошибок</th></tr></thead>
+                    <tbody id="game-view-players-body"></tbody>
+                </table>
+                <div id="game-view-players-empty" class="empty-state" hidden>Список игроков для этой игры не сохранён.</div>
+            </div>
+        </section>
+
+        <section id="game-card-questions" class="game-card-section" hidden>
+            <div class="game-detail-table-wrap">
+                <table class="editor-table game-detail-table">
+                    <thead><tr><th>#</th><th>ID вопроса</th><th>Тип</th><th>Тема</th><th>Автор</th><th>Результат</th></tr></thead>
+                    <tbody id="game-view-questions-body"></tbody>
+                </table>
+                <div id="game-view-questions-empty" class="empty-state" hidden>Использованные вопросы не сохранены.</div>
+            </div>
+        </section>
+
+        <section id="game-card-themes" class="game-card-section" hidden>
+            <div id="game-view-themes-grid" class="game-theme-cards"></div>
+            <div id="game-view-themes-empty" class="empty-state" hidden>Темы замены в этой игре не использовались.</div>
+        </section>
+
+        <section id="game-card-events" class="game-card-section" hidden>
+            <div id="game-view-events-list" class="game-event-timeline"></div>
+            <div id="game-view-events-empty" class="empty-state" hidden>Журнал событий этой игры пуст.</div>
+        </section>
+
+        <section id="game-card-replay" class="game-card-section" hidden>
+            <div id="game-replay-empty" class="empty-state" hidden>
+                Для этой игры недостаточно событий, чтобы запустить Replay.
+            </div>
+
+            <div id="game-replay-player" class="game-replay-player">
+                <div class="game-replay-stage">
+                    <div class="game-replay-stage-head">
+                        <div>
+                            <span id="game-replay-step-label" class="game-replay-step-label">Шаг 0 из 0</span>
+                            <h4 id="game-replay-title">Replay не запущен</h4>
+                        </div>
+                        <div id="game-replay-time" class="game-replay-time">00:00</div>
+                    </div>
+
+                    <div id="game-replay-description" class="game-replay-description">
+                        Выберите событие на временной шкале или нажмите «Старт».
+                    </div>
+
+                    <div id="game-replay-details" class="game-replay-details"></div>
+
+                    <div class="game-replay-progress-wrap">
+                        <input
+                            id="game-replay-progress"
+                            class="game-replay-progress"
+                            type="range"
+                            min="0"
+                            max="0"
+                            value="0"
+                            step="1"
+                        >
+                        <div class="game-replay-progress-meta">
+                            <span id="game-replay-current">00:00</span>
+                            <span id="game-replay-total">00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-replay-controls">
+                    <button id="game-replay-first" class="button button-muted" type="button">⏮ В начало</button>
+                    <button id="game-replay-prev" class="button button-muted" type="button">◀ Назад</button>
+                    <button id="game-replay-play" class="button button-primary" type="button">▶ Старт</button>
+                    <button id="game-replay-next" class="button button-muted" type="button">Вперёд ▶</button>
+                    <button id="game-replay-last" class="button button-muted" type="button">В конец ⏭</button>
+
+                    <label class="game-replay-speed">
+                        <span>Скорость</span>
+                        <select id="game-replay-speed">
+                            <option value="0.5">×0.5</option>
+                            <option value="1" selected>×1</option>
+                            <option value="2">×2</option>
+                            <option value="5">×5</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div id="game-replay-timeline" class="game-replay-timeline"></div>
+            </div>
+        </section>
+
+        <section id="game-card-snapshot" class="game-card-section" hidden>
+            <div id="game-view-snapshot" class="game-snapshot-grid"></div>
+            <div id="game-view-snapshot-empty" class="empty-state" hidden>Snapshot проекта для этой игры не сохранён.</div>
+        </section>
+    </section>
+
+    <section id="game-edit-view" hidden>
+        <div class="form-grid">
+            <label><span>Название</span><input id="game-title" type="text" maxlength="160" placeholder="TPV — выпуск 1"></label>
+            <label><span>Сезон</span><input id="game-season" type="text" maxlength="80" placeholder="2026"></label>
+            <label><span>Дата и время начала</span><input id="game-started-at" type="datetime-local"></label>
+            <label><span>Дата и время завершения</span><input id="game-ended-at" type="datetime-local"></label>
+            <label><span>Builder ID</span><input id="game-builder-name" type="number" min="1"></label>
+            <label><span>Статус</span><select id="game-status"><option value="completed">Завершена</option><option value="draft">Черновик</option><option value="cancelled">Отменена</option></select></label>
+            <label><span>Победитель</span><input id="game-winner" type="text" maxlength="100" list="author-options"></label>
+            <label><span>Выигрыш</span><input id="game-prize" type="number" min="0" step="1"></label>
+            <label><span>Общих вопросов</span><input id="game-general-count" type="number" min="0"></label>
+            <label><span>Вопросов тем замены</span><input id="game-themed-count" type="number" min="0"></label>
+            <label><span>Правильных ответов</span><input id="game-correct-count" type="number" min="0"></label>
+            <label><span>Неправильных ответов</span><input id="game-wrong-count" type="number" min="0"></label>
+            <label class="field-wide"><span>Игроки — Имя | результат | правильных | ошибок | тема</span><textarea id="game-players" rows="6"></textarea></label>
+            <label class="field-wide"><span>Темы — Тема | использовано | правильных | ошибок</span><textarea id="game-themes" rows="5"></textarea></label>
+            <label class="field-wide"><span>Вопросы — ID через запятую</span><textarea id="game-question-ids" rows="3"></textarea></label>
+            <label class="field-wide"><span>Хронология — время | тип | описание</span><textarea id="game-events" rows="6"></textarea></label>
+            <label class="field-wide"><span>Примечание</span><textarea id="game-notes" rows="4"></textarea></label>
+        </div>
+        <div id="game-detail-summary" class="dialog-note"></div>
+    </section>
+
+    <div class="dialog-actions game-card-actions">
+        <button id="game-delete" class="button button-danger-soft" type="button">Удалить</button>
+        <button id="game-export-json" class="button button-muted" type="button">Экспорт игры</button>
+        <span class="actions-spacer"></span>
+        <button id="game-edit" class="button button-secondary" type="button">Редактировать</button>
+        <button id="game-save" class="button button-primary" type="button" hidden>Сохранить</button>
+        <button id="game-cancel-edit" class="button button-muted" type="button" hidden>Отменить изменения</button>
+        <button id="game-cancel" class="button button-muted" type="button">Закрыть</button>
+    </div>
+</form>
+</dialog>
 
 <dialog id="application-dialog" class="editor-dialog application-dialog">
     <form id="application-form" method="dialog">
