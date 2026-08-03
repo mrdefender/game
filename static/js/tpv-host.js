@@ -951,6 +951,8 @@ function advanceRoundAfterSuccess(completedRound) {
     const correctControl =
         document.getElementById("control-correct-count");
 
+    const flipControl = document.getElementById("control-flips-count");  
+
     const passControl =
         document.getElementById("control-pass-count");
     const timerControl = document.getElementById("control-timer-seconds");
@@ -1015,6 +1017,7 @@ function advanceRoundAfterSuccess(completedRound) {
         questionControl.value = 1;
         correctControl.value = 0;
         passControl.value = 0;
+        flipControl.value = 3;
 
         /*
          * Перерисовываем все изменённые значения.
