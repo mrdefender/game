@@ -43,6 +43,7 @@
         <button class="editor-tab" type="button" data-tab="applications">Заявки</button>
         <button class="editor-tab" type="button" data-tab="games">Игры</button>
         <button class="editor-tab" type="button" data-tab="appearance">Оформление</button>
+        <button class="editor-tab" type="button" data-tab="backups">Резервные копии</button>
     </nav>
 
     <section id="dashboard-section" class="editor-section">
@@ -1193,6 +1194,43 @@
                     >
                 </div>
             </section>
+        </section>
+    </section>
+
+
+    <section id="backups-section" class="editor-section" hidden>
+        <section class="editor-panel backup-hero">
+            <div>
+                <div class="eyebrow">TPV BACKUP CENTER · 11.7</div>
+                <h2>Резервные копии</h2>
+                <p>Создание, скачивание и безопасное восстановление SQLite и полного архива проекта.</p>
+            </div>
+            <div class="backup-hero-status">
+                <small>Последняя копия</small>
+                <strong id="backup-last-created">Ещё не создавалась</strong>
+                <span id="backup-directory">—</span>
+            </div>
+        </section>
+        <section class="backup-actions-grid">
+            <article class="editor-panel backup-action-card">
+                <div><div class="backup-action-icon">💾</div><h3>SQLite</h3><p>Согласованный снимок текущей базы данных.</p></div>
+                <button id="backup-create-database" class="button button-primary" type="button">Создать SQLite backup</button>
+            </article>
+            <article class="editor-panel backup-action-card">
+                <div><div class="backup-action-icon">📦</div><h3>Весь проект</h3><p>ZIP исходников и отдельный согласованный снимок SQLite.</p></div>
+                <button id="backup-create-project" class="button button-secondary" type="button">Создать ZIP проекта</button>
+            </article>
+            <article class="editor-panel backup-action-card backup-warning-card">
+                <div><div class="backup-action-icon">♻</div><h3>Восстановление</h3><p>Перед восстановлением автоматически создаётся аварийная копия.</p></div>
+                <small>После восстановления требуется полный перезапуск Flask.</small>
+            </article>
+        </section>
+        <section class="editor-panel backup-list-panel">
+            <div class="backup-panel-head"><div><div class="eyebrow">ИСТОРИЯ BACKUP</div><h3>Созданные копии</h3></div><button id="backup-reload" class="button button-muted" type="button">Обновить</button></div>
+            <div class="game-detail-table-wrap">
+                <table class="editor-table backup-table"><thead><tr><th>Файл</th><th>Тип</th><th>Создан</th><th>Размер</th><th>Действия</th></tr></thead><tbody id="backup-table-body"></tbody></table>
+                <div id="backup-empty" class="empty-state" hidden>Резервные копии пока не создавались.</div>
+            </div>
         </section>
     </section>
 

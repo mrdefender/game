@@ -17,6 +17,7 @@ from .theme_engine import register_tpv_editor_theme_engine
 from .archive_runtime import TpvArchiveRuntime
 from .services import create_tpv_archive_snapshot_service
 from .socket_handlers import register_tpv_socket_handlers
+from .backup_center import register_tpv_backup_center
 
 
 _REQUIRED_NAMES = {
@@ -95,6 +96,15 @@ def register_tpv_application(
     )
     namespace["TPV_EDITOR_THEME_MODELS"] = theme_models
 
+    # Backup Center.
+    backup_exports = register_tpv_backup_center(
+        app,
+        db,
+        allowed=route_exports["tpv_editor_allowed"],
+        error=route_exports["tpv_editor_error"],
+    )
+    namespace["TPV_BACKUP_CENTER"] = backup_exports
+
     # 5. Archive Snapshot providers.
     snapshot_service = create_tpv_archive_snapshot_service(
         db,
@@ -145,6 +155,7 @@ def register_tpv_application(
         **route_exports,
         **archive_exports,
         "TPV_EDITOR_THEME_MODELS": theme_models,
+        "TPV_BACKUP_CENTER": backup_exports,
         **runtime_exports,
         "TPV_SOCKET_EXPORTS": socket_exports,
         "update_users_tpv": socket_exports["update_users_tpv"],

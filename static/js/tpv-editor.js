@@ -1,5 +1,5 @@
 (()=>{"use strict";
-const s={users:[],themes:[],questions:[],authors:[],current:null,currentQuestion:null,currentTheme:null,themeRows:[],qualityIssues:[],qualityStats:{},statistics:null,importPreview:null,historyItems:[],historyStats:{},builderItems:[],builderPreview:[],currentBuild:null,applications:[],currentApplication:null,dashboard:null,games:[],gameStats:{},currentGame:null,gamesView:"archive",tab:"dashboard",replayEvents:[],replayIndex:0,replayTimer:null,replayPlaying:false,replaySpeed:1,records:null,appearanceThemes:[],appearanceTheme:null,appearanceDraft:null,appearanceSavedVariables:null,appearancePreviewDirty:false},e={};
+const s={users:[],themes:[],questions:[],authors:[],current:null,currentQuestion:null,currentTheme:null,themeRows:[],qualityIssues:[],qualityStats:{},statistics:null,importPreview:null,historyItems:[],historyStats:{},builderItems:[],builderPreview:[],currentBuild:null,applications:[],currentApplication:null,dashboard:null,games:[],gameStats:{},currentGame:null,gamesView:"archive",tab:"dashboard",replayEvents:[],replayIndex:0,replayTimer:null,replayPlaying:false,replaySpeed:1,records:null,appearanceThemes:[],appearanceTheme:null,appearanceDraft:null,appearanceSavedVariables:null,appearancePreviewDirty:false,backups:[]},e={};
 document.addEventListener("DOMContentLoaded",init);
 function init(){
     document.querySelectorAll("[id]").forEach(node=>{
@@ -167,6 +167,10 @@ function init(){
     bind("appearance-theme-name","input",markAppearanceDraftDirty);
     bind("appearance-theme-slug","input",markAppearanceDraftDirty);
     bind("appearance-theme-description","input",markAppearanceDraftDirty);
+    bind("backup-reload","click",loadBackups);
+    bind("backup-create-database","click",()=>createBackup("database"));
+    bind("backup-create-project","click",()=>createBackup("project"));
+    bind("backup-table-body","click",handleBackupTableClick);
     bind("appearance-theme-grid","click",event=>{
         const card=event.target.closest("[data-appearance-theme]");
         if(card)selectAppearanceTheme(card.dataset.appearanceTheme);
@@ -297,6 +301,10 @@ function switchTab(tab){
         appearance:[
             "Оформление",
             "Системные темы и инфраструктура Theme Engine."
+        ],
+        backups:[
+            "Резервные копии",
+            "SQLite backup, полный архив проекта и безопасное восстановление."
         ]
     };
 
@@ -325,6 +333,7 @@ function switchTab(tab){
     setHidden("applications-section",tab!=="applications");
     setHidden("games-section",tab!=="games");
     setHidden("appearance-section",tab!=="appearance");
+    setHidden("backups-section",tab!=="backups");
 
     document.querySelectorAll(".users-action").forEach(
         node=>node.hidden=tab!=="users"
@@ -383,6 +392,9 @@ function switchTab(tab){
     }
     if(tab==="appearance"){
         loadAppearanceThemes();
+    }
+    if(tab==="backups"){
+        loadBackups();
     }
 }
 
@@ -766,6 +778,65 @@ async function deleteAppearanceTheme(){
     }catch(error){
         toast(error.message,true);
     }
+}
+
+
+async function loadBackups(){
+    try{
+        const response=await api("/tpv_editor/api/backups");
+        s.backups=response.items||[];
+        setText("backup-last-created",response.last_backup?.created_at_label||"Ещё не создавалась");
+        setText("backup-directory",response.directory||"—");
+        renderBackups();
+    }catch(error){toast(error.message,true)}
+}
+function renderBackups(){
+    const items=s.backups||[];
+    if(e["backup-table-body"]){
+        e["backup-table-body"].innerHTML=items.map(item=>`
+            <tr>
+                <td><strong>${esc(item.filename)}</strong></td>
+                <td><span class="backup-kind backup-kind-${esc(item.kind)}">${esc(item.kind_label)}</span></td>
+                <td>${esc(item.created_at_label)}</td>
+                <td>${esc(item.size_label)}</td>
+                <td><div class="backup-row-actions">
+                    <button class="row-edit" type="button" data-backup-download="${esc(item.filename)}">Скачать</button>
+                    ${item.can_restore?`<button class="row-edit" type="button" data-backup-restore="${esc(item.filename)}">Восстановить</button>`:""}
+                    <button class="row-delete" type="button" data-backup-delete="${esc(item.filename)}">Удалить</button>
+                </div></td>
+            </tr>`).join("");
+    }
+    if(e["backup-empty"])e["backup-empty"].hidden=items.length>0;
+}
+async function createBackup(kind){
+    const label=kind==="project"?"полный ZIP проекта":"резервную копию SQLite";
+    if(!confirm(`Создать ${label}?`))return;
+    try{
+        const response=await api(`/tpv_editor/api/backups/${kind}`,{method:"POST"});
+        toast(response.message); await loadBackups(); await loadDashboard();
+    }catch(error){toast(error.message,true)}
+}
+function handleBackupTableClick(event){
+    const download=event.target.closest("[data-backup-download]");
+    if(download){window.location.href=`/tpv_editor/api/backups/${encodeURIComponent(download.dataset.backupDownload)}/download`;return}
+    const restore=event.target.closest("[data-backup-restore]");
+    if(restore){restoreBackup(restore.dataset.backupRestore);return}
+    const remove=event.target.closest("[data-backup-delete]");
+    if(remove)deleteBackup(remove.dataset.backupDelete);
+}
+async function deleteBackup(filename){
+    if(!confirm(`Удалить backup «${filename}»?`))return;
+    try{const response=await api(`/tpv_editor/api/backups/${encodeURIComponent(filename)}`,{method:"DELETE"});toast(response.message);await loadBackups();await loadDashboard()}catch(error){toast(error.message,true)}
+}
+async function restoreBackup(filename){
+    if(!confirm(`Восстановить SQLite из «${filename}»? Текущая база будет заменена.`))return;
+    const typed=prompt('Для подтверждения введите RESTORE:');
+    if(typed!=="RESTORE"){toast("Восстановление отменено.",true);return}
+    try{
+        const response=await api(`/tpv_editor/api/backups/${encodeURIComponent(filename)}/restore`,{method:"POST",body:{confirmation:"RESTORE"}});
+        alert(`${response.message}\n\nАварийная копия: ${response.emergency?.filename||"создана"}`);
+        await loadBackups();
+    }catch(error){toast(error.message,true)}
 }
 
 function renderUsers(){const q=e["search-input"].value.trim().toLowerCase(),a=e["approve-filter"].value,[f,d]=e["sort-select"].value.split("-");let list=s.users.filter(u=>(!q||(u.username||"").toLowerCase().includes(q)||(u.flip_display||"").toLowerCase().includes(q))&&(a==="all"||u.approve===a));list.sort(sorter(f,d,x=>f==="flip"?x.flip_display:x[f]));e["users-table-body"].innerHTML=list.map(u=>`<tr><td>${u.id}</td><td><strong>${esc(u.username)}</strong></td><td class="money-cell">${money(u.money)}</td><td>${esc(u.flip_display||"Не выбрана")}</td><td>${u.flip_col||0}</td><td><span class="status ${u.approve==="true"?"status-approved":"status-rejected"}">${esc(u.approve_label)}</span></td><td><button class="row-edit" data-edit="${u.id}">Изменить</button></td></tr>`).join("");e["empty-state"].hidden=!!list.length;e["stat-total"].textContent=s.users.length;e["stat-approved"].textContent=s.users.filter(u=>u.approve==="true").length;e["stat-without-theme"].textContent=s.users.filter(u=>!u.flip_display).length;e["stat-money"].textContent=money(s.users.reduce((n,u)=>n+(+u.money||0),0))}
