@@ -457,3 +457,148 @@
   opacity: 1;
   filter: none;
 }
+
+
+/* ==========================================================
+   Статус игрока: ожидание / игрок выбран
+   Класс .wait — компьютер выбирает игрока.
+   Класс .active — выбран именно этот игрок.
+   ========================================================== */
+#welcome3.game-status{
+  position:relative;
+  width:min(900px,100%);
+  max-width:900px;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-top:11px;
+  padding:12px 17px;
+  overflow:hidden;
+  border:1px solid transparent;
+  border-radius:14px;
+  color:#eef9fc;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),0 9px 22px rgba(0,0,0,.3);
+  transition:border-color .38s ease,background .38s ease,box-shadow .38s ease,transform .38s ease;
+}
+
+#welcome3.game-status::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.42;
+  background:linear-gradient(105deg,transparent 0 42%,rgba(255,255,255,.055) 49%,transparent 56%);
+  transform:translateX(-115%);
+}
+
+#welcome3.game-status.status-change::after{
+  animation:tpvStatusSweep .7s ease-out;
+}
+
+.game-status__dot{
+  position:relative;
+  z-index:1;
+  flex:0 0 13px;
+  width:13px;
+  height:13px;
+  border:2px solid rgba(255,255,255,.7);
+  border-radius:50%;
+  transition:background .38s ease,box-shadow .38s ease,transform .38s ease;
+}
+
+.game-status__content{
+  position:relative;
+  z-index:1;
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+
+.game-status__title{
+  display:block;
+  font-size:clamp(10px,.9vw,12px);
+  font-weight:900;
+  line-height:1.15;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+
+.game-status__text{
+  display:block;
+  color:#d8e6eb;
+  font-size:clamp(11px,1.05vw,14px);
+  font-weight:650;
+  line-height:1.35;
+}
+
+/* Ожидание */
+#welcome3.game-status.wait{
+  border-color:rgba(240,165,42,.42);
+  background:
+    linear-gradient(90deg,rgba(240,165,42,.15),rgba(240,165,42,.035) 56%,rgba(255,255,255,.012)),
+    linear-gradient(180deg,#15120d,#090806);
+  box-shadow:inset 0 0 0 1px rgba(255,210,115,.025),0 9px 22px rgba(0,0,0,.3);
+}
+
+#welcome3.game-status.wait .game-status__dot{
+  background:#f0a52a;
+  box-shadow:0 0 8px rgba(240,165,42,.7),0 0 18px rgba(240,165,42,.38);
+}
+
+#welcome3.game-status.wait .game-status__title{
+  color:#ffd27a;
+}
+
+/* Компьютер выбрал этого игрока */
+#welcome3.game-status.active{
+  border-color:rgba(38,199,116,.5);
+  background:
+    linear-gradient(90deg,rgba(38,199,116,.17),rgba(0,183,212,.05) 58%,rgba(255,255,255,.014)),
+    linear-gradient(180deg,#0b1715,#050b0a);
+  box-shadow:inset 0 0 0 1px rgba(121,255,191,.03),0 0 22px rgba(38,199,116,.14),0 9px 22px rgba(0,0,0,.3);
+}
+
+#welcome3.game-status.active .game-status__dot{
+  background:#26c774;
+  box-shadow:0 0 9px rgba(38,199,116,.85),0 0 22px rgba(38,199,116,.48);
+}
+
+#welcome3.game-status.active .game-status__title{
+  color:#72f0ae;
+}
+
+#welcome3.game-status.status-change{
+  animation:tpvStatusChange .62s cubic-bezier(.2,.8,.25,1);
+}
+
+@keyframes tpvStatusChange{
+  0%{opacity:.45;transform:translateY(5px) scale(.985)}
+  60%{opacity:1;transform:translateY(0) scale(1.012)}
+  100%{transform:none}
+}
+
+@keyframes tpvStatusSweep{
+  from{transform:translateX(-115%)}
+  to{transform:translateX(115%)}
+}
+
+@media(max-width:680px){
+  #welcome3.game-status{
+    width:100%;
+    min-height:60px;
+    padding:11px 13px;
+    border-radius:12px;
+  }
+
+  .game-status__dot{
+    flex-basis:11px;
+    width:11px;
+    height:11px;
+  }
+
+  .game-status__text{
+    font-size:12px;
+  }
+}

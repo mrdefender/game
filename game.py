@@ -459,7 +459,7 @@ def tpv_spectator():
 
         session["tpv_role"] = "spectator"
         return render_template("tpv-spectator.html")
-
+    #return render_template("tpv-spectator.html")
     # Прямой ввод /tpv_spectator не открывает экран зрителя.
     abort(403)
 

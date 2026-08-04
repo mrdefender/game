@@ -470,14 +470,16 @@ function init_game_player(){
 
 
 socket.on("reset", (data) => {
-    init_game_player();   
+    init_game_player();  
+     setPlayerGameStatus(false); 
 }
 
 )
 
 
 socket.on("player_selected", (data) => {
-    document.getElementById("welcome3").textContent = "Основная игра";
+    setPlayerGameStatus(true);
+    //document.getElementById("welcome3").textContent = "Основная игра";
     document.getElementById("display-current-flip").textContent = data[2];
 
     update_data();
@@ -961,3 +963,35 @@ document.addEventListener("click", (event) => {
     stop_bong_game_user();
 });
 
+
+
+function setPlayerGameStatus(isSelected) {
+    const status = document.getElementById("welcome3");
+    const title = document.getElementById("welcome3-title");
+    const text = document.getElementById("welcome3-text");
+
+    if (!status || !title || !text) {
+        return;
+    }
+
+    status.classList.remove("wait", "active", "status-change");
+
+    if (isSelected) {
+        status.classList.add("active");
+        title.textContent = "Основная игра";
+        text.textContent =
+            "Компьютер выбрал именно Вас. Приготовьтесь отвечать на вопросы.";
+    } else {
+        status.classList.add("wait");
+        title.textContent = "ОЖИДАНИЕ";
+        text.textContent = "Вы находитесь в комнате ожидания. Дождитесь, когда компьютер выберет Вас!";
+    }
+
+    // Повторный запуск короткой анимации смены статуса
+    void status.offsetWidth;
+    status.classList.add("status-change");
+
+    window.setTimeout(() => {
+        status.classList.remove("status-change");
+    }, 700);
+}

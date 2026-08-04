@@ -23,7 +23,13 @@
                     <div class="welcome-copy">
                         <label class="welcome-title" id="welcome">Добро пожаловать на игру</label>
                         <label class="welcome-title" id="welcome2">{{ game_name|default('The People Versus') }}</label>
-                        <label class="welcome-subtitle game-status wait" id="welcome3">Вы находитесь в комнате ожидания. Дождитесь, когда компьютер выберет именно Вас!</label>
+                        <div class="welcome-subtitle game-status wait" id="welcome3" role="status" aria-live="polite">
+                            <span class="game-status__dot" aria-hidden="true"></span>
+                            <span class="game-status__content">
+                                <strong class="game-status__title" id="welcome3-title">ОЖИДАНИЕ</strong>
+                                <span class="game-status__text" id="welcome3-text">"Вы находитесь в комнате ожидания. Дождитесь, когда компьютер выберет Вас!</span>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="player-meta">
