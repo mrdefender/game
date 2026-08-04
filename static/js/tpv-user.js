@@ -463,7 +463,7 @@ function init_game_player(){
     if (bongStopButton) bongStopButton.disabled = true;
     stop_bong_game_now = false;
     sum_results = 0;
-    document.getElementById("welcome3").textContent = "Вы находитесь в комнате ожидания. Дождитесь, когда компьютер выберет именно Вас!";
+    //document.getElementById("welcome3").textContent = "Вы находитесь в комнате ожидания. Дождитесь, когда компьютер выберет именно Вас!";
     update_data();
 
 }
