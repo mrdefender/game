@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>Статус заявки — TPV</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-apply.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-apply-status.css') }}">
+    <script src="{{ url_for('static', filename='js/tpv-apply-status.js') }}" defer></script>
+</head>
+<body>
+    <main class="apply-page">
+        <section class="apply-card status-card" aria-labelledby="status-title">
+            <div class="apply-brand" aria-label="The People Versus">
+                <span>THE PEOPLE VERSUS</span>
+            </div>
+
+            <div id="status-search-view">
+                <header class="apply-header">
+                    <p class="apply-kicker">TPV · СТАТУС ЗАЯВКИ</p>
+                    <h1 id="status-title">Проверить заявку</h1>
+                    <p>Введите числовой номер, полученный после отправки заявки.</p>
+                </header>
+
+                <form id="tpv-status-form" novalidate>
+                    <div class="apply-field">
+                        <label for="application-id">Номер заявки</label>
+                        <input
+                            id="application-id"
+                            name="application_id"
+                            type="number"
+                            min="1"
+                            step="1"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            required
+                        >
+                        <p class="apply-error" id="application-id-error" aria-live="polite"></p>
+                    </div>
+
+                    <p class="apply-global-error" id="status-global-error" aria-live="assertive"></p>
+
+                    <button id="status-submit" class="apply-button" type="submit">
+                        <span>Проверить</span>
+                    </button>
+                </form>
+
+                <div class="status-links">
+                    <a href="/tpv-apply">Подать новую заявку</a>
+                </div>
+            </div>
+
+            <section id="status-result-view" class="status-result" hidden aria-live="polite">
+                <div class="status-result-head">
+                    <div>
+                        <p class="apply-kicker">ЗАЯВКА НА УЧАСТИЕ</p>
+                        <h1>Заявка №<span id="result-id">—</span></h1>
+                    </div>
+                    <button id="status-check-another" class="status-text-button" type="button">
+                        Проверить другую
+                    </button>
+                </div>
+
+                <dl class="status-details">
+                    <div class="status-detail">
+                        <dt>Имя / Никнейм</dt>
+                        <dd id="result-display-name">—</dd>
+                    </div>
+
+                    <div class="status-detail">
+                        <dt>Тема</dt>
+                        <dd id="result-theme">—</dd>
+                    </div>
+
+                    <div class="status-detail">
+                        <dt>Статус заявки</dt>
+                        <dd>
+                            <span id="result-status" class="status-badge">—</span>
+                        </dd>
+                    </div>
+
+                    <div class="status-detail">
+                        <dt>Проверка темы</dt>
+                        <dd>
+                            <span id="result-theme-status" class="status-badge">—</span>
+                        </dd>
+                    </div>
+
+                    <div class="status-detail status-detail-comment">
+                        <dt>Комментарий редактора</dt>
+                        <dd id="result-public-comment">Комментарий пока не добавлен.</dd>
+                    </div>
+                </dl>
+
+                <a class="apply-button status-link-button" href="/tpv-apply">
+                    Подать новую заявку
+                </a>
+            </section>
+        </section>
+    </main>
+</body>
+</html>

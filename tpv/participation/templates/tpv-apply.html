@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>Заявка на участие — TPV</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-apply.css') }}">
+    <script src="{{ url_for('static', filename='js/tpv-apply.js') }}" defer></script>
+</head>
+<body>
+    <main class="apply-page">
+        <section class="apply-card" aria-labelledby="apply-title">
+            <div class="apply-brand" aria-label="The People Versus">
+                <span>THE PEOPLE VERSUS</span>
+            </div>
+
+            <div id="apply-form-view">
+                <header class="apply-header">
+                    <p class="apply-kicker">TPV · ЗАЯВКА ИГРОКА</p>
+                    <h1 id="apply-title">Подать заявку на участие</h1>
+                    <p>Укажите имя или никнейм и тему, с которой хотите сыграть.</p>
+                </header>
+
+                <form id="tpv-apply-form" novalidate>
+                    <div class="apply-field">
+                        <label for="display-name">Имя / Никнейм</label>
+                        <input
+                            id="display-name"
+                            name="display_name"
+                            type="text"
+                            maxlength="100"
+                            autocomplete="nickname"
+                            required
+                        >
+                        <p class="apply-error" id="display-name-error" aria-live="polite"></p>
+                    </div>
+
+                    <div class="apply-field">
+                        <label for="theme">Тема</label>
+                        <textarea
+                            id="theme"
+                            name="theme"
+                            maxlength="300"
+                            rows="4"
+                            required
+                        ></textarea>
+                        <div class="apply-field-meta">
+                            <p class="apply-error" id="theme-error" aria-live="polite"></p>
+                            <span id="theme-counter">0 / 300</span>
+                        </div>
+                    </div>
+
+                    <p class="apply-global-error" id="apply-global-error" aria-live="assertive"></p>
+
+                    <button id="apply-submit" class="apply-button" type="submit">
+                        <span>Подать заявку</span>
+                    </button>
+                </form>
+
+                <p class="apply-note">
+                    Отправляя заявку, вы подтверждаете, что предложенная тема
+                    вами изучена.
+                </p>
+            </div>
+
+            <section id="apply-success-view" class="apply-success" hidden aria-live="polite">
+                <div class="apply-success-mark" aria-hidden="true">✓</div>
+                <p class="apply-kicker">ЗАЯВКА ПРИНЯТА</p>
+                <h1>Спасибо!</h1>
+                <p>Ваша заявка успешно зарегистрирована.</p>
+
+                <div class="apply-number-block">
+                    <span>Номер заявки</span>
+                    <strong id="application-number">—</strong>
+                </div>
+
+                <p class="apply-success-note">
+                    Сохраните этот номер. По нему можно будет проверить статус заявки.
+                </p>
+
+                <a class="apply-button status-link-button" href="/tpv-apply/status">
+                    Проверить статус заявки
+                </a>
+
+                <button id="apply-again" class="apply-button apply-button-secondary" type="button">
+                    Подать ещё одну заявку
+                </button>
+            </section>
+        </section>
+    </main>
+</body>
+</html>

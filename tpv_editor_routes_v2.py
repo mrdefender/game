@@ -1,6 +1,9 @@
-"""Compatibility import for TPV Editor routes v2.
+"""Legacy v2 import for TPV Editor routes.
 
-Новый путь: tpv.editor_routes_v2
+Canonical module: :mod:`tpv.editor_routes`.
+This file intentionally contains no route implementation.
 """
 
-from tpv.editor_routes_v2 import *  # noqa: F401,F403
+from tpv.editor_routes import ROUTES_VERSION, register_tpv_editor_routes
+
+__all__ = ["ROUTES_VERSION", "register_tpv_editor_routes"]
