@@ -7,6 +7,7 @@ from typing import Any
 from flask import jsonify, request
 from sqlalchemy import func, inspect
 from .registry import EditorContext
+from .responses import message_error_response
 
 class BuilderService:
     def __init__(self, context:EditorContext)->None:
@@ -103,8 +104,7 @@ class BuilderService:
 
 def register_builder(context:EditorContext)->dict[str,Any]:
     s=BuilderService(context)
-    def error(msg,status=400):return jsonify({"ok":False,"message":msg}),status
-    def guard():return None if context.permissions.is_allowed() else error("Нет доступа к редактору.",403)
+    def guard():return None if context.permissions.is_allowed() else message_error_response("Нет доступа к редактору.",403)
     def tpv_editor_builder_list():
         d=guard()
         if d is not None:return d
@@ -118,18 +118,18 @@ def register_builder(context:EditorContext)->dict[str,Any]:
         d=guard()
         if d is not None:return d
         try:config=s.normalize_payload(request.get_json(silent=True) or {})
-        except ValueError as exc:return error(str(exc))
+        except ValueError as exc:return message_error_response(str(exc))
         qs,count=s.select_questions(config)
         return jsonify({"ok":True,"available_count":count,"questions":[s.question_dict(q) for q in qs]})
     def tpv_editor_builder_create():
         d=guard()
         if d is not None:return d
-        if not s.table_exists():return error("Таблица конструктора не создана.",409)
+        if not s.table_exists():return message_error_response("Таблица конструктора не создана.",409)
         data=request.get_json(silent=True) or {}
         try:config=s.normalize_payload(data)
-        except ValueError as exc:return error(str(exc))
+        except ValueError as exc:return message_error_response(str(exc))
         ids=[int(v) for v in data.get("question_ids") or [] if str(v).isdigit()]
-        if not ids:return error("Сначала сформируйте выборку вопросов.")
+        if not ids:return message_error_response("Сначала сформируйте выборку вопросов.")
         row=s.TpvGameBuild(name=config["name"],config_json=s.history_json(config),question_ids_json=s.history_json(ids),is_active=False)
         s.db.session.add(row);s.db.session.flush()
         s.history_add("bulk",row.id,"create",f"Создан игровой набор «{row.name}»",after=s.to_dict(row),details=f"Вопросов в наборе: {len(ids)}.",can_revert=False)
@@ -139,12 +139,12 @@ def register_builder(context:EditorContext)->dict[str,Any]:
         d=guard()
         if d is not None:return d
         row=s.db.session.get(s.TpvGameBuild,build_id)
-        if row is None:return error("Игровой набор не найден.",404)
+        if row is None:return message_error_response("Игровой набор не найден.",404)
         data=request.get_json(silent=True) or {}
         try:config=s.normalize_payload(data)
-        except ValueError as exc:return error(str(exc))
+        except ValueError as exc:return message_error_response(str(exc))
         ids=[int(v) for v in data.get("question_ids") or [] if str(v).isdigit()]
-        if not ids:return error("Сначала сформируйте выборку вопросов.")
+        if not ids:return message_error_response("Сначала сформируйте выборку вопросов.")
         before=s.to_dict(row);row.name=config["name"];row.config_json=s.history_json(config);row.question_ids_json=s.history_json(ids);row.updated_at=datetime.utcnow()
         s.db.session.flush();s.history_add("bulk",row.id,"update",f"Обновлён игровой набор «{row.name}»",before=before,after=s.to_dict(row),can_revert=False);s.db.session.commit()
         return jsonify({"ok":True,"message":"Игровой набор обновлён.","item":s.to_dict(row)})
@@ -152,7 +152,7 @@ def register_builder(context:EditorContext)->dict[str,Any]:
         d=guard()
         if d is not None:return d
         row=s.db.session.get(s.TpvGameBuild,build_id)
-        if row is None:return error("Игровой набор не найден.",404)
+        if row is None:return message_error_response("Игровой набор не найден.",404)
         snap=s.to_dict(row);name=row.name;s.db.session.delete(row)
         s.history_add("bulk",build_id,"delete",f"Удалён игровой набор «{name}»",before=snap,can_revert=False);s.db.session.commit()
         return jsonify({"ok":True,"message":"Игровой набор удалён. Вопросы из базы не изменены."})
@@ -160,7 +160,7 @@ def register_builder(context:EditorContext)->dict[str,Any]:
         d=guard()
         if d is not None:return d
         row=s.db.session.get(s.TpvGameBuild,build_id)
-        if row is None:return error("Игровой набор не найден.",404)
+        if row is None:return message_error_response("Игровой набор не найден.",404)
         active=s.db.session.scalars(s.db.select(s.TpvGameBuild).where(s.TpvGameBuild.is_active.is_(True))).all()
         for x in active:x.is_active=False
         row.is_active=True;row.updated_at=datetime.utcnow()

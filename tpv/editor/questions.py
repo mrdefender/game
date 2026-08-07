@@ -8,6 +8,7 @@ from typing import Any
 from flask import jsonify, request
 from sqlalchemy import func
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 class QuestionService:
@@ -129,8 +130,7 @@ class QuestionService:
 
 def register_questions(context:EditorContext)->dict[str,Any]:
     service=QuestionService(context)
-    def error(message,status=400):return jsonify({"ok":False,"message":message}),status
-    def denied():return None if context.permissions.is_allowed() else error("Нет доступа к редактору.",403)
+    def denied():return None if context.permissions.is_allowed() else message_error_response("Нет доступа к редактору.",403)
 
     def tpv_editor_get_questions():
         d=denied()
@@ -142,25 +142,25 @@ def register_questions(context:EditorContext)->dict[str,Any]:
         d=denied()
         if d is not None:return d
         try:q=service.create(request.get_json(silent=True) or {})
-        except LookupError as exc:return error(str(exc),409)
-        except ValueError as exc:return error(str(exc))
+        except LookupError as exc:return message_error_response(str(exc),409)
+        except ValueError as exc:return message_error_response(str(exc))
         return jsonify({"ok":True,"message":"Вопрос создан.","question":service.serialize(q)}),201
 
     def tpv_editor_update_question(question_id):
         d=denied()
         if d is not None:return d
         q=service.db.session.get(service.QuestionsTpv,question_id)
-        if not q:return error("Вопрос не найден.",404)
+        if not q:return message_error_response("Вопрос не найден.",404)
         try:q=service.update(q,request.get_json(silent=True) or {})
-        except LookupError as exc:return error(str(exc),409)
-        except ValueError as exc:return error(str(exc))
+        except LookupError as exc:return message_error_response(str(exc),409)
+        except ValueError as exc:return message_error_response(str(exc))
         return jsonify({"ok":True,"message":"Вопрос сохранён.","question":service.serialize(q)})
 
     def tpv_editor_delete_question(question_id):
         d=denied()
         if d is not None:return d
         q=service.db.session.get(service.QuestionsTpv,question_id)
-        if not q:return error("Вопрос не найден.",404)
+        if not q:return message_error_response("Вопрос не найден.",404)
         qid=service.delete(q)
         return jsonify({"ok":True,"message":f"Вопрос #{qid} удалён."})
 
@@ -168,7 +168,7 @@ def register_questions(context:EditorContext)->dict[str,Any]:
         d=denied()
         if d is not None:return d
         source=service.db.session.get(service.QuestionsTpv,question_id)
-        if not source:return error("Вопрос не найден.",404)
+        if not source:return message_error_response("Вопрос не найден.",404)
         q=service.copy(source)
         return jsonify({"ok":True,"message":f"Создана копия вопроса #{q.id}.","question":service.serialize(q)}),201
 

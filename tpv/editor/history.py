@@ -15,6 +15,7 @@ from flask import jsonify, request
 from sqlalchemy import func, inspect
 
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 class HistoryService:
@@ -433,13 +434,10 @@ def register_history(context: EditorContext) -> dict[str, Any]:
     """Зарегистрировать историю с прежними URL и endpoint."""
     service = HistoryService(context)
 
-    def error(message: str, status: int = 400):
-        return jsonify({"ok": False, "message": message}), status
-
     def require_access():
         if context.permissions.is_allowed():
             return None
-        return error("Нет доступа к редактору.", 403)
+        return message_error_response("Нет доступа к редактору.", 403)
 
     def tpv_editor_history_status():
         denied = require_access()
@@ -480,12 +478,12 @@ def register_history(context: EditorContext) -> dict[str, Any]:
         try:
             service.revert(history_id)
         except LookupError as exc:
-            return error(str(exc), 404)
+            return message_error_response(str(exc), 404)
         except RuntimeError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except ValueError as exc:
             service.db.session.rollback()
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except Exception:
             service.db.session.rollback()
             raise
@@ -506,9 +504,9 @@ def register_history(context: EditorContext) -> dict[str, Any]:
         try:
             deleted = service.clear(mode)
         except RuntimeError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except ValueError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,

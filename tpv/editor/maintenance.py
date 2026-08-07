@@ -11,6 +11,7 @@ from flask import jsonify
 from sqlalchemy import text
 
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 class MaintenanceService:
@@ -171,16 +172,10 @@ def register_maintenance(
     """Зарегистрировать прежние API обслуживания."""
     service = MaintenanceService(context)
 
-    def error(message: str, status: int = 400):
-        return jsonify({
-            "ok": False,
-            "message": message,
-        }), status
-
     def require_access():
         if context.permissions.is_allowed():
             return None
-        return error("Нет доступа к редактору.", 403)
+        return message_error_response("Нет доступа к редактору.", 403)
 
     def tpv_editor_maintenance_backup_route():
         denied = require_access()
@@ -190,7 +185,7 @@ def register_maintenance(
         try:
             target = service.create_backup()
         except Exception as exc:
-            return error(
+            return message_error_response(
                 f"Не удалось создать backup: {exc}",
                 500,
             )
@@ -209,7 +204,7 @@ def register_maintenance(
         try:
             result = service.integrity_check()
         except Exception as exc:
-            return error(
+            return message_error_response(
                 f"Ошибка проверки SQLite: {exc}",
                 500,
             )
@@ -236,7 +231,7 @@ def register_maintenance(
         try:
             service.analyze()
         except Exception as exc:
-            return error(
+            return message_error_response(
                 f"Не удалось выполнить ANALYZE: {exc}",
                 500,
             )
@@ -257,7 +252,7 @@ def register_maintenance(
         try:
             service.vacuum()
         except Exception as exc:
-            return error(
+            return message_error_response(
                 f"Не удалось выполнить VACUUM: {exc}",
                 500,
             )
@@ -280,7 +275,7 @@ def register_maintenance(
             report = service.full_maintenance()
         except Exception as exc:
             service.db.session.rollback()
-            return error(
+            return message_error_response(
                 f"Обслуживание прервано: {exc}",
                 500,
             )

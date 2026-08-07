@@ -11,9 +11,10 @@ import sqlite3
 import tempfile
 from typing import Any
 
-from flask import jsonify, send_file
+from flask import send_file
 
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 USERS_FIELDS = (
@@ -388,16 +389,10 @@ def register_exporting(
     """Зарегистрировать прежние маршруты экспорта."""
     service = ExportService(context)
 
-    def error(message: str, status: int = 400):
-        return jsonify({
-            "ok": False,
-            "message": message,
-        }), status
-
     def require_access():
         if context.permissions.is_allowed():
             return None
-        return error("Нет доступа к редактору.", 403)
+        return message_error_response("Нет доступа к редактору.", 403)
 
     def tpv_editor_export_users(fmt: str):
         denied = require_access()
@@ -407,9 +402,9 @@ def register_exporting(
         try:
             return service.users_export(fmt)
         except RuntimeError as exc:
-            return error(str(exc), 500)
+            return message_error_response(str(exc), 500)
         except LookupError as exc:
-            return error(str(exc), 404)
+            return message_error_response(str(exc), 404)
 
     def tpv_editor_export_questions(fmt: str):
         denied = require_access()
@@ -419,9 +414,9 @@ def register_exporting(
         try:
             return service.questions_export(fmt)
         except RuntimeError as exc:
-            return error(str(exc), 500)
+            return message_error_response(str(exc), 500)
         except LookupError as exc:
-            return error(str(exc), 404)
+            return message_error_response(str(exc), 404)
 
     def tpv_editor_export_full(fmt: str):
         denied = require_access()
@@ -431,9 +426,9 @@ def register_exporting(
         try:
             return service.full_export(fmt)
         except RuntimeError as exc:
-            return error(str(exc), 500)
+            return message_error_response(str(exc), 500)
         except LookupError as exc:
-            return error(str(exc), 404)
+            return message_error_response(str(exc), 404)
 
     def tpv_editor_export_database():
         denied = require_access()
@@ -443,9 +438,9 @@ def register_exporting(
         try:
             return service.database_export()
         except FileNotFoundError as exc:
-            return error(str(exc), 404)
+            return message_error_response(str(exc), 404)
         except RuntimeError as exc:
-            return error(str(exc), 500)
+            return message_error_response(str(exc), 500)
 
     rules = (
         (

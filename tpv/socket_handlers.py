@@ -1,18 +1,17 @@
 """Socket.IO handlers for The People Versus.
 
-Этап 11.4. Проверенный код обработчиков перенесён из game.py без
-изменения имён событий, payload и комнат Socket.IO.
+Этап 13.8.1.
+Обработчики зарегистрированы обычным читаемым Python-кодом:
+без _TPV_SOCKET_SOURCE, compile() и exec().
 
-Модуль не импортирует game.py. Все зависимости передаются через
-register_tpv_socket_handlers(globals()).
+Модуль не импортирует game.py. Все зависимости по-прежнему передаются
+через register_tpv_socket_handlers(runtime).
 """
 
 from __future__ import annotations
 
 from typing import Any, Mapping
 
-
-_TPV_SOCKET_SOURCE = '@socketio.on("room:join_tpv")\ndef socket_join_room(data):\n    room_code = str(data.get("room") or get_room_code() or "")\n    role = data.get("role") or "unknown"\n    username = data.get("username") or ""\n\n    join_room(room_code)\n    join_room(f"{room_code}:{role}")\n    if username:\n        join_room(f"{room_code}:user:{username}")\n\n    print(f"Socket joined room={room_code}, role={role}, username={username}")\n    update_users_tpv()\n    emit("room:joined", {\n        "room": room_code,\n        "role": role,\n        "username": username\n    }) \n\n@socketio.on("count_answer_interactive")\ndef count_interactive(data):\n    try:\n        col = int(data["interactive"])\n        socketio.emit("count_answer_interactive_for_spec",col,to=f"{DEFAULT_ROOM_CODE}:spectator")\n    except:\n        return\n\n\ndef update_users_tpv():\n        js = db.session.scalars(db.select(QueryTpv)).all()\n        if len(js)==1:\n            id = js[0].id\n            username = js[0].username\n            flip = js[0].flip\n            money = js[0].money\n            status = js[0].status\n            jsn = [id,username,flip,money,status,"true"]\n            result = jsn\n            emit_tpv_host("updated_users_tpv", result)\n        else:\n            jsn = []\n            for i in range(0,len(js)):\n                if js[i].status != "ended":\n                    id = js[i].id\n                    username = js[i].username\n                    flip = js[i].flip\n                    money = js[i].money\n                    status = js[i].status\n                    tmp = [id,username,flip,money,status,"false"]\n                #socketio.emit("updated_user_tpv",js[i].status,to=f"{get_room_code()}:user:{js[i].username}");\n                    jsn.append(tmp)\n            result = jsn\n            emit_tpv_host("updated_users_tpv", result)\n            return result\n\n@socketio.on("clean_db_tpv")\ndef clean_db_tpv():\n    TPV_ARCHIVE_RUNTIME.cancel("Игровая база очищена ведущим")\n    db.session.execute(db.delete(QueryTpv))\n    db.session.commit()\n    update_users_tpv()\n    emit_tpv_host("DB_clean", "ok")\n\n\n@socketio.on("tpv_spectator_ready")\ndef tpv_spectator_ready():\n    """Восстанавливает код комнаты после перезагрузки экрана зрителя."""\n    room_code = get_room_code()\n    if room_code is None:\n        emit("room_code_hide", {})\n        return\n\n    join_url = f"{request.host_url.rstrip(\'/\')}{url_for(\'join\')}?room={room_code}"\n    emit("room_code_show", {\n        "room": room_code,\n        "joinUrl": join_url,\n    })\n\n\n@socketio.on("tpv_selection_start")\ndef tpv_selection_start():\n    TPV_ARCHIVE_RUNTIME.start()\n    players = db.session.scalars(\n        db.select(QueryTpv).where(QueryTpv.status == "wait")\n    ).all()\n    emit_tpv_spectator("tpv_spectator_select_start", {\n        "players": [player.username for player in players]\n    })\n\n\n@socketio.on("tpv_versus")\ndef tpv_versus():\n    emit_tpv_spectator("tpv_versus_spec", {"show": True})\n\n\n@socketio.on("choose_player_random")\ndef choose_player_random():\n    try:\n        js = db.session.scalars(db.select(QueryTpv).where(QueryTpv.status=="wait")).all()\n        if len(js)==0:\n            return\n        if len(js)==1:\n            js[0].status = "selected"\n            db.session.commit()\n            id = js[0].id\n            username = js[0].username\n            flip = js[0].flip\n            money = js[0].money\n            status = js[0].status\n            jsn = [id,username,flip,money,status]\n            result = jsn\n            socketio.emit("player_selected", result, to=f"{get_room_code()}:user:{username}")\n            emit_tpv_host("player_selected", result)\n            emit_tpv_spectator("tpv_spectator_player_selected", {\n                "player": username,\n                "topic": flip,\n                "currentMoney": money,\n            })\n            update_users_tpv()\n        else:\n            secure_rnd = secrets.SystemRandom()\n            num = secure_rnd.randrange(len(js))\n            js[num].status = "selected"\n            db.session.commit()\n            id = js[num].id\n            username = js[num].username\n            flip = js[num].flip\n            money = js[num].money\n            status = js[num].status\n            jsn = [id,username,flip,money,status]\n            result = jsn\n            update_users_tpv()\n            socketio.emit("player_selected", result, to=f"{get_room_code()}:user:{username}")\n            emit_tpv_host("player_selected", result)\n            emit_tpv_spectator("tpv_spectator_player_selected", {\n                "player": username,\n                "topic": flip,\n                "currentMoney": money,\n            })\n            update_users_tpv()\n    except:\n        pass\n    \n@socketio.on("choose_player_id")\ndef choose_player_id(data):\n    try:\n        num = data["id"]\n        js = db.session.scalar(db.select(QueryTpv).where(QueryTpv.id==num))\n        if js == None:\n            return\n        js.status = "selected"\n        db.session.commit()\n        id = js.id\n        username = js.username\n        flip = js.flip\n        money = js.money\n        status = js.status\n        jsn = [id,username,flip,money,status]\n        result = jsn\n        socketio.emit("player_selected", result, to=f"{get_room_code()}:user:{username}")\n        emit_tpv_host("player_selected", result)\n        emit_tpv_spectator("tpv_spectator_player_selected", {\n                "player": username,\n                "topic": flip,\n                "currentMoney": money,\n            })\n        update_users_tpv()\n    except:\n        pass\n\n@socketio.on("reset_to_wait_tpv")\ndef reset_to_wait_tpv():\n    try:\n        js = db.session.scalars(db.select(QueryTpv)).all()\n        if len(js)==1:\n            if js[0].status != "ended":\n                js[0].status = "wait"\n                db.session.commit()\n                update_users_tpv()\n        else:\n            for i in range(0,len(js)):\n                if js[i].status != "ended":\n                    js[i].status = "wait"\n                    db.session.commit()\n                    update_users_tpv()\n        socketio.emit("reset", "wait", to=f"{get_room_code()}:user")\n        emit_tpv_spectator("reset", "wait")\n    except:\n        return json.dump("fail")\n\ndef _emit_tpv_bong_to_player(event_name, data):\n    """Пересылает этап гонг-игры выбранному игроку и экрану зрителя."""\n    payload = dict(data or {})\n    player = str(payload.pop("player", "") or "").strip()\n\n    if player:\n        socketio.emit(\n            f"{event_name}_user",\n            payload,\n            to=f"{get_room_code()}:user:{player}",\n        )\n\n    emit_tpv_spectator(f"{event_name}_spec", payload)\n\n\n@socketio.on("tpv_bong_prepare")\ndef tpv_bong_prepare(data):\n    _emit_tpv_bong_to_player("tpv_bong_prepare", data)\n\n\n@socketio.on("tpv_bong_selected")\ndef tpv_bong_selected(data):\n    _emit_tpv_bong_to_player("tpv_bong_selected", data)\n\n\n@socketio.on("tpv_bong_value")\ndef tpv_bong_value(data):\n    _emit_tpv_bong_to_player("tpv_bong_value", data)\n\n\n@socketio.on("tpv_bong_stop_ack")\ndef tpv_bong_stop_ack(data):\n    _emit_tpv_bong_to_player("tpv_bong_stop_ack", data)\n\n\n@socketio.on("tpv_bong_result")\ndef tpv_bong_result(data):\n    _emit_tpv_bong_to_player("tpv_bong_result", data)\n\n\n@socketio.on("tpv_bong_hide")\ndef tpv_bong_hide(data):\n    _emit_tpv_bong_to_player("tpv_bong_hide", data)\n\n\n@socketio.on("tpv_bong_stop_request")\ndef tpv_bong_stop_request(data):\n    """Игрок нажал STOP. Запрос передаётся в комнату ведущего."""\n    player = str((data or {}).get("player") or "").strip()\n\n    if not player:\n        return {"ok": False, "error": "player_required"}\n\n    payload = {"player": player}\n\n    # TPV-host подключается к технической комнате DEFAULT_ROOM_CODE.\n    # Ранее запрос отправлялся только в get_room_code():host, поэтому\n    # ведущий его не получал, а кнопка визуально казалась нерабочей.\n    host_rooms = {\n        f"{DEFAULT_ROOM_CODE}:host",\n        f"{get_room_code()}:host",\n    }\n\n    for host_room in host_rooms:\n        socketio.emit(\n            "tpv_bong_stop_requested",\n            payload,\n            to=host_room,\n        )\n\n    return {"ok": True}\n\n\n@socketio.on("generate_safe_bong_game")\ndef generate_safe_bong_game():\n    secure_rnd = secrets.SystemRandom()\n    num = secure_rnd.randint(1,3)\n    emit_tpv_host("bong_game_safe_var", num)\n\n\n@socketio.on("generate_sum_for_bong_game")\ndef generate_sum_for_bong_game(data):\n    secure_rnd = secrets.SystemRandom()\n    col = secure_rnd.randint(6,15)\n    secure_rnd = secrets.SystemRandom()\n    result = secure_rnd.sample(range(1,data[\'sum\']),col)\n    result.sort()\n    result.append(data[\'sum\'])\n    emit_tpv_host("sum_generated", result)\n\n\n@socketio.on("take_question")\ndef take_question(data):\n    if data["flips"]=="false":\n        js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip=="false", Questions_tpv.author!=data[\'player\'], Questions_tpv.show=="false").order_by(func.random()).limit(1))\n        if js == None:\n            emit_tpv_host("question_selected", "fail")\n            return\n        question = js.task\n        answer = js.answer\n        comment = js.comment\n        author = js.author\n        result = [question,answer,comment,author]\n        js.show = "true"\n        db.session.commit()\n        TPV_ARCHIVE_RUNTIME.record_question(\n            question_id=js.id,\n            question_type="general",\n            theme=None,\n            author=author,\n            player=data.get("player"),\n            question_number=data.get("questionNumber"),\n        )\n        result_user_spec = {\n            "question": question,\n            "author": author,\n            "replacement": False,\n            "questionNumber": data.get("questionNumber"),\n        }\n        socketio.emit("question_selected_user", result_user_spec, to=f"{get_room_code()}:user:{data[\'player\']}")\n        emit_tpv_spectator("question_selected_spec", result_user_spec)\n        emit_tpv_host("question_selected", result)\n    if data["flips"]!="false":\n        js = db.session.scalar(db.select(Questions_tpv).where(Questions_tpv.flip==data["flips"], Questions_tpv.author!=data[\'player\'], Questions_tpv.show=="false").order_by(func.random()).limit(1))\n        if js == None:\n            emit_tpv_host("question_selected", "fail")\n            return\n        question = js.task\n        answer = js.answer\n        comment = js.comment\n        author = js.author\n        result = [question,answer,comment,author]\n        result_user_spec = {\n            "question": question,\n            "author": author,\n            "replacement": True,\n            "replacementTopic": data.get("flips"),\n            "questionNumber": data.get("questionNumber"),\n        }\n        js.show = "true"\n        db.session.commit()\n        TPV_ARCHIVE_RUNTIME.record_question(\n            question_id=js.id,\n            question_type="theme",\n            theme=data.get("flips"),\n            author=author,\n            player=data.get("player"),\n            question_number=data.get("questionNumber"),\n        )\n        socketio.emit("question_selected_user", result_user_spec, to=f"{get_room_code()}:user:{data[\'player\']}")\n        emit_tpv_spectator("question_selected_spec", result_user_spec)        \n        emit_tpv_host("question_selected", result)\n\n@socketio.on("add_result_author")\ndef add_result_author(data):\n    TPV_ARCHIVE_RUNTIME.record_author_result(\n        data.get("name_author", ""),\n        int(data.get("sum_author", 0) or 0),\n    )\n    js = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==data["name_author"]))\n    if js == None:\n        u = UsersTpv()\n        u.username = data["name_author"]\n        u.flip = "false"\n        u.money = data["sum_author"]\n        u.approve = "false"\n        u.flip_col = 0\n        db.session.add(u)\n        db.session.flush()\n        db.session.commit()\n    else:\n        js.money = js.money + data["sum_author"]\n        db.session.commit()\n\n    emit_tpv_spectator(\n        "tpv_author_win_user",\n        {\n            "amount": int(data.get("sum_author", 0) or 0),\n            "author": data.get("name_author", ""),\n        },\n    )\n\n@socketio.on("add_result_player")\ndef add_result_player(data):\n    TPV_ARCHIVE_RUNTIME.record_player_result(\n        data.get("name_player", ""),\n        int(data.get("sum_player", 0) or 0),\n    )\n    js = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==data["name_player"]))\n    js.money = js.money + data["sum_player"]\n    js1 = db.session.scalar(db.select(QueryTpv).where(QueryTpv.username==data["name_player"]))\n    if js1 == None:\n        return;\n    js1.money = js1.money + data["sum_player"]\n    js1.status = "ended"\n    db.session.commit()\n\n    player_win_payload = {\n        "amount": int(data.get("sum_player", 0) or 0),\n        "player": data.get("name_player", ""),\n    }\n    socketio.emit(\n        "tpv_player_win_user",\n        player_win_payload,\n        to=f"{get_room_code()}:user:{data[\'name_player\']}"\n    )\n    emit_tpv_spectator("tpv_player_win_user", player_win_payload)\n    update_users_tpv()\n\n\n@socketio.on("tpv_update_data_user_spec")\ndef tpv_update_data_user_spec(data):\n    # v7 передаёт именованный объект состояния. Старый массив exp пока поддерживается.\n    result = data.get("state", data.get("exp", {}))\n    socketio.emit("update_data_user", result, to=f"{get_room_code()}:user")\n    emit_tpv_spectator("update_data_spec", result)\n\n@socketio.on("show_tree")\ndef show_tree(data):\n    socketio.emit("show_tree_user", "show", to=f"{get_room_code()}:user:{data["player"]}")\n    emit_tpv_spectator("show_tree_spec", "show")\n    \n\n@socketio.on("hide_tree")\ndef hide_tree(data):\n    socketio.emit("hide_tree_user", "hide", to=f"{get_room_code()}:user:{data["player"]}")\n    emit_tpv_spectator("hide_tree_spec", "hide")\n\n@socketio.on("show_stats")\ndef show_stats(data):\n    socketio.emit("show_stats_user", "show", to=f"{get_room_code()}:user:{data["player"]}")\n    emit_tpv_spectator("show_stats_spec", "show")\n    \n\n@socketio.on("hide_stats")\ndef hide_stats(data):\n    socketio.emit("hide_stats_user", "hide", to=f"{get_room_code()}:user:{data["player"]}")\n    emit_tpv_spectator("hide_stats_spec", "hide")\n\n@socketio.on("tpv_correct")\ndef tpv_correct(data):\n    TPV_ARCHIVE_RUNTIME.record_answer(\n        "correct",\n        player=data.get("player"),\n        answer=data.get("answer"),\n        question_number=data.get("questionNumber"),\n        state=data.get("state"),\n    )\n    payload = {\n        "answer": data.get("answer", ""),\n        "questionNumber": data.get("questionNumber"),\n        "correctCount": data.get("correctCount"),\n        "round": data.get("round"),\n        "roundFinished": bool(data.get("roundFinished", False)),\n    }\n    socketio.emit(\n        "tpv_correct_user",\n        payload,\n        to=f"{get_room_code()}:user:{data[\'player\']}"\n    )\n    emit_tpv_spectator("tpv_correct_spec", payload)\n\n@socketio.on("tpv_pass")\ndef tpv_pass(data):\n    TPV_ARCHIVE_RUNTIME.record_answer(\n        "pass",\n        player=data.get("player"),\n        answer=data.get("answer"),\n        question_number=data.get("questionNumber"),\n        state=data.get("state"),\n    )\n    payload = {\n        "answer": data.get("answer", ""),\n        "questionNumber": data.get("questionNumber"),\n        "passCount": data.get("passCount"),\n        "state": data.get("state"),\n    }\n    emit_tpv_player(data["player"], "tpv_pass_user", payload)\n    emit_tpv_spectator("tpv_pass_spec", payload)\n\n@socketio.on("tpv_flip")\ndef tpv_flip(data):\n    TPV_ARCHIVE_RUNTIME.record_answer(\n        "flip",\n        player=data.get("player"),\n        answer=data.get("answer"),\n        question_number=data.get("questionNumber"),\n        state=data.get("state"),\n    )\n    payload = {\n        "answer": data.get("answer", ""),\n        "questionNumber": data.get("questionNumber"),\n        "replacement": True,\n        "state": data.get("state"),\n    }\n    emit_tpv_player(data["player"], "tpv_flip_user", payload)\n    emit_tpv_spectator("tpv_flip_spec", payload)\n\n@socketio.on("tpv_wrong")\ndef tpv_wrong(data):\n    TPV_ARCHIVE_RUNTIME.record_answer(\n        "wrong",\n        player=data.get("player"),\n        answer=data.get("answer"),\n        question_number=data.get("questionNumber"),\n        state=data.get("state"),\n    )\n    payload = {\n        "answer": data.get("answer", ""),\n        "questionNumber": data.get("questionNumber"),\n        "wrongIndex": data.get("wrongIndex"),\n        "state": data.get("state"),\n    }\n    \n    emit_tpv_player(data["player"], "tpv_wrong_user", payload)\n    emit_tpv_spectator("tpv_wrong_spec", payload)\n\n@socketio.on("start_intro")\ndef start_intro():\n     emit_tpv_spectator("start_intro",{"":""}),\n\n@socketio.on("host_show_credits_tpv")\ndef host_show_credits():\n    socketio.emit("show_credits_tpv", {\n    "title": "Спасибо за игру!",\n    "lines": [\n        "Ведущий: Mokaque",\n        "Редактор вопросов: Mokaque",\n        "Оригинальная идея: David Briggs, Steve Knight, Mike Whitehill",\n        "Голос Гонг Игры: Кирилл (Yandex SpeechKit)",\n        "Техническая реализация: Mokaque",\n        "Композиторы: Keith Strachan, Mattew Strachan",\n        "Адаптация правил: Mokaque",\n        "Графика: ChatGPT",\n        "Оригинальный формат: Sony Pictures Entertainment",\n        "Никто из участников создания данной адаптации игры не претендует на авторские права на формат оригинальной игры \'The People Versus\'",\n        "Данный проект выпущен исключительно в развлекательных целях и не преследует целей получение материальной выгоды",\n        "До встречи в следующей игре!"\n    ]\n}, to=f"{DEFAULT_ROOM_CODE}:spectator")\n   \n   \n@socketio.on("show_results_tpv")\ndef show_results_tpv():\n    TPV_ARCHIVE_RUNTIME.finalize()\n    result = []\n    tmp = db.session.scalars(db.select(UsersTpv).where(UsersTpv.money!=0).order_by(desc(UsersTpv.money))).all()\n    for i in range(len(tmp)):\n        username = tmp[i].username\n        money = tmp[i].money\n        t = [username, money]\n        result.append(t)\n    emit_tpv_spectator("show_results_tpv", result)\n'
 
 _REQUIRED_RUNTIME_NAMES = {
     "socketio",
@@ -37,45 +36,1086 @@ _REQUIRED_RUNTIME_NAMES = {
 }
 
 
-def register_tpv_socket_handlers(runtime: Mapping[str, Any]) -> dict[str, Any]:
-    """Register TPV Socket.IO handlers and return compatibility exports."""
+TPV_SOCKET_EVENTS = [
+    "room:join_tpv",
+    "count_answer_interactive",
+    "clean_db_tpv",
+    "tpv_spectator_ready",
+    "tpv_selection_start",
+    "tpv_versus",
+    "choose_player_random",
+    "choose_player_id",
+    "reset_to_wait_tpv",
+    "tpv_bong_prepare",
+    "tpv_bong_selected",
+    "tpv_bong_value",
+    "tpv_bong_stop_ack",
+    "tpv_bong_result",
+    "tpv_bong_hide",
+    "tpv_bong_stop_request",
+    "generate_safe_bong_game",
+    "generate_sum_for_bong_game",
+    "take_question",
+    "add_result_author",
+    "add_result_player",
+    "tpv_update_data_user_spec",
+    "show_tree",
+    "hide_tree",
+    "show_stats",
+    "hide_stats",
+    "tpv_correct",
+    "tpv_pass",
+    "tpv_flip",
+    "tpv_wrong",
+    "start_intro",
+    "host_show_credits_tpv",
+    "show_results_tpv",
+]
 
+
+TPV_CREDITS_PAYLOAD = {
+    "title": "Спасибо за игру!",
+    "lines": [
+        "Ведущий: Mokaque",
+        "Редактор вопросов: Mokaque",
+        "Оригинальная идея: David Briggs, Steve Knight, Mike Whitehill",
+        "Голос Гонг Игры: Кирилл (Yandex SpeechKit)",
+        "Техническая реализация: Mokaque",
+        "Композиторы: Keith Strachan, Mattew Strachan",
+        "Адаптация правил: Mokaque",
+        "Графика: ChatGPT",
+        "Оригинальный формат: Sony Pictures Entertainment",
+        (
+            "Никто из участников создания данной адаптации игры "
+            "не претендует на авторские права на формат оригинальной "
+            "игры 'The People Versus'"
+        ),
+        (
+            "Данный проект выпущен исключительно в развлекательных "
+            "целях и не преследует целей получение материальной выгоды"
+        ),
+        "До встречи в следующей игре!",
+    ],
+}
+
+
+class TpvSocketHandlers:
+    """Набор Socket.IO-обработчиков TPV.
+
+    Зависимости приложения хранятся в экземпляре сервиса, а события
+    регистрируются явно в :meth:`register`.
+    """
+
+    def __init__(self, runtime: Mapping[str, Any]) -> None:
+        self.socketio = runtime["socketio"]
+        self.db = runtime["db"]
+        self.emit = runtime["emit"]
+        self.join_room = runtime["join_room"]
+        self.request = runtime["request"]
+        self.url_for = runtime["url_for"]
+        self.json = runtime["json"]
+        self.secrets = runtime["secrets"]
+        self.func = runtime["func"]
+        self.desc = runtime["desc"]
+
+        self.DEFAULT_ROOM_CODE = runtime["DEFAULT_ROOM_CODE"]
+
+        self.QueryTpv = runtime["QueryTpv"]
+        self.QuestionsTpv = runtime["Questions_tpv"]
+        self.UsersTpv = runtime["UsersTpv"]
+
+        self.archive = runtime["TPV_ARCHIVE_RUNTIME"]
+
+        self.get_room_code = runtime["get_room_code"]
+        self.emit_tpv_host = runtime["emit_tpv_host"]
+        self.emit_tpv_player = runtime["emit_tpv_player"]
+        self.emit_tpv_spectator = runtime["emit_tpv_spectator"]
+
+    # ------------------------------------------------------------------
+    # Регистрация
+    # ------------------------------------------------------------------
+
+    def register(self) -> None:
+        """Зарегистрировать все TPV Socket.IO events."""
+        handlers = {
+            "room:join_tpv": self.socket_join_room,
+            "count_answer_interactive": self.count_interactive,
+            "clean_db_tpv": self.clean_db_tpv,
+            "tpv_spectator_ready": self.tpv_spectator_ready,
+            "tpv_selection_start": self.tpv_selection_start,
+            "tpv_versus": self.tpv_versus,
+            "choose_player_random": self.choose_player_random,
+            "choose_player_id": self.choose_player_id,
+            "reset_to_wait_tpv": self.reset_to_wait_tpv,
+            "tpv_bong_prepare": self.tpv_bong_prepare,
+            "tpv_bong_selected": self.tpv_bong_selected,
+            "tpv_bong_value": self.tpv_bong_value,
+            "tpv_bong_stop_ack": self.tpv_bong_stop_ack,
+            "tpv_bong_result": self.tpv_bong_result,
+            "tpv_bong_hide": self.tpv_bong_hide,
+            "tpv_bong_stop_request": self.tpv_bong_stop_request,
+            "generate_safe_bong_game": self.generate_safe_bong_game,
+            "generate_sum_for_bong_game": (
+                self.generate_sum_for_bong_game
+            ),
+            "take_question": self.take_question,
+            "add_result_author": self.add_result_author,
+            "add_result_player": self.add_result_player,
+            "tpv_update_data_user_spec": (
+                self.tpv_update_data_user_spec
+            ),
+            "show_tree": self.show_tree,
+            "hide_tree": self.hide_tree,
+            "show_stats": self.show_stats,
+            "hide_stats": self.hide_stats,
+            "tpv_correct": self.tpv_correct,
+            "tpv_pass": self.tpv_pass,
+            "tpv_flip": self.tpv_flip,
+            "tpv_wrong": self.tpv_wrong,
+            "start_intro": self.start_intro,
+            "host_show_credits_tpv": self.host_show_credits,
+            "show_results_tpv": self.show_results_tpv,
+        }
+
+        for event_name, handler in handlers.items():
+            self.socketio.on(event_name)(handler)
+
+    # ------------------------------------------------------------------
+    # Комнаты и список игроков
+    # ------------------------------------------------------------------
+
+    def socket_join_room(self, data):
+        room_code = str(
+            data.get("room")
+            or self.get_room_code()
+            or ""
+        )
+        role = data.get("role") or "unknown"
+        username = data.get("username") or ""
+
+        self.join_room(room_code)
+        self.join_room(f"{room_code}:{role}")
+
+        if username:
+            self.join_room(
+                f"{room_code}:user:{username}"
+            )
+
+        print(
+            "Socket joined "
+            f"room={room_code}, "
+            f"role={role}, "
+            f"username={username}"
+        )
+
+        self.update_users_tpv()
+
+        self.emit(
+            "room:joined",
+            {
+                "room": room_code,
+                "role": role,
+                "username": username,
+            },
+        )
+
+    def count_interactive(self, data):
+        try:
+            count = int(data["interactive"])
+            self.socketio.emit(
+                "count_answer_interactive_for_spec",
+                count,
+                to=(
+                    f"{self.DEFAULT_ROOM_CODE}:spectator"
+                ),
+            )
+        except Exception:
+            return
+
+    @staticmethod
+    def _user_row(user, single: bool):
+        return [
+            user.id,
+            user.username,
+            user.flip,
+            user.money,
+            user.status,
+            "true" if single else "false",
+        ]
+
+    def update_users_tpv(self):
+        users = self.db.session.scalars(
+            self.db.select(self.QueryTpv)
+        ).all()
+
+        if len(users) == 1:
+            result = self._user_row(
+                users[0],
+                single=True,
+            )
+            self.emit_tpv_host(
+                "updated_users_tpv",
+                result,
+            )
+            return None
+
+        result = [
+            self._user_row(user, single=False)
+            for user in users
+            if user.status != "ended"
+        ]
+
+        self.emit_tpv_host(
+            "updated_users_tpv",
+            result,
+        )
+        return result
+
+    def clean_db_tpv(self):
+        self.archive.cancel(
+            "Игровая база очищена ведущим"
+        )
+
+        self.db.session.execute(
+            self.db.delete(self.QueryTpv)
+        )
+        self.db.session.commit()
+
+        self.update_users_tpv()
+        self.emit_tpv_host("DB_clean", "ok")
+
+    def tpv_spectator_ready(self):
+        """Восстановить код комнаты после reload spectator."""
+        room_code = self.get_room_code()
+
+        if room_code is None:
+            self.emit("room_code_hide", {})
+            return
+
+        join_url = (
+            f"{self.request.host_url.rstrip('/')}"
+            f"{self.url_for('join')}"
+            f"?room={room_code}"
+        )
+
+        self.emit(
+            "room_code_show",
+            {
+                "room": room_code,
+                "joinUrl": join_url,
+            },
+        )
+
+    # ------------------------------------------------------------------
+    # Отбор игрока
+    # ------------------------------------------------------------------
+
+    def tpv_selection_start(self):
+        self.archive.start()
+
+        players = self.db.session.scalars(
+            self.db.select(self.QueryTpv).where(
+                self.QueryTpv.status == "wait"
+            )
+        ).all()
+
+        self.emit_tpv_spectator(
+            "tpv_spectator_select_start",
+            {
+                "players": [
+                    player.username
+                    for player in players
+                ]
+            },
+        )
+
+    def tpv_versus(self):
+        self.emit_tpv_spectator(
+            "tpv_versus_spec",
+            {"show": True},
+        )
+
+    @staticmethod
+    def _selected_player_result(player):
+        return [
+            player.id,
+            player.username,
+            player.flip,
+            player.money,
+            player.status,
+        ]
+
+    def _emit_selected_player(self, player):
+        result = self._selected_player_result(
+            player
+        )
+
+        self.socketio.emit(
+            "player_selected",
+            result,
+            to=(
+                f"{self.get_room_code()}"
+                f":user:{player.username}"
+            ),
+        )
+
+        self.emit_tpv_host(
+            "player_selected",
+            result,
+        )
+
+        self.emit_tpv_spectator(
+            "tpv_spectator_player_selected",
+            {
+                "player": player.username,
+                "topic": player.flip,
+                "currentMoney": player.money,
+            },
+        )
+
+        return result
+
+    def choose_player_random(self):
+        try:
+            players = self.db.session.scalars(
+                self.db.select(self.QueryTpv).where(
+                    self.QueryTpv.status == "wait"
+                )
+            ).all()
+
+            if not players:
+                return
+
+            if len(players) == 1:
+                player = players[0]
+                player.status = "selected"
+                self.db.session.commit()
+
+                self._emit_selected_player(player)
+                self.update_users_tpv()
+                return
+
+            secure_rnd = self.secrets.SystemRandom()
+            player = players[
+                secure_rnd.randrange(len(players))
+            ]
+
+            player.status = "selected"
+            self.db.session.commit()
+
+            # Сохраняем прежний порядок обновлений:
+            # host list -> selected event -> host list.
+            self.update_users_tpv()
+            self._emit_selected_player(player)
+            self.update_users_tpv()
+
+        except Exception:
+            pass
+
+    def choose_player_id(self, data):
+        try:
+            player_id = data["id"]
+
+            player = self.db.session.scalar(
+                self.db.select(self.QueryTpv).where(
+                    self.QueryTpv.id == player_id
+                )
+            )
+
+            if player is None:
+                return
+
+            player.status = "selected"
+            self.db.session.commit()
+
+            self._emit_selected_player(player)
+            self.update_users_tpv()
+
+        except Exception:
+            pass
+
+    def reset_to_wait_tpv(self):
+        try:
+            players = self.db.session.scalars(
+                self.db.select(self.QueryTpv)
+            ).all()
+
+            if len(players) == 1:
+                if players[0].status != "ended":
+                    players[0].status = "wait"
+                    self.db.session.commit()
+                    self.update_users_tpv()
+            else:
+                for player in players:
+                    if player.status != "ended":
+                        player.status = "wait"
+                        self.db.session.commit()
+                        self.update_users_tpv()
+
+            self.socketio.emit(
+                "reset",
+                "wait",
+                to=(
+                    f"{self.get_room_code()}:user"
+                ),
+            )
+            self.emit_tpv_spectator(
+                "reset",
+                "wait",
+            )
+
+        except Exception:
+            # Сохраняем прежнюю ветку обработки ошибки.
+            return self.json.dump("fail")
+
+    # ------------------------------------------------------------------
+    # Гонг-игра
+    # ------------------------------------------------------------------
+
+    def _emit_tpv_bong_to_player(
+        self,
+        event_name,
+        data,
+    ):
+        """Переслать этап гонг-игры player + spectator."""
+        payload = dict(data or {})
+        player = str(
+            payload.pop("player", "") or ""
+        ).strip()
+
+        if player:
+            self.socketio.emit(
+                f"{event_name}_user",
+                payload,
+                to=(
+                    f"{self.get_room_code()}"
+                    f":user:{player}"
+                ),
+            )
+
+        self.emit_tpv_spectator(
+            f"{event_name}_spec",
+            payload,
+        )
+
+    def tpv_bong_prepare(self, data):
+        self._emit_tpv_bong_to_player(
+            "tpv_bong_prepare",
+            data,
+        )
+
+    def tpv_bong_selected(self, data):
+        self._emit_tpv_bong_to_player(
+            "tpv_bong_selected",
+            data,
+        )
+
+    def tpv_bong_value(self, data):
+        self._emit_tpv_bong_to_player(
+            "tpv_bong_value",
+            data,
+        )
+
+    def tpv_bong_stop_ack(self, data):
+        self._emit_tpv_bong_to_player(
+            "tpv_bong_stop_ack",
+            data,
+        )
+
+    def tpv_bong_result(self, data):
+        self._emit_tpv_bong_to_player(
+            "tpv_bong_result",
+            data,
+        )
+
+    def tpv_bong_hide(self, data):
+        self._emit_tpv_bong_to_player(
+            "tpv_bong_hide",
+            data,
+        )
+
+    def tpv_bong_stop_request(self, data):
+        """Передать STOP-запрос игрока ведущему."""
+        player = str(
+            (data or {}).get("player") or ""
+        ).strip()
+
+        if not player:
+            return {
+                "ok": False,
+                "error": "player_required",
+            }
+
+        payload = {"player": player}
+
+        host_rooms = {
+            f"{self.DEFAULT_ROOM_CODE}:host",
+            f"{self.get_room_code()}:host",
+        }
+
+        for host_room in host_rooms:
+            self.socketio.emit(
+                "tpv_bong_stop_requested",
+                payload,
+                to=host_room,
+            )
+
+        return {"ok": True}
+
+    def generate_safe_bong_game(self):
+        secure_rnd = self.secrets.SystemRandom()
+        number = secure_rnd.randint(1, 3)
+
+        self.emit_tpv_host(
+            "bong_game_safe_var",
+            number,
+        )
+
+    def generate_sum_for_bong_game(self, data):
+        secure_rnd = self.secrets.SystemRandom()
+        count = secure_rnd.randint(6, 15)
+
+        secure_rnd = self.secrets.SystemRandom()
+        result = secure_rnd.sample(
+            range(1, data["sum"]),
+            count,
+        )
+
+        result.sort()
+        result.append(data["sum"])
+
+        self.emit_tpv_host(
+            "sum_generated",
+            result,
+        )
+
+    # ------------------------------------------------------------------
+    # Вопросы
+    # ------------------------------------------------------------------
+
+    def _select_question(self, data):
+        replacement = (
+            data["flips"] != "false"
+        )
+        theme = (
+            data["flips"]
+            if replacement
+            else "false"
+        )
+
+        question = self.db.session.scalar(
+            self.db.select(
+                self.QuestionsTpv
+            )
+            .where(
+                self.QuestionsTpv.flip == theme,
+                (
+                    self.QuestionsTpv.author
+                    != data["player"]
+                ),
+                self.QuestionsTpv.show == "false",
+            )
+            .order_by(self.func.random())
+            .limit(1)
+        )
+
+        return question, replacement
+
+    def take_question(self, data):
+        question_row, replacement = (
+            self._select_question(data)
+        )
+
+        if question_row is None:
+            self.emit_tpv_host(
+                "question_selected",
+                "fail",
+            )
+            return
+
+        question = question_row.task
+        answer = question_row.answer
+        comment = question_row.comment
+        author = question_row.author
+
+        result_host = [
+            question,
+            answer,
+            comment,
+            author,
+        ]
+
+        result_user_spec = {
+            "question": question,
+            "author": author,
+            "replacement": replacement,
+            "questionNumber": data.get(
+                "questionNumber"
+            ),
+        }
+
+        if replacement:
+            result_user_spec[
+                "replacementTopic"
+            ] = data.get("flips")
+
+        question_row.show = "true"
+        self.db.session.commit()
+
+        self.archive.record_question(
+            question_id=question_row.id,
+            question_type=(
+                "theme"
+                if replacement
+                else "general"
+            ),
+            theme=(
+                data.get("flips")
+                if replacement
+                else None
+            ),
+            author=author,
+            player=data.get("player"),
+            question_number=data.get(
+                "questionNumber"
+            ),
+        )
+
+        self.socketio.emit(
+            "question_selected_user",
+            result_user_spec,
+            to=(
+                f"{self.get_room_code()}"
+                f":user:{data['player']}"
+            ),
+        )
+
+        self.emit_tpv_spectator(
+            "question_selected_spec",
+            result_user_spec,
+        )
+
+        self.emit_tpv_host(
+            "question_selected",
+            result_host,
+        )
+
+    # ------------------------------------------------------------------
+    # Результаты игроков и авторов
+    # ------------------------------------------------------------------
+
+    def add_result_author(self, data):
+        amount = int(
+            data.get("sum_author", 0) or 0
+        )
+        author_name = data.get(
+            "name_author",
+            "",
+        )
+
+        self.archive.record_author_result(
+            author_name,
+            amount,
+        )
+
+        author = self.db.session.scalar(
+            self.db.select(self.UsersTpv).where(
+                self.UsersTpv.username
+                == data["name_author"]
+            )
+        )
+
+        if author is None:
+            author = self.UsersTpv()
+            author.username = data["name_author"]
+            author.flip = "false"
+            author.money = data["sum_author"]
+            author.approve = "false"
+            author.flip_col = 0
+
+            self.db.session.add(author)
+            self.db.session.flush()
+            self.db.session.commit()
+        else:
+            author.money = (
+                author.money
+                + data["sum_author"]
+            )
+            self.db.session.commit()
+
+        self.emit_tpv_spectator(
+            "tpv_author_win_user",
+            {
+                "amount": amount,
+                "author": author_name,
+            },
+        )
+
+    def add_result_player(self, data):
+        amount = int(
+            data.get("sum_player", 0) or 0
+        )
+        player_name = data.get(
+            "name_player",
+            "",
+        )
+
+        self.archive.record_player_result(
+            player_name,
+            amount,
+        )
+
+        user = self.db.session.scalar(
+            self.db.select(self.UsersTpv).where(
+                self.UsersTpv.username
+                == data["name_player"]
+            )
+        )
+
+        # Сохраняем прежнее предположение:
+        # UsersTpv должен существовать.
+        user.money = (
+            user.money
+            + data["sum_player"]
+        )
+
+        game_player = self.db.session.scalar(
+            self.db.select(self.QueryTpv).where(
+                self.QueryTpv.username
+                == data["name_player"]
+            )
+        )
+
+        if game_player is None:
+            return
+
+        game_player.money = (
+            game_player.money
+            + data["sum_player"]
+        )
+        game_player.status = "ended"
+
+        self.db.session.commit()
+
+        payload = {
+            "amount": amount,
+            "player": player_name,
+        }
+
+        self.socketio.emit(
+            "tpv_player_win_user",
+            payload,
+            to=(
+                f"{self.get_room_code()}"
+                f":user:{data['name_player']}"
+            ),
+        )
+
+        self.emit_tpv_spectator(
+            "tpv_player_win_user",
+            payload,
+        )
+
+        self.update_users_tpv()
+
+    # ------------------------------------------------------------------
+    # Синхронизация player / spectator
+    # ------------------------------------------------------------------
+
+    def tpv_update_data_user_spec(self, data):
+        # v7 передаёт именованный state.
+        # Старый exp по-прежнему поддерживается.
+        result = data.get(
+            "state",
+            data.get("exp", {}),
+        )
+
+        self.socketio.emit(
+            "update_data_user",
+            result,
+            to=(
+                f"{self.get_room_code()}:user"
+            ),
+        )
+
+        self.emit_tpv_spectator(
+            "update_data_spec",
+            result,
+        )
+
+    def _emit_visibility(
+        self,
+        *,
+        player,
+        user_event,
+        user_value,
+        spectator_event,
+        spectator_value,
+    ):
+        self.socketio.emit(
+            user_event,
+            user_value,
+            to=(
+                f"{self.get_room_code()}"
+                f":user:{player}"
+            ),
+        )
+
+        self.emit_tpv_spectator(
+            spectator_event,
+            spectator_value,
+        )
+
+    def show_tree(self, data):
+        self._emit_visibility(
+            player=data["player"],
+            user_event="show_tree_user",
+            user_value="show",
+            spectator_event="show_tree_spec",
+            spectator_value="show",
+        )
+
+    def hide_tree(self, data):
+        self._emit_visibility(
+            player=data["player"],
+            user_event="hide_tree_user",
+            user_value="hide",
+            spectator_event="hide_tree_spec",
+            spectator_value="hide",
+        )
+
+    def show_stats(self, data):
+        self._emit_visibility(
+            player=data["player"],
+            user_event="show_stats_user",
+            user_value="show",
+            spectator_event="show_stats_spec",
+            spectator_value="show",
+        )
+
+    def hide_stats(self, data):
+        self._emit_visibility(
+            player=data["player"],
+            user_event="hide_stats_user",
+            user_value="hide",
+            spectator_event="hide_stats_spec",
+            spectator_value="hide",
+        )
+
+    # ------------------------------------------------------------------
+    # Ответы
+    # ------------------------------------------------------------------
+
+    def _record_answer(
+        self,
+        answer_type,
+        data,
+    ):
+        self.archive.record_answer(
+            answer_type,
+            player=data.get("player"),
+            answer=data.get("answer"),
+            question_number=data.get(
+                "questionNumber"
+            ),
+            state=data.get("state"),
+        )
+
+    def tpv_correct(self, data):
+        self._record_answer(
+            "correct",
+            data,
+        )
+
+        payload = {
+            "answer": data.get("answer", ""),
+            "questionNumber": data.get(
+                "questionNumber"
+            ),
+            "correctCount": data.get(
+                "correctCount"
+            ),
+            "round": data.get("round"),
+            "roundFinished": bool(
+                data.get(
+                    "roundFinished",
+                    False,
+                )
+            ),
+        }
+
+        self.socketio.emit(
+            "tpv_correct_user",
+            payload,
+            to=(
+                f"{self.get_room_code()}"
+                f":user:{data['player']}"
+            ),
+        )
+
+        self.emit_tpv_spectator(
+            "tpv_correct_spec",
+            payload,
+        )
+
+    def tpv_pass(self, data):
+        self._record_answer(
+            "pass",
+            data,
+        )
+
+        payload = {
+            "answer": data.get("answer", ""),
+            "questionNumber": data.get(
+                "questionNumber"
+            ),
+            "passCount": data.get(
+                "passCount"
+            ),
+            "state": data.get("state"),
+        }
+
+        self.emit_tpv_player(
+            data["player"],
+            "tpv_pass_user",
+            payload,
+        )
+
+        self.emit_tpv_spectator(
+            "tpv_pass_spec",
+            payload,
+        )
+
+    def tpv_flip(self, data):
+        self._record_answer(
+            "flip",
+            data,
+        )
+
+        payload = {
+            "answer": data.get("answer", ""),
+            "questionNumber": data.get(
+                "questionNumber"
+            ),
+            "replacement": True,
+            "state": data.get("state"),
+        }
+
+        self.emit_tpv_player(
+            data["player"],
+            "tpv_flip_user",
+            payload,
+        )
+
+        self.emit_tpv_spectator(
+            "tpv_flip_spec",
+            payload,
+        )
+
+    def tpv_wrong(self, data):
+        self._record_answer(
+            "wrong",
+            data,
+        )
+
+        payload = {
+            "answer": data.get("answer", ""),
+            "questionNumber": data.get(
+                "questionNumber"
+            ),
+            "wrongIndex": data.get(
+                "wrongIndex"
+            ),
+            "state": data.get("state"),
+        }
+
+        self.emit_tpv_player(
+            data["player"],
+            "tpv_wrong_user",
+            payload,
+        )
+
+        self.emit_tpv_spectator(
+            "tpv_wrong_spec",
+            payload,
+        )
+
+    # ------------------------------------------------------------------
+    # Intro / credits / final results
+    # ------------------------------------------------------------------
+
+    def start_intro(self):
+        self.emit_tpv_spectator(
+            "start_intro",
+            {"": ""},
+        )
+
+    def host_show_credits(self):
+        self.socketio.emit(
+            "show_credits_tpv",
+            TPV_CREDITS_PAYLOAD,
+            to=(
+                f"{self.DEFAULT_ROOM_CODE}"
+                ":spectator"
+            ),
+        )
+
+    def show_results_tpv(self):
+        self.archive.finalize()
+
+        users = self.db.session.scalars(
+            self.db.select(self.UsersTpv)
+            .where(self.UsersTpv.money != 0)
+            .order_by(
+                self.desc(
+                    self.UsersTpv.money
+                )
+            )
+        ).all()
+
+        result = [
+            [user.username, user.money]
+            for user in users
+        ]
+
+        self.emit_tpv_spectator(
+            "show_results_tpv",
+            result,
+        )
+
+
+def register_tpv_socket_handlers(
+    runtime: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Зарегистрировать TPV Socket.IO handlers.
+
+    Совместимый публичный API функции сохранён.
+    """
     missing = sorted(
-        name for name in _REQUIRED_RUNTIME_NAMES
+        name
+        for name in _REQUIRED_RUNTIME_NAMES
         if name not in runtime
     )
+
     if missing:
         raise RuntimeError(
             "Не удалось зарегистрировать TPV Socket.IO. "
-            "Отсутствуют зависимости: " + ", ".join(missing)
+            "Отсутствуют зависимости: "
+            + ", ".join(missing)
         )
 
-    namespace = dict(runtime)
-    namespace["__name__"] = __name__
-    namespace["__package__"] = __package__
+    handlers = TpvSocketHandlers(runtime)
+    handlers.register()
 
-    exec(
-        compile(_TPV_SOCKET_SOURCE, __file__, "exec"),
-        namespace,
-        namespace,
-    )
+    return {
+        "update_users_tpv": (
+            handlers.update_users_tpv
+        ),
+        "_emit_tpv_bong_to_player": (
+            handlers._emit_tpv_bong_to_player
+        ),
+    }
 
-    exports = {}
-    for name in (
-        "update_users_tpv",
-        "_emit_tpv_bong_to_player",
-    ):
-        value = namespace.get(name)
-        if value is None:
-            raise RuntimeError(
-                f"TPV Socket.IO не экспортировал обязательный объект: {name}"
-            )
-        exports[name] = value
-
-    return exports
-
-
-TPV_SOCKET_EVENTS = ['room:join_tpv', 'count_answer_interactive', 'clean_db_tpv', 'tpv_spectator_ready', 'tpv_selection_start', 'tpv_versus', 'choose_player_random', 'choose_player_id', 'reset_to_wait_tpv', 'tpv_bong_prepare', 'tpv_bong_selected', 'tpv_bong_value', 'tpv_bong_stop_ack', 'tpv_bong_result', 'tpv_bong_hide', 'tpv_bong_stop_request', 'generate_safe_bong_game', 'generate_sum_for_bong_game', 'take_question', 'add_result_author', 'add_result_player', 'tpv_update_data_user_spec', 'show_tree', 'hide_tree', 'show_stats', 'hide_stats', 'tpv_correct', 'tpv_pass', 'tpv_flip', 'tpv_wrong', 'start_intro', 'host_show_credits_tpv', 'show_results_tpv']
 
 __all__ = [
     "register_tpv_socket_handlers",

@@ -17,6 +17,7 @@ from tpv.participation.constants import ApplicationStatus, ThemeStatus
 from tpv.participation.services import ParticipationValidationError
 
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 class ParticipationApplicationEditorService:
@@ -277,13 +278,10 @@ def register_participation_applications(
     """Зарегистрировать API и подключить frontend TPV Editor."""
     service = ParticipationApplicationEditorService(context)
 
-    def error(message: str, status: int = 400):
-        return jsonify({"ok": False, "message": message}), status
-
     def require_access():
         if context.permissions.is_allowed():
             return None
-        return error("Нет доступа к редактору.", 403)
+        return message_error_response("Нет доступа к редактору.", 403)
 
     def list_applications():
         denied = require_access()
@@ -299,7 +297,7 @@ def register_participation_applications(
                 ),
             )
         except ValueError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({"ok": True, **data})
 
@@ -310,7 +308,7 @@ def register_participation_applications(
 
         row = service.get(application_id)
         if row is None:
-            return error("Заявка не найдена.", 404)
+            return message_error_response("Заявка не найдена.", 404)
 
         return jsonify({
             "ok": True,
@@ -324,7 +322,7 @@ def register_participation_applications(
 
         row = service.get(application_id)
         if row is None:
-            return error("Заявка не найдена.", 404)
+            return message_error_response("Заявка не найдена.", 404)
 
         try:
             service.update(
@@ -332,7 +330,7 @@ def register_participation_applications(
                 request.get_json(silent=True) or {},
             )
         except ParticipationValidationError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,
@@ -347,14 +345,14 @@ def register_participation_applications(
 
         row = service.get(application_id)
         if row is None:
-            return error("Заявка не найдена.", 404)
+            return message_error_response("Заявка не найдена.", 404)
 
         try:
             player = service.create_player(row)
         except LookupError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except RuntimeError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
 
         return jsonify({
             "ok": True,
@@ -374,7 +372,7 @@ def register_participation_applications(
 
         row = service.get(application_id)
         if row is None:
-            return error("Заявка не найдена.", 404)
+            return message_error_response("Заявка не найдена.", 404)
 
         service.delete(row)
         return jsonify({
@@ -393,7 +391,7 @@ def register_participation_applications(
         try:
             deleted = service.clear(mode)
         except ValueError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,

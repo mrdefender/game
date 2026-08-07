@@ -12,11 +12,10 @@ ErrorCallback = Callable[[str, int], Any]
 
 @dataclass(frozen=True, slots=True)
 class EditorPermissions:
-    """Единая обёртка над существующей проверкой доступа редактора.
+    """Единая обёртка над проверкой доступа TPV Editor.
 
-    На этапе 13.2 класс использует уже проверенные callbacks
-    ``tpv_editor_allowed`` и ``tpv_editor_error``. Поэтому правила
-    авторизации не меняются.
+    Использует общие callbacks ``tpv_editor_allowed`` и
+    ``tpv_editor_error``. Правила доступа остаются централизованными.
     """
 
     allowed: AllowedCallback

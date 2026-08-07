@@ -14,6 +14,7 @@ from typing import Any
 from flask import jsonify, request
 
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 class ImportService:
@@ -569,16 +570,10 @@ def register_importing(
     """Зарегистрировать прежние API импорта."""
     service = ImportService(context)
 
-    def error(message: str, status: int = 400):
-        return jsonify({
-            "ok": False,
-            "message": message,
-        }), status
-
     def require_access():
         if context.permissions.is_allowed():
             return None
-        return error(
+        return message_error_response(
             "Нет доступа к редактору.",
             403,
         )
@@ -603,7 +598,7 @@ def register_importing(
             json.JSONDecodeError,
             UnicodeDecodeError,
         ) as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         if not users and not questions and not errors:
             errors.append(
@@ -639,7 +634,7 @@ def register_importing(
             ) = service.parse_request()
 
             if errors:
-                return error(
+                return message_error_response(
                     "Импорт отменён: "
                     + "; ".join(errors)
                 )
@@ -657,7 +652,7 @@ def register_importing(
             UnicodeDecodeError,
         ) as exc:
             service.db.session.rollback()
-            return error(str(exc))
+            return message_error_response(str(exc))
         except Exception:
             service.db.session.rollback()
             raise

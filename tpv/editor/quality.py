@@ -8,6 +8,7 @@ from typing import Any
 from flask import jsonify, request
 
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 HTML_RE = re.compile(r"<[^>]+>")
@@ -553,16 +554,10 @@ def register_quality(
     """Зарегистрировать API проверки качества."""
     service = QualityService(context)
 
-    def error(message: str, status: int = 400):
-        return jsonify({
-            "ok": False,
-            "message": message,
-        }), status
-
     def require_access():
         if context.permissions.is_allowed():
             return None
-        return error("Нет доступа к редактору.", 403)
+        return message_error_response("Нет доступа к редактору.", 403)
 
     def tpv_editor_quality_report():
         denied = require_access()
@@ -588,9 +583,9 @@ def register_quality(
                 record_id=data.get("record_id"),
             )
         except LookupError as exc:
-            return error(str(exc), 404)
+            return message_error_response(str(exc), 404)
         except (TypeError, ValueError) as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,

@@ -49,7 +49,7 @@ def register_tpv_application(
     *,
     user_mixin,
 ) -> dict[str, Any]:
-    """Register the complete TPV backend and return compatibility exports."""
+    """Register the complete TPV backend and return public exports."""
 
     missing = sorted(name for name in _REQUIRED_NAMES if name not in runtime)
     if missing:

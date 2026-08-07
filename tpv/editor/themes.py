@@ -12,6 +12,7 @@ from typing import Any
 from flask import jsonify, request
 
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 class ThemeService:
@@ -367,13 +368,10 @@ def register_themes(context: EditorContext) -> dict[str, Any]:
     """Зарегистрировать маршруты тем с прежними endpoint-именами."""
     service = ThemeService(context)
 
-    def error(message: str, status: int = 400):
-        return jsonify({"ok": False, "message": message}), status
-
     def require_access():
         if context.permissions.is_allowed():
             return None
-        return error("Нет доступа к редактору.", 403)
+        return message_error_response("Нет доступа к редактору.", 403)
 
     def tpv_editor_get_themes():
         denied = require_access()
@@ -410,9 +408,9 @@ def register_themes(context: EditorContext) -> dict[str, Any]:
                 new_name,
             )
         except LookupError as exc:
-            return error(str(exc), 404)
+            return message_error_response(str(exc), 404)
         except ValueError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,
@@ -436,9 +434,9 @@ def register_themes(context: EditorContext) -> dict[str, Any]:
                 service.delete(name, data.get("target"))
             )
         except LookupError as exc:
-            return error(str(exc), 404)
+            return message_error_response(str(exc), 404)
         except ValueError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,

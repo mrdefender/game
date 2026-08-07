@@ -13,6 +13,7 @@ from flask import jsonify, render_template, request
 from sqlalchemy import func, inspect
 
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 class QuestionApplicationService:
@@ -435,13 +436,10 @@ def register_question_applications(
     """Зарегистрировать публичные и редакторские маршруты."""
     service = QuestionApplicationService(context)
 
-    def error(message: str, status: int = 400):
-        return jsonify({"ok": False, "message": message}), status
-
     def require_access():
         if context.permissions.is_allowed():
             return None
-        return error("Нет доступа к редактору.", 403)
+        return message_error_response("Нет доступа к редактору.", 403)
 
     def tpv_question_application_page():
         return render_template("tpv-question-application.html")
@@ -455,7 +453,7 @@ def register_question_applications(
 
     def tpv_question_application_submit():
         if not service.table_exists():
-            return error(
+            return message_error_response(
                 "Приём заявок временно недоступен.",
                 503,
             )
@@ -465,9 +463,9 @@ def register_question_applications(
                 request.get_json(silent=True) or {}
             )
         except LookupError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except ValueError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,
@@ -506,7 +504,7 @@ def register_question_applications(
             application_id,
         )
         if row is None:
-            return error("Заявка не найдена.", 404)
+            return message_error_response("Заявка не найдена.", 404)
 
         try:
             question = service.approve(
@@ -514,13 +512,13 @@ def register_question_applications(
                 request.get_json(silent=True) or {},
             )
         except LookupError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except OverflowError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except RuntimeError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except ValueError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,
@@ -541,16 +539,16 @@ def register_question_applications(
             application_id,
         )
         if row is None:
-            return error("Заявка не найдена.", 404)
+            return message_error_response("Заявка не найдена.", 404)
 
         data = request.get_json(silent=True) or {}
 
         try:
             service.reject(row, data.get("reject_reason"))
         except RuntimeError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except ValueError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,
@@ -567,7 +565,7 @@ def register_question_applications(
             application_id,
         )
         if row is None:
-            return error("Заявка не найдена.", 404)
+            return message_error_response("Заявка не найдена.", 404)
 
         service.delete(row)
         return jsonify({
@@ -586,9 +584,9 @@ def register_question_applications(
         try:
             deleted = service.clear(mode)
         except RuntimeError as exc:
-            return error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except ValueError as exc:
-            return error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,

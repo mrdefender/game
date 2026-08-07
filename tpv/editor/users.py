@@ -13,6 +13,7 @@ from flask import jsonify, request
 from sqlalchemy import func
 
 from .registry import EditorContext
+from .responses import message_error_response
 
 
 class UserService:
@@ -269,14 +270,10 @@ def register_users(context: EditorContext) -> dict[str, Any]:
     """Зарегистрировать маршруты пользователей с прежними endpoint."""
     service = UserService(context)
 
-    def legacy_error(message: str, status: int = 400):
-        # Сохраняем прежний JSON-контракт: поле называется message.
-        return jsonify({"ok": False, "message": message}), status
-
     def require_access():
         if context.permissions.is_allowed():
             return None
-        return legacy_error("Нет доступа к редактору.", 403)
+        return message_error_response("Нет доступа к редактору.", 403)
 
     def tpv_editor_get_users():
         denied = require_access()
@@ -301,9 +298,9 @@ def register_users(context: EditorContext) -> dict[str, Any]:
         try:
             user = service.create(data)
         except LookupError as exc:
-            return legacy_error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except (ValueError, TypeError) as exc:
-            return legacy_error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,
@@ -318,16 +315,16 @@ def register_users(context: EditorContext) -> dict[str, Any]:
 
         user = service.get_user(user_id)
         if user is None:
-            return legacy_error("Пользователь не найден.", 404)
+            return message_error_response("Пользователь не найден.", 404)
 
         data = request.get_json(silent=True) or {}
 
         try:
             user, message = service.update(user, data)
         except LookupError as exc:
-            return legacy_error(str(exc), 409)
+            return message_error_response(str(exc), 409)
         except (ValueError, TypeError) as exc:
-            return legacy_error(str(exc))
+            return message_error_response(str(exc))
 
         return jsonify({
             "ok": True,
@@ -342,7 +339,7 @@ def register_users(context: EditorContext) -> dict[str, Any]:
 
         user = service.get_user(user_id)
         if user is None:
-            return legacy_error("Пользователь не найден.", 404)
+            return message_error_response("Пользователь не найден.", 404)
 
         return jsonify({
             "ok": True,
@@ -356,7 +353,7 @@ def register_users(context: EditorContext) -> dict[str, Any]:
 
         user = service.get_user(user_id)
         if user is None:
-            return legacy_error("Пользователь не найден.", 404)
+            return message_error_response("Пользователь не найден.", 404)
 
         return jsonify({
             "ok": True,
@@ -431,7 +428,7 @@ def register_users(context: EditorContext) -> dict[str, Any]:
         "tpv_editor_recalculate_all": (
             tpv_editor_recalculate_all
         ),
-        # Compatibility helpers for modules migrated later.
+        # Общие user helpers, используемые другими модулями TPV Editor.
         "tpv_editor_author_question_count": (
             service.author_question_count
         ),
