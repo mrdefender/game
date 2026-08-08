@@ -1,5 +1,5 @@
 (()=>{"use strict";
-const s={users:[],themes:[],questions:[],authors:[],current:null,currentQuestion:null,currentTheme:null,themeRows:[],qualityIssues:[],qualityStats:{},statistics:null,importPreview:null,historyItems:[],historyStats:{},builderItems:[],builderPreview:[],currentBuild:null,applications:[],currentApplication:null,dashboard:null,games:[],gameStats:{},currentGame:null,gamesView:"archive",tab:"dashboard",replayEvents:[],replayIndex:0,replayTimer:null,replayPlaying:false,replaySpeed:1,records:null,appearanceThemes:[],appearanceTheme:null,appearanceDraft:null,appearanceSavedVariables:null,appearancePreviewDirty:false,backups:[]},e={};
+const s={users:[],themes:[],questions:[],authors:[],current:null,currentQuestion:null,currentTheme:null,themeRows:[],qualityIssues:[],qualityStats:{},statistics:null,importPreview:null,historyItems:[],historyStats:{},builderItems:[],builderPreview:[],currentBuild:null,applications:[],currentApplication:null,dashboard:null,games:[],gameStats:{},currentGame:null,gamesView:"archive",tab:"dashboard",replayEvents:[],replayIndex:0,replayTimer:null,replayPlaying:false,replaySpeed:1,records:null,appearanceThemes:[],appearanceTheme:null,appearanceDraft:null,appearanceSavedVariables:null,appearancePreviewDirty:false},e={};
 document.addEventListener("DOMContentLoaded",init);
 function init(){
     document.querySelectorAll("[id]").forEach(node=>{
@@ -167,10 +167,6 @@ function init(){
     bind("appearance-theme-name","input",markAppearanceDraftDirty);
     bind("appearance-theme-slug","input",markAppearanceDraftDirty);
     bind("appearance-theme-description","input",markAppearanceDraftDirty);
-    bind("backup-reload","click",loadBackups);
-    bind("backup-create-database","click",()=>createBackup("database"));
-    bind("backup-create-project","click",()=>createBackup("project"));
-    bind("backup-table-body","click",handleBackupTableClick);
     bind("appearance-theme-grid","click",event=>{
         const card=event.target.closest("[data-appearance-theme]");
         if(card)selectAppearanceTheme(card.dataset.appearanceTheme);
@@ -301,10 +297,6 @@ function switchTab(tab){
         appearance:[
             "Оформление",
             "Системные темы и инфраструктура Theme Engine."
-        ],
-        backups:[
-            "Резервные копии",
-            "SQLite backup, полный архив проекта и безопасное восстановление."
         ]
     };
 
@@ -333,7 +325,6 @@ function switchTab(tab){
     setHidden("applications-section",tab!=="applications");
     setHidden("games-section",tab!=="games");
     setHidden("appearance-section",tab!=="appearance");
-    setHidden("backups-section",tab!=="backups");
 
     document.querySelectorAll(".users-action").forEach(
         node=>node.hidden=tab!=="users"
@@ -392,9 +383,6 @@ function switchTab(tab){
     }
     if(tab==="appearance"){
         loadAppearanceThemes();
-    }
-    if(tab==="backups"){
-        loadBackups();
     }
 }
 
@@ -780,67 +768,8 @@ async function deleteAppearanceTheme(){
     }
 }
 
-
-async function loadBackups(){
-    try{
-        const response=await api("/tpv_editor/api/backups");
-        s.backups=response.items||[];
-        setText("backup-last-created",response.last_backup?.created_at_label||"Ещё не создавалась");
-        setText("backup-directory",response.directory||"—");
-        renderBackups();
-    }catch(error){toast(error.message,true)}
-}
-function renderBackups(){
-    const items=s.backups||[];
-    if(e["backup-table-body"]){
-        e["backup-table-body"].innerHTML=items.map(item=>`
-            <tr>
-                <td><strong>${esc(item.filename)}</strong></td>
-                <td><span class="backup-kind backup-kind-${esc(item.kind)}">${esc(item.kind_label)}</span></td>
-                <td>${esc(item.created_at_label)}</td>
-                <td>${esc(item.size_label)}</td>
-                <td><div class="backup-row-actions">
-                    <button class="row-edit" type="button" data-backup-download="${esc(item.filename)}">Скачать</button>
-                    ${item.can_restore?`<button class="row-edit" type="button" data-backup-restore="${esc(item.filename)}">Восстановить</button>`:""}
-                    <button class="row-delete" type="button" data-backup-delete="${esc(item.filename)}">Удалить</button>
-                </div></td>
-            </tr>`).join("");
-    }
-    if(e["backup-empty"])e["backup-empty"].hidden=items.length>0;
-}
-async function createBackup(kind){
-    const label=kind==="project"?"полный ZIP проекта":"резервную копию SQLite";
-    if(!confirm(`Создать ${label}?`))return;
-    try{
-        const response=await api(`/tpv_editor/api/backups/${kind}`,{method:"POST"});
-        toast(response.message); await loadBackups(); await loadDashboard();
-    }catch(error){toast(error.message,true)}
-}
-function handleBackupTableClick(event){
-    const download=event.target.closest("[data-backup-download]");
-    if(download){window.location.href=`/tpv_editor/api/backups/${encodeURIComponent(download.dataset.backupDownload)}/download`;return}
-    const restore=event.target.closest("[data-backup-restore]");
-    if(restore){restoreBackup(restore.dataset.backupRestore);return}
-    const remove=event.target.closest("[data-backup-delete]");
-    if(remove)deleteBackup(remove.dataset.backupDelete);
-}
-async function deleteBackup(filename){
-    if(!confirm(`Удалить backup «${filename}»?`))return;
-    try{const response=await api(`/tpv_editor/api/backups/${encodeURIComponent(filename)}`,{method:"DELETE"});toast(response.message);await loadBackups();await loadDashboard()}catch(error){toast(error.message,true)}
-}
-async function restoreBackup(filename){
-    if(!confirm(`Восстановить SQLite из «${filename}»? Текущая база будет заменена.`))return;
-    const typed=prompt('Для подтверждения введите RESTORE:');
-    if(typed!=="RESTORE"){toast("Восстановление отменено.",true);return}
-    try{
-        const response=await api(`/tpv_editor/api/backups/${encodeURIComponent(filename)}/restore`,{method:"POST",body:{confirmation:"RESTORE"}});
-        alert(`${response.message}\n\nАварийная копия: ${response.emergency?.filename||"создана"}`);
-        await loadBackups();
-    }catch(error){toast(error.message,true)}
-}
-
 function renderUsers(){const q=e["search-input"].value.trim().toLowerCase(),a=e["approve-filter"].value,[f,d]=e["sort-select"].value.split("-");let list=s.users.filter(u=>(!q||(u.username||"").toLowerCase().includes(q)||(u.flip_display||"").toLowerCase().includes(q))&&(a==="all"||u.approve===a));list.sort(sorter(f,d,x=>f==="flip"?x.flip_display:x[f]));e["users-table-body"].innerHTML=list.map(u=>`<tr><td>${u.id}</td><td><strong>${esc(u.username)}</strong></td><td class="money-cell">${money(u.money)}</td><td>${esc(u.flip_display||"Не выбрана")}</td><td>${u.flip_col||0}</td><td><span class="status ${u.approve==="true"?"status-approved":"status-rejected"}">${esc(u.approve_label)}</span></td><td><button class="row-edit" data-edit="${u.id}">Изменить</button></td></tr>`).join("");e["empty-state"].hidden=!!list.length;e["stat-total"].textContent=s.users.length;e["stat-approved"].textContent=s.users.filter(u=>u.approve==="true").length;e["stat-without-theme"].textContent=s.users.filter(u=>!u.flip_display).length;e["stat-money"].textContent=money(s.users.reduce((n,u)=>n+(+u.money||0),0))}
-function renderQuestions(){const query=e["question-search"].value.trim().toLowerCase(),theme=e["question-theme-filter"].value,author=e["question-author-filter"].value,show=e["question-show-filter"].value,[f,d]=e["question-sort"].value.split("-");let list=s.questions.filter(q=>{const hay=[q.task,q.answer,q.comment,q.author,q.flip_display].join(" ").toLowerCase();const mt=theme==="all"||(theme==="general"?q.is_general:q.flip_display===theme);return(!query||hay.includes(query))&&mt&&(author==="all"||q.author===author)&&(show==="all"||q.show===show)});list.sort(sorter(f,d,x=>f==="flip"?x.flip_display:x[f]));e["questions-table-body"].innerHTML=list.map(q=>`<tr><td>${q.id}</td><td><div class="question-text">${esc(q.task)}</div>${q.comment?`<small>${esc(q.comment)}</small>`:""}</td><td><div class="answer-text">${esc(q.answer)}</div></td><td>${esc(q.author||"—")}</td><td><span class="tag ${q.is_general?"tag-general":"tag-theme"}">${esc(q.flip_display)}</span></td><td><span class="status ${q.show==="true"?"status-rejected":"status-unused"}">${q.show==="true"?"Использован":"Не использован"}</span></td><td><button class="row-edit" data-edit-question="${q.id}">Изменить</button></td></tr>`).join("");e["questions-empty"].hidden=!!list.length;e["q-stat-total"].textContent=s.questions.length;e["q-stat-general"].textContent=s.questions.filter(q=>q.is_general).length;e["q-stat-themed"].textContent=s.questions.filter(q=>!q.is_general).length;e["q-stat-shown"].textContent=s.questions.filter(q=>q.show==="true").length;e["q-stat-themes"].textContent=new Set(s.questions.filter(q=>!q.is_general).map(q=>q.flip_display.toLowerCase())).size}
+function renderQuestions(){const query=e["question-search"].value.trim().toLowerCase(),theme=e["question-theme-filter"].value,author=e["question-author-filter"].value,show=e["question-show-filter"].value,[f,d]=e["question-sort"].value.split("-");let list=s.questions.filter(q=>{const hay=[q.task,q.answer,q.comment,q.author,q.flip_display].join(" ").toLowerCase();const mt=theme==="all"||(theme==="general"?q.is_general:q.flip_display===theme);return(!query||hay.includes(query))&&mt&&(author==="all"||q.author===author)&&(show==="all"||q.show===show)});list.sort(sorter(f,d,x=>f==="flip"?x.flip_display:x[f]));e["questions-table-body"].innerHTML=list.map(q=>`<tr><td>${q.id}</td><td><div class="question-text">${esc(q.task)}</div>${q.comment?`<small>${esc(q.comment)}</small>`:""}</td><td><div class="answer-text">${esc(q.answer)}</div></td><td>${esc(q.author||"—")}</td><td><span class="tag ${q.is_general?"tag-general":"tag-theme"}">${esc(q.flip_display)}</span></td><td><span class="status ${q.show==="true"?"status-rejected":"status-unused"}">${q.show==="true"?"Использован":"Не использован"}</span></td><td><button class="row-edit" data-edit-question="${q.id}">Изменить</button></td></tr>`).join("");e["questions-empty"].hidden=!!list.length;if(e["question-filter-count"])e["question-filter-count"].textContent=list.length;if(e["question-filter-total"])e["question-filter-total"].textContent=`из ${s.questions.length}`;e["q-stat-total"].textContent=s.questions.length;e["q-stat-general"].textContent=s.questions.filter(q=>q.is_general).length;e["q-stat-themed"].textContent=s.questions.filter(q=>!q.is_general).length;e["q-stat-shown"].textContent=s.questions.filter(q=>q.show==="true").length;e["q-stat-themes"].textContent=new Set(s.questions.filter(q=>!q.is_general).map(q=>q.flip_display.toLowerCase())).size}
 function renderThemes(){const query=e["theme-search"].value.trim().toLowerCase(),filter=e["theme-state-filter"].value,[field,dir]=e["theme-sort"].value.split("-");let list=s.themeRows.filter(t=>{const search=!query||t.name.toLowerCase().includes(query)||(t.variants||[]).join(" ").toLowerCase().includes(query);const state=filter==="all"||(filter==="ready"&&t.ready)||(filter==="shortage"&&!t.ready&&t.question_count>0)||(filter==="unused"&&t.user_count===0)||(filter==="empty"&&t.question_count===0);return search&&state});list.sort(sorter(field,dir,x=>field==="questions"?x.question_count:field==="users"?x.user_count:x.name));e["themes-table-body"].innerHTML=list.map(t=>{const status=t.question_count===0?["status-neutral","Нет вопросов"]:t.ready?["status-approved","Готова"]:["status-warning",`Не хватает ${Math.max(0,t.required_questions-t.question_count)}`];return `<tr><td><span class="theme-name">${esc(t.name)}</span>${t.variants?.length>1?`<span class="theme-variants">Варианты: ${esc(t.variants.join(", "))}</span>`:""}</td><td>${t.question_count}</td><td>${t.shown_count}</td><td>${t.user_count}</td><td>${t.approved_count}</td><td><span class="status ${status[0]}">${status[1]}</span></td><td><button class="row-edit" data-edit-theme="${esc(t.name)}">Управление</button></td></tr>`}).join("");e["themes-empty"].hidden=!!list.length;e["t-stat-total"].textContent=s.themeRows.length;e["t-stat-questions"].textContent=s.themeRows.reduce((n,t)=>n+t.question_count,0);e["t-stat-users"].textContent=s.themeRows.reduce((n,t)=>n+t.user_count,0);e["t-stat-ready"].textContent=s.themeRows.filter(t=>t.ready).length;e["t-stat-empty"].textContent=s.themeRows.filter(t=>t.question_count===0).length}
 function openTheme(t){s.currentTheme=t;e["theme-dialog-title"].textContent=t.name;e["theme-original-name"].value=t.name;e["theme-new-name"].value=t.name;e["theme-dialog-questions"].textContent=t.question_count;e["theme-dialog-users"].textContent=t.user_count;e["theme-dialog-approved"].textContent=t.approved_count;e["theme-dialog-shown"].textContent=t.shown_count;e["theme-delete-target"].innerHTML='<option value="false">Общие вопросы / тема не выбрана</option>'+s.themeRows.filter(x=>x.name!==t.name).map(x=>`<option value="${esc(x.name)}">${esc(x.name)}</option>`).join("");e["theme-dialog"].showModal()}
 function closeTheme(){if(e["theme-dialog"].open)e["theme-dialog"].close();s.currentTheme=null}

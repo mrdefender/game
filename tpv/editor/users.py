@@ -46,7 +46,7 @@ class UserService:
         )
 
         self.required_questions = int(
-            context.get("TPV_REQUIRED_FLIP_QUESTIONS", 5)
+            context.get("TPV_REQUIRED_FLIP_QUESTIONS", 6)
         )
 
     def _dependency(self, name: str) -> Any:
