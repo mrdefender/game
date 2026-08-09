@@ -92,42 +92,56 @@
         setLoading(true);
 
         try {
-            const csrfToken = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content") || "";
+            const url = new URL(
+                "/tpv/api/participation/application-status",
+                window.location.origin,
+            );
+            url.searchParams.set("application_id", String(id));
 
-            const response = await fetch("/tpv-apply/status", {
-                method: "POST",
+            const response = await fetch(url, {
+                method: "GET",
                 headers: {
-                    "Content-Type": "application/json",
                     "Accept": "application/json",
-                    "X-CSRFToken": csrfToken,
                 },
                 credentials: "same-origin",
-                body: JSON.stringify({ application_id: id }),
+                cache: "no-store",
             });
 
-            const responseText = await response.text();
-            let payload = {};
+            const contentType =
+                response.headers.get("content-type") || "";
 
-            if (responseText) {
+            let payload = null;
+
+            if (contentType.includes("application/json")) {
                 try {
-                    payload = JSON.parse(responseText);
+                    payload = await response.json();
                 } catch {
-                    payload = {
-                        ok: false,
-                        error: responseText,
-                    };
+                    payload = null;
                 }
             }
 
-            if (!response.ok || payload.ok === false) {
-                const message =
-                    payload.error
-                    || payload.message
-                    || `Сервер вернул ошибку ${response.status}.`;
+            if (!response.ok || !payload || payload.ok === false) {
+                let message =
+                    payload?.error
+                    || payload?.message
+                    || "";
 
-                if (payload.field === "application_id") {
+                if (!message) {
+                    if (response.status === 404) {
+                        message = "Заявка с указанным номером не найдена.";
+                    } else if (response.status === 405) {
+                        message =
+                            "Сервер не разрешил этот способ проверки заявки.";
+                    } else {
+                        message =
+                            `Не удалось проверить заявку. Код ответа: ${response.status}.`;
+                    }
+                }
+
+                if (
+                    payload?.field === "application_id"
+                    || response.status === 404
+                ) {
                     fieldError.textContent = message;
                     applicationId.setAttribute("aria-invalid", "true");
                 } else {
@@ -140,7 +154,7 @@
         } catch (error) {
             console.error("TPV status lookup failed:", error);
             globalError.textContent =
-                "Не удалось обработать ответ сервера. Проверьте консоль браузера.";
+                "Нет соединения с сервером. Попробуйте ещё раз.";
         } finally {
             setLoading(false);
         }

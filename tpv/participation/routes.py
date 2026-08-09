@@ -25,10 +25,11 @@ def register_participation_routes(app, *, service):
     def participation_status():
         return jsonify({
             "ok": True,
-            "stage": "12.0.3",
+            "stage": "13.9.2",
             "table": "tpv_participation_applications",
             "public_form": "/tpv-apply",
             "public_status": "/tpv-apply/status",
+            "public_status_api": "/tpv/api/participation/application-status",
             "application_statuses": ApplicationStatus.LABELS,
             "theme_statuses": ThemeStatus.LABELS,
         })
@@ -41,16 +42,10 @@ def register_participation_routes(app, *, service):
     def participation_application_status_page():
         return render_template("tpv-apply-status.html")
 
-    @public.post("/tpv-apply/status")
-    def participation_application_status_lookup():
-        data = request.get_json(silent=True)
-        if not isinstance(data, dict):
-            data = request.form.to_dict()
-
+    def _application_status_response(application_id):
+        """Вернуть публичный статус заявки единым JSON-контрактом."""
         try:
-            application = service.get_public_status(
-                data.get("application_id", data.get("id"))
-            )
+            application = service.get_public_status(application_id)
         except ParticipationValidationError as exc:
             return jsonify({
                 "ok": False,
@@ -69,6 +64,30 @@ def register_participation_routes(app, *, service):
             "ok": True,
             "application": application,
         })
+
+    @infrastructure.get("/application-status")
+    def participation_application_status_api():
+        """GET API для публичной проверки статуса.
+
+        Отдельный endpoint не пересекается с HTML-страницей
+        /tpv-apply/status и не требует POST/CSRF.
+        """
+        application_id = request.args.get(
+            "application_id",
+            request.args.get("id"),
+        )
+        return _application_status_response(application_id)
+
+    @public.post("/tpv-apply/status")
+    def participation_application_status_lookup():
+        """Legacy POST endpoint для обратной совместимости."""
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict):
+            data = request.form.to_dict()
+
+        return _application_status_response(
+            data.get("application_id", data.get("id"))
+        )
 
     @public.post("/tpv-apply")
     def participation_application_submit():
