@@ -1,434 +1,250 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-    
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>The People Versus — пульт ведущего</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-host.css') }}">
-  <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/brand-theme.css') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <title>The People Versus — Neon Grid Host</title>
 
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-host.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/brand-theme.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body data-role="host">
-  <main class="tpv-console" id="host-console">
+<main class="neon-grid" id="host-console">
 
-    <header class="console-header">
-      <div class="console-brand">
-        <span id="display-game-subtitle" class="console-brand__eyebrow">{{ game_subtitle|default('LIVE GAME MASTER CONSOLE') }}</span>
-        <h1 id="display-game-name">{{ game_name|default('The People Versus') }}</h1>
+  <header class="ng-topbar">
+    <div class="ng-brand">
+      <span class="ng-brand__logo">TPV</span>
+      <div>
+        <small id="display-game-subtitle">{{ game_subtitle|default('NEON GRID HOST') }}</small>
+        <strong id="display-game-name">{{ game_name|default('The People Versus') }}</strong>
       </div>
+    </div>
 
-      <div class="console-header__status">
-        <div class="room-badge" aria-label="Код комнаты">
-          <span>Комната</span>
-          <output id="display-room-code" data-room-display>----</output>
+    <div class="ng-topstats">
+      <div class="ng-stat ng-stat--room">
+        <span>КОМНАТА</span>
+        <output id="display-room-code" data-room-display>----</output>
+      </div>
+      <div id="socket-status" class="ng-status socket-offline">
+        <i></i>
+        <span id="socket-status-text">OFFLINE</span>
+      </div>
+      <div class="ng-stat"><span>КРУГ</span><output id="display-circle">1</output></div>
+      <div class="ng-stat"><span>РАУНД</span><output id="display-round">1</output></div>
+      <div class="ng-stat"><span>ВРЕМЯ</span><output id="display-time">4:00</output></div>
+      <div class="ng-stat ng-stat--money"><span>БАНК</span><output id="display-bank">0</output></div>
+      <div class="ng-stat"><span>В КРУГЕ</span><output id="display-current-money">0</output></div>
+    </div>
+  </header>
+
+  <section class="ng-layout">
+
+    <!-- LEFT RAIL -->
+    <aside class="ng-left">
+      <section class="ng-panel">
+        <header class="ng-panel-title">ДЕРЕВО</header>
+        <div class="money-tree" id="money-tree">
+          <button id="money-round-1" class="money-row is-active" type="button" data-round="1" data-value="10000"><span>1</span><strong>10 000</strong></button>
+          <button id="money-round-2" class="money-row" type="button" data-round="2" data-value="25000"><span>2</span><strong>25 000</strong></button>
+          <button id="money-round-3" class="money-row" type="button" data-round="3" data-value="50000"><span>3</span><strong>50 000</strong></button>
+          <button id="money-round-4" class="money-row" type="button" data-round="4" data-value="150000"><span>4</span><strong>150 000</strong></button>
+          <button id="money-round-5" class="money-row money-row--top" type="button" data-round="5" data-value="500000"><span>5</span><strong>500 000</strong></button>
+        </div>
+      </section>
+
+      <section class="ng-panel ng-room">
+        <header class="ng-panel-title">КОМНАТА</header>
+        <input id="room" class="room_id" name="room_id" type="text" maxlength="4" placeholder="----" readonly>
+        <div class="ng-two">
+          <button id="open_room" class="ng-btn ng-btn--green" type="button" data-action="open-room" onclick="open_room()">ОТКРЫТЬ</button>
+          <button id="close_room" class="ng-btn ng-btn--red" type="button" data-action="close-room" onclick="close_room()" disabled>ЗАКРЫТЬ</button>
+        </div>
+      </section>
+
+      <section class="ng-panel ng-params" id="section-parameters">
+        <header class="ng-panel-title">ПАРАМЕТРЫ</header>
+        <div class="params-grid">
+          <label><span>Таймер</span><input id="control-timer-seconds" type="number" min="0" value="240"></label>
+          <label><span>Круг</span><input id="control-circle" type="number" min="1" value="1"></label>
+          <label><span>Раунд</span><input id="control-round" type="number" min="1" value="1"></label>
+          <label><span>Банк</span><input id="control-bank" type="number" min="0" value="0"></label>
+          <label><span>В круге</span><input id="control-current-money" type="number" min="0" value="0"></label>
+          <label><span>№ вопроса</span><input id="control-question-number" type="number" min="1" max="5" value="1"></label>
+          <label><span>Верных</span><input id="control-correct-count" type="number" min="0" max="5" value="0"></label>
+          <label><span>Замены</span><input id="control-flips-count" type="number" min="0" max="3" value="3"></label>
+          <label><span>Пасы</span><input id="control-pass-count" type="number" min="0" max="4" value="0"></label>
+        </div>
+        <button id="action-update-state" class="ng-btn ng-btn--blue ng-wide" type="button" data-action="update-state" onclick="update_data()">ПРИМЕНИТЬ</button>
+      </section>
+    </aside>
+
+    <!-- CENTER -->
+    <section class="ng-center">
+      <section class="ng-program">
+        <header class="ng-program-head">
+          <div>
+            <span>ON AIR</span>
+            <strong>ТЕКУЩИЙ ВОПРОС</strong>
+          </div>
+          <div class="ng-mini-state">
+            <div id="correct-answer-indicators" class="answer-indicators">
+              <output id="correct-indicator-1" class="status-orb">В</output>
+              <output id="correct-indicator-2" class="status-orb">В</output>
+              <output id="correct-indicator-3" class="status-orb">В</output>
+              <output id="correct-indicator-4" class="status-orb">В</output>
+              <output id="correct-indicator-5" class="status-orb">В</output>
+            </div>
+            <div id="flip-indicators" class="flip-indicators">
+              <output id="flip-indicator-1" class="flip-orb">→</output>
+              <output id="flip-indicator-2" class="flip-orb">→</output>
+              <output id="flip-indicator-3" class="flip-orb">→</output>
+            </div>
+          </div>
+        </header>
+
+        <label class="ng-question ng-question--q">
+          <span>ВОПРОС</span>
+          <textarea id="question-text" readonly></textarea>
+        </label>
+
+        <div class="ng-meta">
+          <label class="ng-question ng-question--a">
+            <span>ОТВЕТ</span>
+            <textarea id="question-answer" readonly></textarea>
+          </label>
+          <label class="ng-question ng-question--author">
+            <span>АВТОР</span>
+            <textarea id="question-author" readonly></textarea>
+          </label>
         </div>
 
-        <div id="socket-status" class="socket-status socket-offline" aria-live="polite">
-          <span class="socket-dot" aria-hidden="true"></span>
-          <span id="socket-status-text">Сервер отключён</span>
-        </div>
-      </div>
-    </header>
+        <label class="ng-question ng-question--comment">
+          <span>КОММЕНТАРИЙ</span>
+          <textarea id="question-comment" readonly></textarea>
+        </label>
+      </section>
 
-    <section class="metrics-strip" aria-label="Текущие показатели">
-      <article class="metric-shell metric-shell--wide">
-        <span>Время</span>
-        <output id="display-time" class="metric-value">4:00</output>
-      </article>
+      <section class="ng-action-zone">
+        <button id="action-answer-correct" class="decision decision--green" type="button" data-action="answer-correct" onclick="correct()" disabled><span>✓</span><strong>ВЕРНО</strong></button>
+        <button id="action-answer-wrong" class="decision decision--red" type="button" data-action="answer-wrong" onclick="wrong()" disabled><span>×</span><strong>НЕВЕРНО</strong></button>
+        <button id="action-answer-pass" class="decision decision--orange" type="button" data-action="answer-pass" onclick="pass()" disabled><span>П</span><strong>ПАС</strong></button>
+        <button id="action-question-flip" class="decision decision--blue" type="button" data-action="question-flip" onclick="flip()" disabled><span>↻</span><strong>ЗАМЕНА</strong></button>
+      </section>
 
-      <article class="metric-shell">
-        <span>Круг</span>
-        <output id="display-circle" class="metric-value">1</output>
-      </article>
+      <section class="ng-launch">
+        <button id="action-start-game" class="ng-btn ng-btn--purple ng-launch-main" type="button" data-action="start-game" onclick="tpv()">{{ game_name|default('The People Versus') }}<span id="action-start-game-label"></span></button>
+        <button id="action-start-circle" class="ng-btn" type="button" data-action="start-circle" onclick="start_circle()" disabled>НАЧАТЬ КРУГ</button>
+        <button id="action-start-round" class="ng-btn ng-btn--blue" type="button" data-action="start-round" onclick="start_round()" disabled>НАЧАТЬ РАУНД</button>
+      </section>
 
-      <article class="metric-shell">
-        <span>Раунд</span>
-        <output id="display-round" class="metric-value">1</output>
-      </article>
-
-      <article class="metric-shell metric-shell--red">
-        <span>Банк</span>
-        <output id="display-bank" class="metric-value">0</output>
-      </article>
-
-      <article class="metric-shell">
-        <span>Сумма</span>
-        <output id="display-current-money" class="metric-value">0</output>
-      </article>
-
-      <article class="metric-shell metric-shell--name">
-        <span>Игрок</span>
-        <output id="display-current-player" class="metric-value metric-value--text">—</output>
-      </article>
-
-      <article class="metric-shell metric-shell--name">
-        <span>Замена</span>
-        <output id="display-current-flip" class="metric-value metric-value--text">—</output>
-      </article>
-    </section>
-
-    <section class="console-grid console-grid--centered-question">
-
-      <aside class="console-column console-column--left">
-        <section class="tpv-panel tree-panel" id="section-money-tree">
-          <div class="panel-heading">
-            <div>
-              <h2>Дерево игры</h2>
-              <p>Суммы по раундам</p>
-            </div>
-            <span class="panel-chip">Money tree</span>
-          </div>
-
-          <div class="money-tree" id="money-tree">
-            <button id="money-round-1" class="money-row" type="button" data-round="1" data-value="10000">
-              <span>1</span><strong>10 000</strong>
-            </button>
-            <button id="money-round-2" class="money-row" type="button" data-round="2" data-value="25000">
-              <span>2</span><strong>25 000</strong>
-            </button>
-            <button id="money-round-3" class="money-row" type="button" data-round="3" data-value="50000">
-              <span>3</span><strong>50 000</strong>
-            </button>
-            <button id="money-round-4" class="money-row" type="button" data-round="4" data-value="150000">
-              <span>4</span><strong>150 000</strong>
-            </button>
-            <button id="money-round-5" class="money-row" type="button" data-round="5" data-value="500000">
-              <span>5</span><strong>500 000</strong>
-            </button>
-          </div>
-        </section>
-        <section class="tpv-panel bong-game-panel" id="section-bong-game">
-          <div class="panel-heading">
-            <div>
-              <h2>Гонг-игра</h2>
-              <p>Текущие значения финального этапа</p>
-            </div>
-            <span class="panel-chip">Bong game</span>
-          </div>
-
-          <div class="bong-game-console">
-            <div class="bong-options" role="group" aria-label="Выбор варианта Гонг-игры">
-              <button id="bong-variable-1" class="bong-option-button" type="button" data-bong-option="1" aria-pressed="false">1</button>
-              <button id="bong-variable-2" class="bong-option-button" type="button" data-bong-option="2" aria-pressed="false">2</button>
-              <button id="bong-variable-3" class="bong-option-button" type="button" data-bong-option="3" aria-pressed="false">3</button>
-            </div>
-
-            <div class="bong-info-grid">
-              <div class="bong-display bong-display--sum">
-                <span class="bong-display__label">Сумма Гонг-игры</span>
-                <output id="bong-current-sum" class="bong-display__value">0</output>
-              </div>
-
-              <div class="bong-display bong-display--author">
-                <span class="bong-display__label">Автор вопроса</span>
-                <output id="bong-question-author" class="bong-display__value bong-display__value--text">— Автор вопроса —</output>
-              </div>
-            </div>
-
-            <div class="bong-display bong-display--author">
-                <span class="bong-display__label">Выигрыш автора</span>
-                <output id="bong-game-status" class="bong-display__value">0</output>
-              </div>
-            </div>
-
-        </section>
-
-        <section class="tpv-panel room-control-panel" id="section-room-control">
-          <div class="panel-heading">
-            <div>
-              <h2>Комната</h2>
-              <p>Создание комнаты для подключения игроков</p>
-            </div>
-            <span class="panel-chip">Player room</span>
-          </div>
-
-          <div class="room-control-grid">
-            <label class="room-code-field" for="room">
-              <span>ID комнаты</span>
-              <input
-                id="room"
-                class="room_id control-input"
-                name="room_id"
-                type="text"
-                maxlength="4"
-                placeholder="Room ID"
-                readonly>
-            </label>
-
-            <button
-              id="open_room"
-              class="game-btn game-btn--primary"
-              type="button"
-              data-action="open-room" onclick="open_room()">
-              Открыть комнату
-            </button>
-
-            <button
-              id="close_room"
-              class="game-btn game-btn--danger"
-              type="button"
-              data-action="close-room" onclick="close_room()"
-              disabled>
-              Закрыть комнату
-            </button>
-          </div>
-        </section>
-      </aside>
-
-      <section class="console-column console-column--center">
-        <section class="tpv-panel question-panel" id="section-question">
-          <div class="panel-heading">
-            <div>
-              <h2>Вопрос</h2>
-              <p>Текущий материал для ведущего</p>
-            </div>
-            <span class="panel-chip">Question</span>
-          </div>
-
-          <div class="question-layout">
-            <label class="field field--full">
-              <span>Вопрос</span>
-              <textarea id="question-text" readonly></textarea>
-            </label>
-
-            <label class="field">
-              <span>Ответ</span>
-              <textarea id="question-answer" type="text" readonly></textarea>
-            </label>
-
-            <label class="field">
-              <span>Автор</span>
-              <textarea id="question-author" type="text" readonly></textarea>
-            </label>
-
-            <label class="field field--full">
-              <span>Комментарий</span>
-              <textarea id="question-comment" readonly></textarea>
-            </label>
-          </div>
-
-          <div class="status-orbs-wrap">
-            <div class="status-orb-group">
-              <span class="mini-label">Верные ответы</span>
-              <div class="status-orbs" id="correct-answer-indicators">
-                <output id="correct-indicator-1" class="status-orb status-orb--correct">В</output>
-                <output id="correct-indicator-2" class="status-orb status-orb--correct"></output>
-                <output id="correct-indicator-3" class="status-orb status-orb--correct"></output>
-                <output id="correct-indicator-4" class="status-orb status-orb--correct"></output>
-                <output id="correct-indicator-5" class="status-orb status-orb--correct"></output>
-              </div>
-            </div>
-
-            <div class="status-orb-group">
-              <span class="mini-label">Замены</span>
-              <div class="status-orbs" id="flip-indicators">
-                <output id="flip-indicator-1" class="status-orb status-orb--flip">→</output>
-                <output id="flip-indicator-2" class="status-orb status-orb--flip">→</output>
-                <output id="flip-indicator-3" class="status-orb status-orb--flip">→</output>
-              </div>
-            </div>
+      <section class="ng-utility-grid">
+        <section class="ng-panel ng-spectator">
+          <header class="ng-panel-title">ЭКРАН ЗРИТЕЛЯ</header>
+          <div class="ng-four">
+            <button id="action-show-tree" class="ng-btn ng-btn--blue" type="button" data-action="show-tree" onclick="show_tree()">ПОКАЗАТЬ ДЕРЕВО</button>
+            <button id="action-hide-tree" class="ng-btn" type="button" data-action="hide-tree" onclick="hide_tree()">УБРАТЬ ДЕРЕВО</button>
+            <button id="action-show-stats" class="ng-btn ng-btn--blue" type="button" data-action="show-stats" onclick="show_stats()">СТАТИСТИКА</button>
+            <button id="action-hide-stats" class="ng-btn" type="button" data-action="hide-stats" onclick="hide_stats()">УБРАТЬ СТАТИСТИКУ</button>
           </div>
         </section>
 
-        <section class="tpv-panel actions-panel actions-panel--compact" id="section-actions">
-          <div class="panel-heading">
-            <div>
-              <h2>Управление</h2>
-              <p>Частые действия всегда под рукой</p>
-            </div>
-            <span class="panel-chip">Live controls</span>
+        <section class="ng-panel ng-bong" id="section-bong-game">
+          <header class="ng-panel-title">ГОНГ-ИГРА</header>
+
+          <div class="bong-info">
+            <div><span>СУММА</span><output id="bong-current-sum">0</output></div>
+            <div><span>АВТОР</span><output id="bong-question-author">— Автор вопроса —</output></div>
+            <div><span>ВЫИГРЫШ АВТОРА</span><output id="bong-game-status">0</output></div>
           </div>
 
-          <div class="primary-actions">
-            <section class="action-group action-group--primary">
-              <h3>Игра и раунд</h3>
-              <div class="action-grid action-grid--5">
-                <button id="action-start-game" class="game-btn game-btn--primary" type="button" data-action="start-game" onclick="tpv()">{{ game_name|default('The People Versus') }}
-                  <span id="action-start-game-label"></span>
-                </button>
-                <button id="action-start-circle" class="game-btn" type="button" data-action="start-circle" onclick="start_circle()" disabled>
-                  Начать круг
-                </button>
-                <button id="action-start-round" class="game-btn game-btn--primary" type="button" data-action="start-round" onclick="start_round()" disabled>
-                  Начать раунд
-                </button>
-                <button id="action-answer-correct" class="game-btn game-btn--success" type="button" data-action="answer-correct" onclick="correct()" disabled>
-                  Верно
-                </button>
-                <button id="action-answer-wrong" class="game-btn game-btn--danger" type="button" data-action="answer-wrong" onclick="wrong()" disabled>
-                  Неверно
-                </button>
-                <button id="action-answer-pass" class="game-btn game-btn--warning" type="button" data-action="answer-pass" onclick="pass()" disabled>
-                  Пас
-                </button>
-                <button id="action-question-flip" class="game-btn game-btn--info" type="button" data-action="question-flip" onclick="flip()" disabled>
-                  Замена вопроса
-                </button>
-                <button id="action-select-random-player" class="game-btn game-btn--primary" type="button" data-action="select-random-player" onclick="choose_player_random()">
-                  Выбрать игрока
-                </button>
-                <label class="compact-field compact-field--inline">
-                  <span>ID игрока</span>
-                  <input id="control-player-id" maxlength="12" placeholder="User ID" value="">
-                </label>
-                <button id="action-select-player-by-id" class="game-btn" type="button" data-action="select-player-by-id" onclick="choose_player_id()">
-                  Выбрать по ID
-                </button>
-              </div>
-            </section>
+          <div class="bong-variables">
+            <button id="bong-variable-1" class="bong-variable" type="button" data-bong-option="1">1</button>
+            <button id="bong-variable-2" class="bong-variable" type="button" data-bong-option="2">2</button>
+            <button id="bong-variable-3" class="bong-variable" type="button" data-bong-option="3">3</button>
           </div>
 
-          <div class="secondary-actions">
-            <section class="action-group">
-              <h3>Экран зрителя</h3>
-              <div class="action-grid action-grid--4">
-                <button id="action-show-tree" class="game-btn" type="button" data-action="show-tree" onclick="show_tree()">Показать дерево</button>
-                <button id="action-hide-tree" class="game-btn" type="button" data-action="hide-tree" onclick="hide_tree()">Убрать дерево</button>
-                <button id="action-show-stats" class="game-btn" type="button" data-action="show-stats" onclick="show_stats()">Показать статистику</button>
-                <button id="action-hide-stats" class="game-btn" type="button" data-action="hide-stats" onclick="hide_stats()">Убрать статистику</button>
-              </div>
-            </section>
+          <div class="ng-six">
+            <button id="action-bong-start" class="ng-btn ng-btn--green" type="button" data-action="bong-start" onclick="start_bong_game()">СТАРТ</button>
+            <button id="action-bong-stop" class="ng-btn ng-btn--red" type="button" data-action="bong-stop" onclick="stop_bong_game()" disabled>СТОП</button>
+            <button id="action-bong-next-sum" class="ng-btn" type="button" data-action="bong-next-sum" onclick="next_sum()" disabled>СЛЕД. СУММА</button>
+            <button id="action-bong-option-1" class="ng-btn" type="button" data-action="bong-option-1" onclick="bong_game_start_var_1()" disabled>ВАР. 1</button>
+            <button id="action-bong-option-2" class="ng-btn" type="button" data-action="bong-option-2" onclick="bong_game_start_var_2()" disabled>ВАР. 2</button>
+            <button id="action-bong-option-3" class="ng-btn" type="button" data-action="bong-option-3" onclick="bong_game_start_var_3()" disabled>ВАР. 3</button>
+          </div>
 
-            <section class="action-group">
-              <h3>Гонг-игра</h3>
-              <div class="action-grid action-grid--4">
-                <button id="action-bong-start" class="game-btn game-btn--primary" type="button" data-action="bong-start" onclick="start_bong_game()">Гонг-игра</button>
-                <button id="action-bong-option-1" class="game-btn game-btn--square" type="button" data-action="bong-option-1" onclick="bong_game_start_var_1()" disabled>1</button>
-                <button id="action-bong-option-2" class="game-btn game-btn--square" type="button" data-action="bong-option-2" onclick="bong_game_start_var_2()" disabled>2</button>
-                <button id="action-bong-option-3" class="game-btn game-btn--square" type="button" data-action="bong-option-3" onclick="bong_game_start_var_3()" disabled>3</button>
-                <button id="action-bong-stop" class="game-btn game-btn--danger" type="button" data-action="bong-stop" onclick="stop_bong_game()" disabled>Остановить</button>
-                <button id="action-bong-author-win" class="game-btn game-btn--warning" type="button" data-action="bong-author-win" onclick="sum_for_author()" disabled>Выигрыш автора</button>
-                <button id="action-bong-next-sum" class="game-btn" type="button" data-action="bong-next-sum" onclick="next_sum()" disabled>Следующая сумма</button>
-                <button id="action-bong-player-win" class="game-btn game-btn--success" type="button" data-action="bong-player-win" onclick="result_sum_for_player()">Выигрыш игрока</button>
-              </div>
-            </section>
-
-            <section class="action-group">
-              <h3>Музыка</h3>
-              <div class="action-grid action-grid--3">
-                <button id="sound-intro" class="game-btn game-btn--purple" type="button" data-action="sound-intro" onclick="intro()">Заставка</button>
-                <button id="sound-host-entrance" class="game-btn game-btn--purple" type="button" data-action="sound-host-entrance" onclick="intro_host()">Выход ведущего</button>
-                <button id="sound-background" class="game-btn game-btn--purple" type="button" data-action="sound-background" onclick="bg()">Фон</button>
-                <button id="sound-ending" class="game-btn game-btn--purple" type="button" data-action="sound-ending" onclick="final()">Окончание</button>
-                <button id="sound-credits" class="game-btn game-btn--purple" type="button" data-action="sound-credits" onclick="credits()">Титры</button>
-                <button id="sound-stop-all" class="game-btn game-btn--danger" type="button" data-action="sound-stop-all" onclick="stop_sounds()">Остановить звуки</button>
-              </div>
-            </section>
-
-            <section class="action-group">
-              <h3>Завершение</h3>
-              <div class="action-grid action-grid--3">
-                <button id="action-show-results" class="game-btn" type="button" data-action="show-results" onclick="show_results()">Результаты игры</button>
-                <button id="action-reset-game" class="game-btn game-btn--warning" type="button" data-action="reset-game" onclick="cancel_all()">Сброс</button>
-                <button id="action-reset-game" class="game-btn game-btn--warning" type="button" data-action="reset-game" onclick="clear_db()">Очистить БД</button>
-              </div>
-            </section>
+          <div class="ng-two">
+            <button id="action-bong-author-win" class="ng-btn ng-btn--orange" type="button" data-action="bong-author-win" onclick="sum_for_author()" disabled>ВЫИГРЫШ АВТОРА</button>
+            <button id="action-bong-player-win" class="ng-btn ng-btn--green" type="button" data-action="bong-player-win" onclick="result_sum_for_player()">ВЫИГРЫШ ИГРОКА</button>
           </div>
         </section>
       </section>
-
-      <aside class="console-column console-column--right">
-        <section class="tpv-panel params-panel" id="section-parameters">
-          <div class="panel-heading">
-            <div>
-              <h2>Параметры</h2>
-              <p>Технические значения</p>
-            </div>
-            <span class="panel-chip">Control</span>
-          </div>
-
-          <div class="params-grid">
-            <label>
-              <span>Время, сек.</span>
-              <input id="control-timer-seconds" type="number" min="0" value="240">
-            </label>
-            <label>
-              <span>Текущий круг</span>
-              <input id="control-circle" type="number" min="1" value="1">
-            </label>
-            <label>
-              <span>Текущий раунд</span>
-              <input id="control-round" type="number" min="1" value="1">
-            </label>
-            <label>
-              <span>В банке</span>
-              <input id="control-bank" type="number" min="0" value="0">
-            </label>
-            <label>
-              <span>В круге</span>
-              <input id="control-current-money" type="number" min="0" value="0">
-            </label>
-            <label>
-              <span>№ вопроса</span>
-              <input id="control-question-number" type="number" min="1" max="5" value="1">
-            </label>
-            <label>
-              <span>Верных ответов</span>
-              <input id="control-correct-count" type="number" min="0" max="5" value="0">
-            </label>
-            <label>
-              <span>Замены</span>
-              <input id="control-flips-count" type="number" min="0" max="3" value="3">
-            </label>
-            <label>
-              <span>Пас</span>
-              <input id="control-pass-count" type="number" min="0" max="4" value="0">
-            </label>
-          </div>
-
-          <button id="action-update-state" class="game-btn game-btn--primary game-btn--full" type="button" data-action="update-state" onclick="update_data()">
-            Обновить данные
-          </button>
-        </section>
-
-        <section class="tpv-panel players-panel" id="section-players">
-          <div class="panel-heading">
-            <div>
-              <h2>Игроки</h2>
-              <p>Подключённые участники</p>
-            </div>
-            <output id="players-count" class="panel-counter"></output>
-          </div>
-
-          <div class="table-wrap">
-            <table class="status-users" id="players-table">
-              <thead>
-                <tr>
-                  <th>№</th>
-                  <th>Игрок</th>
-                  <th>Тема замены</th>
-                  <th>Выигрыш</th>
-                  <th>Статус</th>
-                </tr>
-              </thead>
-              <tbody id="players-table-body">
-                <tr id="player-row-template" hidden>
-                  <td data-column="number"></td>
-                  <td data-column="name"></td>
-                  <td data-column="flip-topic"></td>
-                  <td data-column="sum-result"></td>
-                  <td data-column="status"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </aside>
-
-      
     </section>
-  </main>
-  <script src="/static/js/socket.io.min.js"></script>
-  <script src="/static/js/tpv-host.js"></script>
-  <script src="{{ url_for('static', filename='js/tpv-game-engine.js') }}"></script>
-  <script src="/static/js/tpv-game-engine.js"></script>
-  <script src="/static/js/number_voice.js"></script>
-  <script src="{{ url_for('static', filename='js/tpv-host-spectator-addon.js') }}"></script>
+
+    <!-- RIGHT -->
+    <aside class="ng-right">
+      <section class="ng-panel ng-player">
+        <header class="ng-panel-title">АКТИВНЫЙ ИГРОК</header>
+        <output id="display-current-player" class="ng-player-name">—</output>
+        <div class="ng-player-topic"><span>ТЕМА ЗАМЕНЫ</span><output id="display-current-flip">—</output></div>
+        <button id="action-select-random-player" class="ng-btn ng-btn--purple ng-wide" type="button" data-action="select-random-player" onclick="choose_player_random()">Выбрать игрока случайно</button>
+        <p></p>
+        <div class="ng-idpick">
+          <input id="control-player-id" maxlength="12" placeholder="ID игрока" value="">
+          <button id="action-select-player-by-id" class="ng-btn" type="button" data-action="select-player-by-id" onclick="choose_player_id()">Выбрать игрока по ID</button>
+        </div>
+      </section>
+
+     
+
+      <section class="ng-panel ng-sound">
+        <header class="ng-panel-title">МУЗЫКА / ЗВУК</header>
+        <div class="ng-two">
+          <button id="sound-intro" class="ng-btn ng-btn--cyan" type="button" data-action="sound-intro" onclick="intro()">ЗАСТАВКА</button>
+          <button id="sound-host-entrance" class="ng-btn ng-btn--cyan" type="button" data-action="sound-host-entrance" onclick="intro_host()">ВЫХОД ВЕДУЩЕГО</button>
+          <button id="sound-background" class="ng-btn ng-btn--cyan" type="button" data-action="sound-background" onclick="bg()">ФОН</button>
+          <button id="sound-ending" class="ng-btn ng-btn--cyan" type="button" data-action="sound-ending" onclick="final()">ОКОНЧАНИЕ</button>
+          <button id="sound-credits" class="ng-btn ng-btn--cyan" type="button" data-action="sound-credits" onclick="credits()">ТИТРЫ</button>
+          <button id="sound-stop-all" class="ng-btn ng-btn--red" type="button" data-action="sound-stop-all" onclick="stop_sounds()">СТОП ЗВУКА</button>
+        </div>
+      </section>
+
+      <section class="ng-panel ng-service">
+        <header class="ng-panel-title">СЕРВИС</header>
+        <div class="ng-three">
+          <button id="action-show-results" class="ng-btn" type="button" data-action="show-results" onclick="show_results()">РЕЗУЛЬТАТЫ</button>
+          <button id="action-reset-game" class="ng-btn ng-btn--orange" type="button" data-action="reset-game" onclick="cancel_all()">СБРОС</button>
+          <button id="action-clear-db" class="ng-btn ng-btn--red" type="button" data-action="clear-db" onclick="clear_db()">ОЧИСТИТЬ БД</button>
+        </div>
+      </section>
+       <section class="ng-panel ng-players" id="section-players">
+        <header class="ng-panel-title ng-panel-title--split"><span>ИГРОКИ</span><output id="players-count"></output></header>
+        <div class="players-table-wrap">
+          <table class="status-users" id="players-table">
+            <thead><tr><th>№</th><th>Игрок</th><th>Тема</th><th>Выигрыш</th><th>Статус</th></tr></thead>
+            <tbody id="players-table-body">
+              <tr id="player-row-template" hidden>
+                <td data-column="number"></td>
+                <td data-column="name"></td>
+                <td data-column="flip-topic"></td>
+                <td data-column="sum-result"></td>
+                <td data-column="status"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </aside>
+  </section>
+</main>
+
+<script src="/static/js/socket.io.min.js"></script>
+<script src="/static/js/tpv-host.js"></script>
+<script src="{{ url_for('static', filename='js/tpv-game-engine.js') }}"></script>
+<script src="/static/js/number_voice.js"></script>
+<script src="{{ url_for('static', filename='js/tpv-host-spectator-addon.js') }}"></script>
 </body>
 </html>

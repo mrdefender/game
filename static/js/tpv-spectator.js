@@ -153,7 +153,7 @@ function renderState(payload) {
   $("display-current-money").textContent = fmt(state.currentMoney);
   $("display-bank").textContent = fmt(state.bank);
   $("bank-stat").hidden = (Number(state.bank) || 0) <= 0;
-  $("display-replacement-topic").textContent = replacementTopic || "—";
+  $("display-replacement-topic").textContent = replacementTopic || "-";
 
   renderTree();
   renderIndicators();
