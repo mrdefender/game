@@ -911,3 +911,83 @@ button:disabled {
     grid-template-columns:repeat(2,1fr);
   }
 }
+
+
+/* =========================================================
+   PLAYERS TABLE — FULL REPLACEMENT TOPIC TEXT
+   ========================================================= */
+
+.status-users tr {
+  height: auto;
+}
+
+.status-users th,
+.status-users td {
+  vertical-align: middle;
+}
+
+.status-users th:nth-child(3),
+.status-users td:nth-child(3) {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.status-users td:nth-child(3) span,
+.status-users td:nth-child(3) div,
+.status-users td:nth-child(3) output {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.3;
+}
+
+.status-users th:nth-child(1),
+.status-users td:nth-child(1) {
+  width: 7%;
+}
+
+.status-users th:nth-child(2),
+.status-users td:nth-child(2) {
+  width: 23%;
+}
+
+.status-users th:nth-child(3),
+.status-users td:nth-child(3) {
+  width: 34%;
+}
+
+.status-users th:nth-child(4),
+.status-users td:nth-child(4) {
+  width: 20%;
+}
+
+.status-users th:nth-child(5),
+.status-users td:nth-child(5) {
+  width: 16%;
+}
+
+@media (max-width: 1250px) {
+  .status-users th:nth-child(3),
+  .status-users td:nth-child(3) {
+    width: 36%;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 850px) {
+  .status-users th:nth-child(3),
+  .status-users td:nth-child(3) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}

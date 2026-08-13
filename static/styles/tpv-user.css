@@ -741,6 +741,12 @@ button {
   box-shadow: 0 0 8px var(--red);
 }
 
+:disabled {
+  opacity:.28;
+  cursor:not-allowed;
+  filter:saturate(.35);
+}
+
 .bong-info-grid {
   display: grid;
   grid-template-columns: .8fr 1.2fr .9fr;
