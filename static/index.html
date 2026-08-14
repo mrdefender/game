@@ -4,66 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <title>Веселые игры</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Весёлые игры</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/mokaque.ico') }}">
-    <link rel="stylesheet" href="styles/main.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="/static/js/csrf.js"></script>
 </head>
 <body>
-    <div class="landing-bg"></div>
+<div class="page">
+  <header>
+    <div class="brand">
+      <span class="brand-orb"></span>
+      <strong>ВЕСЁЛЫЕ ИГРЫ</strong>
+    </div>
+    <div class="status"><i></i><span>система онлайн</span></div>
+  </header>
 
-    <main class="landing-shell">
-        <section class="hero-card panel-glow">
-            <header class="hero-header">
-                <div class="eyebrow">TV-режим</div>
-                <h1>Веселые игры</h1>
-                <div class="hero-subline">Интерактивная игровая платформа</div>
-            </header>
+  <main class="hero">
+    <section class="copy">
+      <div class="kicker">Интерактивная игровая платформа</div>
+      <h1>Всё начинается <span>здесь.</span></h1>
+      <p class="desc">
+        Подключайтесь к игровой комнате и используйте телефон,
+        планшет или компьютер как персональный игровой пульт.
+      </p>
+      <div class="action-row">
+        <a href="{{ url_for('join') }}" class="enter">ВОЙТИ В ИГРУ</a>
+        <button class="info-btn" type="button" id="infoBtn">Как это работает?</button>
+      </div>
+      <div class="device-row">
+        <span class="device">PHONE</span>
+        <span class="device">TABLET</span>
+        <span class="device">DESKTOP</span>
+      </div>
+    </section>
 
-            <section class="hero-main panel-inner">
-                <div class="hero-copy">
-                    <div class="hero-kicker">Добро пожаловать</div>
-                    <h2>Готовы начать игру?</h2>
-                    <p>
-                        Подключайтесь к комнате, выбирайте режим и запускайте игровой экран
-                        в едином стиле шоу.
-                    </p>
+    <section class="visual">
+      <div class="neon-frame">
+        <div class="visual-card">
+          <div class="orbit"></div>
+          <div class="badge one">MAIN VISUAL / ACTIVE</div>
+          <div class="badge two">NEON UI</div>
+          <div class="monkey-zone" aria-label="Главная иллюстрация">
+            <div class="placeholder">
+              <div class="placeholder-orb">◉</div>
+              <strong>МЕСТО ДЛЯ ИСХОДНОЙ КАРТИНКИ С ОБЕЗЬЯНОЙ</strong>
+              <span>Подставьте финальный файл ассета в CSS.</span>
+            </div>
+          </div>
+          <div class="scan"></div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-                    <div class="hero-actions">
-                        <a href="{{ url_for('join') }}" class="hero-button">В игру</a>
-                    </div>
-                </div>
+  <footer>
+    <span>© 2026 Весёлые игры</span>
+    <span>INTERACTIVE GAME PLATFORM</span>
+  </footer>
+</div>
 
-                <div class="hero-preview">
-                    <div class="preview-frame">
-                        <img src="/static/img/screen1.jpg" alt="Экран игры">
-                    </div>
-                </div>
-            </section>
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Как начать игру</h2>
+      <button class="close" id="closeBtn" type="button">×</button>
+    </div>
+    <p>
+      Нажмите «Войти в игру». На следующем экране укажите имя и код комнаты,
+      который сообщает ведущий.
+    </p>
+  </div>
+</div>
 
-            <section class="hero-features panel-inner">
-                <div class="feature-card">
-                    <div class="feature-title">Быстрый вход</div>
-                    <div class="feature-text">Подключение к комнате за несколько секунд.</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-title">Шоу-стиль</div>
-                    <div class="feature-text">Темная сцена, неоновые акценты и читаемый UI.</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-title">Мобильный экран</div>
-                    <div class="feature-text">Адаптация под телефон без отдельной логики.</div>
-                </div>
-            </section>
-        </section>
-    </main>
-
-    <footer class="copyrights">
-        Здесь могло бы быть ваше имя и ваша реклама.
-    </footer>
+<script>
+const modal=document.getElementById("modal");
+document.getElementById("infoBtn").addEventListener("click",()=>modal.classList.add("open"));
+document.getElementById("closeBtn").addEventListener("click",()=>modal.classList.remove("open"));
+modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("open")});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")modal.classList.remove("open")});
+</script>
 </body>
 </html>

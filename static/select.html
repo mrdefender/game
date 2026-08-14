@@ -2,46 +2,73 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <title>Веселые игры</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Выбор игры</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/select.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="/static/js/csrf.js"></script>
 </head>
 <body>
-    <div class="stage-bg"></div>
+<div class="page">
+<header>
+  <div class="brand"><span class="orb"></span><strong>ВЕСЁЛЫЕ ИГРЫ</strong></div>
+  <div class="mode"><span>ADMIN MODE</span></div>
+</header>
 
-    <main class="screen-shell">
-        <section class="screen-card panel-glow">
-            <header class="screen-header">
-                <div class="eyebrow">ADMIN MODE</div>
-                <h1>Веселые игры</h1>
-                <div class="subline">Режим администратора</div>
-            </header>
+<main class="main">
+<section class="hub">
+  <div class="heading">
+    <div class="kicker">Режим администратора</div>
+    <h1>Выберите <span>игру.</span></h1>
+    <p class="lead">Выберите игровой сценарий, который нужно запустить.</p>
+  </div>
 
-            <section class="screen-intro panel-inner">
-                <div class="intro-title">Добро пожаловать</div>
-                <div class="intro-text">Выберите игру для запуска административного сценария.</div>
-            </section>
+  <div class="games">
+    <div class="game-frame slot">
+      <article class="game">
+        <div class="game-top">
+          <div class="game-index"><span>Game 01</span><strong>SLOT</strong></div>
+          <div class="icon">S</div>
+          <h2>Свободный слот</h2>
+          <div style="margin-top:8px;color:#8d7650;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase">Game Control Mode</div>
+          <p>Запуск административного режима игры «Свободный слот».</p>
+        </div>
+        <div class="game-bottom">
+          <div class="meta"><span>Административный сценарий</span><span>→ /slot</span></div>
+          <form action="/slot" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="select-btn" type="submit">ВЫБРАТЬ ИГРУ</button>
+          </form>
+        </div>
+      </article>
+    </div>
 
-            <section class="screen-actions panel-inner">
-                <div class="section-title">Доступные игры</div>
-                <form action="/slot" method="post" class="select_game">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="submit" class="action-btn action-primary-slot" value="Свободный слот">
-                    
-                </form>
-                <form action="/tpv" method="post" class="select_game">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="submit" class="action-btn action-primary-tpv" value="The People Versus">
-                </form>
-            </section>
-        </section>
-    </main>
+    <div class="game-frame tpv">
+      <article class="game">
+        <div class="game-top">
+          <div class="game-index"><span>Game 02</span><strong>TPV</strong></div>
+          <div class="icon">VS</div>
+          <h2>The People Versus</h2>
+          <div style="margin-top:8px;color:#6b88a8;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase">Game Control Mode</div>
+          <p>Запуск административного режима The People Versus.</p>
+        </div>
+        <div class="game-bottom">
+          <div class="meta"><span>Административный сценарий</span><span>→ /tpv</span></div>
+          <form action="/tpv" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="select-btn" type="submit">ВЫБРАТЬ ИГРУ</button>
+          </form>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
 
-    <script src="/static/js/select.js"></script>
+<footer><span>© 2026 Весёлые игры</span><span>ADMIN GAME SELECTOR</span></footer>
+<script src="/static/js/select.js"></script>
 </body>
 </html>

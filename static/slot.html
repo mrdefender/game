@@ -2,51 +2,72 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <title>Веселые игры</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Свободный слот — выбор режима</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/slot.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/slot.ico') }}">
-    <link rel="stylesheet" href="/static/styles/slot.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="/static/js/csrf.js"></script>
 </head>
 <body>
-    <div class="stage-bg stage-bg-slot"></div>
+<div class="page">
+<header>
+  <div class="brand"><span class="orb"></span><strong>ВЕСЁЛЫЕ ИГРЫ</strong></div>
+  <a href="/select" class="back">← Выбор игры</a>
+</header>
 
-    <main class="screen-shell">
-        <section class="screen-card panel-glow">
-            <header class="screen-header">
-                <div class="eyebrow">ADMIN MODE</div>
-                <h1>Веселые игры</h1>
-                <div class="subline">Свободный слот</div>
-            </header>
+<main class="main">
+<section class="content">
+  <div class="heading">
+    <div class="kicker">Свободный слот · Admin Mode</div>
+    <h1>Выберите <span>режим.</span></h1>
+    <p class="lead">Выберите, какой интерфейс нужно открыть для текущей игровой комнаты.</p>
+  </div>
 
-            <section class="screen-intro panel-inner">
-                <div class="intro-title">Добро пожаловать на игру</div>
-                <div class="intro-text">Выберите режим запуска для текущей комнаты.</div>
-            </section>
+  <div class="roles">
+    <div class="role-frame host">
+      <article class="role">
+        <div class="top">
+          <div class="index"><span>Mode 01</span><strong>HOST</strong></div>
+          <div class="icon">H</div>
+          <h2>Режим ведущего</h2>
+          <p>Пульт управления игрой, игроками, вопросами и текущим состоянием комнаты.</p>
+        </div>
+        <div class="bottom">
+          <div class="meta"><span>Управление игрой</span><span>→ /host_slot</span></div>
+          <form action="/host_slot" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="go">ОТКРЫТЬ ПУЛЬТ</button>
+          </form>
+        </div>
+      </article>
+    </div>
 
-            <section class="screen-actions panel-inner">
-                <div class="section-title">Режимы</div>
+    <div class="role-frame spec">
+      <article class="role">
+        <div class="top">
+          <div class="index"><span>Mode 02</span><strong>SPECTATOR</strong></div>
+          <div class="icon">S</div>
+          <h2>Режим зрителя</h2>
+          <p>Отдельный экран для отображения игрового процесса зрителям.</p>
+        </div>
+        <div class="bottom">
+          <div class="meta"><span>Экран трансляции</span><span>→ /spec_slot</span></div>
+          <form action="/spec_slot" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="go">ОТКРЫТЬ ЭКРАН</button>
+          </form>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
 
-                <form action="/host_slot" method="post" class="select_game">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="submit" class="action-btn action-host" value="Режим ведущего">
-                </form>
-
-                <form action="/spec_slot" method="post" class="select_game">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="submit" class="action-btn action-spec" value="Режим зрителя">
-                </form>
-            </section>
-        </section>
-    </main>
-
-    <footer class="copyrights">
-        Здесь могло бы быть ваше имя и ваша реклама.
-    </footer>
+<footer><span>© 2026 Весёлые игры</span><span>FREE SLOT · ADMIN MODE</span></footer>
+</div>
 </body>
 </html>
