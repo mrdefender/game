@@ -223,6 +223,9 @@ def register_tpv_archive(
             existing = set(inspect(db.engine).get_table_names())
             return table_names.issubset(existing)
         except Exception:
+            app.logger.exception(
+                "TPV archive: не удалось проверить наличие таблиц архива."
+            )
             return False
 
     def create_tables() -> None:
@@ -907,7 +910,7 @@ def register_tpv_archive(
             elif isinstance(document.get("game"), dict):
                 games = [document["game"]]
             elif "title" in document:
-                # Совместимость с JSON одной игры из этапов 10.2.3–10.2.4.
+                # Совместимость с ранним JSON-форматом одной игры.
                 games = [document]
             else:
                 raise ValueError("В файле отсутствуют записи игр.")

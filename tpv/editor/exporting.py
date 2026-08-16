@@ -1,4 +1,4 @@
-"""Экспорт данных TPV Editor — этап 13.6.4."""
+"""Экспорт данных TPV Editor."""
 
 from __future__ import annotations
 

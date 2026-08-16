@@ -241,7 +241,7 @@ function bind(id,eventName,handler){
     node.addEventListener(eventName,handler);
 }
 
-async function api(url,o={}){const h=new Headers(o.headers||{}),t=document.querySelector('meta[name="csrf-token"]')?.content;h.set("X-Requested-With","XMLHttpRequest");if(t)h.set("X-CSRFToken",t);let body=o.body;if(body&&typeof body!=="string"){h.set("Content-Type","application/json");body=JSON.stringify(body)}const r=await fetch(url,{credentials:"same-origin",...o,headers:h,body});let d={};try{d=await r.json()}catch{}if(!r.ok||d.ok===false)throw new Error(d.message||`HTTP ${r.status}`);return d}
+async function api(url,o={}){const h=new Headers(o.headers||{}),t=document.querySelector('meta[name="csrf-token"]')?.content;h.set("X-Requested-With","XMLHttpRequest");if(t)h.set("X-CSRFToken",t);let body=o.body;if(body&&typeof body!=="string"){h.set("Content-Type","application/json");body=JSON.stringify(body)}const r=await fetch(url,{credentials:"same-origin",...o,headers:h,body});let d={};try{d=await r.json()}catch{}if(!r.ok||d.ok===false)throw new Error(d.error||d.message||`HTTP ${r.status}`);return d}
 async function loadAll(){await Promise.all([loadUsers(),loadQuestions(),loadThemes()]);if(s.tab==="dashboard")await loadDashboard()}
 async function loadUsers(){try{const[u,t]=await Promise.all([api("/tpv_editor/api/users"),api("/tpv_editor/api/themes")]);s.users=u.users||[];s.themes=t.themes||[];fillLists();renderUsers()}catch(x){toast(x.message,true)}}
 async function loadQuestions(){try{const r=await api("/tpv_editor/api/questions");s.questions=r.questions||[];s.authors=r.authors||[];s.themes=r.themes||s.themes;fillLists();renderQuestions()}catch(x){toast(x.message,true)}}
@@ -1765,7 +1765,7 @@ async function uploadApi(url,formData){
     try{data=await response.json()}catch{}
 
     if(!response.ok||data.ok===false){
-        throw new Error(data.message||`HTTP ${response.status}`);
+        throw new Error(data.error||data.message||`HTTP ${response.status}`);
     }
 
     return data;

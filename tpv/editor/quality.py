@@ -1,4 +1,4 @@
-"""Проверка качества данных TPV Editor — этап 13.6.2."""
+"""Проверка качества данных TPV Editor."""
 
 from __future__ import annotations
 

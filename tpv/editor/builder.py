@@ -1,4 +1,4 @@
-"""Конструктор игры TPV Editor — этап 13.4.2."""
+"""Конструктор игры TPV Editor."""
 from __future__ import annotations
 from datetime import datetime
 import json
@@ -26,7 +26,11 @@ class BuilderService:
         return value
     def table_exists(self)->bool:
         try:return "tpv_game_builds" in inspect(self.db.engine).get_table_names()
-        except Exception:return False
+        except Exception:
+            self.context.app.logger.exception(
+                "TPV Editor Builder: не удалось проверить таблицу tpv_game_builds."
+            )
+            return False
     def create_table(self)->None:self.TpvGameBuild.__table__.create(bind=self.db.engine,checkfirst=True)
     @staticmethod
     def parse_json(value:Any,default:Any)->Any:

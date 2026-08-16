@@ -1,8 +1,7 @@
 """TPV package.
 
-Этап 11.1: единая точка импорта инфраструктурных модулей TPV.
-Игровые маршруты и Socket.IO-обработчики пока остаются в game.py
-и будут переноситься на следующих этапах рефакторинга.
+Stable package entry point for TPV 15.0 infrastructure, services,
+Editor modules, media routes and application bootstrap.
 """
 
 from .archive import register_tpv_archive
@@ -12,6 +11,7 @@ from .socket_handlers import register_tpv_socket_handlers
 from .application import register_tpv_application
 from .backup_center import register_tpv_backup_center
 from .participation import register_tpv_participation
+from .diagnostics import register_tpv_diagnostics
 from .media_routes import register_tpv_media_routes
 from .services import (
     create_tpv_room_service,
@@ -28,6 +28,7 @@ __all__ = [
     "register_tpv_application",
     "register_tpv_backup_center",
     "register_tpv_participation",
+    "register_tpv_diagnostics",
     "register_tpv_media_routes",
     "create_tpv_room_service",
     "create_tpv_archive_snapshot_service",
@@ -35,4 +36,4 @@ __all__ = [
     "create_tpv_models",
 ]
 
-__version__ = "11.2"
+__version__ = "15.0"

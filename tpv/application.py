@@ -1,9 +1,10 @@
 """Unified TPV application bootstrap.
 
-Этап 11.6. Собирает модели, маршруты Editor, архив, Theme Engine,
-Snapshot providers, Archive Runtime и Socket.IO в правильном порядке.
+Registers TPV models, public participation, Editor modules, archive,
+Theme Engine, diagnostics, snapshot providers and Socket.IO handlers
+in dependency order.
 
-Модуль не импортирует game.py. Зависимости передаются через runtime.
+The module does not import game.py; runtime dependencies are injected.
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ from .services import create_tpv_archive_snapshot_service
 from .socket_handlers import register_tpv_socket_handlers
 from .backup_center import register_tpv_backup_center
 from .participation import register_tpv_participation
+from .diagnostics import register_tpv_diagnostics
 from .editor import (
     create_editor_context,
     register_builder,
@@ -85,6 +87,10 @@ def register_tpv_application(
         "TPV_PARTICIPATION_SERVICE": participation_service,
     })
 
+    # 1.2. Read-only production diagnostics.
+    diagnostics_exports = register_tpv_diagnostics(app, db)
+    namespace["TPV_DIAGNOSTICS"] = diagnostics_exports
+
     # Constants historically located next to the model block.
     namespace.setdefault("TPV_REQUIRED_FLIP_QUESTIONS", 5)
     namespace.setdefault(
@@ -96,14 +102,14 @@ def register_tpv_application(
     route_exports = register_tpv_editor_routes(namespace)
     namespace.update(route_exports)
 
-    # 2.1. Shared TPV Editor infrastructure (stage 13.2).
+    # 2.1. Shared TPV Editor infrastructure.
     editor_context = create_editor_context(
         namespace,
         route_exports=route_exports,
     )
     namespace["TPV_EDITOR_CONTEXT"] = editor_context
 
-    # 2.2. History and snapshots (stage 13.4.3).
+    # 2.2. History and snapshots.
     history_exports = editor_context.register_module(
         "history",
         register_history,
@@ -115,7 +121,7 @@ def register_tpv_application(
     route_exports.update(history_exports)
     namespace.update(history_exports)
 
-    # 2.3. Themes and shared theme helpers (stage 13.4.1).
+    # 2.3. Themes and shared theme helpers.
     theme_exports = editor_context.register_module(
         "themes",
         register_themes,
@@ -130,7 +136,7 @@ def register_tpv_application(
     )
     namespace.update(theme_exports)
 
-    # 2.4. Users migrated to readable module (stage 13.3.2).
+    # 2.4. Users module.
     user_exports = editor_context.register_module(
         "users",
         register_users,
@@ -138,7 +144,7 @@ def register_tpv_application(
     namespace["TPV_EDITOR_USERS"] = user_exports
     editor_context.runtime.update(user_exports)
 
-    # 2.5. Questions migrated to readable module (stage 13.3.3).
+    # 2.5. Questions module.
     # Question exports are required by Game Builder.
     question_exports = editor_context.register_module(
         "questions",
@@ -147,7 +153,7 @@ def register_tpv_application(
     namespace["TPV_EDITOR_QUESTIONS"] = question_exports
     editor_context.runtime.update(question_exports)
 
-    # 2.6. Game Builder migrated to readable module (stage 13.4.2).
+    # 2.6. Game Builder.
     # Builder depends on tpv_editor_question_to_dict.
     builder_exports = editor_context.register_module(
         "builder",
@@ -176,7 +182,7 @@ def register_tpv_application(
     route_exports.update(question_application_exports)
     namespace.update(question_application_exports)
 
-    # 2.8. Participation applications (stage 13.5.2).
+    # 2.8. Participation applications.
     participation_editor_exports = editor_context.register_module(
         "participation_applications",
         register_participation_applications,
@@ -188,7 +194,7 @@ def register_tpv_application(
         participation_editor_exports
     )
 
-    # 2.9. Database maintenance (stage 13.6.1).
+    # 2.9. Database maintenance.
     maintenance_exports = editor_context.register_module(
         "maintenance",
         register_maintenance,
@@ -202,7 +208,7 @@ def register_tpv_application(
     route_exports.update(maintenance_exports)
     namespace.update(maintenance_exports)
 
-    # 2.10. Data quality checks (stage 13.6.2).
+    # 2.10. Data quality checks.
     quality_exports = editor_context.register_module(
         "quality",
         register_quality,
@@ -214,7 +220,7 @@ def register_tpv_application(
     route_exports.update(quality_exports)
     namespace.update(quality_exports)
 
-    # 2.11. Statistics (stage 13.6.3).
+    # 2.11. Statistics.
     statistics_exports = editor_context.register_module(
         "statistics",
         register_statistics,
@@ -226,7 +232,7 @@ def register_tpv_application(
     route_exports.update(statistics_exports)
     namespace.update(statistics_exports)
 
-    # 2.12. Exporting (stage 13.6.4).
+    # 2.12. Exporting.
     exporting_exports = editor_context.register_module(
         "exporting",
         register_exporting,
@@ -238,7 +244,7 @@ def register_tpv_application(
     route_exports.update(exporting_exports)
     namespace.update(exporting_exports)
 
-    # 2.13. Importing (stage 13.6.5).
+    # 2.13. Importing.
     importing_exports = editor_context.register_module(
         "importing",
         register_importing,
@@ -250,7 +256,7 @@ def register_tpv_application(
     route_exports.update(importing_exports)
     namespace.update(importing_exports)
 
-    # 2.14. Dashboard migrated to readable module (stage 13.3.1).
+    # 2.14. Dashboard.
     # Dashboard depends on Builder and question applications.
     dashboard_exports = editor_context.register_module(
         "dashboard",
@@ -362,6 +368,7 @@ def register_tpv_application(
         "TPV_PARTICIPATION": participation_exports,
         "TpvParticipationApplication": participation_model,
         "TPV_PARTICIPATION_SERVICE": participation_service,
+        "TPV_DIAGNOSTICS": diagnostics_exports,
         **runtime_exports,
         "TPV_SOCKET_EXPORTS": socket_exports,
         "update_users_tpv": socket_exports["update_users_tpv"],

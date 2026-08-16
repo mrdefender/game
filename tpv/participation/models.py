@@ -1,4 +1,4 @@
-"""ORM-модель заявок на участие TPV — этап 12.0.1."""
+"""ORM-модель заявок на участие TPV."""
 
 from __future__ import annotations
 

@@ -10,7 +10,11 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any, Mapping
+
+
+logger = logging.getLogger(__name__)
 
 
 _REQUIRED_RUNTIME_NAMES = {
@@ -230,6 +234,9 @@ class TpvSocketHandlers:
                 ),
             )
         except Exception:
+            logger.exception(
+                "TPV Socket.IO: ошибка обработки count_answer_interactive."
+            )
             return
 
     @staticmethod
@@ -262,7 +269,7 @@ class TpvSocketHandlers:
         result = [
             self._user_row(user, single=False)
             for user in users
-            if user.status != "ended"
+            if user.status != ""
         ]
 
         self.emit_tpv_host(
@@ -410,7 +417,10 @@ class TpvSocketHandlers:
             self.update_users_tpv()
 
         except Exception:
-            pass
+            self.db.session.rollback()
+            logger.exception(
+                "TPV Socket.IO: ошибка случайного выбора игрока."
+            )
 
     def choose_player_id(self, data):
         try:
@@ -432,7 +442,10 @@ class TpvSocketHandlers:
             self.update_users_tpv()
 
         except Exception:
-            pass
+            self.db.session.rollback()
+            logger.exception(
+                "TPV Socket.IO: ошибка выбора игрока по ID."
+            )
 
     def reset_to_wait_tpv(self):
         try:
@@ -465,7 +478,11 @@ class TpvSocketHandlers:
             )
 
         except Exception:
-            # Сохраняем прежнюю ветку обработки ошибки.
+            self.db.session.rollback()
+            logger.exception(
+                "TPV Socket.IO: ошибка сброса игроков в состояние wait."
+            )
+            # Сохраняем прежний внешний контракт обработки ошибки.
             return self.json.dump("fail")
 
     # ------------------------------------------------------------------
@@ -1051,6 +1068,7 @@ class TpvSocketHandlers:
         )
 
     def host_show_credits(self):
+        self.archive.finalize()
         self.socketio.emit(
             "show_credits_tpv",
             TPV_CREDITS_PAYLOAD,
@@ -1061,7 +1079,7 @@ class TpvSocketHandlers:
         )
 
     def show_results_tpv(self):
-        self.archive.finalize()
+      #  self.archive.finalize()
 
         users = self.db.session.scalars(
             self.db.select(self.UsersTpv)

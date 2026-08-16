@@ -1,4 +1,4 @@
-"""TPV application services — этап 11.5."""
+"""TPV application services."""
 
 from .room import TpvRoomService, create_tpv_room_service
 from .archive_snapshot import (

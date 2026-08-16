@@ -1,4 +1,4 @@
-"""Обслуживание SQLite для TPV Editor — этап 13.6.1."""
+"""Обслуживание SQLite для TPV Editor."""
 
 from __future__ import annotations
 
@@ -185,6 +185,9 @@ def register_maintenance(
         try:
             target = service.create_backup()
         except Exception as exc:
+            context.app.logger.exception(
+                "TPV Editor Maintenance: ошибка создания backup."
+            )
             return message_error_response(
                 f"Не удалось создать backup: {exc}",
                 500,
@@ -204,6 +207,9 @@ def register_maintenance(
         try:
             result = service.integrity_check()
         except Exception as exc:
+            context.app.logger.exception(
+                "TPV Editor Maintenance: ошибка проверки SQLite."
+            )
             return message_error_response(
                 f"Ошибка проверки SQLite: {exc}",
                 500,
@@ -231,6 +237,9 @@ def register_maintenance(
         try:
             service.analyze()
         except Exception as exc:
+            context.app.logger.exception(
+                "TPV Editor Maintenance: ошибка ANALYZE."
+            )
             return message_error_response(
                 f"Не удалось выполнить ANALYZE: {exc}",
                 500,
@@ -252,6 +261,9 @@ def register_maintenance(
         try:
             service.vacuum()
         except Exception as exc:
+            context.app.logger.exception(
+                "TPV Editor Maintenance: ошибка VACUUM."
+            )
             return message_error_response(
                 f"Не удалось выполнить VACUUM: {exc}",
                 500,
@@ -275,6 +287,9 @@ def register_maintenance(
             report = service.full_maintenance()
         except Exception as exc:
             service.db.session.rollback()
+            context.app.logger.exception(
+                "TPV Editor Maintenance: полное обслуживание прервано."
+            )
             return message_error_response(
                 f"Обслуживание прервано: {exc}",
                 500,

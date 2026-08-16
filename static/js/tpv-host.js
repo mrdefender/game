@@ -644,7 +644,7 @@ console.error('Ошибка:', error);
 
 
 socket.on("updated_users_tpv", (data) => {
-    console.log(data);
+
     update_list_user(data);
 }
 
@@ -654,9 +654,6 @@ socket.on("updated_users_tpv", (data) => {
 function update_list_user(data)
 {
   
-
-    console.log(data);
-
     var table = document.getElementById("players-table");
     if (table.rows.length!=1)
     {
@@ -738,8 +735,10 @@ function choose_player_id(){
 }
 
 socket.on("player_selected", (data) => {
-    document.getElementById("display-current-player").textContent = data[1]
-    document.getElementById("display-current-flip").textContent = data[2]
+    console.log(data)
+    document.getElementById("control-player-id").value = data[0];
+    document.getElementById("display-current-player").textContent = data[1];
+    document.getElementById("display-current-flip").textContent = data[2];
 
 }
 

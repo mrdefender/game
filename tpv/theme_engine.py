@@ -147,6 +147,9 @@ def register_tpv_editor_theme_engine(
             names = set(inspect(db.engine).get_table_names())
             return required.issubset(names)
         except Exception:
+            app.logger.exception(
+                "TPV Theme Engine: не удалось проверить служебные таблицы."
+            )
             return False
 
     def setting(key: str, default: str = "") -> str:

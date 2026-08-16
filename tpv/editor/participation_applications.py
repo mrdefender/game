@@ -463,7 +463,7 @@ def register_participation_applications(
             return response
 
         html = response.get_data(as_text=True)
-        marker = 'data-tpv-participation-editor="13.5.2"'
+        marker = 'data-tpv-participation-editor="15.0"'
 
         if marker in html:
             return response

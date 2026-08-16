@@ -1,11 +1,10 @@
-"""Модуль заявок на участие TPV — этап 12.0.1."""
+"""Модуль заявок на участие TPV."""
 
 from __future__ import annotations
 
 from .constants import ApplicationSource, ApplicationStatus, ThemeStatus
 from .models import ParticipationModels, create_participation_models
 from .routes import register_participation_routes
-from .editor import register_participation_editor
 from .services import (
     ParticipationValidationError,
     TpvParticipationService,
@@ -48,6 +47,5 @@ __all__ = [
     "create_participation_models",
     "create_participation_service",
     "register_participation_routes",
-    "register_participation_editor",
     "register_tpv_participation",
 ]

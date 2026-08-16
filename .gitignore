@@ -216,3 +216,7 @@ ModelManifest.xml
 
 *.json
 .env
+
+# Python bytecode / cache
+*.py[cod]
+*$py.class

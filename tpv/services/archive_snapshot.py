@@ -7,7 +7,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import logging
 from typing import Any, Callable
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(slots=True)
@@ -72,6 +76,9 @@ class TpvArchiveSnapshotService:
         try:
             return str(self.db.engine.url.database or "")
         except Exception:
+            logger.exception(
+                "TPV archive snapshot: не удалось определить путь к базе."
+            )
             return None
 
     def runtime_callbacks(self) -> dict[str, Callable[..., Any]]:

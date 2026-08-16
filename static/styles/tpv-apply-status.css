@@ -1,154 +1,238 @@
-.status-card {
-    width: min(100%, 720px);
+/* ================================================================
+   TPV PUBLIC UI — 14.6.1 FIX
+   Страница проверки заявки
+   ================================================================ */
+
+.status-card{
+    width:min(780px,100%);
 }
 
-.status-links {
-    margin-top: 20px;
-    text-align: center;
+#status-search-view{
+    padding:clamp(32px,5vw,52px);
 }
 
-.status-links a,
-.status-text-button {
-    color: var(--apply-cyan);
-    font-size: 12px;
-    font-weight: 800;
-    text-decoration: none;
+#tpv-status-form{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 180px;
+    gap:14px 16px;
+    align-items:end;
+    margin-top:30px;
 }
 
-.status-links a:hover,
-.status-text-button:hover {
-    text-decoration: underline;
+#tpv-status-form .apply-field{
+    min-width:0;
 }
 
-.status-result-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 26px;
+#tpv-status-form .apply-field input{
+    min-height:56px;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:.04em;
+    font-variant-numeric:tabular-nums;
 }
 
-.status-result-head h1 {
-    font-size: clamp(28px, 6vw, 44px);
+#tpv-status-form .apply-button{
+    min-height:56px;
 }
 
-.status-text-button {
-    flex: 0 0 auto;
-    border: 0;
-    padding: 8px 0;
-    background: transparent;
-    cursor: pointer;
+#tpv-status-form .apply-global-error{
+    grid-column:1/-1;
 }
 
-.status-details {
-    display: grid;
-    gap: 12px;
-    margin: 0 0 24px;
+.status-links{
+    display:flex;
+    justify-content:center;
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px solid #132c3e;
 }
 
-.status-detail {
-    display: grid;
-    grid-template-columns: minmax(130px, .42fr) minmax(0, 1fr);
-    gap: 18px;
-    align-items: start;
-    padding: 16px 18px;
-    border: 1px solid var(--apply-line);
-    border-radius: 13px;
-    background: rgba(3, 14, 22, .58);
+.status-links a{
+    color:#7bd9ff;
+    font-size:14px;
+    font-weight:700;
+    text-decoration:none;
 }
 
-.status-detail dt {
-    color: var(--apply-muted);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .08em;
-    text-transform: uppercase;
+.status-links a:hover{
+    color:#b7efff;
+    text-decoration:underline;
 }
 
-.status-detail dd {
-    min-width: 0;
-    margin: 0;
-    overflow-wrap: anywhere;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.5;
+/* Result view */
+
+.status-result{
+    padding:clamp(32px,5vw,50px);
 }
 
-.status-detail-comment dd {
-    white-space: pre-wrap;
-    font-weight: 500;
+.status-result-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:28px;
+    padding-bottom:24px;
+    border-bottom:1px solid #19364c;
 }
 
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    min-height: 30px;
-    padding: 6px 10px;
-    border: 1px solid var(--apply-line);
-    border-radius: 999px;
-    color: var(--apply-text);
-    background: rgba(255, 255, 255, .025);
-    font-size: 11px;
-    font-weight: 900;
+.status-result-head h1{
+    margin:0;
+    color:#fff;
+    font-size:clamp(30px,5vw,44px);
+    line-height:1.08;
+    font-weight:800;
+    letter-spacing:-.04em;
 }
 
-.status-badge.status-new {
-    color: #8cdfff;
-    border-color: rgba(103, 220, 255, .42);
-    background: rgba(103, 220, 255, .08);
+.status-text-button{
+    flex:0 0 auto;
+    min-height:40px;
+    border:1px solid #24445d;
+    border-radius:3px;
+    padding:0 14px;
+    color:#9cc8de;
+    background:#06111a;
+    font-size:12px;
+    font-weight:800;
+    cursor:pointer;
 }
 
-.status-badge.status-in_review {
-    color: #ffc878;
-    border-color: rgba(255, 174, 76, .45);
-    background: rgba(255, 174, 76, .08);
+.status-text-button:hover{
+    border-color:#34729c;
+    color:#d7f3ff;
 }
 
-.status-badge.status-needs_clarification,
-.status-badge.theme-similar {
-    color: #ffe278;
-    border-color: rgba(255, 218, 84, .45);
-    background: rgba(255, 218, 84, .08);
+.status-details{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin:0;
 }
 
+.status-detail{
+    min-width:0;
+    margin:0;
+    padding:17px 18px;
+    border:1px solid #19364c;
+    background:linear-gradient(180deg,#07131d,#03090e);
+}
+
+.status-detail dt{
+    margin:0 0 8px;
+    color:#7593a6;
+    font-size:11px;
+    line-height:1.3;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+.status-detail dd{
+    margin:0;
+    color:#edf8ff;
+    font-size:16px;
+    line-height:1.5;
+    font-weight:650;
+    overflow-wrap:anywhere;
+}
+
+.status-detail-comment{
+    grid-column:1/-1;
+}
+
+.status-detail-comment dd{
+    min-height:48px;
+    color:#bad0dc;
+    font-weight:500;
+}
+
+.status-badge{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:5px 10px;
+    border:1px solid #31536b;
+    border-radius:3px;
+    color:#cfe8f5;
+    background:#07151f;
+    font-size:12px;
+    line-height:1.25;
+    font-weight:900;
+    letter-spacing:.035em;
+}
+
+/* Common status names used by JS can inherit these automatically. */
+.status-badge.pending,
+.status-badge.status-pending{
+    border-color:#805d17;
+    color:#ffd876;
+    background:#1a1304;
+}
+.status-badge.approved,
 .status-badge.status-approved,
-.status-badge.theme-unique {
-    color: var(--apply-green);
-    border-color: rgba(107, 226, 173, .45);
-    background: rgba(107, 226, 173, .08);
+.status-badge.accepted,
+.status-badge.status-accepted{
+    border-color:#237d47;
+    color:#8dffae;
+    background:#04170b;
+}
+.status-badge.rejected,
+.status-badge.status-rejected{
+    border-color:#8c2d3a;
+    color:#ff9aa5;
+    background:#190609;
 }
 
-.status-badge.status-completed,
-.status-badge.theme-unchecked {
-    color: #b4c1c9;
-    border-color: rgba(180, 193, 201, .32);
-    background: rgba(180, 193, 201, .06);
+.status-result>.status-link-button{
+    width:100%;
+    margin-top:20px;
 }
 
-.status-badge.status-rejected,
-.status-badge.theme-exists {
-    color: var(--apply-red);
-    border-color: rgba(255, 123, 137, .45);
-    background: rgba(255, 123, 137, .08);
-}
-
-.status-link-button {
-    display: grid;
-    place-items: center;
-    text-decoration: none;
-}
-
-@media (max-width: 600px) {
-    .status-result-head {
-        display: grid;
+@media(max-width:680px){
+    #status-search-view,
+    .status-result{
+        padding:28px 20px;
     }
 
-    .status-text-button {
-        justify-self: start;
+    #tpv-status-form{
+        grid-template-columns:1fr;
+        gap:16px;
     }
 
-    .status-detail {
-        grid-template-columns: 1fr;
-        gap: 7px;
+    #tpv-status-form .apply-global-error{
+        grid-column:auto;
+    }
+
+    .status-result-head{
+        display:grid;
+        gap:16px;
+    }
+
+    .status-text-button{
+        width:100%;
+        min-height:46px;
+    }
+
+    .status-details{
+        grid-template-columns:1fr;
+    }
+
+    .status-detail-comment{
+        grid-column:auto;
+    }
+}
+
+@media(max-width:420px){
+    #status-search-view,
+    .status-result{
+        padding:25px 16px 30px;
+    }
+
+    #tpv-status-form .apply-field input{
+        font-size:18px;
+    }
+
+    .status-detail{
+        padding:15px;
     }
 }

@@ -55,6 +55,9 @@ class TpvArchiveRuntime:
             names = set(inspect(self.db.engine).get_table_names())
             return self.REQUIRED_TABLES.issubset(names)
         except Exception:
+            self._log_exception(
+                "TPV archive runtime: не удалось проверить таблицы архива."
+            )
             return False
 
     def _active(self):
@@ -121,7 +124,8 @@ class TpvArchiveRuntime:
                 correct_answers=0,
                 wrong_answers=0,
                 ended_normally=False,
-                editor_version="10.2.2",
+                tpv_version="15.0",
+                editor_version="15.0",
             )
 
             seen = set()

@@ -94,8 +94,11 @@ class DashboardService:
                 size_bytes = database_path.stat().st_size
                 backup_label = self._last_backup_label(database_path)
         except Exception:
-            # Dashboard должен открываться даже при недоступной диагностике.
-            pass
+            # Dashboard должен открываться даже при недоступной диагностике,
+            # но причина сбоя должна оставаться в серверном логе.
+            self.context.app.logger.exception(
+                "TPV Editor Dashboard: ошибка диагностики SQLite."
+            )
 
         return {
             "path": filename,

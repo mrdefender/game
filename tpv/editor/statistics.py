@@ -1,4 +1,4 @@
-"""Статистика TPV Editor — этап 13.6.3."""
+"""Статистика TPV Editor."""
 
 from __future__ import annotations
 from typing import Any

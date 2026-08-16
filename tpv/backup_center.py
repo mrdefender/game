@@ -1,7 +1,7 @@
 """TPV Editor Backup Center.
 
-Этап 11.7: SQLite backup, полный ZIP проекта, список, скачивание,
-удаление и безопасное восстановление SQLite с аварийной копией.
+SQLite backup, полный ZIP проекта, список, скачивание, удаление
+и безопасное восстановление SQLite с аварийной копией.
 """
 from __future__ import annotations
 
@@ -97,7 +97,9 @@ def register_tpv_backup_center(
             target=backup_dir()/f'{source.stem}_backup_{stamp}{suffix}'
             sqlite_backup(target)
             return jsonify({'ok':True,'message':'Резервная копия SQLite создана.','item':item(target)})
-        except Exception as exc:return error(f'Не удалось создать SQLite backup: {exc}',500)
+        except Exception as exc:
+            app.logger.exception("TPV backup center: ошибка создания SQLite backup.")
+            return error(f'Не удалось создать SQLite backup: {exc}',500)
 
     @bp.post('/project')
     def create_project_backup():
@@ -121,7 +123,9 @@ def register_tpv_backup_center(
                     archive.write(snapshot,f'database_snapshot/{source_db.name}')
                     archive.writestr('BACKUP_INFO.txt',f'TPV project backup\nCreated: {datetime.now().isoformat(timespec="seconds")}\nProject: {root}\nDatabase snapshot: database_snapshot/{source_db.name}\n')
             return jsonify({'ok':True,'message':'Полный ZIP проекта создан.','item':item(target)})
-        except Exception as exc:return error(f'Не удалось создать ZIP проекта: {exc}',500)
+        except Exception as exc:
+            app.logger.exception("TPV backup center: ошибка создания ZIP проекта.")
+            return error(f'Не удалось создать ZIP проекта: {exc}',500)
 
     @bp.get('/<path:filename>/download')
     def download_backup(filename):
@@ -137,7 +141,9 @@ def register_tpv_backup_center(
         if denied:return denied
         try:path=safe_file(filename); name=path.name; path.unlink()
         except (ValueError,FileNotFoundError) as exc:return error(str(exc),404)
-        except Exception as exc:return error(f'Не удалось удалить backup: {exc}',500)
+        except Exception as exc:
+            app.logger.exception("TPV backup center: ошибка удаления backup.")
+            return error(f'Не удалось удалить backup: {exc}',500)
         return jsonify({'ok':True,'message':f'Backup «{name}» удалён.'})
 
     @bp.post('/<path:filename>/restore')
@@ -156,7 +162,9 @@ def register_tpv_backup_center(
                 src.execute('PRAGMA integrity_check')
                 src.backup(dst)
             return jsonify({'ok':True,'message':'SQLite восстановлена. Перезапустите Flask перед продолжением работы.','emergency':item(emergency),'restart_required':True})
-        except Exception as exc:return error(f'Не удалось восстановить SQLite: {exc}',500)
+        except Exception as exc:
+            app.logger.exception("TPV backup center: ошибка восстановления SQLite.")
+            return error(f'Не удалось восстановить SQLite: {exc}',500)
 
     app.register_blueprint(bp)
     return {'backup_directory':backup_dir}

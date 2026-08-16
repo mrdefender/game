@@ -1,4 +1,8 @@
-"""Публичные маршруты заявок на участие TPV — этап 12.0.3."""
+"""Публичные маршруты заявок на участие TPV.
+
+HTML-шаблоны являются каноническими в ``tpv/participation/templates``.
+Дубли в ``static/`` не используются и удалены на этапе 14.9.2.
+"""
 
 from __future__ import annotations
 
@@ -15,6 +19,8 @@ def register_participation_routes(app, *, service):
         url_prefix="/tpv/api/participation",
     )
 
+    # Канонический источник публичных HTML-шаблонов.
+    # Не дублировать tpv-apply*.html в static/.
     public = Blueprint(
         "tpv_participation_public",
         __name__,
@@ -25,7 +31,7 @@ def register_participation_routes(app, *, service):
     def participation_status():
         return jsonify({
             "ok": True,
-            "stage": "13.9.2",
+            "stage": "15.0",
             "table": "tpv_participation_applications",
             "public_form": "/tpv-apply",
             "public_status": "/tpv-apply/status",

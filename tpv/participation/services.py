@@ -1,4 +1,4 @@
-"""Сервис заявок на участие TPV — этап 12.0.3."""
+"""Сервис заявок на участие TPV."""
 
 from __future__ import annotations
 
@@ -154,7 +154,7 @@ class TpvParticipationService:
         Ручное добавление игроков в TPV Editor остаётся независимым.
         """
         raise NotImplementedError(
-            "Создание игрока из заявки будет добавлено на этапе 12.0.4."
+            "Legacy service hook is not used by the current TPV Editor."
         )
 
 

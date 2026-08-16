@@ -1,0 +1,118 @@
+/* ================================================================
+   TPV PUBLIC UI — COMMON THEME 14.6.3
+   Общая визуальная база публичных страниц TPV
+   ================================================================ */
+
+:root{
+    color-scheme:dark;
+    --tpv-bg:#010205;
+    --tpv-panel:#071018;
+    --tpv-panel-2:#0a141e;
+    --tpv-line:#163650;
+    --tpv-line-strong:#24445d;
+    --tpv-text:#f4f8fb;
+    --tpv-muted:#7894a8;
+    --tpv-purple:#b13cff;
+    --tpv-pink:#ff28dc;
+    --tpv-blue:#199cff;
+    --tpv-cyan:#16dbea;
+    --tpv-green:#20e066;
+    --tpv-red:#ff3544;
+    --tpv-orange:#ff9d16;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+html{
+    min-height:100%;
+    background:var(--tpv-bg);
+}
+
+body.tpv-public-refresh,
+body.tpv-question-public{
+    min-width:320px;
+    min-height:100vh;
+    margin:0;
+    color:var(--tpv-text);
+    background:
+        radial-gradient(circle at 28% -8%,rgba(177,60,255,.12),transparent 34rem),
+        radial-gradient(circle at 95% 18%,rgba(25,156,255,.08),transparent 30rem),
+        linear-gradient(145deg,#010205,#02060a 55%,#010205);
+    font-family:"Montserrat","Segoe UI",Arial,sans-serif;
+    font-size:16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+}
+
+body.tpv-public-refresh::before,
+body.tpv-question-public::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    opacity:.22;
+    background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+    background-size:48px 48px;
+    mask-image:linear-gradient(to bottom,black,transparent 82%);
+}
+
+button,
+input,
+select,
+textarea{
+    font:inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea{
+    -webkit-tap-highlight-color:transparent;
+}
+
+[hidden]{
+    display:none!important;
+}
+
+input,
+select,
+textarea{
+    border-radius:4px;
+}
+
+button{
+    border-radius:3px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible{
+    outline:2px solid var(--tpv-cyan);
+    outline-offset:3px;
+}
+
+@media(max-width:680px){
+    body.tpv-public-refresh,
+    body.tpv-question-public{
+        font-size:16px;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    *,
+    *::before,
+    *::after{
+        scroll-behavior:auto!important;
+        transition:none!important;
+        animation:none!important;
+    }
+}

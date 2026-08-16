@@ -17,7 +17,20 @@ document.addEventListener("DOMContentLoaded",async()=>{
             "/api/tpv-question-applications/status",
             {credentials:"same-origin"}
         );
-        const data=await response.json();
+        let data={};
+        try{
+            data=await response.json();
+        }catch{
+            data={};
+        }
+
+        if(!response.ok||data.ok===false){
+            throw new Error(
+                data.error
+                ||data.message
+                ||`Не удалось проверить доступность формы. HTTP ${response.status}`
+            );
+        }
 
         if(!data.table_exists){
             unavailable.hidden=false;
@@ -97,10 +110,19 @@ async function sendApplication(event){
             body:JSON.stringify(payload)
         });
 
-        const data=await response.json();
+        let data={};
+        try{
+            data=await response.json();
+        }catch{
+            data={};
+        }
 
         if(!response.ok||data.ok===false){
-            throw new Error(data.message||`HTTP ${response.status}`);
+            throw new Error(
+                data.error
+                ||data.message
+                ||`Не удалось отправить заявку. HTTP ${response.status}`
+            );
         }
 
         form.reset();

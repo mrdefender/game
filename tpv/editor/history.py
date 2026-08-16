@@ -70,6 +70,9 @@ class HistoryService:
                 in inspect(self.db.engine).get_table_names()
             )
         except Exception:
+            self.context.app.logger.exception(
+                "TPV Editor History: не удалось проверить таблицу истории."
+            )
             return False
 
     def create_table(self) -> None:

@@ -6,10 +6,15 @@
     <meta name="color-scheme" content="dark">
     <title>Заявка на участие — TPV</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-public-common.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-apply.css') }}">
     <script src="{{ url_for('static', filename='js/tpv-apply.js') }}" defer></script>
 </head>
-<body>
+<body class="tpv-public-refresh">
     <main class="apply-page">
         <section class="apply-card" aria-labelledby="apply-title">
             <div class="apply-brand" aria-label="The People Versus">

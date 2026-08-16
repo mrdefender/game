@@ -20,7 +20,7 @@ from .editor.responses import message_error_response
 from .editor.validators import normalize_text
 
 
-ROUTES_VERSION = "13.6.6"
+ROUTES_VERSION = "15.0"
 
 
 def tpv_editor_normalize_text(value: Any) -> str:

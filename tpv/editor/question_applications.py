@@ -74,6 +74,9 @@ class QuestionApplicationService:
                 in inspect(self.db.engine).get_table_names()
             )
         except Exception:
+            self.context.app.logger.exception(
+                "TPV Question Applications: не удалось проверить таблицу заявок."
+            )
             return False
 
     def create_table(self) -> None:
