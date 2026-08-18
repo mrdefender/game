@@ -21,6 +21,7 @@
                 <span>THE PEOPLE VERSUS</span>
             </div>
 
+            {% if form_enabled %}
             <div id="apply-form-view">
                 <header class="apply-header">
                     <p class="apply-kicker">TPV · ЗАЯВКА ИГРОКА</p>
@@ -93,6 +94,17 @@
                     Подать ещё одну заявку
                 </button>
             </section>
+            {% else %}
+            <section class="apply-success apply-closed" aria-live="polite">
+                <div class="apply-success-mark" aria-hidden="true">×</div>
+                <p class="apply-kicker">ПРИЁМ ЗАКРЫТ</p>
+                <h1>Заявки на участие временно не принимаются</h1>
+                <p>Форма отключена организатором. Проверка ранее отправленной заявки остаётся доступной.</p>
+                <a class="apply-button status-link-button" href="/tpv-apply/status">
+                    Проверить статус заявки
+                </a>
+            </section>
+            {% endif %}
         </section>
     </main>
 </body>

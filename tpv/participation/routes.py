@@ -40,9 +40,20 @@ def register_participation_routes(app, *, service):
             "theme_statuses": ThemeStatus.LABELS,
         })
 
+    def public_form_enabled() -> bool:
+        settings = app.extensions.get("tpv_operational_settings")
+        if settings is None:
+            return True
+        return settings.bool_setting(
+            "public_participation_form_enabled"
+        )
+
     @public.get("/tpv-apply")
     def participation_application_page():
-        return render_template("tpv-apply.html")
+        return render_template(
+            "tpv-apply.html",
+            form_enabled=public_form_enabled(),
+        )
 
     @public.get("/tpv-apply/status")
     def participation_application_status_page():
@@ -97,6 +108,13 @@ def register_participation_routes(app, *, service):
 
     @public.post("/tpv-apply")
     def participation_application_submit():
+        if not public_form_enabled():
+            return jsonify({
+                "ok": False,
+                "error": "Приём заявок на участие временно закрыт.",
+                "code": "public_form_disabled",
+            }), 403
+
         data = request.get_json(silent=True)
         if not isinstance(data, dict):
             data = request.form.to_dict()

@@ -1,3 +1,4 @@
+
 """Пользователи TPV Editor.
 
 Этап 13.3.2. Модуль содержит обычный читаемый Python-код вместо
@@ -7,6 +8,7 @@
 
 from __future__ import annotations
 
+from tpv.admission import check_player_admission
 from typing import Any
 
 from flask import jsonify, request
@@ -45,9 +47,21 @@ class UserService:
             "tpv_editor_user_snapshot"
         )
 
-        self.required_questions = int(
-            context.get("TPV_REQUIRED_FLIP_QUESTIONS", 6)
+        self.required_questions_getter = context.get(
+            "tpv_editor_required_flip_questions"
         )
+        self.required_questions_fallback = int(
+            context.get("TPV_REQUIRED_FLIP_QUESTIONS", 5)
+        )
+
+    @property
+    def required_questions(self) -> int:
+        if callable(self.required_questions_getter):
+            try:
+                return int(self.required_questions_getter())
+            except (TypeError, ValueError):
+                pass
+        return self.required_questions_fallback
 
     def _dependency(self, name: str) -> Any:
         value = self.context.get(name)
@@ -83,14 +97,26 @@ class UserService:
         )
         approved = str(user.approve).lower() == "true"
 
+        print(
+            "TPV APPROVAL DEBUG:",
+            {
+                "player": user.username,
+                "flip": user.flip,
+                "flip_col": int(user.flip_col or 0),
+                "required_questions": self.required_questions,
+                "source": "UserService.serialize",
+            },
+        )
+
         if not flip_display:
             label = "Тема не выбрана"
         elif approved:
             label = "Допущен"
         else:
+            required = self.required_questions
             label = (
                 "Недостаточно вопросов: "
-                f"{int(user.flip_col or 0)}/{self.required_questions}"
+                f"{int(user.flip_col or 0)}/{required}"
             )
 
         return {
@@ -259,11 +285,16 @@ class UserService:
             self.db.select(self.UsersTpv)
         ).all()
 
+        changed = 0
         for user in users:
+            before = str(user.approve).lower()
             self.update_approval(user)
+            after = str(user.approve).lower()
+            if before != after:
+                changed += 1
 
         self.db.session.commit()
-        return len(users)
+        return changed
 
 
 def register_users(context: EditorContext) -> dict[str, Any]:
@@ -437,3 +468,8 @@ def register_users(context: EditorContext) -> dict[str, Any]:
 
 
 __all__ = ["UserService", "register_users"]
+
+# TPV 15.1.2.1.6 unified approval source
+
+
+# TPV 15.1.2.1.9.2 admission service integration

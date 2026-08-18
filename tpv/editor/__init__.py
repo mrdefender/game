@@ -47,7 +47,10 @@ from .validators import (
     require_text,
 )
 
+from .operational_settings import register_operational_settings
+
 __all__ = [
+    "register_operational_settings",
     "DashboardService",
     "BuilderService",
     "EditorContext",

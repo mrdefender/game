@@ -379,9 +379,23 @@ def join():
                 if find_user.flip=="false" or find_user.flip==None:
                     flash ('К сожалению, Ваша заявку на игру не одобрена! Отстуствует тема замены.')
                     return render_template("login.html")  
-                if int(find_user.flip_col) < TPV_REQUIRED_FLIP_QUESTIONS:
-                    flash ('К сожалению, Ваша заявку на игру не одобрена! Недостаточно вопросов замены.')
-                    return render_template("login.html")  
+                # TPV 15.1.2.1.8.13 runtime source
+                required_flip_questions = TPV_REQUIRED_FLIP_QUESTIONS
+
+                try:
+                    from flask import current_app
+                    operational = current_app.extensions.get("tpv_operational_settings")
+                    if operational is not None:
+                        required_flip_questions = int(operational.required_flip_questions())
+                except Exception:
+                    pass
+
+                if int(find_user.flip_col) < required_flip_questions:
+                    flash(
+                        'К сожалению, Ваша заявка на игру не одобрена! '
+                        f'Недостаточно вопросов замены: {find_user.flip_col}/{required_flip_questions}.'
+                    )
+                    return render_template("login.html")
                 user_tpv = QueryTpv()
                 user_tpv.username = request.form['user_name']
                 tmp = db.session.scalar(db.select(QueryTpv).where(QueryTpv.username==user_tpv.username))
@@ -2339,3 +2353,5 @@ if __name__ == "__main__":
     
 
 
+
+# TPV 15.1.2.1.8.7.1 connection marker

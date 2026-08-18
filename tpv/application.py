@@ -36,6 +36,7 @@ from .editor import (
     register_questions,
     register_themes,
     register_users,
+    register_operational_settings,
 )
 
 
@@ -136,10 +137,22 @@ def register_tpv_application(
     )
     namespace.update(theme_exports)
 
+    # 2.4. Operational settings.
+    settings_exports = editor_context.register_module(
+        "operational_settings",
+        register_operational_settings,
+    )
+    namespace["TPV_EDITOR_OPERATIONAL_SETTINGS"] = settings_exports
+    editor_context.runtime.update(settings_exports)
+
     # 2.4. Users module.
     user_exports = editor_context.register_module(
         "users",
         register_users,
+    )
+
+    editor_context.runtime["TPV_EDITOR_USERS_SERVICE"] = (
+        user_exports.get("service")
     )
     namespace["TPV_EDITOR_USERS"] = user_exports
     editor_context.runtime.update(user_exports)
@@ -351,6 +364,7 @@ def register_tpv_application(
         "TPV_EDITOR_HISTORY": history_exports,
         "TPV_EDITOR_THEMES": theme_exports,
         "TPV_EDITOR_DASHBOARD": dashboard_exports,
+        "TPV_EDITOR_OPERATIONAL_SETTINGS": settings_exports,
         "TPV_EDITOR_USERS": user_exports,
         "TPV_EDITOR_QUESTIONS": question_exports,
         "TPV_EDITOR_BUILDER": builder_exports,

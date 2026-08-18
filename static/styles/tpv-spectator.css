@@ -1969,7 +1969,7 @@ output {
 }
 
 .tpv-bank-update {
-  animation: spectatorBankUpdate .34s ease;
+  /*animation: spectatorBankUpdate .34s ease;*/
 }
 
 /* Shared tpv-animations.js exposes Bong methods but the current shared

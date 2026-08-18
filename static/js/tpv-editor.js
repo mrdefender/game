@@ -153,6 +153,11 @@ function init(){
     bind("games-create-table","click",createGamesTables);
     bind("games-reload","click",loadGames);
     bind("records-reload","click",loadRecords);
+    bind("operational-settings-form","submit",saveOperationalSettings);
+    bind("operational-settings-reload","click",loadOperationalSettings);
+    bind("participation-form-enabled","change",renderOperationalSwitches);
+    bind("question-form-enabled","change",renderOperationalSwitches);
+
     bind("appearance-create","click",createAppearanceEngine);
     bind("appearance-reload","click",loadAppearanceThemes);
     bind("appearance-reset","click",resetAppearanceTheme);
@@ -297,6 +302,10 @@ function switchTab(tab){
         appearance:[
             "Оформление",
             "Системные темы и инфраструктура Theme Engine."
+        ],
+        settings:[
+            "Настройки",
+            "Допуск игроков и управление публичными формами TPV."
         ]
     };
 
@@ -325,6 +334,7 @@ function switchTab(tab){
     setHidden("applications-section",tab!=="applications");
     setHidden("games-section",tab!=="games");
     setHidden("appearance-section",tab!=="appearance");
+    setHidden("settings-section",tab!=="settings");
 
     document.querySelectorAll(".users-action").forEach(
         node=>node.hidden=tab!=="users"
@@ -383,6 +393,69 @@ function switchTab(tab){
     }
     if(tab==="appearance"){
         loadAppearanceThemes();
+    }
+    if(tab==="settings"){
+        loadOperationalSettings();
+    }
+}
+
+function renderOperationalSwitches(){
+    const participation=!!e["participation-form-enabled"]?.checked;
+    const questions=!!e["question-form-enabled"]?.checked;
+    if(e["participation-form-label"]){
+        e["participation-form-label"].textContent=participation?"Форма открыта":"Приём закрыт";
+    }
+    if(e["question-form-label"]){
+        e["question-form-label"].textContent=questions?"Форма открыта":"Приём закрыт";
+    }
+}
+
+async function loadOperationalSettings(){
+    try{
+        const response=await api("/tpv_editor/api/operational-settings");
+        const settings=response.settings||{};
+        if(e["required-flip-questions"])e["required-flip-questions"].value=settings.required_flip_questions??5;
+        if(e["participation-form-enabled"])e["participation-form-enabled"].checked=!!settings.public_participation_form_enabled;
+        if(e["question-form-enabled"])e["question-form-enabled"].checked=!!settings.public_question_form_enabled;
+        if(e["operational-settings-state"]){
+            e["operational-settings-state"].textContent="Настройки загружены";
+            e["operational-settings-state"].className="status status-approved";
+        }
+        renderOperationalSwitches();
+    }catch(error){
+        if(e["operational-settings-state"]){
+            e["operational-settings-state"].textContent="Ошибка загрузки";
+            e["operational-settings-state"].className="status status-rejected";
+        }
+        toast(error.message,true);
+    }
+}
+
+async function saveOperationalSettings(event){
+    event.preventDefault();
+    const required=Number(e["required-flip-questions"]?.value);
+    if(!Number.isInteger(required)||required<1||required>100){
+        toast("Количество вопросов должно быть от 1 до 100.",true);
+        return;
+    }
+    try{
+        const response=await api("/tpv_editor/api/operational-settings",{
+            method:"PUT",
+            body:{
+                required_flip_questions:required,
+                public_participation_form_enabled:!!e["participation-form-enabled"]?.checked,
+                public_question_form_enabled:!!e["question-form-enabled"]?.checked
+            }
+        });
+        if(e["operational-settings-state"]){
+            e["operational-settings-state"].textContent="Сохранено";
+            e["operational-settings-state"].className="status status-approved";
+        }
+        renderOperationalSwitches();
+        toast(response.message||"Настройки сохранены.");
+        await Promise.allSettled([loadUsers(),loadThemes(),loadDashboard()]);
+    }catch(error){
+        toast(error.message,true);
     }
 }
 

@@ -444,17 +444,32 @@ def register_question_applications(
             return None
         return message_error_response("Нет доступа к редактору.", 403)
 
+    def public_form_enabled() -> bool:
+        getter = context.get("tpv_public_question_form_enabled")
+        return True if not callable(getter) else bool(getter())
+
     def tpv_question_application_page():
-        return render_template("tpv-question-application.html")
+        return render_template(
+            "tpv-question-application.html",
+            form_enabled=public_form_enabled(),
+        )
 
     def tpv_question_application_status():
+        enabled = public_form_enabled()
         return jsonify({
             "ok": True,
             "table_exists": service.table_exists(),
-            "themes": service.available_themes(),
+            "form_enabled": enabled,
+            "themes": service.available_themes() if enabled else [],
         })
 
     def tpv_question_application_submit():
+        if not public_form_enabled():
+            return message_error_response(
+                "Приём вопросов временно закрыт.",
+                403,
+            )
+
         if not service.table_exists():
             return message_error_response(
                 "Приём заявок временно недоступен.",

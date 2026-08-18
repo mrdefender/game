@@ -1,6 +1,7 @@
 """Проверка качества данных TPV Editor."""
 
 from __future__ import annotations
+from tpv.admission import check_player_admission
 
 import re
 from typing import Any
@@ -348,11 +349,16 @@ class QualityService:
     ) -> None:
         theme = self.normalize_theme(user.flip)
         expected_count = self.count_questions(theme)
+        admission = check_player_admission(
+            expected_count,
+            self.context
+        )
+
         expected_approve = (
             "true"
             if (
                 not self.is_general_theme(theme)
-                and expected_count >= self.required_questions
+                and admission["approved"]
             )
             else "false"
         )

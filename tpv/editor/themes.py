@@ -6,6 +6,7 @@
 """
 
 from __future__ import annotations
+from tpv.admission import check_player_admission
 
 from typing import Any
 
@@ -45,8 +46,19 @@ class ThemeService:
                 {"", "false", "общий"},
             )
         }
-        self.required_questions = int(
-            context.get("TPV_REQUIRED_FLIP_QUESTIONS", 5)
+        self.required_questions_getter = context.get(
+            "tpv_editor_required_flip_questions"
+        )
+
+    @property
+    def required_questions(self) -> int:
+        if callable(self.required_questions_getter):
+            try:
+                return int(self.required_questions_getter())
+            except (TypeError, ValueError):
+                pass
+        return int(
+            self.context.get("TPV_REQUIRED_FLIP_QUESTIONS", 5)
         )
 
     def _dependency(self, name: str) -> Any:
@@ -117,9 +129,14 @@ class ThemeService:
             return
 
         user.flip_col = self.count_questions(user.flip)
+        admission = check_player_admission(
+            user.flip_col,
+            self.context
+        )
+
         user.approve = (
             "true"
-            if user.flip_col >= self.required_questions
+            if admission["approved"]
             else "false"
         )
 
@@ -504,3 +521,9 @@ def register_themes(context: EditorContext) -> dict[str, Any]:
 
 
 __all__ = ["ThemeService", "register_themes"]
+
+
+# TPV 15.1.2.1.4 debug marker
+def _tpv_debug_required_flip_questions(value, fallback):
+    print('TPV DEBUG required_flip_questions=', value, 'fallback=', fallback)
+    return value

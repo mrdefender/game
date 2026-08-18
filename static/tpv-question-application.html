@@ -22,6 +22,12 @@
         <h1>Предложить вопрос</h1>
         <p class="lead">После отправки вопрос попадёт на модерацию и не будет использоваться в игре до утверждения редактором.</p>
 
+        {% if not form_enabled %}
+        <div class="public-alert public-alert-error">
+            Приём вопросов временно закрыт организатором.
+        </div>
+        <p class="lead">Когда приём будет открыт, эта форма снова станет доступна.</p>
+        {% else %}
         <div id="application-unavailable" class="public-alert public-alert-error" hidden>
             Приём заявок временно недоступен: таблица заявок ещё не создана.
         </div>
@@ -74,6 +80,7 @@
         </form>
 
         <div id="public-result" class="public-result" hidden></div>
+        {% endif %}
     </section>
 </main>
 </body>
