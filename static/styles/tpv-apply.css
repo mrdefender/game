@@ -380,9 +380,9 @@ a{
     display:grid;
     place-items:center;
     margin:0 auto 20px;
-    border:2px solid #23844a;
+    border:2px solid #7a0303;
     border-radius:50%;
-    color:#99ffb5;
+    color:#810101;
     background:
         radial-gradient(circle,rgba(32,224,102,.16),transparent 68%),
         #031108;
@@ -392,7 +392,7 @@ a{
 }
 
 .apply-success .apply-kicker{
-    color:#7eff9e;
+    color:#d10f0f;
 }
 
 .apply-number-block{

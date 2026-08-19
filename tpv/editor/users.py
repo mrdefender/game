@@ -16,6 +16,7 @@ from sqlalchemy import func
 
 from .registry import EditorContext
 from .responses import message_error_response
+from .runtime_threshold import required_flip_questions
 
 
 class UserService:
@@ -47,21 +48,10 @@ class UserService:
             "tpv_editor_user_snapshot"
         )
 
-        self.required_questions_getter = context.get(
-            "tpv_editor_required_flip_questions"
-        )
-        self.required_questions_fallback = int(
-            context.get("TPV_REQUIRED_FLIP_QUESTIONS", 5)
-        )
-
     @property
     def required_questions(self) -> int:
-        if callable(self.required_questions_getter):
-            try:
-                return int(self.required_questions_getter())
-            except (TypeError, ValueError):
-                pass
-        return self.required_questions_fallback
+        # 15.1.2.1.9.12.4: resolve operational setting at runtime.
+        return required_flip_questions(self.context)
 
     def _dependency(self, name: str) -> Any:
         value = self.context.get(name)
@@ -96,17 +86,6 @@ class UserService:
             else (user.flip or "")
         )
         approved = str(user.approve).lower() == "true"
-
-        print(
-            "TPV APPROVAL DEBUG:",
-            {
-                "player": user.username,
-                "flip": user.flip,
-                "flip_col": int(user.flip_col or 0),
-                "required_questions": self.required_questions,
-                "source": "UserService.serialize",
-            },
-        )
 
         if not flip_display:
             label = "Тема не выбрана"

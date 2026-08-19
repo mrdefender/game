@@ -398,15 +398,48 @@ function switchTab(tab){
         loadOperationalSettings();
     }
 }
+function updateFormStatusVisual(inputId, labelId) {
+
+    const input = document.getElementById(inputId);
+    const label = document.getElementById(labelId);
+
+    if (!input || !label) {
+        return;
+    }
+
+
+    const container = label.closest(".operational-status-button");
+
+    if (!container) {
+        return;
+    }
+
+
+    if (input.checked) {
+
+        container.classList.remove("status-closed");
+        container.classList.add("status-open");
+
+        label.innerHTML = "🟢 Форма открыта";
+
+    } else {
+
+        container.classList.remove("status-open");
+        container.classList.add("status-closed");
+
+        label.innerHTML = "🔴 Приём закрыт";
+
+    }
+}
 
 function renderOperationalSwitches(){
     const participation=!!e["participation-form-enabled"]?.checked;
     const questions=!!e["question-form-enabled"]?.checked;
     if(e["participation-form-label"]){
-        e["participation-form-label"].textContent=participation?"Форма открыта":"Приём закрыт";
+        updateFormStatusVisual("participation-form-enabled","participation-form-label");
     }
     if(e["question-form-label"]){
-        e["question-form-label"].textContent=questions?"Форма открыта":"Приём закрыт";
+        updateFormStatusVisual("question-form-enabled","question-form-label");
     }
 }
 

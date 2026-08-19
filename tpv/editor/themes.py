@@ -14,6 +14,7 @@ from flask import jsonify, request
 
 from .registry import EditorContext
 from .responses import message_error_response
+from .runtime_threshold import required_flip_questions
 
 
 class ThemeService:
@@ -46,20 +47,10 @@ class ThemeService:
                 {"", "false", "общий"},
             )
         }
-        self.required_questions_getter = context.get(
-            "tpv_editor_required_flip_questions"
-        )
-
     @property
     def required_questions(self) -> int:
-        if callable(self.required_questions_getter):
-            try:
-                return int(self.required_questions_getter())
-            except (TypeError, ValueError):
-                pass
-        return int(
-            self.context.get("TPV_REQUIRED_FLIP_QUESTIONS", 5)
-        )
+        # 15.1.2.1.9.12.4: resolve operational setting at runtime.
+        return required_flip_questions(self.context)
 
     def _dependency(self, name: str) -> Any:
         value = self.context.get(name)
@@ -522,8 +513,3 @@ def register_themes(context: EditorContext) -> dict[str, Any]:
 
 __all__ = ["ThemeService", "register_themes"]
 
-
-# TPV 15.1.2.1.4 debug marker
-def _tpv_debug_required_flip_questions(value, fallback):
-    print('TPV DEBUG required_flip_questions=', value, 'fallback=', fallback)
-    return value

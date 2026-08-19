@@ -1,4 +1,4 @@
-"""TPV Editor operational settings — 15.1.1."""
+"""TPV Editor operational settings — 15.1.2.1.9.12.4."""
 
 from __future__ import annotations
 

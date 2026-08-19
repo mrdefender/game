@@ -43,7 +43,7 @@
         <button class="editor-tab" type="button" data-tab="builder">Конструктор игры</button>
         <button class="editor-tab" type="button" data-tab="applications">Заявки</button>
         <button class="editor-tab" type="button" data-tab="games">Игры</button>
-        <button class="editor-tab" type="button" data-tab="appearance">Оформление</button>
+        <button class="editor-tab" type="button" data-tab="appearance" disabled hidden>Оформление</button>
         <button class="editor-tab" type="button" data-tab="settings">Настройки</button>
     </nav>
 
@@ -1107,10 +1107,11 @@
                     <h3>Заявки на участие</h3>
                     <p>Управляет приёмом новых заявок через <strong>/tpv-apply</strong>. Проверка статуса остаётся доступной.</p>
                 </div>
-                <label class="operational-switch">
+                <label class="operational-status-button status-open">
                     <input id="participation-form-enabled" type="checkbox">
-                    <span class="operational-switch-track" aria-hidden="true"></span>
-                    <span id="participation-form-label">Форма открыта</span>
+                        <span id="participation-form-label">
+                             🟢 Форма открыта
+                        </span>
                 </label>
             </article>
 
@@ -1120,10 +1121,11 @@
                     <h3>Отправка вопросов</h3>
                     <p>Управляет приёмом новых вопросов через <strong>/tpv_questions</strong>.</p>
                 </div>
-                <label class="operational-switch">
+                <label class="operational-status-button status-open">
                     <input id="question-form-enabled" type="checkbox">
-                    <span class="operational-switch-track" aria-hidden="true"></span>
-                    <span id="question-form-label">Форма открыта</span>
+                        <span id="question-form-label">
+                             🟢 Форма открыта
+                        </span>
                 </label>
             </article>
 

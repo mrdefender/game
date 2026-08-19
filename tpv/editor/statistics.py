@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 from flask import jsonify
 from .registry import EditorContext
+from .runtime_threshold import required_flip_questions
 
 
 class StatisticsService:
@@ -17,23 +18,12 @@ class StatisticsService:
         self.theme_rows = self._dep("tpv_editor_theme_rows")
         self.is_general_theme = self._dep("tpv_editor_is_general_theme")
         self.normalize_text = self._dep("tpv_editor_normalize_text")
-        self.required_questions_getter = context.get(
-            "tpv_editor_required_flip_questions"
-        )
 
-        if callable(self.required_questions_getter):
-            try:
-                self.required_questions = int(
-                    self.required_questions_getter()
-                )
-            except (TypeError, ValueError):
-                self.required_questions = int(
-                    context.get("TPV_REQUIRED_FLIP_QUESTIONS", 5)
-                )
-        else:
-            self.required_questions = int(
-                context.get("TPV_REQUIRED_FLIP_QUESTIONS", 5)
-            )
+
+    @property
+    def required_questions(self) -> int:
+        # 15.1.2.1.9.12.4: never cache this value at service startup.
+        return required_flip_questions(self.context)
 
     def _dep(self, name: str) -> Any:
         value = self.context.get(name)
