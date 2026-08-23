@@ -769,11 +769,22 @@ output {
 }
 
 .answer-indicators i.correct {
-  color: #a4ffbd;
+  color:transparent;
   border-color: var(--green);
   background: #0c6630;
   box-shadow:
     0 0 14px rgba(32,220,105,.42);
+}
+
+.answer-indicators i.correct::after {
+  content:"✔";
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:#4ebb7d;
+  font-size:21px;
+  font-weight:900;
 }
 
 .answer-indicators i.wrong {

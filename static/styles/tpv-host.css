@@ -346,12 +346,24 @@ button:disabled {
   font-weight:900;
 }
 
+
 .status-orb-correct-answer {
+  color:transparent!important;
   border-color:var(--green)!important;
-  background:#0f672f!important;
-  color:#9bffb8!important;
-  box-shadow:0 0 8px rgba(32,224,102,.4);
+  background:#01702c!important;
 }
+
+.status-orb-correct-answer::after {
+  content:"✔";
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:#4ebb7d;
+  font-size:15px;
+  font-weight:900;
+}
+
 
 .status-orb-pass {
   color:transparent!important;
