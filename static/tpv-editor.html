@@ -43,7 +43,6 @@
         <button class="editor-tab" type="button" data-tab="builder">Конструктор игры</button>
         <button class="editor-tab" type="button" data-tab="applications">Заявки</button>
         <button class="editor-tab" type="button" data-tab="games">Игры</button>
-        <button class="editor-tab" type="button" data-tab="appearance" disabled hidden>Оформление</button>
         <button class="editor-tab" type="button" data-tab="settings">Настройки</button>
     </nav>
 
@@ -230,7 +229,6 @@
         <section id="games-content">
             <div class="games-subtabs">
                 <button class="games-subtab is-active" type="button" data-games-view="archive">Архив</button>
-                <button class="games-subtab" type="button" disabled title="Будет реализовано в следующих подэтапах 10.2">Сезоны</button>
                 <button class="games-subtab" type="button" data-games-view="records">Рекорды</button>
                 <button class="games-subtab" type="button" data-games-view="analytics">Аналитика</button>
             </div>
@@ -264,6 +262,7 @@
                         <label><span>Сортировка</span><select id="games-sort"><option value="new-desc">Сначала новые</option><option value="new-asc">Сначала старые</option><option value="prize-desc">По выигрышу</option></select></label>
                         <button id="games-reload" class="button button-muted" type="button">Обновить</button>
                         <button id="games-export-all" class="button button-muted" type="button">Экспорт архива</button>
+                        <button id="games-clear-all" class="button button-danger" type="button">Очистить архив</button>
                         <button id="games-import" class="button button-muted" type="button">Импорт JSON</button>
                         <input id="games-import-file" type="file" accept=".json,application/json" hidden>
                         <button id="games-new" class="button button-primary" type="button">Новая запись</button>
@@ -271,7 +270,6 @@
                     <div class="table-wrap"><table class="games-table"><thead><tr><th>№</th><th>Дата</th><th>Сезон</th><th>Игра / Builder</th><th>Игроков</th><th>Победитель</th><th>Выигрыш</th><th>Время</th><th></th></tr></thead><tbody id="games-table-body"></tbody></table><div id="games-empty" class="empty-state" hidden>Игры не найдены.</div></div>
                 </section>
             </section>
-            <section id="games-seasons-view" hidden><section id="games-seasons-grid" class="games-card-grid"></section></section>
             <section id="games-records-view" hidden>
                 <section class="editor-panel records-hero">
                     <div>
@@ -1136,135 +1134,7 @@
         </form>
     </section>
 
-    <section id="appearance-section" class="editor-section" hidden>
-        <section id="appearance-missing" class="editor-panel appearance-missing" hidden>
-            <div>
-                <div class="eyebrow">TPV THEME ENGINE · 10.2.8.1</div>
-                <h2>Theme Engine не создан</h2>
-                <p>Создайте отдельные таблицы настроек оформления.</p>
-            </div>
-            <button id="appearance-create" class="button button-primary" type="button">
-                Создать Theme Engine
-            </button>
-        </section>
-
-        <section id="appearance-content" hidden>
-            <section class="editor-panel appearance-hero">
-                <div>
-                    <div class="eyebrow">TPV THEME ENGINE · 10.2.8.1</div>
-                    <h2>Оформление TPV Editor</h2>
-                    <p>Выбор темы меняет только существующие базовые CSS-переменные.</p>
-                </div>
-                <div class="appearance-current">
-                    <span>Текущая тема</span>
-                    <strong id="appearance-current-name">TPV Dark</strong>
-                </div>
-            </section>
-
-            <section class="editor-panel appearance-panel">
-                <div class="appearance-panel-head">
-                    <div>
-                        <div class="eyebrow">СИСТЕМНЫЕ ТЕМЫ</div>
-                        <h3>Готовые палитры</h3>
-                    </div>
-                    <div class="header-actions">
-                        <button id="appearance-reload" class="button button-muted" type="button">Обновить</button>
-                        <button id="appearance-reset" class="button button-danger-soft" type="button">Сбросить</button>
-                    </div>
-                </div>
-                <div id="appearance-theme-grid" class="appearance-theme-grid"></div>
-            </section>
-
-            <section id="appearance-designer" class="editor-panel appearance-designer" hidden>
-                <div class="appearance-panel-head">
-                    <div>
-                        <div class="eyebrow">THEME DESIGNER · 10.2.8.2</div>
-                        <h3>Редактор пользовательской темы</h3>
-                    </div>
-                    <span id="appearance-designer-status" class="appearance-designer-status">
-                        Изменения не сохранены
-                    </span>
-                </div>
-
-                <div class="appearance-designer-layout">
-                    <div class="appearance-designer-form">
-                        <div class="form-grid">
-                            <label>
-                                <span>Название темы</span>
-                                <input id="appearance-theme-name" type="text" maxlength="120">
-                            </label>
-                            <label>
-                                <span>Slug</span>
-                                <input id="appearance-theme-slug" type="text" maxlength="80">
-                            </label>
-                            <label class="field-wide">
-                                <span>Описание</span>
-                                <textarea id="appearance-theme-description" rows="3" maxlength="300"></textarea>
-                            </label>
-                        </div>
-
-                        <div id="appearance-color-fields" class="appearance-color-fields"></div>
-                    </div>
-
-                    <aside class="appearance-preview">
-                        <div class="eyebrow">LIVE PREVIEW</div>
-                        <h4>Предпросмотр компонентов</h4>
-
-                        <div class="appearance-preview-panel">
-                            <strong>Панель TPV Editor</strong>
-                            <small>Текст, границы и основной акцент.</small>
-                            <div class="appearance-preview-actions">
-                                <button class="button button-primary" type="button">Primary</button>
-                                <button class="button button-secondary" type="button">Secondary</button>
-                            </div>
-                            <div class="appearance-preview-statuses">
-                                <span class="status status-approved">Успех</span>
-                                <span class="status status-rejected">Ошибка</span>
-                            </div>
-                        </div>
-                    </aside>
-                </div>
-
-                <div class="appearance-designer-actions">
-                    <button id="appearance-save-theme" class="button button-primary" type="button">
-                        Сохранить тему
-                    </button>
-                    <button id="appearance-cancel-preview" class="button button-muted" type="button">
-                        Отменить изменения
-                    </button>
-                    <button id="appearance-export-theme" class="button button-muted" type="button">
-                        Экспорт theme.json
-                    </button>
-                    <button id="appearance-delete-theme" class="button button-danger-soft" type="button">
-                        Удалить тему
-                    </button>
-                </div>
-            </section>
-
-            <section class="editor-panel appearance-tools">
-                <div>
-                    <strong>Пользовательские темы</strong>
-                    <p>Создайте копию активной темы или импортируйте готовый theme.json.</p>
-                </div>
-                <div class="header-actions">
-                    <button id="appearance-copy-theme" class="button button-secondary" type="button">
-                        Создать копию
-                    </button>
-                    <button id="appearance-import-theme" class="button button-muted" type="button">
-                        Импорт theme.json
-                    </button>
-                    <input
-                        id="appearance-import-file"
-                        type="file"
-                        accept=".json,application/json"
-                        hidden
-                    >
-                </div>
-            </section>
-        </section>
-    </section>
-
-<dialog id="user-dialog">
+    <dialog id="user-dialog">
 <form id="user-form" method="dialog">
     <div class="dialog-header"><div><div class="eyebrow">КАРТОЧКА ПОЛЬЗОВАТЕЛЯ</div><h2 id="dialog-title">Новый пользователь</h2></div><button class="icon-button" id="dialog-close" type="button">×</button></div>
     <input id="user-id" type="hidden">

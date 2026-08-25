@@ -1,5 +1,5 @@
 (()=>{"use strict";
-const s={users:[],themes:[],questions:[],authors:[],current:null,currentQuestion:null,currentTheme:null,themeRows:[],qualityIssues:[],qualityStats:{},statistics:null,importPreview:null,historyItems:[],historyStats:{},builderItems:[],builderPreview:[],currentBuild:null,applications:[],currentApplication:null,dashboard:null,games:[],gameStats:{},currentGame:null,gamesView:"archive",tab:"dashboard",replayEvents:[],replayIndex:0,replayTimer:null,replayPlaying:false,replaySpeed:1,records:null,appearanceThemes:[],appearanceTheme:null,appearanceDraft:null,appearanceSavedVariables:null,appearancePreviewDirty:false},e={};
+const s={users:[],themes:[],questions:[],authors:[],current:null,currentQuestion:null,currentTheme:null,themeRows:[],qualityIssues:[],qualityStats:{},statistics:null,importPreview:null,historyItems:[],historyStats:{},builderItems:[],builderPreview:[],currentBuild:null,applications:[],currentApplication:null,dashboard:null,games:[],gameStats:{},currentGame:null,gamesView:"archive",tab:"dashboard",replayEvents:[],replayIndex:0,replayTimer:null,replayPlaying:false,replaySpeed:1,records:null},e={};
 document.addEventListener("DOMContentLoaded",init);
 function init(){
     document.querySelectorAll("[id]").forEach(node=>{
@@ -157,26 +157,8 @@ function init(){
     bind("operational-settings-reload","click",loadOperationalSettings);
     bind("participation-form-enabled","change",renderOperationalSwitches);
     bind("question-form-enabled","change",renderOperationalSwitches);
-
-    bind("appearance-create","click",createAppearanceEngine);
-    bind("appearance-reload","click",loadAppearanceThemes);
-    bind("appearance-reset","click",resetAppearanceTheme);
-    bind("appearance-copy-theme","click",copyAppearanceTheme);
-    bind("appearance-save-theme","click",saveAppearanceTheme);
-    bind("appearance-cancel-preview","click",cancelAppearancePreview);
-    bind("appearance-export-theme","click",exportAppearanceTheme);
-    bind("appearance-delete-theme","click",deleteAppearanceTheme);
-    bind("appearance-import-theme","click",()=>e["appearance-import-file"]?.click());
-    bind("appearance-import-file","change",importAppearanceTheme);
-    bind("appearance-color-fields","input",handleAppearanceDesignerInput);
-    bind("appearance-theme-name","input",markAppearanceDraftDirty);
-    bind("appearance-theme-slug","input",markAppearanceDraftDirty);
-    bind("appearance-theme-description","input",markAppearanceDraftDirty);
-    bind("appearance-theme-grid","click",event=>{
-        const card=event.target.closest("[data-appearance-theme]");
-        if(card)selectAppearanceTheme(card.dataset.appearanceTheme);
-    });
     bind("games-export-all","click",exportGamesArchive);
+    bind("games-clear-all","click",clearGamesArchive);
     bind("games-import","click",()=>e["games-import-file"]?.click());
     bind("games-import-file","change",importGamesArchive);
     bind("games-new","click",()=>openGame(null));
@@ -231,7 +213,6 @@ function init(){
         fixQualityIssue(button.dataset.fixIssue);
     });
 
-    loadCurrentAppearanceTheme();
     loadAll();
 }
 
@@ -297,11 +278,7 @@ function switchTab(tab){
         ],
         games:[
             "Игры",
-            "Архив проведённых игр, сезоны, рекорды и аналитика."
-        ],
-        appearance:[
-            "Оформление",
-            "Системные темы и инфраструктура Theme Engine."
+            "Архив проведённых игр, рекорды и аналитика."
         ],
         settings:[
             "Настройки",
@@ -333,7 +310,6 @@ function switchTab(tab){
     setHidden("builder-section",tab!=="builder");
     setHidden("applications-section",tab!=="applications");
     setHidden("games-section",tab!=="games");
-    setHidden("appearance-section",tab!=="appearance");
     setHidden("settings-section",tab!=="settings");
 
     document.querySelectorAll(".users-action").forEach(
@@ -390,9 +366,6 @@ function switchTab(tab){
 
     if(tab==="games"){
         loadGames();
-    }
-    if(tab==="appearance"){
-        loadAppearanceThemes();
     }
     if(tab==="settings"){
         loadOperationalSettings();
@@ -2260,7 +2233,7 @@ function renderGamesAnalytics(analytics){
 }
 
 function renderCompact(id,items,mapper){if(!e[id])return;e[id].innerHTML=items.map(x=>{const [a,b]=mapper(x);return `<div class="dashboard-compact-item"><div><strong>${esc(a)}</strong><small>${esc(b)}</small></div></div>`}).join("")}
-function switchGamesView(view){s.gamesView=view;document.querySelectorAll("[data-games-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.gamesView===view));["archive","seasons","records","analytics"].forEach(v=>setHidden(`games-${v}-view`,v!==view))}
+function switchGamesView(view){s.gamesView=view;document.querySelectorAll("[data-games-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.gamesView===view));["archive","records","analytics"].forEach(v=>setHidden(`games-${v}-view`,v!==view))}
 function parsePipeLines(value,keys){return String(value||"").split(/\r?\n/).map(v=>v.trim()).filter(Boolean).map(line=>{const parts=line.split("|").map(v=>v.trim()),obj={};keys.forEach((k,i)=>obj[k]=parts[i]||"");return obj})}
 function gamePayload(){
     return{
@@ -2792,6 +2765,31 @@ async function exportGameJson(){
         toast("Игра экспортирована.");
     }catch(error){
         toast(error.message,true);
+    }
+}
+
+async function clearGamesArchive(){
+    const games=Array.isArray(s.games)?s.games:[];
+    if(!games.length){toast("Архив игр уже пуст.");return;}
+    const count=games.length;
+    if(!confirm(`Полностью очистить архив игр?\n\nБудут удалены все ${count} игр и связанные архивные данные.`))return;
+    if(!confirm("Подтвердите ещё раз: удалить ВЕСЬ архив игр? Это действие нельзя отменить."))return;
+    const button=e["games-clear-all"];
+    if(button){button.disabled=true;button.textContent="Очистка…";}
+    try{
+        let deleted=0;
+        for(const id of games.map(x=>Number(x.id)).filter(Number.isFinite)){
+            await api(`/tpv_editor/api/games/${id}`,{method:"DELETE"});
+            deleted++;
+        }
+        toast(`Архив очищен. Удалено игр: ${deleted}.`);
+        await loadGames();
+        if(s.gamesView==="records")await loadRecords();
+    }catch(error){
+        toast(`Очистка архива остановлена: ${error.message}`,true);
+        await loadGames();
+    }finally{
+        if(button){button.disabled=false;button.textContent="Очистить архив";}
     }
 }
 

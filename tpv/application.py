@@ -14,7 +14,6 @@ from typing import Any, Mapping
 from .models import create_tpv_models
 from .editor_routes import register_tpv_editor_routes
 from .archive import register_tpv_archive
-from .theme_engine import register_tpv_editor_theme_engine
 from .archive_runtime import TpvArchiveRuntime
 from .services import create_tpv_archive_snapshot_service
 from .socket_handlers import register_tpv_socket_handlers
@@ -295,15 +294,7 @@ def register_tpv_application(
     }
     namespace.update(archive_exports)
 
-    # 4. Theme Engine / Theme Designer backend.
-    theme_models = register_tpv_editor_theme_engine(
-        app,
-        db,
-        allowed=route_exports["tpv_editor_allowed"],
-        error=route_exports["tpv_editor_error"],
-    )
-    namespace["TPV_EDITOR_THEME_MODELS"] = theme_models
-
+    # Theme Engine оформления удалён как неактуальный.
     # Backup Center.
     backup_exports = register_tpv_backup_center(
         app,
@@ -377,7 +368,6 @@ def register_tpv_application(
         "TPV_EDITOR_IMPORTING": importing_exports,
         **route_exports,
         **archive_exports,
-        "TPV_EDITOR_THEME_MODELS": theme_models,
         "TPV_BACKUP_CENTER": backup_exports,
         "TPV_PARTICIPATION": participation_exports,
         "TpvParticipationApplication": participation_model,
