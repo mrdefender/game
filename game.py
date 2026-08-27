@@ -377,7 +377,7 @@ def join():
                     flash ('К сожалению, Ваша заявку на игру не найдена.')
                     return render_template("login.html")
                 if find_user.flip=="false" or find_user.flip==None:
-                    flash ('К сожалению, Ваша заявку на игру не одобрена! Отстуствует тема замены.')
+                    flash ('К сожалению, Ваша заявку на игру не подтверждена! Отстуствует тема замены.')
                     return render_template("login.html")  
                 # TPV 15.1.2.1.8.13 runtime source
                 required_flip_questions = TPV_REQUIRED_FLIP_QUESTIONS
@@ -392,7 +392,7 @@ def join():
 
                 if int(find_user.flip_col) < required_flip_questions:
                     flash(
-                        'К сожалению, Ваша заявка на игру не одобрена! '
+                        'К сожалению, Ваша заявка на игру не подтверждена! '
                         f'Недостаточно вопросов замены: {find_user.flip_col}/{required_flip_questions}.'
                     )
                     return render_template("login.html")
