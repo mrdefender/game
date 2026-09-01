@@ -982,10 +982,11 @@ function show_winner_otbor(data){
             inputName.setAttribute('id', 'r'+i.toString());
             inputName.setAttribute('innerText', "Игрок: " + data[i][1]+ "      " +"Ответ: " + data[i][2]+ "      "+"Время: "+data[i][4]);
             inputName.setAttribute('value',"Игрок: " + data[i][1]+ "      " +"Ответ: " + data[i][2]+ "      "+"Время: "+data[i][4]);
+            
             document.body.appendChild(inputName);
             if (data[i][2]=='0')
             {
-                 document.getElementById('r'+i.toString()).disabled = true;
+                 document.getElementById('r'+i.toString()).classList.add("disabled");
             }
             if (data[i][5]=="winner otbor")
             {
