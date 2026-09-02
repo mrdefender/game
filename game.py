@@ -328,27 +328,46 @@ def give_name_game(game_name):
 
 @app.route('/join', methods=["POST", "GET"])
 def join():
+    from tpv.auth.yandex import get_yandex_user, is_yandex_auth_enabled
+    yandex_user = get_yandex_user()
+    yandex_required = is_yandex_auth_enabled()
+
     if request.method == 'POST':
         if 'userLogged' in session:
             pass
         print(request.form)
-        if request.form['user_name']== "":
+        posted_name = str(request.form.get('user_name') or '').strip()
+        posted_room = str(request.form.get('room_id') or '').strip()
+        technical_host = (posted_name == HOST_USERNAME and posted_room == DEFAULT_ROOM_CODE)
+
+        if yandex_required and not yandex_user and not technical_host:
+            flash('Для входа игрока требуется авторизация через Яндекс')
+            return redirect('/auth/yandex?next=/join')
+
+        # При включённой Яндекс-авторизации обычному игроку имя нельзя
+        # подменить формой. При выключенной настройке TPV Editor разрешён
+        # прежний ручной ввод имени. Технический ведущий работает всегда.
+        if technical_host or not yandex_required:
+            user_name = posted_name
+        else:
+            user_name = str(yandex_user.get('display_name') or '').strip()
+        if user_name == "":
            flash ('Требуется авторизация')
-           return render_template("login.html")
-        if  (request.form['user_name']!=HOST_USERNAME) and (request.form['room_id']==DEFAULT_ROOM_CODE):
+           return render_template("login.html", yandex_user=yandex_user)
+        if  (user_name!=HOST_USERNAME) and (request.form['room_id']==DEFAULT_ROOM_CODE):
            flash ('Неверный код комнаты')
-           return render_template("login.html")
-        if (request.form['user_name']==HOST_USERNAME)  and (request.form['room_id']==DEFAULT_ROOM_CODE):
-           # _users[0] = request.form['user_name']
+           return render_template("login.html", yandex_user=yandex_user)
+        if (user_name==HOST_USERNAME)  and (request.form['room_id']==DEFAULT_ROOM_CODE):
+           # _users[0] = user_name
             init_game()
             return render_template("select.html")
         else:
             if check_id_room(request.form['room_id'])==False:
                 flash ('Неверный код комнаты')
-                return render_template("login.html")
+                return render_template("login.html", yandex_user=yandex_user)
             if give_name_game(request.form['room_id']) == 'slot':
                 u = Users()
-                u.username = request.form['user_name']
+                u.username = user_name
                 u.answer = "0"
                 u.money = 0
                 u.time = datetime.now()
@@ -364,7 +383,7 @@ def join():
 
                             
                     #else:
-                     #   return render_template("login.html")                       
+                     #   return render_template("login.html", yandex_user=yandex_user)                       
                 db.session.add(u)
                 db.session.flush()
                 db.session.commit()
@@ -372,13 +391,13 @@ def join():
                 ch = login_user(u)
                 return render_template("user_slot.html",value=u.username)
             if give_name_game(request.form['room_id']) == 'tpv':
-                find_user = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==request.form['user_name']))
+                find_user = db.session.scalar(db.select(UsersTpv).where(UsersTpv.username==user_name))
                 if find_user == None:
                     flash ('К сожалению, Ваша заявку на игру не найдена.')
-                    return render_template("login.html")
+                    return render_template("login.html", yandex_user=yandex_user)
                 if find_user.flip=="false" or find_user.flip==None:
                     flash ('К сожалению, Ваша заявку на игру не подтверждена! Отстуствует тема замены.')
-                    return render_template("login.html")  
+                    return render_template("login.html", yandex_user=yandex_user)  
                 # TPV 15.1.2.1.8.13 runtime source
                 required_flip_questions = TPV_REQUIRED_FLIP_QUESTIONS
 
@@ -395,9 +414,9 @@ def join():
                         'К сожалению, Ваша заявка на игру не подтверждена! '
                         f'Недостаточно вопросов замены: {find_user.flip_col}/{required_flip_questions}.'
                     )
-                    return render_template("login.html")
+                    return render_template("login.html", yandex_user=yandex_user)
                 user_tpv = QueryTpv()
-                user_tpv.username = request.form['user_name']
+                user_tpv.username = user_name
                 tmp = db.session.scalar(db.select(QueryTpv).where(QueryTpv.username==user_tpv.username))
                 if tmp!=None:
                     if tmp.username == user_tpv.username:
@@ -418,7 +437,7 @@ def join():
                 ch = login_user(user_tpv)
                 return render_template("tpv-user.html",value=user_tpv.username)
                     
-    return render_template("login.html")
+    return render_template("login.html", yandex_user=yandex_user)
 
 @app.route('/select', methods=["POST", "GET"])
 def select():

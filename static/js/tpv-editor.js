@@ -155,6 +155,9 @@ function init(){
     bind("records-reload","click",loadRecords);
     bind("operational-settings-form","submit",saveOperationalSettings);
     bind("operational-settings-reload","click",loadOperationalSettings);
+    bind("yandex-auth-enabled","change",renderOperationalSwitches);
+    bind("participation-form-enabled","change",renderOperationalSwitches);
+    bind("question-form-enabled","change",renderOperationalSwitches);
     bind("participation-form-enabled","change",renderOperationalSwitches);
     bind("question-form-enabled","change",renderOperationalSwitches);
     bind("games-export-all","click",exportGamesArchive);
@@ -408,11 +411,19 @@ function updateFormStatusVisual(inputId, labelId) {
 function renderOperationalSwitches(){
     const participation=!!e["participation-form-enabled"]?.checked;
     const questions=!!e["question-form-enabled"]?.checked;
+    const yandex=!!e["yandex-auth-enabled"]?.checked;
     if(e["participation-form-label"]){
         updateFormStatusVisual("participation-form-enabled","participation-form-label");
     }
     if(e["question-form-label"]){
         updateFormStatusVisual("question-form-enabled","question-form-label");
+    }
+    if(e["yandex-auth-label"]){
+        const label=e["yandex-auth-label"];
+        const box=label.closest(".operational-status-button");
+        label.textContent=yandex?"🟢 Авторизация включена":"🔴 Авторизация отключена";
+        box?.classList.toggle("status-open",yandex);
+        box?.classList.toggle("status-closed",!yandex);
     }
 }
 
@@ -423,6 +434,7 @@ async function loadOperationalSettings(){
         if(e["required-flip-questions"])e["required-flip-questions"].value=settings.required_flip_questions??5;
         if(e["participation-form-enabled"])e["participation-form-enabled"].checked=!!settings.public_participation_form_enabled;
         if(e["question-form-enabled"])e["question-form-enabled"].checked=!!settings.public_question_form_enabled;
+        if(e["yandex-auth-enabled"])e["yandex-auth-enabled"].checked=settings.yandex_auth_enabled!==false;
         if(e["operational-settings-state"]){
             e["operational-settings-state"].textContent="Настройки загружены";
             e["operational-settings-state"].className="status status-approved";
@@ -450,7 +462,8 @@ async function saveOperationalSettings(event){
             body:{
                 required_flip_questions:required,
                 public_participation_form_enabled:!!e["participation-form-enabled"]?.checked,
-                public_question_form_enabled:!!e["question-form-enabled"]?.checked
+                public_question_form_enabled:!!e["question-form-enabled"]?.checked,
+                yandex_auth_enabled:!!e["yandex-auth-enabled"]?.checked
             }
         });
         if(e["operational-settings-state"]){

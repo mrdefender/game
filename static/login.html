@@ -31,9 +31,20 @@
         </div>
 
         <p class="subtitle">
-          Введите имя и код комнаты. После подключения это устройство станет вашим игровым пультом.
+          {% if yandex_auth_enabled %}
+          Войдите через Яндекс и введите код комнаты. Имя игрока берётся из real_name, а если оно не заполнено — из login.
+          {% else %}
+          Введите имя игрока и код комнаты. Авторизация через Яндекс отключена.
+          {% endif %}
         </p>
 
+        {% if yandex_auth_enabled and not yandex_user %}
+        <div class="yandex-auth-box">
+          <strong>Для входа игрока нужна авторизация</strong>
+          <span>Имя игрока будет получено из вашего профиля Яндекса.</span>
+          <a class="submit yandex-login" href="/auth/yandex?next=/join"><span class="yandex-logo" aria-hidden="true">Я</span><span>Войти через Яндекс</span></a>
+        </div>
+        {% else %}
         <form action="/join" method="post" class="form" id="loginForm">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -43,26 +54,44 @@
               <span class="hint">отображается в игре</span>
             </div>
             <div class="input" id="nameShell">
-              <input id="name" name="user_name" type="text" placeholder="Введите имя"
-                     required autofocus autocomplete="name">
+              <input id="name" name="user_name" type="text" value="{{ yandex_user.display_name if (yandex_auth_enabled and yandex_user) else '' }}"
+                     {% if yandex_auth_enabled %}readonly{% endif %} required autocomplete="name" placeholder="Введите имя">
             </div>
             <div class="message" id="nameMessage"></div>
           </div>
 
           <div class="group">
             <div class="labelrow">
-              <label for="room">Код игровой комнаты</label>
-              <span class="hint"></span>
+              <label for="room">Код комнаты</label>
+              <span class="hint">4 цифры</span>
             </div>
             <div class="input room" id="roomShell">
-              <input id="room" name="room_id" type="text" inputmode="numeric"
-                     maxlength="8" placeholder="1234" required autocomplete="one-time-code">
+              <input id="room" name="room_id" type="text" inputmode="numeric" maxlength="8" placeholder="0000" required>
             </div>
-            <div class="message" id="roomMessage">Код сообщает ведущий перед подключением к игре.</div>
+            <div class="message" id="roomMessage"></div>
           </div>
 
-          <button class="submit" id="submitBtn" type="submit">ВОЙТИ В ИГРУ</button>
+          <button class="submit" type="submit">ВОЙТИ В ИГРУ</button>
         </form>
+        {% endif %}
+
+        {% if yandex_auth_enabled %}
+        <div class="technical-entry-link">
+          <a href="/join?technical=1">Технический вход →</a>
+        </div>
+
+        {% if request.args.get('technical') == '1' %}
+        <div class="technical-login" id="technical-login">
+          <div class="technical-login-title">Технический вход ведущего</div>
+          <form action="/join" method="post" class="form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="group"><div class="input"><input name="user_name" type="text" placeholder="Имя ведущего" required></div></div>
+            <div class="group"><div class="input room"><input name="room_id" type="text" inputmode="numeric" maxlength="8" placeholder="Код" required></div></div>
+            <button class="submit" type="submit">ТЕХНИЧЕСКИЙ ВХОД</button>
+          </form>
+        </div>
+        {% endif %}
+        {% endif %}
 
         {% for msg in get_flashed_messages() %}
           <div class="flash">{{ msg }}</div>
@@ -116,11 +145,11 @@ const modal=document.getElementById("modal");
 const modalTitle=document.getElementById("modalTitle");
 const modalContent=document.getElementById("modalContent");
 
-room.addEventListener("input",()=>{
+room?.addEventListener("input",()=>{
   room.value=room.value.replace(/\D/g,"").slice(0,8);
 });
 
-form.addEventListener("submit",()=>{
+form?.addEventListener("submit",()=>{
   submitBtn.disabled=true;
   submitBtn.textContent="ПОДКЛЮЧЕНИЕ…";
 });

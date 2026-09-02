@@ -19,6 +19,7 @@ from .services import create_tpv_archive_snapshot_service
 from .socket_handlers import register_tpv_socket_handlers
 from .backup_center import register_tpv_backup_center
 from .participation import register_tpv_participation
+from .auth import register_yandex_auth
 from .diagnostics import register_tpv_diagnostics
 from .editor import (
     create_editor_context,
@@ -77,11 +78,16 @@ def register_tpv_application(
     }
     namespace.update(model_exports)
 
+    # 1.0.1. Yandex ID authentication for TPV public forms.
+    auth_exports = register_yandex_auth(app)
+    namespace["TPV_YANDEX_AUTH"] = auth_exports
+
     # 1.1. Participation applications infrastructure.
     participation_exports = register_tpv_participation(app, db)
     participation_model = participation_exports["model"]
     participation_service = participation_exports["service"]
     namespace.update({
+        "TPV_YANDEX_AUTH": auth_exports,
         "TPV_PARTICIPATION": participation_exports,
         "TpvParticipationApplication": participation_model,
         "TPV_PARTICIPATION_SERVICE": participation_service,
@@ -369,6 +375,7 @@ def register_tpv_application(
         **route_exports,
         **archive_exports,
         "TPV_BACKUP_CENTER": backup_exports,
+        "TPV_YANDEX_AUTH": auth_exports,
         "TPV_PARTICIPATION": participation_exports,
         "TpvParticipationApplication": participation_model,
         "TPV_PARTICIPATION_SERVICE": participation_service,

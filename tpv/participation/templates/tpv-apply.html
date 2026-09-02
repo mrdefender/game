@@ -1,9 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="dark">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Заявка на участие — TPV</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,23 +25,34 @@
                 <header class="apply-header">
                     <p class="apply-kicker">TPV · ЗАЯВКА ИГРОКА</p>
                     <h1 id="apply-title">Подать заявку на участие</h1>
-                    <p>Укажите имя или никнейм и тему, с которой хотите сыграть.</p>
+                    <p>{% if yandex_auth_enabled %}Войдите через Яндекс и укажите тему, с которой хотите сыграть.{% else %}Укажите имя и тему, с которой хотите сыграть.{% endif %}</p>
                 </header>
 
+                {% if yandex_auth_enabled and not yandex_user %}
+                <section class="tpv-auth-box" aria-live="polite">
+                    <p><strong>Для подачи заявки нужна авторизация.</strong></p>
+                    <p>Имя будет получено из Яндекс ID: сначала real_name, а если оно не заполнено — login.</p>
+                    <a class="apply-button tpv-yandex-login" href="/auth/yandex?next=/tpv-apply"><span class="yandex-logo" aria-hidden="true">Я</span><span>Войти через Яндекс</span></a>
+                    {% if request.args.get('auth_error') %}
+                    <p class="apply-global-error">Не удалось выполнить вход через Яндекс. Попробуйте ещё раз.</p>
+                    {% endif %}
+                </section>
+                {% else %}
+                {% if yandex_user %}
+                <section class="tpv-auth-box tpv-auth-ok">
+                    <span>Вы вошли как</span>
+                    <strong id="authenticated-name">{{ yandex_user.display_name }}</strong>
+                </section>
+                {% endif %}
+
                 <form id="tpv-apply-form" novalidate>
+                    {% if not yandex_auth_enabled and not yandex_user %}
                     <div class="apply-field">
-                        <label for="display-name">Имя / Никнейм</label>
-                        <input
-                            id="display-name"
-                            name="display_name"
-                            type="text"
-                            maxlength="100"
-                            autocomplete="nickname"
-                            required
-                        >
+                        <label for="display-name">Имя / никнейм</label>
+                        <input id="display-name" name="display_name" maxlength="160" required autocomplete="name">
                         <p class="apply-error" id="display-name-error" aria-live="polite"></p>
                     </div>
-
+                    {% endif %}
                     <div class="apply-field">
                         <label for="theme">Тема</label>
                         <textarea
@@ -69,6 +79,7 @@
                     Отправляя заявку, вы подтверждаете, что предложенная тема
                     вами изучена.
                 </p>
+                {% endif %}
             </div>
 
             <section id="apply-success-view" class="apply-success" hidden aria-live="polite">

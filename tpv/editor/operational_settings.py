@@ -16,6 +16,7 @@ DEFAULTS = {
     "required_flip_questions": "5",
     "public_participation_form_enabled": "true",
     "public_question_form_enabled": "true",
+    "yandex_auth_enabled": "true",
 }
 
 
@@ -101,6 +102,7 @@ class OperationalSettingsService:
             "public_question_form_enabled": self.bool_setting(
                 "public_question_form_enabled"
             ),
+            "yandex_auth_enabled": self.bool_setting("yandex_auth_enabled"),
         }
 
     def save(self, data: dict[str, Any]) -> dict[str, Any]:
@@ -136,6 +138,10 @@ class OperationalSettingsService:
         self._set_raw(
             "public_question_form_enabled",
             bool_value("public_question_form_enabled"),
+        )
+        self._set_raw(
+            "yandex_auth_enabled",
+            bool_value("yandex_auth_enabled"),
         )
         self.db.session.commit()
         return self.serialize()
@@ -228,6 +234,9 @@ def register_operational_settings(
             lambda: service.bool_setting(
                 "public_question_form_enabled"
             )
+        ),
+        "tpv_yandex_auth_enabled": (
+            lambda: service.bool_setting("yandex_auth_enabled")
         ),
     }
 

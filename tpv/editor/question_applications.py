@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import Any
 
 from flask import jsonify, render_template, request
+from tpv.auth.yandex import get_yandex_user, is_yandex_auth_enabled
 from sqlalchemy import func, inspect
 
 from .registry import EditorContext
@@ -33,6 +34,9 @@ class QuestionApplicationService:
         self.QuestionsTpv = self._dependency("Questions_tpv")
         self.QuestionApplication = self._dependency(
             "TpvQuestionApplication"
+        )
+        self.ParticipationApplication = self.context.get(
+            "TpvParticipationApplication"
         )
 
         self.normalize_text = self._dependency(
@@ -110,6 +114,60 @@ class QuestionApplicationService:
             themes_by_key.setdefault(value.casefold(), value)
 
         return sorted(themes_by_key.values(), key=str.casefold)
+
+    def user_for_identity(self, yandex_user: dict[str, Any] | None):
+        """Find a TPV player by the Yandex display name only.
+
+        We intentionally do not store or use Yandex ID. The canonical public
+        identity is real_name with login fallback, saved in display_name.
+        """
+        if not yandex_user:
+            return None
+        display_name = self.normalize_text(yandex_user.get("display_name"))
+        if not display_name:
+            return None
+        return self.db.session.scalar(
+            self.db.select(self.UsersTpv).where(
+                func.lower(self.UsersTpv.username) == display_name.casefold()
+            )
+        )
+
+    def own_theme_for_identity(self, yandex_user: dict[str, Any] | None) -> str | None:
+        user = self.user_for_identity(yandex_user)
+        if user is not None:
+            theme = self.normalize_theme(user.flip)
+            if not self.is_general_theme(theme):
+                return theme
+
+        # If the player has not yet been created, use their latest active
+        # participation application, matched by the same display name.
+        display_name = self.normalize_text((yandex_user or {}).get("display_name"))
+        if display_name and self.ParticipationApplication is not None:
+            application = self.db.session.scalar(
+                self.db.select(self.ParticipationApplication)
+                .where(
+                    func.lower(self.ParticipationApplication.display_name)
+                    == display_name.casefold(),
+                    self.ParticipationApplication.status != "rejected",
+                )
+                .order_by(self.ParticipationApplication.id.desc())
+            )
+            if application is not None:
+                theme = self.normalize_theme(application.theme)
+                if not self.is_general_theme(theme):
+                    return theme
+        return None
+
+    def public_themes(self, yandex_user: dict[str, Any] | None) -> list[str]:
+        themes = self.available_themes()
+        own_theme = self.own_theme_for_identity(yandex_user)
+        if not own_theme:
+            return themes
+        own_key = self.normalize_text(own_theme).casefold()
+        return [
+            theme for theme in themes
+            if self.normalize_text(theme).casefold() != own_key
+        ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, str]:
         author = self.normalize_text(data.get("author"))
@@ -195,8 +253,25 @@ class QuestionApplicationService:
             "author_exists": author_exists,
         }
 
-    def submit(self, data: dict[str, Any]) -> Any:
-        values = self.validate(data)
+    def submit(
+        self,
+        data: dict[str, Any],
+        *,
+        yandex_user: dict[str, Any],
+    ) -> Any:
+        public_data = dict(data)
+        public_data["author"] = yandex_user.get("display_name")
+        values = self.validate(public_data)
+
+        own_theme = self.own_theme_for_identity(yandex_user)
+        if own_theme and not self.is_general_theme(values["flip"]):
+            if (
+                self.normalize_text(values["flip"]).casefold()
+                == self.normalize_text(own_theme).casefold()
+            ):
+                raise PermissionError(
+                    "Нельзя отправлять вопросы по своей теме."
+                )
 
         duplicate = self.db.session.scalar(
             self.db.select(self.QuestionApplication).where(
@@ -449,18 +524,35 @@ def register_question_applications(
         return True if not callable(getter) else bool(getter())
 
     def tpv_question_application_page():
+        auth_enabled = is_yandex_auth_enabled(context.app)
         return render_template(
             "tpv-question-application.html",
             form_enabled=public_form_enabled(),
+            yandex_user=(get_yandex_user() if auth_enabled else None),
+            yandex_auth_enabled=auth_enabled,
         )
 
     def tpv_question_application_status():
         enabled = public_form_enabled()
+        auth_enabled = is_yandex_auth_enabled(context.app)
+        yandex_user = get_yandex_user() if auth_enabled else None
+        if not yandex_user and not auth_enabled:
+            manual_author = service.normalize_text(request.args.get("author"))
+            if manual_author:
+                yandex_user = {"display_name": manual_author, "login": ""}
+        own_theme = service.own_theme_for_identity(yandex_user)
         return jsonify({
             "ok": True,
             "table_exists": service.table_exists(),
             "form_enabled": enabled,
-            "themes": service.available_themes() if enabled else [],
+            "auth_enabled": auth_enabled,
+            "authenticated": bool(yandex_user) if auth_enabled else True,
+            "user": ({
+                "display_name": yandex_user.get("display_name"),
+                "login": yandex_user.get("login"),
+            } if yandex_user else None),
+            "own_theme": own_theme,
+            "themes": service.public_themes(yandex_user) if enabled else [],
         })
 
     def tpv_question_application_submit():
@@ -476,10 +568,30 @@ def register_question_applications(
                 503,
             )
 
+        data = request.get_json(silent=True) or {}
+        auth_enabled = is_yandex_auth_enabled(context.app)
+        yandex_user = get_yandex_user() if auth_enabled else None
+        if auth_enabled and not yandex_user:
+            return message_error_response(
+                "Для отправки вопроса необходимо войти через Яндекс.",
+                401,
+            )
+        if not yandex_user:
+            manual_author = service.normalize_text(data.get("author"))
+            if not manual_author:
+                return message_error_response(
+                    "Укажите имя или никнейм автора.",
+                    400,
+                )
+            yandex_user = {"display_name": manual_author, "login": ""}
+
         try:
             row = service.submit(
-                request.get_json(silent=True) or {}
+                data,
+                yandex_user=yandex_user,
             )
+        except PermissionError as exc:
+            return message_error_response(str(exc), 403)
         except LookupError as exc:
             return message_error_response(str(exc), 409)
         except ValueError as exc:
@@ -616,6 +728,12 @@ def register_question_applications(
         (
             "/tpv_questions",
             "tpv_question_application_page",
+            tpv_question_application_page,
+            ["GET"],
+        ),
+        (
+            "/tpv-question",
+            "tpv_question_application_page_alias",
             tpv_question_application_page,
             ["GET"],
         ),

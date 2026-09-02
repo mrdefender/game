@@ -10,6 +10,7 @@ from flask import Blueprint, jsonify, render_template, request
 
 from .constants import ApplicationSource, ApplicationStatus, ThemeStatus
 from .services import ParticipationValidationError
+from tpv.auth.yandex import get_yandex_user, is_yandex_auth_enabled
 
 
 def register_participation_routes(app, *, service):
@@ -50,9 +51,12 @@ def register_participation_routes(app, *, service):
 
     @public.get("/tpv-apply")
     def participation_application_page():
+        auth_enabled = is_yandex_auth_enabled(app)
         return render_template(
             "tpv-apply.html",
             form_enabled=public_form_enabled(),
+            yandex_user=(get_yandex_user() if auth_enabled else None),
+            yandex_auth_enabled=auth_enabled,
         )
 
     @public.get("/tpv-apply/status")
@@ -119,9 +123,24 @@ def register_participation_routes(app, *, service):
         if not isinstance(data, dict):
             data = request.form.to_dict()
 
+        auth_enabled = is_yandex_auth_enabled(app)
+        yandex_user = get_yandex_user() if auth_enabled else None
+        if auth_enabled and not yandex_user:
+            return jsonify({
+                "ok": False,
+                "error": "Для подачи заявки необходимо войти через Яндекс.",
+                "code": "authentication_required",
+            }), 401
+
+        display_name = (
+            yandex_user.get("display_name")
+            if yandex_user
+            else data.get("display_name")
+        )
+
         try:
             application = service.create_application(
-                display_name=data.get("display_name"),
+                display_name=display_name,
                 theme=data.get("theme"),
                 created_from=ApplicationSource.PUBLIC_FORM,
             )

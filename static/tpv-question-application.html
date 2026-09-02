@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-public-common.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-question-application.css') }}">
     <script src="{{ url_for('static', filename='js/csrf.js') }}"></script>
@@ -27,17 +26,31 @@
             Приём вопросов временно закрыт организатором.
         </div>
         <p class="lead">Когда приём будет открыт, эта форма снова станет доступна.</p>
+        {% elif yandex_auth_enabled and not yandex_user %}
+        <section class="tpv-auth-box">
+            <p><strong>Для отправки вопроса необходимо войти через Яндекс.</strong></p>
+            <p>Имя автора берётся из real_name профиля Яндекса, а если оно не заполнено — из login. Поле имени не редактируется.</p>
+            <a class="tpv-yandex-login" href="/auth/yandex?next=/tpv-question"><span class="yandex-logo" aria-hidden="true">Я</span><span>Войти через Яндекс</span></a>
+            {% if request.args.get('auth_error') %}
+            <div class="public-alert public-alert-error">Не удалось выполнить вход через Яндекс. Попробуйте ещё раз.</div>
+            {% endif %}
+        </section>
         {% else %}
         <div id="application-unavailable" class="public-alert public-alert-error" hidden>
             Приём заявок временно недоступен: таблица заявок ещё не создана.
         </div>
 
-        <form id="public-application-form">
-            <label>
-                <span>Ваше имя</span>
-                <input id="public-author" type="text" maxlength="100" required>
-            </label>
+        <section class="tpv-auth-box tpv-auth-ok">
+            <span>Автор</span>
+            {% if yandex_user %}
+            <strong id="public-author-name">{{ yandex_user.display_name }}</strong>
+            {% else %}
+            <input id="public-author-input" type="text" maxlength="160" autocomplete="name" placeholder="Имя / никнейм" required>
+            {% endif %}
+            <small id="public-own-theme" hidden></small>
+        </section>
 
+        <form id="public-application-form">
             <label>
                 <span>Тип вопроса</span>
                 <select id="public-type">

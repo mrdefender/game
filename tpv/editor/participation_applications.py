@@ -185,11 +185,11 @@ class ParticipationApplicationEditorService:
                 "Создать игрока можно только из одобренной заявки."
             )
 
+        duplicate_conditions = [
+            func.lower(self.UsersTpv.username) == row.display_name.casefold()
+        ]
         duplicate = self.db.session.scalar(
-            self.db.select(self.UsersTpv).where(
-                func.lower(self.UsersTpv.username)
-                == row.display_name.casefold()
-            )
+            self.db.select(self.UsersTpv).where(or_(*duplicate_conditions))
         )
         if duplicate is not None:
             raise LookupError(
