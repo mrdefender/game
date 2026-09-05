@@ -5,18 +5,18 @@ from __future__ import annotations
 
 class ApplicationStatus:
     NEW = "new"
-    IN_REVIEW = "in_review"
+    IN_REVIEW = "reviewing"
     NEEDS_CLARIFICATION = "needs_clarification"
-    APPROVED = "approved"
-    COMPLETED = "completed"
+    ACCEPTED = "accepted"
+    CONFIRMED = "confirmed"
     REJECTED = "rejected"
 
     ALL = (
         NEW,
         IN_REVIEW,
         NEEDS_CLARIFICATION,
-        APPROVED,
-        COMPLETED,
+        ACCEPTED,
+        CONFIRMED,
         REJECTED,
     )
 
@@ -24,8 +24,8 @@ class ApplicationStatus:
         NEW: "Новая",
         IN_REVIEW: "На рассмотрении",
         NEEDS_CLARIFICATION: "Требуется уточнение",
-        APPROVED: "Одобрена",
-        COMPLETED: "Завершена",
+        ACCEPTED: "Принята",
+        CONFIRMED: "Подтверждена",
         REJECTED: "Отклонена",
     }
 

@@ -1,11 +1,30 @@
+from __future__ import annotations
+
+# TPV 15.1.3.7.4 STATUS NORMALIZER
+LEGACY_APPLICATION_STATUS_MAP = {
+    "pending": "reviewing",
+    "approved": "accepted",
+    "completed": "confirmed",
+}
+
+def normalize_application_status(value):
+    if value is None:
+        return None
+    value = str(value).strip()
+    return LEGACY_APPLICATION_STATUS_MAP.get(value, value)
+
 """Сервис заявок на участие TPV."""
 
-from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
 
 from .constants import ApplicationSource, ApplicationStatus, ThemeStatus
+
+LEGACY_APPLICATION_STATUS_MAP = {"pending": "reviewing", "approved": "accepted", "completed": "confirmed"}
+def normalize_application_status(value):
+    return LEGACY_APPLICATION_STATUS_MAP.get(value, value)
+
 
 
 class ParticipationValidationError(ValueError):
@@ -126,6 +145,7 @@ class TpvParticipationService:
         editor_comment: Any | None = None,
     ):
         if status is not None:
+            status = normalize_application_status(status)
             if status not in ApplicationStatus.ALL:
                 raise ParticipationValidationError(
                     "Неизвестный статус заявки."

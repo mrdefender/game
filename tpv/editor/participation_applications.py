@@ -1,3 +1,18 @@
+from __future__ import annotations
+
+# TPV 15.1.3.7.4 STATUS NORMALIZER
+LEGACY_APPLICATION_STATUS_MAP = {
+    "pending": "reviewing",
+    "approved": "accepted",
+    "completed": "confirmed",
+}
+
+def normalize_application_status(value):
+    if value is None:
+        return None
+    value = str(value).strip()
+    return LEGACY_APPLICATION_STATUS_MAP.get(value, value)
+
 """Заявки на участие TPV Editor — этап 13.5.2.
 
 Редакторская логика вынесена из ``tpv.participation.editor``.
@@ -5,7 +20,6 @@
 ``tpv.participation.routes``.
 """
 
-from __future__ import annotations
 
 from datetime import datetime
 from typing import Any
@@ -18,14 +32,20 @@ from tpv.participation.services import ParticipationValidationError
 
 from .registry import EditorContext
 from .responses import message_error_response
+from tpv.admission import check_player_admission
+
+LEGACY_APPLICATION_STATUS_MAP = {"pending": "reviewing", "approved": "accepted", "completed": "confirmed"}
+def normalize_application_status(value):
+    return LEGACY_APPLICATION_STATUS_MAP.get(value, value)
+
 
 
 class ParticipationApplicationEditorService:
     """Модерация заявок на участие и создание игроков."""
 
     PROCESSED_STATUSES = (
-        ApplicationStatus.APPROVED,
-        ApplicationStatus.COMPLETED,
+        ApplicationStatus.ACCEPTED,
+        ApplicationStatus.CONFIRMED,
         ApplicationStatus.REJECTED,
     )
 
@@ -91,9 +111,13 @@ class ParticipationApplicationEditorService:
         status: str,
         theme_status: str,
     ) -> dict[str, Any]:
+        # TPV 15.1.3.8 SYNC BEFORE READ
+        self.sync_runtime_statuses()
         query = self.db.select(self.model)
 
+        status = normalize_application_status(status)
         if status != "all":
+            status = normalize_application_status(status)
             if status not in ApplicationStatus.ALL:
                 raise ValueError("Некорректный статус заявки.")
             query = query.where(self.model.status == status)
@@ -143,7 +167,7 @@ class ParticipationApplicationEditorService:
                     for row in all_rows
                 ),
                 "approved": sum(
-                    row.status == ApplicationStatus.APPROVED
+                    row.status == ApplicationStatus.ACCEPTED
                     for row in all_rows
                 ),
             },
@@ -179,8 +203,51 @@ class ParticipationApplicationEditorService:
         self.db.session.commit()
         return row
 
+
+    # TPV 15.1.3.8 PARTICIPATION RUNTIME STATUS SYNC
+    def sync_runtime_statuses(self) -> int:
+        """Sync accepted applications with the existing player admission state."""
+        accepted = self.db.session.scalars(
+            self.db.select(self.model).where(
+                self.model.status == ApplicationStatus.ACCEPTED
+            )
+        ).all()
+        if not accepted:
+            return 0
+
+        users = self.db.session.scalars(self.db.select(self.UsersTpv)).all()
+
+        def key(value):
+            return " ".join(str(value or "").strip().split()).casefold()
+
+        by_name = {}
+        for user in users:
+            by_name.setdefault(key(user.username), []).append(user)
+
+        changed = 0
+        for row in accepted:
+            candidates = by_name.get(key(row.display_name), [])
+            player = next(
+                (user for user in candidates if key(user.flip) == key(row.theme)),
+                None,
+            )
+            if player is None:
+                continue
+
+            # Canonical existing path recalculates flip_col and approve.
+            self.update_approval(player)
+            if str(player.approve or "").casefold() == "true":
+                row.status = ApplicationStatus.CONFIRMED
+                changed += 1
+
+        if changed:
+            self.db.session.commit()
+        else:
+            self.db.session.flush()
+        return changed
+
     def create_player(self, row: Any) -> Any:
-        if row.status != ApplicationStatus.APPROVED:
+        if row.status != ApplicationStatus.ACCEPTED:
             raise RuntimeError(
                 "Создать игрока можно только из одобренной заявки."
             )
@@ -208,7 +275,17 @@ class ParticipationApplicationEditorService:
         self.db.session.add(player)
         self.db.session.flush()
 
-        row.status = ApplicationStatus.COMPLETED
+        # TPV 15.1.3.8.1: player has already been recalculated by
+        # self.update_approval(player); use that exact player for admission.
+        admission = check_player_admission(
+            int(getattr(player, "flip_col", 0) or 0),
+            self.context,
+        )
+        row.status = (
+            ApplicationStatus.CONFIRMED
+            if admission.get("approved")
+            else ApplicationStatus.ACCEPTED
+        )
 
         self.history_add(
             "user",

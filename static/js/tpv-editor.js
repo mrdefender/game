@@ -1,3 +1,14 @@
+
+const PARTICIPATION_APPLICATION_STATUS_LABELS = Object.freeze({
+  new: "Новая",
+  reviewing: "На рассмотрении",
+  accepted: "Принята",
+  confirmed: "Подтверждена",
+  rejected: "Отклонена"
+});
+function participationApplicationStatusLabel(status){
+  return PARTICIPATION_APPLICATION_STATUS_LABELS[status] || status || "—";
+}
 (()=>{"use strict";
 const s={users:[],themes:[],questions:[],authors:[],current:null,currentQuestion:null,currentTheme:null,themeRows:[],qualityIssues:[],qualityStats:{},statistics:null,importPreview:null,historyItems:[],historyStats:{},builderItems:[],builderPreview:[],currentBuild:null,applications:[],currentApplication:null,dashboard:null,games:[],gameStats:{},currentGame:null,gamesView:"archive",tab:"dashboard",replayEvents:[],replayIndex:0,replayTimer:null,replayPlaying:false,replaySpeed:1,records:null},e={};
 document.addEventListener("DOMContentLoaded",init);
@@ -2866,4 +2877,107 @@ async function importGamesArchive(event){
 }
 
 
+})();
+
+/* TPV 15.1.3.7.3 PARTICIPATION CARD HARD SYNC */
+(() => {
+    "use strict";
+    const STATUSES = [
+        ["new", "Новая"],
+        ["reviewing", "На рассмотрении"],
+        ["accepted", "Принята"],
+        ["confirmed", "Подтверждена"],
+        ["rejected", "Отклонена"],
+    ];
+    function normText(value){
+        return String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
+    }
+    function isParticipationDialog(dialog){
+        if(!dialog) return false;
+        const text=normText(dialog.textContent);
+        return text.includes("модерация заявки на участие")
+            || (text.includes("статус заявки")
+                && text.includes("проверка темы")
+                && text.includes("создать игрока"));
+    }
+    function findStatusSelect(dialog){
+        for(const label of dialog.querySelectorAll("label")){
+            const caption=label.querySelector("span");
+            if(normText(caption?.textContent)==="статус заявки"){
+                return label.querySelector("select");
+            }
+        }
+        return null;
+    }
+    function syncSelect(select){
+        if(!select) return;
+        const legacy={pending:"reviewing",approved:"accepted",completed:"confirmed"};
+        const wanted=legacy[select.value] || select.value || "new";
+        const signature=STATUSES.map(([v,t])=>`${v}:${t}`).join("|");
+        if(select.dataset.tpvParticipationStatuses!==signature){
+            select.replaceChildren(...STATUSES.map(([value,label])=>{
+                const option=document.createElement("option");
+                option.value=value;
+                option.textContent=label;
+                return option;
+            }));
+            select.dataset.tpvParticipationStatuses=signature;
+        }
+        if(STATUSES.some(([value])=>value===wanted)) select.value=wanted;
+    }
+    function syncBadges(scope=document){
+        scope.querySelectorAll(".application-status").forEach(badge=>{
+            const text=normText(badge.textContent);
+            if(text==="принята") badge.classList.add("application-status-accepted");
+            if(text==="подтверждена") badge.classList.add("application-status-confirmed");
+        });
+    }
+    function syncParticipationCards(){
+        document.querySelectorAll("dialog").forEach(dialog=>{
+            if(!isParticipationDialog(dialog)) return;
+            syncSelect(findStatusSelect(dialog));
+            syncBadges(dialog);
+        });
+        syncBadges(document);
+    }
+    document.addEventListener("DOMContentLoaded", syncParticipationCards);
+    document.addEventListener("click", ()=>setTimeout(syncParticipationCards,0), true);
+    document.addEventListener("change", event=>{
+        const dialog=event.target?.closest?.("dialog");
+        if(dialog && isParticipationDialog(dialog)) setTimeout(syncParticipationCards,0);
+    }, true);
+    new MutationObserver(syncParticipationCards).observe(document.documentElement,{
+        childList:true, subtree:true
+    });
+})();
+
+/* TPV 15.1.3.7.4.1 STATUS COLOR HARD FIX */
+(() => {
+  "use strict";
+  function norm(v){ return String(v||"").replace(/\s+/g," ").trim().toLowerCase(); }
+  function paint(el, kind){
+    if(!el) return;
+    if(kind==="accepted"){
+      el.classList.add("tpv-status-accepted-hard");
+      el.style.setProperty("color","#67e8f9","important");
+      el.style.setProperty("border-color","rgba(34,211,238,.78)","important");
+      el.style.setProperty("background","rgba(8,145,178,.22)","important");
+    } else if(kind==="confirmed"){
+      el.classList.add("tpv-status-confirmed-hard");
+      el.style.setProperty("color","#86efac","important");
+      el.style.setProperty("border-color","rgba(34,197,94,.78)","important");
+      el.style.setProperty("background","rgba(22,163,74,.22)","important");
+    }
+  }
+  function refresh(){
+    document.querySelectorAll(".application-status,.status,.status-badge,.badge,[data-status],[class*='status']").forEach(el=>{
+      const t=norm(el.textContent), d=norm(el.getAttribute("data-status"));
+      if(t==="принята" || d==="accepted") paint(el,"accepted");
+      if(t==="подтверждена" || d==="confirmed") paint(el,"confirmed");
+    });
+  }
+  document.addEventListener("DOMContentLoaded",refresh);
+  document.addEventListener("click",()=>setTimeout(refresh,0),true);
+  document.addEventListener("change",()=>setTimeout(refresh,0),true);
+  new MutationObserver(refresh).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
 })();

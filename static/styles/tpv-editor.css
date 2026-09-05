@@ -4023,3 +4023,31 @@ textarea:focus {
         0 0 18px
         rgba(239,68,68,.45);
 }
+
+/* TPV 15.1.3.7.3 PARTICIPATION STATUS COLORS */
+.application-status-accepted,
+.application-status.application-status-accepted {
+    color: #67e8f9 !important;
+    border-color: rgba(34, 211, 238, .72) !important;
+    background: rgba(8, 145, 178, .18) !important;
+    box-shadow: 0 0 14px rgba(34, 211, 238, .16);
+}
+.application-status-confirmed,
+.application-status.application-status-confirmed {
+    color: #86efac !important;
+    border-color: rgba(34, 197, 94, .72) !important;
+    background: rgba(22, 163, 74, .18) !important;
+    box-shadow: 0 0 14px rgba(34, 197, 94, .16);
+}
+
+/* TPV 15.1.3.7.4.1 STATUS COLOR HARD FIX */
+.tpv-status-accepted-hard {
+  color:#67e8f9 !important;
+  border-color:rgba(34,211,238,.78) !important;
+  background:rgba(8,145,178,.22) !important;
+}
+.tpv-status-confirmed-hard {
+  color:#86efac !important;
+  border-color:rgba(34,197,94,.78) !important;
+  background:rgba(22,163,74,.22) !important;
+}
