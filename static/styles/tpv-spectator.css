@@ -2162,3 +2162,29 @@ output {
     line-height: 1.25;
   }
 }
+
+
+/* Long text: wrap instead of ellipsis */
+#room-url,
+#vs-player,
+.selection-name,
+.brand-logo--header strong,
+#current-player,
+.public-stat > output,
+.question-author,
+.result-name,
+#award-name {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.question-text,
+#bong-question-author {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}

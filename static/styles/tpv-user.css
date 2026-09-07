@@ -1133,3 +1133,22 @@ button {
     transition-duration: .001ms !important;
   }
 }
+
+
+/* Long text: wrap instead of ellipsis */
+#welcome2,
+.metric-card > output,
+.question-author,
+.bong-display__value--text {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+#question-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-overflow: clip;
+}

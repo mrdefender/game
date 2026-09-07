@@ -24,6 +24,7 @@ html,body {
   margin:0;
   min-height:100%;
   background:#000;
+  overflow-wrap: anywhere;
 }
 
 body {
@@ -1215,4 +1216,24 @@ button:disabled {
   0% { transform:translateX(-120%); opacity:0; }
   20% { opacity:.38; }
   100% { transform:translateX(120%); opacity:0; }
+}
+
+
+/* Long text: wrap instead of ellipsis */
+.ng-brand strong,
+.bong-info output,
+.ng-player-name,
+.status-users th,
+.status-users td {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.ng-question textarea {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-overflow: clip;
 }
