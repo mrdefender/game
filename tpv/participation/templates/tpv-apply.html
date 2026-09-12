@@ -32,6 +32,7 @@
                 <section class="tpv-auth-box" aria-live="polite">
                     <p><strong>Для подачи заявки нужна авторизация.</strong></p>
                     <p>Имя будет получено из Яндекс ID: сначала real_name, а если оно не заполнено — login.</p>
+                    <p>Нажимая на кнпоку войти, вы соглашаетсь на обработку данных, таких как имени/login из вашего профиля.</p>
                     <a class="apply-button tpv-yandex-login" href="/auth/yandex?next=/tpv-apply"><span class="yandex-logo" aria-hidden="true">Я</span><span>Войти через Яндекс</span></a>
                     {% if request.args.get('auth_error') %}
                     <p class="apply-global-error">Не удалось выполнить вход через Яндекс. Попробуйте ещё раз.</p>

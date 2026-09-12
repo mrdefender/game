@@ -3226,7 +3226,7 @@ function timer_otbor(){
     if (document.getElementById("au").value == "0")
     {
         document.getElementById("answer_otbor").disabled = false;
-        setTimeout(() => {playAudio("otbor_timeout.ogg",true);}, 3500);
+        setTimeout(() => {playAudio("otbor_timeout.ogg",true);}, 2000);
         return;
     }
     document.getElementById("au").value = (parseInt(document.getElementById("au").value)-1).toString();

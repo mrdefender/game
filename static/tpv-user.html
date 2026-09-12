@@ -26,6 +26,7 @@
       <div class="player-brand__copy">
         <span id="welcome">ДОБРО ПОЖАЛОВАТЬ НА ИГРУ</span>
         <strong id="welcome2">{{ game_name|default('The People Versus') }}</strong>
+        <span id="welcome">Пульт игрока</span>
       </div>
     </section>
 
@@ -116,8 +117,16 @@
       </div>
     </aside>
 
+    <!-- QUESTION AUTHOR
+         Separate broadcast-style element, like on the spectator screen. -->
+    
+
     <!-- QUESTION -->
     <section class="question-panel tpv-player-question-panel" id="section-question" hidden>
+      <section class="question-author-card" id="question-author-card" aria-label="Автор вопроса">
+      <span class="question-author-card__label">АВТОР ВОПРОСА</span>
+      <output id="question-author" class="question-author-card__name">—</output>
+    </section>
       <div class="question-stage">
 
         <aside class="question-number-shell" aria-label="Номер вопроса">
@@ -132,10 +141,6 @@
               ТЕКУЩИЙ ВОПРОС
             </div>
 
-            <div class="question-author-shell">
-              <span class="question-author-label">АВТОР ВОПРОСА</span>
-              <output id="question-author" class="question-author">—</output>
-            </div>
           </div>
 
           <div class="question-text-shell">

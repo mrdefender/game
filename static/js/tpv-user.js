@@ -613,7 +613,7 @@ socket.on("question_selected_user", async (payload) => {
 
     clearAnswerResultState();
     document.getElementById("question-text").textContent = data.question || "";
-    document.getElementById("question-author").textContent = data.author || "";
+    document.getElementById("question-author").textContent = "";
     setQuestionMarker(replacementQuestionPending ? "replacement" : "question", data.questionNumber);
 
     showPlayerTimer({showMetrics: true});
@@ -622,7 +622,12 @@ socket.on("question_selected_user", async (payload) => {
         TPVAnimation.showQuestion(),
         TPVAnimation.showTimer(),
     ]);
-
+    const bankCard = document.getElementById("metric-bank");
+    if (bankCard.value<=0)
+    {
+        bankCard.hidden = true;
+    }
+    setTimeout(() => { document.getElementById("question-author").textContent = data.author || "— Автор вопроса —";}, 1500);
     TPVAnimation.activateRound(
         Number(document.getElementById("control-round").value)
     );

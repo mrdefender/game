@@ -279,9 +279,12 @@ function showQuestion(payload) {
   $("round-stage").hidden = false;
   $("money-tree").hidden = true;
   $("section-question").hidden = false;
-
+ $("question-author").textContent = " — Автор вопроса —";
   $("question-text").textContent = data.question || "";
-  $("question-author").textContent = data.author || "— Автор вопроса —";
+  setTimeout(() => {
+    $("question-author").textContent = data.author || "— Автор вопроса —";
+    }, 1500);
+  
   $("num_question").textContent =
     data.replacement ? "↻" : `В.${Number(data.questionNumber) || Number(state.question) || 1}`;
 

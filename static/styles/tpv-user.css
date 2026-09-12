@@ -152,6 +152,10 @@ button {
   font-size: 11px;
   font-weight: 900;
   text-align: center;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-overflow: clip;
 }
 
 .socket-status {
@@ -1151,4 +1155,1407 @@ button {
   overflow-wrap: anywhere;
   word-break: normal;
   text-overflow: clip;
+}
+
+
+/* ========================================================================
+   TPV PLAYER — TWITCH VERSUS / BROADCAST STYLE
+   Visual override only. Existing IDs, hidden states and JS hooks preserved.
+   ======================================================================== */
+
+:root{
+  --tv-bg:#05080b;
+  --tv-panel:#004653;
+  --tv-panel-hi:#006174;
+  --tv-cyan:#0ac8dc;
+  --tv-cyan-soft:#0b8192;
+  --tv-metal:#87969b;
+  --tv-ink:#030709;
+  --tv-red:#e9160b;
+  --tv-orange:#ff8b00;
+}
+
+html,body{
+  background:#05080b !important;
+}
+
+body{
+  background-image:none !important;
+  color:#fff;
+}
+
+.tpv-player-shell{
+  width:min(1500px,100%);
+  min-height:100dvh;
+  padding:clamp(8px,1vw,15px);
+}
+
+/* ---------------- TOP BAR ---------------- */
+.player-topbar{
+  min-height:82px;
+  border:2px solid var(--tv-cyan-soft);
+  border-radius:25px;
+  background:linear-gradient(180deg,#00596a,#003a46);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.13),
+    inset 0 -6px 12px rgba(0,0,0,.24),
+    0 0 0 6px rgba(0,0,0,.70),
+    0 0 0 8px rgba(125,139,144,.48);
+}
+
+.player-brand__mark{
+  width:95px;
+  color:#fff;
+  font-size:30px;
+  font-style:italic;
+  text-shadow:0 2px 2px #001f26;
+}
+
+#welcome{
+  color:#70e3ed;
+  font-size:9px;
+}
+
+#welcome2{
+  color:#fff;
+  font-style:italic;
+  font-weight:600;
+  text-shadow:0 2px 2px #00252d;
+}
+
+.player-topbar__right{
+  gap:12px;
+  padding:10px 14px;
+}
+
+.player-name-chip{
+  min-width:220px;
+  max-width:360px;
+  height:48px;
+  border:2px solid #0b8799;
+  border-radius:999px;
+  padding:0 18px;
+  color:#fff;
+  background:linear-gradient(180deg,#006074,#003e4b);
+  font-size:14px;
+  font-style:italic;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.12),
+    0 0 0 4px rgba(0,0,0,.55);
+}
+
+.socket-status{
+  min-height:45px;
+  border:2px solid #31565e;
+  border-radius:999px;
+  color:#a9cbd0;
+  background:#061014;
+}
+.socket-online .socket-dot{
+  background:#00d8b2;
+  box-shadow:0 0 10px #00d8b2;
+}
+
+/* ---------------- STATUS ---------------- */
+.game-status{
+  min-height:66px;
+  grid-template-columns:8px 1fr;
+  border:2px solid #0a7180;
+  border-radius:20px;
+  background:linear-gradient(180deg,#004653,#002e38);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08);
+}
+.game-status__signal{
+  background:#0ac8dc;
+  box-shadow:0 0 14px rgba(10,200,220,.8);
+}
+.game-status__title{color:#8ef3fb}
+.game-status__text{color:#c4dfe3}
+
+/* ---------------- METRICS ---------------- */
+.player-metrics{
+  gap:10px;
+}
+.metric-card{
+  min-height:72px;
+  border:2px solid #0b8192;
+  border-radius:20px;
+  background:linear-gradient(180deg,#005264,#003642);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.10),
+    0 0 0 3px rgba(0,0,0,.42);
+}
+.metric-card::before{display:none}
+.metric-card>span{
+  color:#75dce6;
+  font-size:8px;
+}
+.metric-card>output{
+  color:#fff;
+  font-style:italic;
+  font-weight:600;
+}
+.metric-card--bank{
+  border-color:#e86e00;
+  background:linear-gradient(180deg,#ef250e,#bd0804);
+}
+.metric-card--bank>span,
+.metric-card--bank>output{color:#fff}
+.metric-card--flip{
+  background:linear-gradient(180deg,#00505f,#00343e);
+}
+
+/* ---------------- MAIN LAYOUT ---------------- */
+.player-game-grid{
+  grid-template-columns:minmax(230px,18vw) minmax(0,1fr);
+  gap:14px;
+}
+
+/* ---------------- MONEY TREE ---------------- */
+.tpv-player-money-tree{
+  border:0;
+  border-radius:0;
+  overflow:visible;
+  background:transparent;
+}
+.tpv-player-money-tree .panel-heading{
+  border:0;
+  border-radius:18px;
+  margin-bottom:13px;
+  color:#d8f8fb;
+  background:linear-gradient(180deg,#005465,#003844);
+  box-shadow:0 0 0 5px rgba(0,0,0,.58);
+}
+.money-tree__rows{
+  gap:13px;
+  padding:8px 10px;
+}
+.money-row{
+  position:relative;
+  min-height:68px;
+  grid-template-columns:66px 1fr;
+  overflow:visible;
+  border:2px solid #0b8192;
+  border-radius:20px;
+  padding:0 18px 0 0;
+  color:#fff;
+  background:linear-gradient(180deg,#00596a,#003b47);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.12),
+    0 0 0 5px rgba(0,0,0,.64),
+    0 0 0 7px rgba(126,140,145,.45);
+}
+.money-row span{
+  align-self:stretch;
+  display:grid;
+  place-items:center;
+  margin:-7px 0 -7px -11px;
+  border:2px solid #0c8fa1;
+  border-radius:50%;
+  color:#b7f6fb;
+  background:radial-gradient(circle at 38% 30%,#0b7384,#003d49 63%,#001a20);
+  font-size:13px;
+  font-style:italic;
+  box-shadow:0 0 0 5px rgba(0,0,0,.62);
+}
+.money-row strong{
+  font-size:clamp(18px,1.5vw,25px);
+  font-style:italic;
+  font-weight:600;
+}
+.money-row--top strong{color:#fff}
+.money-row.is-active{
+  border-color:#c7fbff;
+  background:linear-gradient(180deg,#08788b,#004754);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.18),
+    0 0 0 4px #e7fbfd,
+    0 0 0 8px rgba(0,0,0,.65),
+    0 0 18px rgba(0,210,230,.22);
+}
+
+/* ---------------- QUESTION ---------------- */
+.tpv-player-question-panel{
+  padding:14px;
+  border:2px solid #0b8192;
+  border-radius:28px;
+  background:linear-gradient(180deg,#003b47,#001e25);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.08),
+    0 0 0 5px rgba(0,0,0,.45);
+}
+
+.question-stage{
+  grid-template-columns:clamp(100px,9vw,140px) minmax(0,1fr);
+  gap:16px;
+}
+
+.question-number-shell{
+  min-height:140px;
+  align-self:start;
+  aspect-ratio:1;
+  border:3px solid #0b95a8;
+  border-radius:50%;
+  background:radial-gradient(circle at 38% 28%,#087185,#003d49 64%,#001a20);
+  box-shadow:
+    0 0 0 7px rgba(0,0,0,.68),
+    0 0 0 9px rgba(126,140,145,.5),
+    inset 0 3px 0 rgba(255,255,255,.14);
+}
+.question-number-label{
+  color:#80e5ee;
+  font-size:8px;
+}
+.question-number{
+  color:#fff;
+  font-style:italic;
+  font-weight:500;
+  text-shadow:0 2px 2px #001e24;
+}
+
+.question-caption{
+  color:#79e7ef;
+}
+.on-air-dot{
+  background:#0ac8dc;
+  box-shadow:0 0 10px #0ac8dc;
+}
+
+.question-author-shell{
+  width:min(42%,390px);
+  min-width:210px;
+  padding:8px 15px;
+  border:2px solid #0b8192;
+  border-radius:999px;
+  background:linear-gradient(180deg,#00596a,#003b47);
+  box-shadow:0 0 0 4px rgba(0,0,0,.45);
+}
+.question-author-label{color:#75dce6}
+.question-author{
+  color:#fff;
+  font-style:italic;
+}
+
+.question-text-shell{
+  min-height:clamp(190px,25vh,310px);
+  border:3px solid #0a91a3;
+  border-left:3px solid #0a91a3;
+  border-radius:34px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(15,127,145,.24),transparent 55%),
+    linear-gradient(180deg,#005062,#003541);
+  box-shadow:
+    inset 0 3px 0 rgba(255,255,255,.10),
+    inset 0 -12px 20px rgba(0,0,0,.22),
+    0 0 0 7px rgba(0,0,0,.55),
+    0 0 0 9px rgba(126,140,145,.42);
+}
+#question-text{
+  overflow:auto;
+  padding:clamp(20px,2vw,34px);
+  color:#fff;
+  font-size:clamp(19px,1.9vw,31px);
+  font-style:italic;
+  font-weight:500;
+  line-height:1.38;
+}
+
+/* Long text wrapping stays enabled */
+#welcome2,
+.metric-card>output,
+.question-author,
+.bong-display__value--text{
+  overflow:visible !important;
+  text-overflow:clip !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:normal !important;
+}
+#question-text{
+  white-space:pre-wrap !important;
+  overflow-wrap:anywhere !important;
+  word-break:normal !important;
+  text-overflow:clip !important;
+}
+
+/* ---------------- ANSWER / FLIP STATUS ---------------- */
+.player-state-strip{
+  margin-top:13px;
+  padding:10px 14px;
+  border:0;
+  border-radius:20px;
+  background:#02090d;
+}
+.state-label{color:#79aeb8}
+.status-orbs{gap:8px}
+.status-orb{
+  width:clamp(38px,3.2vw,49px);
+  height:clamp(38px,3.2vw,49px);
+  border:2px solid #0b91a3;
+  color:#b7eef2;
+  background:#064d5b;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.12),
+    0 0 0 3px rgba(0,0,0,.62);
+}
+.status-orb--flip{
+  color:#0ed1e5;
+  border-color:#0b91a3;
+  background:#043f4a;
+}
+.status-orb-correct-answer,
+.status-orb.is-correct{
+  color:#fff;
+  border-color:#d2ffff;
+  background:#087181;
+}
+.status-orb-pass,
+.status-orb.is-pass{
+  border-color:#b6edf2;
+  background:#075461;
+}
+.status-orb-pass::after,
+.status-orb.is-pass::after{color:#fff}
+.status-orb-wrong-answer{
+  border-color:#c9f3f5;
+  background:#064754;
+}
+.status-orb-wrong-answer::after{color:#fff}
+
+/* ---------------- BONG ---------------- */
+.tpv-player-bong{
+  padding:12px;
+  border:2px solid #0b8192;
+  border-radius:28px;
+  background:linear-gradient(180deg,#003d49,#001f26);
+}
+.panel-heading--bong{
+  margin:-12px -12px 13px;
+  min-height:45px;
+  border:0;
+  border-radius:25px 25px 0 0;
+  color:#d9fbff;
+  background:linear-gradient(180deg,#00596a,#003b47);
+}
+.bong-game-console{
+  grid-template-columns:minmax(220px,.8fr) minmax(150px,.5fr) minmax(0,2fr);
+  gap:12px;
+}
+.bong-options{gap:10px}
+.bong-option-button{
+  min-height:75px;
+  aspect-ratio:1;
+  border:2px solid #0b8799;
+  border-radius:50%;
+  color:#0dc2d5;
+  background:radial-gradient(circle at 45% 35%,#075a6a,#002e38 68%);
+  font-size:30px;
+  font-style:italic;
+  font-weight:500;
+  box-shadow:
+    0 0 0 5px rgba(0,0,0,.62),
+    inset 0 2px 0 rgba(255,255,255,.10);
+}
+.bong-option-button.is-active,
+.bong-option-button[aria-pressed="true"],
+.bong-option-button.bong-option-select{
+  color:#fff;
+  border-color:#bafaff;
+  background:radial-gradient(circle at center,#0b8092,#00414e 72%);
+  box-shadow:
+    0 0 0 5px rgba(0,0,0,.62),
+    0 0 18px rgba(0,220,240,.30);
+}
+.bong-stop-button{
+  min-height:75px;
+  border:2px solid #e25b50;
+  border-radius:22px;
+  color:#fff;
+  background:linear-gradient(180deg,#bd1d13,#750b07);
+  font-size:11px;
+}
+.bong-stop-icon{
+  background:#fff;
+  box-shadow:0 0 8px rgba(255,255,255,.7);
+}
+.bong-display{
+  min-height:75px;
+  border:2px solid #0b8192;
+  border-radius:18px;
+  background:linear-gradient(180deg,#00505f,#00323c);
+}
+.bong-display__label{color:#72d7e1}
+.bong-display__value{
+  color:#fff;
+  font-style:italic;
+  font-weight:600;
+}
+
+/* ---------------- WIN ---------------- */
+.tpv-player-win-overlay{
+  background:rgba(0,0,0,.86);
+  backdrop-filter:none;
+}
+.tpv-player-win-card{
+  width:min(700px,88vw);
+  padding:36px 55px;
+  border:3px solid var(--tv-orange);
+  border-radius:45px;
+  background:linear-gradient(180deg,#ef210f,#bd0804);
+  box-shadow:
+    0 0 0 14px rgba(0,0,0,.78),
+    0 0 0 17px rgba(128,141,145,.58),
+    inset 0 3px 0 rgba(255,255,255,.15);
+}
+.tpv-player-win-kicker{
+  color:#fff;
+  font-size:11px;
+}
+#tpv-player-win-amount{
+  color:#fff;
+  font-style:italic;
+  font-weight:500;
+  text-shadow:0 3px 3px #710000;
+}
+
+/* ---------------- TABLET ---------------- */
+@media(max-width:1000px){
+  .player-game-grid{
+    grid-template-columns:1fr;
+  }
+  .tpv-player-money-tree{width:100%}
+  .money-tree__rows{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:9px;
+  }
+  .money-row{
+    min-height:72px;
+    grid-template-columns:1fr;
+    grid-template-rows:30px 1fr;
+    padding:0;
+  }
+  .money-row span{
+    margin:0;
+    border-radius:18px 18px 0 0;
+    border:0;
+    border-bottom:1px solid #0b8192;
+    box-shadow:none;
+  }
+}
+
+/* ---------------- MOBILE ---------------- */
+@media(max-width:680px){
+  .tpv-player-shell{padding:6px}
+  .player-topbar{
+    border-radius:20px;
+  }
+  .player-brand__mark{width:70px}
+  .player-topbar__right{
+    grid-template-columns:1fr auto;
+  }
+  .player-name-chip{
+    min-width:0;
+    max-width:none;
+    width:100%;
+  }
+  .player-metrics{
+    grid-template-columns:repeat(2,1fr);
+  }
+  .question-stage{
+    grid-template-columns:1fr;
+  }
+  .question-number-shell{
+    width:90px;
+    min-height:90px;
+    aspect-ratio:1;
+    justify-self:center;
+    border-radius:50%;
+  }
+  .question-topline{
+    flex-direction:column;
+  }
+  .question-author-shell{
+    width:100%;
+    min-width:0;
+  }
+  .question-text-shell{
+    min-height:230px;
+    border-radius:25px;
+  }
+  #question-text{
+    padding:17px 13px;
+    font-size:clamp(17px,5vw,22px);
+  }
+  .player-state-strip{
+    grid-template-columns:1fr;
+  }
+  .status-orbs{justify-content:center}
+  .answer-state-group--flip .status-orbs{justify-content:center}
+  .bong-game-console{grid-template-columns:1fr}
+  .bong-info-grid{grid-template-columns:1fr}
+  .bong-option-button{
+    aspect-ratio:auto;
+    min-height:62px;
+    border-radius:999px;
+  }
+}
+
+
+/* ========================================================================
+   TPV USER — APPROVED MOCKUP V2
+   Matches the approved spectator-like player console composition.
+   ======================================================================== */
+
+:root{
+  --tpv-bg:#030609;
+  --tpv-panel-top:#075c6d;
+  --tpv-panel-mid:#034553;
+  --tpv-panel-bottom:#012c35;
+  --tpv-cyan:#10c9db;
+  --tpv-cyan-soft:#0b8798;
+  --tpv-metal-a:#f4f5f2;
+  --tpv-metal-b:#6f7b7f;
+  --tpv-metal-c:#161b1d;
+  --tpv-red:#d91209;
+  --tpv-red-dark:#8f0704;
+  --tpv-green:#008d73;
+  --tpv-blue:#006f9b;
+  --tpv-purple:#67217f;
+}
+
+html, body {
+  background:#030609 !important;
+}
+
+body {
+  background:
+    linear-gradient(rgba(3,6,9,.94), rgba(3,6,9,.94)),
+    radial-gradient(circle at 40% 25%, rgba(0,123,145,.10), transparent 35rem) !important;
+}
+
+.tpv-player-shell{
+  width:min(1600px,100%);
+  padding:14px 16px 18px;
+}
+
+/* ---------- COMMON TV PANEL ---------- */
+.player-topbar,
+.game-status,
+.metric-card,
+.tpv-player-question-panel,
+.tpv-player-bong,
+.player-name-chip,
+.money-row,
+.question-author-shell,
+.question-text-shell,
+.bong-display,
+.bong-option-button,
+.bong-stop-button{
+  position:relative;
+}
+
+.player-topbar,
+.game-status,
+.metric-card,
+.tpv-player-question-panel,
+.tpv-player-bong{
+  border-color:#0a7484 !important;
+}
+
+/* ---------- HEADER ---------- */
+.player-topbar{
+  min-height:84px;
+  padding:0 10px;
+  border:1px solid #0d4d58 !important;
+  border-radius:17px !important;
+  background:linear-gradient(180deg,#06131a 0%,#03090d 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 7px 24px rgba(0,0,0,.32) !important;
+}
+
+.player-brand{
+  align-items:center;
+}
+
+.player-brand__mark{
+  width:104px !important;
+  height:56px;
+  margin:12px 8px 12px 0;
+  border:2px solid #7f8d90;
+  border-radius:12px;
+  color:#fff !important;
+  background:
+    linear-gradient(180deg,#0a6575,#023846 60%,#011f28);
+  font-size:34px !important;
+  font-style:italic;
+  font-weight:900;
+  letter-spacing:-.08em;
+  text-shadow:0 2px 3px #001217,0 0 10px rgba(28,220,239,.32) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.18),
+    inset 0 -5px 8px rgba(0,0,0,.25),
+    0 0 0 4px rgba(0,0,0,.55);
+}
+
+#welcome{
+  color:#14d7e6 !important;
+  font-size:10px !important;
+  letter-spacing:.08em !important;
+}
+
+#welcome2{
+  margin-top:1px;
+  color:#fff !important;
+  font-size:clamp(18px,1.55vw,27px) !important;
+  font-style:italic;
+  font-weight:700 !important;
+  text-transform:uppercase;
+}
+
+.player-topbar__right{
+  gap:14px !important;
+  padding:9px 10px !important;
+}
+
+.player-name-chip{
+  width:clamp(220px,18vw,340px);
+  min-width:220px !important;
+  max-width:340px !important;
+  height:54px !important;
+  border:2px solid #0b92a5 !important;
+  border-radius:999px !important;
+  color:#fff !important;
+  background:linear-gradient(180deg,#07596a,#023845) !important;
+  font-size:clamp(14px,1.25vw,20px) !important;
+  font-style:italic;
+  font-weight:600 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.14),
+    0 0 0 4px #020506,
+    0 0 0 6px #808b8e !important;
+}
+
+.socket-status{
+  min-height:52px !important;
+  padding:0 16px !important;
+  border:1px solid #17606c !important;
+  background:#031016 !important;
+  color:#7db9c0 !important;
+  font-size:9px !important;
+  text-transform:uppercase;
+}
+.socket-dot{
+  width:18px !important;
+  height:18px !important;
+}
+.socket-online .socket-dot{
+  background:#43edb8 !important;
+  box-shadow:0 0 16px rgba(67,237,184,.8) !important;
+}
+
+/* ---------- STATUS ---------- */
+.game-status{
+  min-height:54px !important;
+  margin-top:10px !important;
+  padding:7px 14px !important;
+  border-radius:15px !important;
+  background:#031016 !important;
+}
+.game-status__signal{
+  width:5px !important;
+  height:30px !important;
+  background:#0cc5d8 !important;
+}
+.game-status__title{
+  color:#7cecf4 !important;
+  font-size:9px !important;
+}
+.game-status__text{
+  color:#a8c4c9 !important;
+  font-size:11px !important;
+}
+
+/* ---------- METRICS ---------- */
+.player-metrics{
+  grid-template-columns:.75fr 1fr 1fr 1.5fr auto !important;
+  gap:10px !important;
+  margin-top:12px !important;
+}
+
+.metric-card{
+  min-height:76px !important;
+  padding:8px 15px;
+  border:2px solid #0b8393 !important;
+  border-radius:20px !important;
+  background:linear-gradient(180deg,#075465 0%,#023a46 100%) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.10),
+    0 0 0 5px rgba(0,0,0,.75),
+    0 0 0 7px rgba(127,139,143,.72) !important;
+}
+.metric-card>span{
+  color:#16d7e6 !important;
+  font-size:9px !important;
+  font-style:italic;
+}
+.metric-card>output{
+  margin-top:2px !important;
+  color:#fff !important;
+  font-size:clamp(21px,2vw,34px) !important;
+  font-style:italic;
+  font-weight:600 !important;
+}
+.metric-card--bank{
+  border-color:#ff4a2b !important;
+  background:linear-gradient(180deg,#df160b,#980704) !important;
+}
+.metric-card--bank>span{color:#ffd3ca !important}
+.metric-card--flip>output{
+  font-size:clamp(14px,1.25vw,21px) !important;
+}
+.metric-card--flips{
+  min-width:190px !important;
+}
+
+/* ---------- DESKTOP GRID ---------- */
+.player-game-grid{
+  grid-template-columns:minmax(240px,18vw) minmax(0,1fr) !important;
+  grid-template-areas:
+    "tree question"
+    "tree bong" !important;
+  gap:16px !important;
+  margin-top:18px !important;
+}
+
+/* ---------- MONEY TREE ---------- */
+.tpv-player-money-tree{
+  overflow:visible !important;
+  background:transparent !important;
+}
+.tpv-player-money-tree .panel-heading{
+  min-height:34px !important;
+  margin:0 18px 14px !important;
+  border:1px solid #0b7180 !important;
+  border-radius:999px !important;
+  background:#031016 !important;
+  color:#fff !important;
+  font-size:10px !important;
+  font-style:italic;
+}
+
+.money-tree__rows{
+  gap:14px !important;
+  padding:6px 11px !important;
+}
+
+.money-row{
+  min-height:62px !important;
+  grid-template-columns:62px minmax(0,1fr) !important;
+  padding:0 18px 0 0 !important;
+  border:2px solid #087e90 !important;
+  border-radius:19px !important;
+  color:#fff !important;
+  background:linear-gradient(180deg,#075668,#023743) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.11),
+    0 0 0 5px rgba(0,0,0,.76),
+    0 0 0 7px rgba(128,140,144,.74) !important;
+}
+
+.money-row span{
+  width:64px;
+  min-height:64px;
+  margin-left:-8px !important;
+  border:2px solid #0bb0c3 !important;
+  border-radius:50% !important;
+  color:#12d8e8 !important;
+  background:radial-gradient(circle at 40% 30%,#096d7e,#023b47 62%,#011b22) !important;
+  font-size:16px !important;
+  font-style:italic;
+  font-weight:500 !important;
+  box-shadow:
+    0 0 0 5px rgba(0,0,0,.76),
+    inset 0 2px 0 rgba(255,255,255,.10) !important;
+}
+
+.money-row strong{
+  justify-self:center !important;
+  color:#fff !important;
+  font-size:clamp(19px,1.5vw,27px) !important;
+  font-style:italic;
+  font-weight:500 !important;
+}
+
+.money-row.is-active{
+  border-color:#78eaf2 !important;
+  background:linear-gradient(180deg,#0a7183,#034754) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.16),
+    0 0 0 5px rgba(0,0,0,.78),
+    0 0 0 7px #e7f7f7,
+    0 0 20px rgba(0,211,229,.18) !important;
+}
+
+/* ---------- QUESTION ---------- */
+.tpv-player-question-panel{
+  padding:16px 18px 18px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+.question-stage{
+  grid-template-columns:120px minmax(0,1fr) !important;
+  gap:12px !important;
+}
+
+.question-number-shell{
+  z-index:3;
+  width:120px !important;
+  min-height:120px !important;
+  aspect-ratio:1;
+  margin-top:30px;
+  border:2px solid #11bad0 !important;
+  border-radius:50% !important;
+  background:radial-gradient(circle at 38% 28%,#095d6e,#023642 65%,#011a20) !important;
+  box-shadow:
+    0 0 0 8px rgba(0,0,0,.78),
+    0 0 0 11px rgba(126,139,143,.76),
+    inset 0 2px 0 rgba(255,255,255,.12) !important;
+}
+
+.question-number-label{
+  display:none !important;
+}
+.question-number{
+  margin:0 !important;
+  font-size:clamp(37px,3.8vw,58px) !important;
+  font-style:italic !important;
+  font-weight:400 !important;
+}
+
+.question-main{
+  min-width:0;
+}
+
+.question-topline{
+  position:relative;
+  z-index:4;
+  min-height:38px !important;
+  margin-bottom:-18px !important;
+  padding:0 22px 0 12px;
+}
+
+.question-caption{
+  visibility:hidden;
+}
+
+.question-author-shell{
+  width:auto !important;
+  min-width:260px !important;
+  max-width:46% !important;
+  margin-left:auto;
+  padding:7px 13px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  text-align:right;
+}
+.question-author-label{
+  display:inline !important;
+  margin-right:5px;
+  color:#c9eef2 !important;
+  font-size:8px !important;
+}
+.question-author-label::after{
+  content:":";
+}
+.question-author{
+  display:inline !important;
+  color:#fff !important;
+  font-size:clamp(11px,1vw,15px) !important;
+  font-style:italic !important;
+  font-weight:600 !important;
+}
+
+.question-text-shell{
+  min-height:clamp(220px,28vh,350px) !important;
+  border:2px solid #0b8798 !important;
+  border-radius:36px !important;
+  background:linear-gradient(180deg,#075468,#023743) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.10),
+    inset 0 -10px 18px rgba(0,0,0,.20),
+    0 0 0 7px rgba(0,0,0,.80),
+    0 0 0 10px rgba(126,139,143,.80) !important;
+}
+
+#question-text{
+  padding:38px clamp(28px,3vw,52px) 30px !important;
+  color:#fff !important;
+  font-size:clamp(21px,2.1vw,34px) !important;
+  font-style:normal !important;
+  font-weight:500 !important;
+  line-height:1.35 !important;
+  text-align:center !important;
+}
+
+/* ---------- INDICATORS ---------- */
+.player-state-strip{
+  margin-top:18px !important;
+  padding:10px 16px !important;
+  border:0 !important;
+  border-radius:16px !important;
+  background:#031016 !important;
+}
+
+.state-label{
+  color:#7fa7ae !important;
+  font-size:7px !important;
+}
+
+.status-orb{
+  width:44px !important;
+  height:44px !important;
+  border:2px solid #13c5d8 !important;
+  background:#064754 !important;
+  color:#d8ffff !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.09),
+    0 0 0 3px rgba(0,0,0,.70) !important;
+}
+
+.status-orb--flip{
+  color:#12d9e8 !important;
+}
+
+.status-orb.is-correct,
+.status-orb-correct-answer{
+  background:#087564 !important;
+  border-color:#58efd0 !important;
+}
+.status-orb-wrong-answer{
+  background:#730f14 !important;
+  border-color:#ff5a67 !important;
+}
+.status-orb-wrong-answer::after{color:#fff !important}
+
+/* ---------- BONG ---------- */
+.tpv-player-bong{
+  padding:13px 14px !important;
+  border:1px solid #0d5560 !important;
+  border-radius:20px !important;
+  background:#031016 !important;
+}
+
+.panel-heading--bong{
+  margin:-13px -14px 14px !important;
+  min-height:38px !important;
+  border:0 !important;
+  border-radius:20px 20px 0 0 !important;
+  color:#fff !important;
+  background:linear-gradient(180deg,#075363,#023642) !important;
+}
+
+.bong-game-console{
+  grid-template-columns:280px 180px minmax(0,1fr) !important;
+  gap:14px !important;
+}
+
+.bong-options{
+  gap:12px !important;
+}
+
+.bong-option-button{
+  min-height:72px !important;
+  border:2px solid #0b94a6 !important;
+  border-radius:50% !important;
+  color:#13d6e5 !important;
+  background:radial-gradient(circle at 40% 30%,#086072,#023641 68%) !important;
+  font-size:29px !important;
+  font-style:italic !important;
+  font-weight:500 !important;
+  box-shadow:
+    0 0 0 5px rgba(0,0,0,.75),
+    0 0 0 7px rgba(128,140,144,.70) !important;
+}
+
+.bong-stop-button{
+  border:2px solid #ff5a4a !important;
+  border-radius:20px !important;
+  color:#fff !important;
+  background:linear-gradient(180deg,#c51a10,#7e0805) !important;
+}
+
+.bong-display{
+  border:2px solid #0b8393 !important;
+  border-radius:18px !important;
+  background:linear-gradient(180deg,#075363,#023641) !important;
+}
+.bong-display__label{color:#78dce5 !important}
+
+/* ---------- WIN ---------- */
+.tpv-player-win-card{
+  width:min(720px,90vw) !important;
+  border:3px solid #ff7800 !important;
+  border-radius:44px !important;
+  background:linear-gradient(180deg,#ea1b0e,#a70704) !important;
+  box-shadow:
+    0 0 0 14px rgba(0,0,0,.82),
+    0 0 0 18px rgba(126,139,143,.76),
+    inset 0 3px 0 rgba(255,255,255,.13) !important;
+}
+
+/* ---------- TABLET ---------- */
+@media(max-width:1000px){
+  .player-topbar{
+    min-height:74px;
+  }
+  .player-brand__mark{
+    width:88px !important;
+    height:48px;
+    font-size:28px !important;
+  }
+
+  .player-metrics{
+    grid-template-columns:repeat(3,1fr) !important;
+  }
+  .metric-card--flip{
+    grid-column:span 2;
+  }
+  .metric-card--flips{
+    grid-column:auto !important;
+  }
+
+  .player-game-grid{
+    grid-template-columns:1fr !important;
+    grid-template-areas:
+      "question"
+      "tree"
+      "bong" !important;
+  }
+
+  .money-tree__rows{
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  }
+  .money-row{
+    min-height:78px !important;
+    grid-template-columns:1fr !important;
+    grid-template-rows:32px 1fr !important;
+    padding:0 !important;
+  }
+  .money-row span{
+    width:auto !important;
+    min-height:32px !important;
+    margin:0 !important;
+    border:0 !important;
+    border-bottom:1px solid #0b8293 !important;
+    border-radius:18px 18px 0 0 !important;
+    box-shadow:none !important;
+    font-size:12px !important;
+  }
+
+  .question-stage{
+    grid-template-columns:100px minmax(0,1fr) !important;
+  }
+  .question-number-shell{
+    width:100px !important;
+    min-height:100px !important;
+  }
+
+  .bong-game-console{
+    grid-template-columns:1fr 1fr !important;
+  }
+  .bong-info-grid{
+    grid-column:1 / -1;
+  }
+}
+
+/* ---------- MOBILE ---------- */
+@media(max-width:680px){
+  .tpv-player-shell{
+    padding:7px !important;
+  }
+
+  .player-topbar{
+    min-height:auto !important;
+    border-radius:14px !important;
+  }
+
+  .player-brand{
+    min-height:58px !important;
+  }
+  .player-brand__mark{
+    width:76px !important;
+    height:43px !important;
+    margin:8px 7px 8px 0 !important;
+    font-size:25px !important;
+  }
+  .player-brand__copy{
+    padding:7px 8px !important;
+  }
+  #welcome{
+    display:none;
+  }
+  #welcome2{
+    font-size:14px !important;
+  }
+
+  .player-topbar__right{
+    grid-template-columns:1fr 48px !important;
+    gap:8px !important;
+    padding:8px !important;
+  }
+  .player-name-chip{
+    width:100% !important;
+    min-width:0 !important;
+    height:46px !important;
+    font-size:16px !important;
+  }
+  .socket-status{
+    width:48px !important;
+    min-height:46px !important;
+    padding:0 !important;
+  }
+
+  .game-status{
+    min-height:48px !important;
+  }
+
+  .player-metrics{
+    grid-template-columns:repeat(3,1fr) !important;
+    gap:7px !important;
+  }
+  .metric-card{
+    min-height:62px !important;
+    padding:6px 8px !important;
+    border-radius:14px !important;
+  }
+  .metric-card>span{
+    font-size:7px !important;
+  }
+  .metric-card>output{
+    font-size:clamp(17px,5vw,23px) !important;
+  }
+  .metric-card--flip,
+  .metric-card--flips{
+    grid-column:1 / -1 !important;
+  }
+
+  .tpv-player-question-panel{
+    padding:10px 5px !important;
+  }
+  .question-stage{
+    grid-template-columns:1fr !important;
+    gap:6px !important;
+  }
+  .question-number-shell{
+    width:76px !important;
+    min-height:76px !important;
+    margin:0 0 -28px 6px !important;
+    justify-self:start !important;
+    z-index:5;
+  }
+  .question-number{
+    font-size:34px !important;
+  }
+
+  .question-topline{
+    min-height:28px !important;
+    margin:0 6px -10px 88px !important;
+    padding:0 !important;
+  }
+  .question-author-shell{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    padding:3px 5px !important;
+  }
+  .question-author-label{
+    font-size:6px !important;
+  }
+  .question-author{
+    font-size:10px !important;
+  }
+
+  .question-text-shell{
+    min-height:240px !important;
+    border-radius:26px !important;
+  }
+  #question-text{
+    padding:40px 18px 22px !important;
+    font-size:clamp(19px,5.5vw,25px) !important;
+  }
+
+  .player-state-strip{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+  .status-orbs{
+    justify-content:center !important;
+  }
+
+  .money-tree__rows{
+    grid-template-columns:1fr !important;
+    gap:11px !important;
+  }
+  .money-row{
+    min-height:58px !important;
+    grid-template-columns:58px 1fr !important;
+    grid-template-rows:1fr !important;
+    padding:0 14px 0 0 !important;
+  }
+  .money-row span{
+    width:58px !important;
+    min-height:58px !important;
+    margin-left:-6px !important;
+    border:2px solid #0bb0c3 !important;
+    border-radius:50% !important;
+    box-shadow:0 0 0 4px rgba(0,0,0,.74) !important;
+    font-size:14px !important;
+  }
+  .money-row strong{
+    font-size:22px !important;
+  }
+
+  .bong-game-console{
+    grid-template-columns:1fr !important;
+  }
+  .bong-options{
+    grid-template-columns:repeat(3,1fr) !important;
+  }
+  .bong-option-button{
+    min-height:60px !important;
+  }
+  .bong-info-grid{
+    grid-template-columns:1fr !important;
+  }
+}
+
+/* Keep all wrapping fixes */
+#welcome2,
+.metric-card > output,
+.question-author,
+.bong-display__value--text{
+  overflow:visible !important;
+  text-overflow:clip !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:normal !important;
+}
+#question-text{
+  white-space:pre-wrap !important;
+  overflow-wrap:anywhere !important;
+  word-break:normal !important;
+  text-overflow:clip !important;
+}
+
+
+/* ========================================================================
+   TPV USER — AUTHOR CARD + DISTINCT GAME STATUS COLORS
+   ======================================================================== */
+
+/* Separate author element, matching the broadcast treatment on spectator. */
+.question-author-card {
+  display: none;
+  width: min(390px, 42%);
+  min-width: 210px;
+  margin: 0 0 10px auto;
+  padding: 9px 16px;
+  display: grid;
+  gap: 3px;
+  border: 2px solid #d08a27;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5a3510, #2a1707);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.12),
+    0 0 0 4px rgba(0,0,0,.45),
+    0 0 18px rgba(208,138,39,.18);
+  text-align: left;
+}
+
+/* Show the separate author card only while the question panel is visible. */
+.tpv-player-shell:has(#section-question:not([hidden])) .question-author-card {
+  display: grid;
+}
+
+.question-author-card__label {
+  color: #ffc65c;
+  font-size: 8px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.question-author-card__name {
+  display: block;
+  color: #fff;
+  font-size: clamp(12px, 1vw, 15px);
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* WAITING — warm amber/orange, clearly different from the live game. */
+.game-status.wait {
+  border-color: #a86d20 !important;
+  background:
+    linear-gradient(90deg, rgba(255,167,42,.18), transparent 52%),
+    linear-gradient(180deg, #3a250d, #211508) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.08),
+    0 0 16px rgba(255,167,42,.12) !important;
+}
+
+.game-status.wait .game-status__signal {
+  background: #ffb52e !important;
+  box-shadow: 0 0 14px rgba(255,181,46,.85) !important;
+}
+
+.game-status.wait .game-status__title {
+  color: #ffd27a !important;
+}
+
+.game-status.wait .game-status__text {
+  color: #e1c18a !important;
+}
+
+/* MAIN GAME — green, live/active state. */
+.game-status.active {
+  border-color: #159b78 !important;
+  background:
+    linear-gradient(90deg, rgba(22,224,164,.17), transparent 52%),
+    linear-gradient(180deg, #063d35, #052720) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.08),
+    0 0 18px rgba(22,224,164,.14) !important;
+}
+
+.game-status.active .game-status__signal {
+  background: #16e0a4 !important;
+  box-shadow: 0 0 14px rgba(22,224,164,.9) !important;
+}
+
+.game-status.active .game-status__title {
+  color: #67f5c8 !important;
+}
+
+.game-status.active .game-status__text {
+  color: #b5e9d9 !important;
+}
+
+@media (max-width: 680px) {
+  .question-author-card {
+    width: 100%;
+    min-width: 0;
+    margin: 0 0 8px;
+    border-radius: 22px;
+    text-align: left;
+  }
 }

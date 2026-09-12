@@ -1237,3 +1237,493 @@ button:disabled {
   word-break: normal;
   text-overflow: clip;
 }
+
+/* =========================================================
+   TWITCH VERSUS / THE PEOPLE VERSUS — TV METAL SKIN
+   Visual prototype based on the supplied reference frames.
+   Existing IDs / structure / JS logic are preserved.
+   ========================================================= */
+
+:root {
+  --tv-bg: #020509;
+  --tv-panel: #06394b;
+  --tv-panel-deep: #022633;
+  --tv-teal: #00a8bd;
+  --tv-teal-soft: #50e5ee;
+  --tv-silver-1: #eef6f8;
+  --tv-silver-2: #77838a;
+  --tv-silver-3: #11191e;
+  --tv-orange: #ff6a00;
+  --tv-red: #e00000;
+  --tv-red-deep: #750000;
+  --tv-ink: #031017;
+}
+
+html, body {
+  background:
+    radial-gradient(circle at 78% 30%, rgba(0,72,173,.35), transparent 34rem),
+    radial-gradient(circle at 49% 110%, rgba(0,93,168,.18), transparent 38rem),
+    #020406;
+}
+
+body {
+  position: relative;
+  color: #f7fbfc;
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(34vw, 560px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: .9;
+  background:
+    radial-gradient(ellipse at -16% 50%, transparent 0 33%, rgba(255,255,255,.78) 33.4% 33.8%, transparent 34.2% 41%, rgba(255,255,255,.58) 41.3% 41.65%, transparent 42% 49%, rgba(255,255,255,.38) 49.3% 49.55%, transparent 49.9% 57%, rgba(255,255,255,.24) 57.3% 57.55%, transparent 58%),
+    linear-gradient(90deg, #1f2225 0 45%, rgba(20,23,25,.88) 75%, transparent 100%);
+  filter: drop-shadow(10px 0 26px rgba(0,0,0,.8));
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 44%;
+  height: 5px;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(90deg, transparent 0 16%, #fff 22%, #35ebff 37%, #00a8ff 70%, transparent 98%);
+  box-shadow: 0 0 7px #6ef1ff, 0 0 20px rgba(0,145,255,.75), 0 0 42px rgba(0,92,255,.55);
+  opacity: .95;
+}
+
+.neon-grid {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 2560px);
+  padding: 10px;
+}
+
+/* Shared TV capsule */
+.ng-panel,
+.ng-program,
+.ng-topbar {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ng-panel {
+  position: relative;
+  padding: 16px 12px 12px;
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.17), transparent 8%),
+    linear-gradient(180deg, #121a1f 0%, #03090d 16%, #063343 17%, #042936 74%, #010609 100%);
+  border: 2px solid #111b20;
+  box-shadow:
+    inset 0 2px 1px rgba(255,255,255,.65),
+    inset 0 -7px 13px rgba(0,0,0,.75),
+    0 9px 22px rgba(0,0,0,.46),
+    0 0 0 1px #4b5960;
+}
+
+.ng-panel::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 21px;
+  border: 1px solid rgba(81,228,238,.28);
+  pointer-events: none;
+}
+
+.ng-panel-title {
+  position: relative;
+  z-index: 1;
+  min-height: 30px;
+  width: fit-content;
+  max-width: calc(100% - 16px);
+  margin: -29px auto 9px;
+  padding: 5px 21px 4px;
+  border: 2px solid #087e8c;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.10), transparent 35%),
+    linear-gradient(180deg, #075269, #053747 60%, #032735);
+  color: #f7ffff;
+  font-size: 12px;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: .055em;
+  text-shadow: 0 1px 1px #000, 0 0 8px rgba(90,239,255,.36);
+  box-shadow:
+    inset 0 0 0 1px rgba(146,246,255,.24),
+    0 0 0 3px #11191e,
+    0 3px 8px rgba(0,0,0,.6);
+}
+
+/* Metallic end caps on major panels */
+.ng-program::before,
+.ng-program::after,
+.ng-player::after,
+.ng-sound::after,
+.ng-service::after,
+.ng-players::after,
+.ng-room::after,
+.ng-params::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  bottom: 16px;
+  width: 18px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #0f1519 0, #f6fbfc 22%, #7e898f 42%, #11181c 72%, #010203 100%);
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,.7));
+  opacity: .72;
+  pointer-events: none;
+}
+
+.ng-program::before { left: -8px; }
+.ng-program::after,
+.ng-player::after,
+.ng-sound::after,
+.ng-service::after,
+.ng-players::after,
+.ng-room::after,
+.ng-params::after { right: -8px; }
+
+/* Top bar -> floating TV capsules */
+.ng-topbar {
+  min-height: 74px;
+  display: grid;
+  grid-template-columns: minmax(250px, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 10px;
+}
+
+.ng-brand {
+  width: fit-content;
+  min-width: 280px;
+  min-height: 56px;
+  border: 0;
+  border-radius: 30px;
+  padding: 4px 10px 4px 5px;
+  background: linear-gradient(180deg, #171e22, #05090b 16%, #073d4e 17%, #032b39 78%, #04090b);
+  box-shadow: inset 0 2px rgba(255,255,255,.58), 0 0 0 2px #171d20, 0 6px 15px rgba(0,0,0,.55);
+}
+
+.ng-brand__logo {
+  width: 64px;
+  height: 48px;
+  margin: 0 5px 0 0;
+  border-radius: 24px;
+  background: radial-gradient(circle at 40% 24%, #12c8dc, #056478 55%, #01252e 100%);
+  border: 2px solid #27aebb;
+  color: #fff;
+  font-size: 20px;
+  font-style: italic;
+  text-shadow: 0 2px 2px #001b22;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.08), inset 0 -6px 10px rgba(0,0,0,.5);
+}
+
+.ng-brand small { color: #6adfe8; font-size: 8px; }
+.ng-brand strong { font-style: italic; font-weight: 600; }
+
+.ng-topstats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.ng-stat,
+.ng-status {
+  min-width: 92px;
+  min-height: 48px;
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #11191d 0, #020506 15%, #064254 16%, #032e3b 78%, #020708 100%);
+  box-shadow: inset 0 2px 1px rgba(255,255,255,.64), 0 0 0 2px #161e22, 0 4px 9px rgba(0,0,0,.65);
+}
+
+.ng-stat span { color: #53bfc8; font-size: 8px; font-style: italic; }
+.ng-stat output { color: #fff; font-size: 20px; font-weight: 500; font-style: italic; text-shadow: 0 1px 2px #000; }
+.ng-stat--money output,
+.ng-stat--money span { color: #fff; }
+.ng-stat--money { background: linear-gradient(180deg, #1d1c1c 0, #060606 13%, #b41508 14%, #f01808 54%, #8d0600 88%, #1a0704 100%); }
+.ng-stat--money span { font-size: 7px; letter-spacing: .17em; }
+
+.ng-status i { width: 9px; height: 9px; }
+
+/* Layout proportions closer to TV control surface */
+.ng-layout {
+  grid-template-columns: minmax(210px, 16vw) minmax(620px, 1fr) minmax(300px, 24vw);
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ng-left, .ng-center, .ng-right { gap: 12px; }
+
+/* Money tree styled like the reference */
+.money-tree { padding: 9px 8px 6px; }
+.money-row {
+  position: relative;
+  min-height: 51px;
+  margin: 0 0 8px 13px;
+  grid-template-columns: 49px 1fr;
+  border: 0;
+  border-radius: 25px;
+  overflow: visible;
+  background: linear-gradient(180deg,#171e21 0,#050808 13%,#0a3b4b 14%,#063243 77%,#02090c 100%);
+  color: #d8eef1;
+  box-shadow: inset 0 2px 1px rgba(255,255,255,.58), 0 0 0 2px #161d20, 0 4px 8px rgba(0,0,0,.55);
+}
+.money-row span {
+  width: 54px;
+  height: 54px;
+  margin-left: -13px;
+  border: 2px solid #087a89;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 24%, #0c6378, #043542 62%, #02181f 100%);
+  font-size: 20px;
+  font-weight: 500;
+  font-style: italic;
+  color: #d5f5f8;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), 0 0 0 4px #11191d;
+}
+.money-row strong {
+  padding-right: 16px;
+  font-size: clamp(15px, .95vw, 22px);
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: .03em;
+}
+.money-row.is-active {
+  border: 0;
+  color: #fff;
+  background: linear-gradient(180deg,#e7edef 0,#666f74 11%,#064f60 12%,#07586b 77%,#02080a 100%);
+  box-shadow: inset 0 2px 1px rgba(255,255,255,.85), 0 0 0 2px #e4e8e9, 0 0 0 5px #141b1f, 0 5px 12px rgba(0,0,0,.7);
+}
+.money-row--top strong { color: inherit; }
+.money-row.passed { opacity: .34; filter: saturate(.4); }
+
+/* Main current-question card */
+.ng-program {
+  position: relative;
+  padding: 17px 22px 20px;
+  border-radius: 42px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.08), transparent 7%),
+    linear-gradient(180deg, #0e171b 0, #050708 8%, #075266 9%, #044454 84%, #02090c 100%);
+  box-shadow:
+    inset 0 2px 1px rgba(255,255,255,.75),
+    inset 0 -8px 15px rgba(0,0,0,.58),
+    0 0 0 3px #10181c,
+    0 0 0 5px #7f8a8f,
+    0 10px 26px rgba(0,0,0,.58);
+}
+
+.ng-program-head {
+  margin: -40px auto 8px;
+  min-height: 40px;
+  justify-content: center;
+}
+.ng-program-head > div:first-child {
+  min-width: 260px;
+  text-align: center;
+  padding: 8px 24px 7px;
+  border-radius: 22px;
+  background: linear-gradient(180deg,#131b1f 0,#050808 15%,#075165 16%,#043847 82%,#020809);
+  border: 2px solid #0c6c79;
+  box-shadow: 0 0 0 3px #141c20, inset 0 2px rgba(255,255,255,.6), 0 4px 10px rgba(0,0,0,.6);
+}
+.ng-program-head > div:first-child span { color: #61d1da; }
+.ng-program-head strong { font-size: 13px; font-style: italic; font-weight: 600; }
+.ng-mini-state { position: absolute; right: 20px; top: -35px; }
+
+/* Four text fields become internal cyan/red TV plates */
+.ng-program .ng-question {
+  border: 0 !important;
+  border-radius: 22px;
+  padding: 9px 14px 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,.055), transparent 18%), linear-gradient(180deg,#064457,#033746 70%,#022630) !important;
+  box-shadow: inset 0 0 0 2px rgba(22,181,196,.78), inset 0 -5px 10px rgba(0,0,0,.35), 0 2px 7px rgba(0,0,0,.35) !important;
+}
+.ng-program .ng-question > span {
+  color: #65dce4 !important;
+  text-shadow: none !important;
+  font-size: 9px;
+  font-style: italic;
+  letter-spacing: .12em;
+}
+.ng-program .ng-question textarea {
+  min-height: 0;
+  color: #fff !important;
+  font-size: clamp(15px, 1vw, 21px);
+  font-weight: 500;
+  font-style: italic;
+  text-align: center;
+  line-height: 1.3;
+}
+.ng-question--q { min-height: 120px; }
+.ng-program .ng-question--q textarea { min-height: 82px; }
+.ng-program .ng-question--a,
+.ng-program .ng-question--author { min-height: 68px; }
+.ng-program .ng-question--comment { min-height: 72px; margin-top: 8px; }
+
+.ng-meta { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* Indicators */
+.status-orb, .flip-orb {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #48d6df;
+  background: radial-gradient(circle at 40% 25%, #0d7e91, #064559 68%, #02212a);
+  color: #9cedf0;
+  font-size: 16px;
+  font-style: italic;
+  box-shadow: 0 0 0 3px #0a1115, inset 0 0 0 1px rgba(255,255,255,.12);
+}
+.flip-orb { color: #18c6d4; }
+
+/* Big answer buttons imitate physical TV controls */
+.ng-action-zone { gap: 10px; }
+.decision {
+  min-height: 66px;
+  border: 0;
+  border-radius: 27px;
+  font-style: italic;
+  font-weight: 700;
+  box-shadow: inset 0 2px 1px rgba(255,255,255,.65), 0 0 0 3px #11181b, 0 6px 12px rgba(0,0,0,.5);
+}
+.decision span {
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,.28);
+  border: 2px solid currentColor;
+}
+.decision--green { color: #eaffef; background: linear-gradient(180deg,#0b7270,#064c58 55%,#02303b); }
+.decision--red { color: #fff; background: linear-gradient(180deg,#b31313,#6f0606 58%,#340000); }
+.decision--orange { color: #fff; background: linear-gradient(180deg,#d07814,#7a3d05 58%,#341900); }
+.decision--blue { color: #fff; background: linear-gradient(180deg,#11889c,#075369 58%,#022c38); }
+
+/* Generic buttons */
+.ng-btn {
+  min-height: 40px;
+  border: 0;
+  border-radius: 20px;
+  padding: 7px 12px;
+  background: linear-gradient(180deg,#12191d 0,#050708 12%,#075266 13%,#043747 82%,#02080a 100%);
+  color: #effcfd;
+  font-size: 10px;
+  font-weight: 700;
+  font-style: italic;
+  box-shadow: inset 0 2px 1px rgba(255,255,255,.56), 0 0 0 2px #11191d, 0 4px 8px rgba(0,0,0,.5);
+}
+.ng-btn:hover:not(:disabled) { filter: brightness(1.16); transform: translateY(-1px); }
+.ng-btn:active:not(:disabled) { transform: translateY(1px); }
+.ng-btn--red { background: linear-gradient(180deg,#ce1616,#7b0707 58%,#330000); color:#fff; }
+.ng-btn--green { background: linear-gradient(180deg,#13887c,#075b63 58%,#02343f); color:#fff; }
+.ng-btn--orange { background: linear-gradient(180deg,#e37c11,#8b4506 58%,#391b00); color:#fff; }
+.ng-btn--purple { background: linear-gradient(180deg,#0e7e92,#074f60 58%,#032c36); color:#fff; }
+.ng-btn--blue, .ng-btn--cyan { background: linear-gradient(180deg,#12879b,#065468 58%,#022e3b); color:#fff; }
+.ng-launch-main { font-size: 13px; }
+
+/* Room + inputs */
+.ng-room input, .ng-idpick input, .params-grid input {
+  border: 2px solid #097080;
+  border-radius: 18px;
+  background: #032b37;
+  color: #fff;
+  box-shadow: inset 0 0 10px rgba(0,0,0,.6), 0 0 0 2px #11191d;
+}
+.params-grid label span { color:#74d5dc; font-style:italic; }
+
+/* Active player */
+.ng-player-name {
+  margin: 3px 8px 10px;
+  padding: 10px 14px;
+  border-radius: 22px;
+  background: linear-gradient(180deg,#07576c,#043847 72%,#02232d);
+  border: 2px solid #0b7f8d;
+  color:#fff;
+  text-align:center;
+  font-style:italic;
+  font-weight:500;
+  box-shadow: inset 0 1px rgba(255,255,255,.18);
+}
+.ng-player-topic {
+  border: 0;
+  border-radius: 18px;
+  background: #032b37;
+  box-shadow: inset 0 0 0 2px #0b7280;
+}
+.ng-player-topic span { color:#58c5ce; font-style:italic; }
+
+/* Gong game with three top roundels like the reference */
+.bong-variables { gap: 14px; padding: 5px 22px 10px; }
+.bong-variable {
+  min-height: 55px;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 25%, #0b7184, #033743 65%, #03171d 100%);
+  color: #9edfe3;
+  font-size: 22px;
+  font-weight: 500;
+  font-style: italic;
+  box-shadow: inset 0 2px 1px rgba(255,255,255,.4), 0 0 0 5px #11191d, 0 4px 10px rgba(0,0,0,.55);
+}
+.bong-option-select { background: radial-gradient(circle at 40% 25%, #18b9c7, #087083 65%, #03303a 100%) !important; color:#fff !important; }
+.bong-info > div {
+  border: 0;
+  border-radius: 17px;
+  background: #032c38;
+  box-shadow: inset 0 0 0 1px #0b7180;
+}
+.bong-info span { color:#63cbd3; }
+
+/* Player table */
+.players-table-wrap { border-radius: 16px; overflow: hidden; background:#032630; box-shadow: inset 0 0 0 1px #0b6875; }
+.status-users { font-size: 10px; }
+.status-users th { background:#05171e; color:#5fc5cd; font-style:italic; }
+.status-users th,.status-users td { border-bottom:1px solid rgba(87,215,224,.13); }
+.status-users tbody tr:nth-child(even) { background:rgba(4,69,82,.28); }
+
+/* Utility section more compact like a broadcast panel */
+.ng-utility-grid { grid-template-columns: .8fr 1.2fr; }
+.ng-spectator, .ng-bong, .ng-sound, .ng-service, .ng-players { margin-top: 4px; }
+
+/* TV-style red bank emphasis when active/focused */
+#display-bank,
+#bong-game-status { font-variant-numeric: tabular-nums; }
+
+/* scrollbar kept discreet */
+* { scrollbar-width: thin; scrollbar-color: #0b6875 #02080a; }
+
+@media (max-width: 1250px) {
+  body::before { width: 42vw; opacity: .55; }
+  .ng-topbar { grid-template-columns: 1fr; }
+  .ng-brand { min-width: 0; width: 100%; }
+  .ng-layout { grid-template-columns: 190px minmax(0,1fr); }
+  .ng-right { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 850px) {
+  body::before { width: 58vw; opacity: .38; }
+  body::after { top: 29%; }
+  .ng-topstats { justify-content:center; }
+  .ng-layout { grid-template-columns: 1fr; }
+  .ng-left,.ng-right { grid-template-columns: 1fr; }
+  .ng-meta { grid-template-columns: 1fr; }
+  .ng-program { border-radius: 28px; }
+  .ng-mini-state { position: static; margin-left:auto; }
+  .ng-program-head { margin: -40px 0 8px; justify-content:space-between; }
+}

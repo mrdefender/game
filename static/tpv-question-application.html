@@ -30,6 +30,7 @@
         <section class="tpv-auth-box">
             <p><strong>Для отправки вопроса необходимо войти через Яндекс.</strong></p>
             <p>Имя автора берётся из real_name профиля Яндекса, а если оно не заполнено — из login. Поле имени не редактируется.</p>
+            <p>Нажимая на кнпоку войти, вы соглашаетсь на обработку данных, таких как имени/login из вашего профиля.</p>
             <a class="tpv-yandex-login" href="/auth/yandex?next=/tpv-question"><span class="yandex-logo" aria-hidden="true">Я</span><span>Войти через Яндекс</span></a>
             {% if request.args.get('auth_error') %}
             <div class="public-alert public-alert-error">Не удалось выполнить вход через Яндекс. Попробуйте ещё раз.</div>
