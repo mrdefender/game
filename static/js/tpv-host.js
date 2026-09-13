@@ -1304,9 +1304,9 @@ socket.on("sum_generated", async (data) => {
         if (!bongRunFinished) {
             playAudio("tpv-bong-start.ogg", false);
         }
-    }, 3000);
+    }, 1700);
 
-    await delay(9000);
+    await delay(7000);
 
     for (let index = 0; index < sums.length; index += 1) {
         if (stop_bong_game_now) {
@@ -1358,7 +1358,7 @@ socket.on("sum_generated", async (data) => {
         await NumberVoice.speak(bongLastPresentedValue, {
             includeCurrency: true
         });
-        await delay(1400);
+        await delay(800);
     }
 
     stop_current_sound();
