@@ -1457,3 +1457,378 @@ tr.player-playing:hover,
 tr.player-otbor:hover{
     filter:brightness(1.1);
 }
+
+
+
+/* =========================================================
+   СВОБОДНЫЙ СЛОТ — TV SLOT GRID
+   Visual patch based on reference screenshots.
+   IMPORTANT: only presentation is changed. Existing IDs,
+   classes, disabled states and bomb markers remain intact.
+   ========================================================= */
+
+.answers-grid,
+.player-answers-grid,
+.alt-zone {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+
+/* Every slot is a glossy TV-show capsule, not a rectangular card. */
+.answers-grid .answer-btn,
+.player-answers-grid .answer-btn,
+.alt-zone .answer-btn,
+.answer-btn.answer-btn-pick {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  height: 42px;
+  padding: 4px 8px !important;
+  border: 2px solid #20d9ff !important;
+  border-radius: 999px !important;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(80,120,155,.20), transparent 55%),
+    linear-gradient(180deg, #111820 0%, #02060b 55%, #050a10 100%) !important;
+  color: #f5f8ff !important;
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: clamp(.82rem, 1.2vw, 1.02rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.95);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.85),
+    0 0 7px rgba(0,201,255,.72),
+    0 0 17px rgba(0,132,255,.22),
+    inset 0 1px 1px rgba(255,255,255,.14),
+    inset 0 -4px 8px rgba(0,0,0,.72) !important;
+  transform: none;
+  overflow: hidden;
+  transition:
+    transform .14s ease,
+    filter .14s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    background .18s ease;
+}
+
+/* Thin inner cyan highlight gives the characteristic "tube" edge. */
+.answers-grid .answer-btn::before,
+.player-answers-grid .answer-btn::before,
+.alt-zone .answer-btn::before,
+.answer-btn.answer-btn-pick::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid rgba(116,236,255,.22);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.08);
+}
+
+/* Remove the old purple diamond used by the previous skin. */
+.answer-btn.answer-btn-pick::after {
+  content: none !important;
+}
+
+.answer-btn.answer-btn-pick {
+  padding-left: 8px !important;
+  color: #f5f8ff !important;
+}
+
+.answer-btn.answer-btn-pick::before {
+  transform: none !important;
+  width: auto !important;
+  height: auto !important;
+  left: 3px !important;
+  top: 3px !important;
+  background: transparent !important;
+}
+
+/* Hover/press: keep the slot shape intact. */
+.answers-grid .answer-btn:hover:not(:disabled),
+.player-answers-grid .answer-btn:hover:not(:disabled),
+.alt-zone .answer-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.12);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.85),
+    0 0 10px rgba(0,221,255,.95),
+    0 0 24px rgba(0,150,255,.34),
+    inset 0 1px 2px rgba(255,255,255,.16),
+    inset 0 -4px 8px rgba(0,0,0,.72) !important;
+}
+
+.answers-grid .answer-btn:active:not(:disabled),
+.player-answers-grid .answer-btn:active:not(:disabled) {
+  transform: scale(.97);
+}
+
+/* ---------------------------------------------------------
+   ACTIVE / PLAYER CHOICE — orange/yellow slot
+   --------------------------------------------------------- */
+.answer-btn.is-player,
+.answer-btn.spec-player,
+.answer-btn[style*="orange"],
+.answer-btn[style*="rgb(255, 165"],
+.answer-btn[style*="#ffa500"] {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,238,144,.48), transparent 48%),
+    linear-gradient(180deg, #ffcf39 0%, #ff9d00 55%, #d96b00 100%) !important;
+  color: #171000 !important;
+  border-color: #ffe47a !important;
+  text-shadow: 0 1px 1px rgba(255,255,255,.25) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,137,0,.55),
+    0 0 9px rgba(255,177,0,.95),
+    0 0 25px rgba(255,123,0,.52),
+    inset 0 2px 2px rgba(255,255,255,.42),
+    inset 0 -5px 9px rgba(136,55,0,.30) !important;
+}
+
+/* ---------------------------------------------------------
+   CORRECT / SAFE — green slot
+   --------------------------------------------------------- */
+.answer-btn.is-right,
+.answer-btn.spec-right,
+.answer-btn[style*="green"],
+.answer-btn[style*="rgb(0, 255"],
+.answer-btn[style*="#00ff00"] {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(206,255,225,.45), transparent 48%),
+    linear-gradient(180deg, #38ef67 0%, #10bd4d 55%, #078b35 100%) !important;
+  color: #03170b !important;
+  border-color: #9affba !important;
+  text-shadow: 0 1px 1px rgba(255,255,255,.22) !important;
+  box-shadow:
+    0 0 0 1px rgba(20,229,104,.48),
+    0 0 10px rgba(20,229,104,.95),
+    0 0 26px rgba(20,229,104,.44),
+    inset 0 2px 2px rgba(255,255,255,.36),
+    inset 0 -5px 9px rgba(0,72,30,.32) !important;
+}
+
+/* ---------------------------------------------------------
+   FATAL / BOMB — keep the bomb classes and their markers.
+   We change only the capsule frame; the existing bomb SVG
+   or host bomb artwork remains responsible for the symbol.
+   --------------------------------------------------------- */
+.answer-btn.bomb-red,
+.answer-btn.is-fatal,
+.answer-btn.spec-fatal,
+.answer-btn[style*="red"],
+.answer-btn[style*="rgb(255, 0, 0"],
+.answer-btn[style*="#ff0000"] {
+  border-color: #ff4057 !important;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,80,90,.20), transparent 52%),
+    linear-gradient(180deg, #23080d 0%, #090306 58%, #140307 100%) !important;
+  color: #fff !important;
+  box-shadow:
+    0 0 0 1px rgba(255,28,55,.52),
+    0 0 9px rgba(255,32,55,.90),
+    0 0 25px rgba(255,0,35,.38),
+    inset 0 1px 2px rgba(255,130,140,.15),
+    inset 0 -5px 9px rgba(0,0,0,.75) !important;
+}
+
+/* Bomb icon is deliberately NOT removed. Existing SVG/drawn marker wins. */
+.answer-btn.bomb-red {
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 42px 42px !important;
+  font-size: 0 !important;
+  color: transparent !important;
+}
+
+/* Black bomb: preserve its existing icon, but make its slot a
+   clearly visible black/glass capsule. */
+.answer-btn.bomb-black {
+  border-color: rgba(190,210,230,.72) !important;
+  background-color: #020407 !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 42px 42px !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.20),
+    0 0 8px rgba(110,170,205,.42),
+    inset 0 1px 2px rgba(255,255,255,.10),
+    inset 0 -5px 10px rgba(0,0,0,.9) !important;
+}
+
+/* ---------------------------------------------------------
+   NAVIGATOR / ALTERNATIVE
+   --------------------------------------------------------- */
+.answer-btn.is-navi-result,
+.answer-btn.spec-navi {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,150,255,.30), transparent 50%),
+    linear-gradient(180deg, #d55bea 0%, #9d19bf 60%, #5e0877 100%) !important;
+  border-color: #f1a6ff !important;
+  color: #fff !important;
+  box-shadow:
+    0 0 0 1px rgba(217,5,236,.48),
+    0 0 10px rgba(217,5,236,.88),
+    0 0 25px rgba(217,5,236,.36),
+    inset 0 1px 2px rgba(255,255,255,.22) !important;
+}
+
+.answer-btn.is-action,
+.answer-btn.spec-alter-on {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(155,195,255,.30), transparent 50%),
+    linear-gradient(180deg, #416fff 0%, #2450ce 58%, #112875 100%) !important;
+  border-color: #8db9ff !important;
+  color: #fff !important;
+  box-shadow:
+    0 0 0 1px rgba(76,133,255,.48),
+    0 0 10px rgba(65,117,255,.82),
+    0 0 24px rgba(45,87,255,.34),
+    inset 0 1px 2px rgba(255,255,255,.18) !important;
+}
+
+/* ---------------------------------------------------------
+   DISABLED / EMPTY SLOTS
+   They stay capsules and retain the number when the browser
+   can display it. Bomb classes are excluded so their marker
+   can never be hidden by the disabled rule.
+   --------------------------------------------------------- */
+.answer-btn:disabled:not(.bomb-red):not(.bomb-black):not(.is-player):not(.is-right):not(.is-fatal):not(.is-navi-result):not(.spec-player):not(.spec-right):not(.spec-fatal):not(.spec-navi):not(.spec-alter-on) {
+  opacity: 1 !important;
+  filter: saturate(.45) brightness(.62) !important;
+  border-color: rgba(28,185,224,.38) !important;
+  background:
+    linear-gradient(180deg, #111820 0%, #03070c 58%, #080c12 100%) !important;
+  color: #8d9aaa !important;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.85),
+    0 0 5px rgba(0,145,190,.28),
+    inset 0 1px 1px rgba(255,255,255,.07),
+    inset 0 -4px 8px rgba(0,0,0,.82) !important;
+}
+
+/* Spectator's 50:50-off state remains visually inactive. */
+.answer-btn.spec-5050-off {
+  opacity: .32 !important;
+  filter: grayscale(.2) brightness(.72) !important;
+}
+
+/* Small screens: preserve the 5 × 3 slot layout from the show. */
+@media (max-width: 760px) {
+  .answers-grid,
+  .player-answers-grid,
+  .alt-zone {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 6px;
+  }
+
+  .answers-grid .answer-btn,
+  .player-answers-grid .answer-btn,
+  .alt-zone .answer-btn,
+  .answer-btn.answer-btn-pick {
+    min-height: 40px;
+    height: 40px;
+    border-radius: 999px !important;
+    font-size: .78rem !important;
+    padding: 3px 4px !important;
+  }
+
+  .answer-btn.bomb-red,
+  .answer-btn.bomb-black {
+    background-size: 32px 32px !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .answers-grid,
+  .player-answers-grid,
+  .alt-zone {
+    gap: 5px;
+  }
+
+  .answers-grid .answer-btn,
+  .player-answers-grid .answer-btn,
+  .alt-zone .answer-btn,
+  .answer-btn.answer-btn-pick {
+    min-height: 36px;
+    height: 36px;
+    font-size: .70rem !important;
+    border-width: 1.5px !important;
+  }
+
+  .answer-btn.bomb-red,
+  .answer-btn.bomb-black {
+    background-size: 28px 28px !important;
+  }
+}
+
+
+
+/* =========================================================
+   BOMB SAFETY OVERRIDE
+   The bomb marker is functional/semantic and must remain visible.
+   ========================================================= */
+
+/* Host: keep the original drawn bomb marker. */
+#btn1.bomb-red,#btn2.bomb-red,#btn3.bomb-red,#btn4.bomb-red,#btn5.bomb-red,
+#btn6.bomb-red,#btn7.bomb-red,#btn8.bomb-red,#btn9.bomb-red,#btn10.bomb-red,
+#btn11.bomb-red,#btn12.bomb-red,#btn13.bomb-red,#btn14.bomb-red,#btn15.bomb-red {
+  font-size:0 !important;
+  color:transparent !important;
+  opacity:1 !important;
+  filter:none !important;
+  background:
+    radial-gradient(circle at 50% 45%, #ff6778 0 13px, transparent 14px),
+    radial-gradient(circle at 59% 31%, #ffe66b 0 4px, transparent 5px),
+    linear-gradient(180deg,#3b070b,#160205) !important;
+  border-style:solid !important;
+  border-color:rgba(255,80,80,.80) !important;
+  box-shadow:
+    0 0 0 2px rgba(212,0,31,.28),
+    0 0 12px rgba(255,40,40,.72),
+    0 0 26px rgba(255,0,0,.34) !important;
+}
+
+#btn1.bomb-black,#btn2.bomb-black,#btn3.bomb-black,#btn4.bomb-black,#btn5.bomb-black,
+#btn6.bomb-black,#btn7.bomb-black,#btn8.bomb-black,#btn9.bomb-black,#btn10.bomb-black,
+#btn11.bomb-black,#btn12.bomb-black,#btn13.bomb-black,#btn14.bomb-black,#btn15.bomb-black {
+  font-size:0 !important;
+  color:transparent !important;
+  opacity:1 !important;
+  filter:none !important;
+  background:
+    radial-gradient(circle at 50% 45%, #0a0d12 0 14px, transparent 15px),
+    radial-gradient(circle at 59% 31%, #c5ceda 0 4px, transparent 5px),
+    linear-gradient(180deg,#222936,#05070a) !important;
+  border-style:solid !important;
+  border-color:rgba(205,225,240,.58) !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.08),
+    0 0 10px rgba(90,160,200,.38),
+    0 0 22px rgba(0,0,0,.78) !important;
+}
+
+/* Player + spectator: explicitly retain the supplied SVG bomb artwork. */
+.answer-btn.bomb-red:not(#btn1):not(#btn2):not(#btn3):not(#btn4):not(#btn5):not(#btn6):not(#btn7):not(#btn8):not(#btn9):not(#btn10):not(#btn11):not(#btn12):not(#btn13):not(#btn14):not(#btn15) {
+  background-image: url("/static/img/bomb-red.svg") !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  background-size:42px 42px !important;
+}
+
+.answer-btn.bomb-black:not(#btn1):not(#btn2):not(#btn3):not(#btn4):not(#btn5):not(#btn6):not(#btn7):not(#btn8):not(#btn9):not(#btn10):not(#btn11):not(#btn12):not(#btn13):not(#btn14):not(#btn15) {
+  background-image: url("/static/img/bomb-black.svg") !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  background-size:42px 42px !important;
+}
+
+@media (max-width:760px) {
+  .answer-btn.bomb-red:not(#btn1):not(#btn2):not(#btn3):not(#btn4):not(#btn5):not(#btn6):not(#btn7):not(#btn8):not(#btn9):not(#btn10):not(#btn11):not(#btn12):not(#btn13):not(#btn14):not(#btn15),
+  .answer-btn.bomb-black:not(#btn1):not(#btn2):not(#btn3):not(#btn4):not(#btn5):not(#btn6):not(#btn7):not(#btn8):not(#btn9):not(#btn10):not(#btn11):not(#btn12):not(#btn13):not(#btn14):not(#btn15) {
+    background-size:32px 32px !important;
+  }
+}
