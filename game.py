@@ -1023,6 +1023,52 @@ def show_rights():
       #     os.remove("alter.json")
       #  if os.path.exists("navi.json"):
       #      os.remove("navi.json")
+        # Первая ошибочная попытка x2: не раскрываем полный набор фаталов.
+        x2_player = db.session.scalar(
+            db.select(Users).where(Users.status == "check main x2")
+        )
+        if x2_player is not None:
+            task = db.session.scalar(db.select(Task).limit(1))
+            fatals = ([int(task.fatal)] if task.round == 1
+                      else json.loads(task.fatal))
+            if int(x2_player.answer) in fatals:
+                socketio.emit(
+                    "slot:x2:first_wrong",
+                    {"slot": int(x2_player.answer), "round": task.round,
+                     "black_bomb": task.b_bomb if int(x2_player.answer) == task.b_bomb else None,
+                     "red_bomb": task.r_bomb if int(x2_player.answer) == task.r_bomb else None},
+                    to=f"{DEFAULT_ROOM_CODE}:spectator",
+                )
+                # Возвращаем интерактивных участников в состояние ожидания,
+                # но НЕ завершаем ход основного игрока и НЕ рассылаем полный
+                # список фаталов всем участникам комнаты.
+                for participant in db.session.scalars(db.select(Users)).all():
+                    if participant.status == "check interactive":
+                        participant.status = "wait next round interactive"
+                db.session.commit()
+                update_list_users()
+
+                # Для второй попытки отправляем только выбранный слот и его тип.
+                # Ни полный список фаталов, ни hash, ни другие бомбы игроку не передаются.
+                chosen = int(x2_player.answer)
+                bomb_type = (
+                    "black" if task.b_bomb is not None and chosen == int(task.b_bomb)
+                    else "red" if task.r_bomb is not None and chosen == int(task.r_bomb)
+                    else None
+                )
+                socketio.emit(
+                    "slot:x2:retry",
+                    {"slot": chosen, "bomb_type": bomb_type},
+                    to=f"{get_room_code()}:user:{x2_player.username}",
+                )
+                # Ведущему сохраняем прежний формат для совместимости.
+                result = [task.round, task.fatal if task.round == 1
+                          else fatals, task.md5, task.count_fatal,
+                          task.b_bomb if task.b_bomb is not None else "false",
+                          task.r_bomb if task.r_bomb is not None else "false"]
+                socketio.emit("checked answer", result,
+                              to=f"{DEFAULT_ROOM_CODE}:host")
+                return jsn
         check_answer()
         answered_check_spec()
         return jsn

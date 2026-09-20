@@ -1455,7 +1455,7 @@ function check_answered()
 .then(response => response.json())
 
 .then(data => {
-    if (data = "true")
+    if (data === "true")
         return true;
     else
         return false;
@@ -1901,8 +1901,9 @@ console.error('Ошибка:', error);
 
 /** Показывает правильный ответ на пульте ведущего. */
 function show_right(){
-    if (check_answered)
-        fetch('/show_rights', {
+    // show_right вызывается при проверке ответа; асинхронный check_answered()
+    // здесь не даёт синхронного результата и не должен служить условием.
+    fetch('/show_rights', {
         method: 'POST',
         body: JSON.stringify({answer: " ", round:"round"}),
         headers: {

@@ -1529,6 +1529,26 @@ console.error('Ошибка:', error);
 
 }
 
+// Первая ошибка x2: сервер не передаёт полный массив фаталов.
+socket.on("slot:x2:retry", (data) => {
+    const slot = Number(data?.slot);
+    const ex2 = document.getElementById("ex2");
+    if (!ex2 || ex2.value !== "x2" || !Number.isInteger(slot) || slot < 1 || slot > 15) return;
+    const selected = document.getElementById(get_o(String(slot)));
+    if (!selected) return;
+    selected.style.backgroundColor = "red";
+    if (data.bomb_type === "black") selected.classList.add("bomb-black");
+    if (data.bomb_type === "red") selected.classList.add("bomb-red");
+    document.getElementById("px2")?.classList.remove("is-active");
+    document.getElementById("px2")?.classList.add("used");
+    ex2.value = "x2-2";
+    for (let i = 1; i <= 15; i++) {
+        const button = document.getElementById(get_o(String(i)));
+        if (button && i !== slot) button.disabled = false;
+    }
+    selected.disabled = true;
+});
+
 socket.on("checked answer",(data) => {
     show_right_user(data);
 })

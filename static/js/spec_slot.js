@@ -1065,6 +1065,18 @@ function answered_main(data){
 }
 
 
+// Только выбранный фатал при первой ошибке x2; полный список не передаётся.
+socket.on("slot:x2:first_wrong", (data) => {
+    const slot = Number(data?.slot);
+    if (!Number.isInteger(slot) || slot < 1 || slot > 15) return;
+    const button = document.getElementById(get_o(String(slot)));
+    if (!button) return;
+    button.style.backgroundColor = "red";
+    if (slot === Number(data.black_bomb)) button.classList.add("bomb-black");
+    if (slot === Number(data.red_bomb)) button.classList.add("bomb-red");
+    document.getElementById("ex2").value = "x2-2";
+});
+
 socket.on("answered_check_spec", (data) =>{
 check_answered(data)
 })
