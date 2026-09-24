@@ -1298,7 +1298,7 @@ socket.on("sum_generated", async (data) => {
         sums[sums.length - 1] = "BONG";
     }
 
-    console.log("bong sums:", sums);
+    console.log("bong-game sums:", sums);
 
     setTimeout(() => {
         if (!bongRunFinished) {
@@ -1310,7 +1310,7 @@ socket.on("sum_generated", async (data) => {
 
     for (let index = 0; index < sums.length; index += 1) {
         if (stop_bong_game_now) {
-            stop_current_sound();
+            //stop_current_sound();
 
             sum_results = Number(bongLastPresentedValue) || 0;
             stop_el = Math.max(0, index - 1);
@@ -1358,7 +1358,7 @@ socket.on("sum_generated", async (data) => {
         await NumberVoice.speak(bongLastPresentedValue, {
             includeCurrency: true
         });
-        await delay(800);
+        await delay(randomBongDelay());
     }
 
     stop_current_sound();
@@ -1372,6 +1372,31 @@ socket.on("sum_generated", async (data) => {
         option: select_bong_game
     });
 });
+function randomBongDelay() {
+    const r = Math.random();
+
+    if (r < 0.25) {
+        return randomInt(200, 700);
+    }
+
+    if (r < 0.70) {
+        return randomInt(700, 1250);
+    }
+
+    if (r < 0.92) {
+        return randomInt(1250, 1900);
+    }
+
+    return randomInt(1900, 3200);
+}
+
+function randomInt(min, max) {
+    let rand_int = Math.floor(
+        Math.random()* (max - min + 1)
+    ) + min;
+    console.log("delay: ",rand_int)
+    return rand_int
+}
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));

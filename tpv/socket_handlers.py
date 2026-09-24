@@ -587,24 +587,551 @@ class TpvSocketHandlers:
             "bong_game_safe_var",
             number,
         )
-
     def generate_sum_for_bong_game(self, data):
-        secure_rnd = self.secrets.SystemRandom()
-        count = secure_rnd.randint(6, 15)
+        rnd = self.secrets.SystemRandom()
 
-        secure_rnd = self.secrets.SystemRandom()
-        result = secure_rnd.sample(
-            range(1, data["sum"]),
-            count,
+        # =========================================================
+        # ЦЕЛЕВАЯ СУММА
+        # =========================================================
+
+        try:
+            target = int(data["sum"])
+        except (KeyError, TypeError, ValueError):
+            return
+
+        if target <= 0:
+            return
+
+        if target == 1:
+            self.emit_tpv_host(
+                "sum_generated",
+                [target],
+            )
+            return
+
+        # =========================================================
+        # КОЛИЧЕСТВО БАЗОВЫХ ЗНАЧЕНИЙ
+        #
+        # Намеренно широкий диапазон.
+        # Игрок не должен понимать длину игры по первым значениям.
+        # =========================================================
+
+        min_steps = 4
+        max_steps = 16
+
+        count = min(
+            rnd.randint(min_steps, max_steps),
+            target - 1,
         )
 
-        result.sort()
-        result.append(data["sum"])
+        # =========================================================
+        # РЕДКИЙ РАННИЙ ГОНГ
+        #
+        # Только примерно 5% игр.
+        #
+        # Важно:
+        # диапазон НЕ всегда 40–60%.
+        # =========================================================
+
+        big_final_jump = (
+            target >= 20
+            and rnd.random() < 0.1
+        )
+
+        # =========================================================
+        # БАЗОВАЯ ПОСЛЕДОВАТЕЛЬНОСТЬ
+        # =========================================================
+
+        values = set()
+        attempts = 0
+        max_attempts = 3000
+
+        while (
+            len(values) < count
+            and attempts < max_attempts
+        ):
+            attempts += 1
+
+            mode = rnd.randrange(7)
+
+            # -----------------------------------------------------
+            # Полностью равномерное распределение
+            # -----------------------------------------------------
+
+            if mode == 0:
+                ratio = rnd.random()
+
+            # -----------------------------------------------------
+            # Чаще маленькие значения
+            # -----------------------------------------------------
+
+            elif mode == 1:
+                ratio = (
+                    rnd.random()
+                    ** rnd.uniform(1.5, 5.0)
+                )
+
+            # -----------------------------------------------------
+            # Чаще большие значения
+            # -----------------------------------------------------
+
+            elif mode == 2:
+                ratio = 1 - (
+                    rnd.random()
+                    ** rnd.uniform(1.5, 5.0)
+                )
+
+            # -----------------------------------------------------
+            # Сильно хаотичное распределение
+            # -----------------------------------------------------
+
+            elif mode == 3:
+                exponent = rnd.uniform(
+                    0.20,
+                    5.0,
+                )
+
+                if rnd.random() < 0.5:
+                    ratio = (
+                        rnd.random()
+                        ** exponent
+                    )
+                else:
+                    ratio = 1 - (
+                        rnd.random()
+                        ** exponent
+                    )
+
+            # -----------------------------------------------------
+            # Центральная область
+            # -----------------------------------------------------
+
+            elif mode == 4:
+                ratio = rnd.uniform(
+                    0.20,
+                    0.80,
+                )
+
+            # -----------------------------------------------------
+            # Нижняя область
+            # -----------------------------------------------------
+
+            elif mode == 5:
+                ratio = rnd.uniform(
+                    0.02,
+                    0.35,
+                )
+
+            # -----------------------------------------------------
+            # Верхняя область
+            # -----------------------------------------------------
+
+            else:
+                ratio = rnd.uniform(
+                    0.65,
+                    0.98,
+                )
+
+            value = round(
+                (target - 1) * ratio
+            )
+
+            value = max(
+                1,
+                min(
+                    value,
+                    target - 1,
+                ),
+            )
+
+            values.add(value)
+
+        # ---------------------------------------------------------
+        # Если target маленький или было слишком много совпадений,
+        # добираем недостающие значения.
+        # ---------------------------------------------------------
+
+        if len(values) < count:
+
+            remaining = [
+                value
+                for value in range(1, target)
+                if value not in values
+            ]
+
+            rnd.shuffle(remaining)
+
+            missing = count - len(values)
+
+            values.update(
+                remaining[:missing]
+            )
+
+        result = sorted(values)
+
+        # =========================================================
+        # ОБЫЧНЫЕ +1
+        #
+        # Не в каждой игре.
+        #
+        # Иногда один блок.
+        # Реже два.
+        # Очень редко три.
+        # =========================================================
+
+        if (
+            result
+            and target >= 10
+            and rnd.random() < 0.50
+        ):
+            block_count = rnd.choices(
+                population=[1, 2, 3],
+                weights=[80, 18, 2],
+                k=1,
+            )[0]
+
+            for _ in range(block_count):
+
+                available = [
+                    value
+                    for value in result
+                    if value < target - 3
+                ]
+
+                if not available:
+                    break
+
+                base = rnd.choice(
+                    available
+                )
+
+                plus_count = rnd.choices(
+                    population=[1, 2, 3],
+                    weights=[62, 31, 7],
+                    k=1,
+                )[0]
+
+                for offset in range(
+                    1,
+                    plus_count + 1,
+                ):
+                    value = (
+                        base + offset
+                    )
+
+                    if value < target:
+                        result.append(value)
+
+        # =========================================================
+        # ЗАМИРАНИЕ
+        #
+        # Несколько очень маленьких прибавок.
+        #
+        # Пример:
+        #
+        # 42 180
+        # 42 193
+        # 42 198
+        # 42 199
+        # 42 200
+        # =========================================================
+
+        if (
+            result
+            and target >= 100
+            and rnd.random() < 0.15
+        ):
+            available = [
+                value
+                for value in result
+                if value < target - 100
+            ]
+
+            if available:
+
+                freeze_base = rnd.choice(
+                    available
+                )
+
+                freeze_length = rnd.randint(
+                    2,
+                    5,
+                )
+
+                current = freeze_base
+
+                for _ in range(
+                    freeze_length
+                ):
+                    increment = rnd.choices(
+                        population=[
+                            1,
+                            2,
+                            3,
+                            5,
+                            10,
+                            20,
+                            50,
+                        ],
+                        weights=[
+                            25,
+                            20,
+                            15,
+                            12,
+                            10,
+                            10,
+                            8,
+                        ],
+                        k=1,
+                    )[0]
+
+                    current += increment
+
+                    if current >= target:
+                        break
+
+                    result.append(current)
+
+        # =========================================================
+        # ОЧЕНЬ РЕДКАЯ ДЛИННАЯ СЕРИЯ +1
+        #
+        # Около 2% игр.
+        # =========================================================
+
+        if (
+            result
+            and target >= 20
+            and rnd.random() < 0.02
+        ):
+            available = [
+                value
+                for value in result
+                if value < target - 10
+            ]
+
+            if available:
+
+                base = rnd.choice(
+                    available
+                )
+
+                long_plus_count = (
+                    rnd.randint(4, 8)
+                )
+
+                for offset in range(
+                    1,
+                    long_plus_count + 1,
+                ):
+                    value = (
+                        base + offset
+                    )
+
+                    if value >= target:
+                        break
+
+                    result.append(value)
+
+        # =========================================================
+        # ЛОЖНЫЙ ФИНАЛ
+        #
+        # Около 11% обычных игр.
+        #
+        # Игрок видит число очень близко к цели,
+        # иногда затем +1, +1, +1...
+        #
+        # Но после этого НЕ обязательно сразу идёт гонг.
+        # =========================================================
+
+        false_finish = (
+            not big_final_jump
+            and target >= 100
+            and rnd.random() < 0.11
+        )
+
+        if false_finish:
+
+            min_gap = max(
+                5,
+                int(target * 0.0005),
+            )
+
+            max_gap = max(
+                min_gap + 1,
+                int(target * 0.015),
+            )
+
+            # Не позволяем gap выйти за target.
+            max_gap = min(
+                max_gap,
+                target - 1,
+            )
+
+            min_gap = min(
+                min_gap,
+                max_gap,
+            )
+
+            gap = rnd.randint(
+                min_gap,
+                max_gap,
+            )
+
+            base = target - gap
+
+            if 0 < base < target:
+
+                result.append(base)
+
+                plus_count = rnd.choices(
+                    population=[1, 2, 3, 4],
+                    weights=[38, 34, 22, 6],
+                    k=1,
+                )[0]
+
+                current = base
+
+                for _ in range(
+                    plus_count
+                ):
+                    current += 1
+
+                    if current >= target:
+                        break
+
+                    result.append(current)
+
+                # -------------------------------------------------
+                # В 60% случаев серия +1 НЕ является последней.
+                #
+                # После неё появляется ещё одно значение.
+                # -------------------------------------------------
+
+                if (
+                    current < target - 2
+                    and rnd.random() < 0.60
+                ):
+                    extra = rnd.randint(
+                        current + 1,
+                        target - 1,
+                    )
+
+                    result.append(extra)
+
+        # =========================================================
+        # РЕДКИЙ РАННИЙ ГОНГ
+        #
+        # Примерно 5% игр.
+        #
+        # Причём положение предпоследнего значения
+        # само выбирается случайно.
+        # =========================================================
+
+        if big_final_jump:
+
+            jump_mode = rnd.choices(
+                population=[
+                    "very_early",
+                    "early",
+                    "middle",
+                ],
+                weights=[
+                    10,
+                    65,
+                    25,
+                ],
+                k=1,
+            )[0]
+
+            if jump_mode == "very_early":
+
+                low_ratio = 0.25
+                high_ratio = 0.40
+
+            elif jump_mode == "early":
+
+                low_ratio = 0.40
+                high_ratio = 0.60
+
+            else:
+
+                low_ratio = 0.60
+                high_ratio = 0.75
+
+            low = max(
+                1,
+                int(
+                    target
+                    * low_ratio
+                ),
+            )
+
+            high = max(
+                low,
+                int(
+                    target
+                    * high_ratio
+                ),
+            )
+
+            # Предпоследнее значение никогда
+            # не должно стать target.
+            high = min(
+                high,
+                target - 1,
+            )
+
+            low = min(
+                low,
+                high,
+            )
+
+            before_bong = rnd.randint(
+                low,
+                high,
+            )
+
+            # Удаляем всё, что выше выбранного
+            # значения раннего финала.
+            result = [
+                value
+                for value in result
+                if value < before_bong
+            ]
+
+            result.append(
+                before_bong
+            )
+
+        # =========================================================
+        # ФИНАЛЬНАЯ ОЧИСТКА
+        # =========================================================
+
+        result = sorted(
+            set(result)
+        )
+
+        result = [
+            value
+            for value in result
+            if 0 < value < target
+        ]
+
+        # =========================================================
+        # КОНЕЧНАЯ СУММА
+        #
+        # Всегда строго последняя.
+        # =========================================================
+
+        result.append(target)
 
         self.emit_tpv_host(
             "sum_generated",
             result,
         )
+
+ 
+
 
     # ------------------------------------------------------------------
     # Вопросы
