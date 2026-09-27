@@ -28,6 +28,7 @@ html,body {
   height:auto;
   overflow-x:hidden;
   overflow-y:auto
+  
 }
 
 body {
@@ -1831,4 +1832,33 @@ tr.player-otbor:hover{
   .answer-btn.bomb-black:not(#btn1):not(#btn2):not(#btn3):not(#btn4):not(#btn5):not(#btn6):not(#btn7):not(#btn8):not(#btn9):not(#btn10):not(#btn11):not(#btn12):not(#btn13):not(#btn14):not(#btn15) {
     background-size:32px 32px !important;
   }
+}
+
+
+/* =========================================================
+   SLOT — player tab visibility status
+   ========================================================= */
+
+.status_users tbody tr {
+  transition: opacity .25s ease, background-color .25s ease;
+}
+
+.status_users tbody tr.slot-player-hidden {
+  opacity: .58;
+  background: rgba(255, 159, 26, .055);
+}
+
+.slot-visibility-status {
+  display: inline-block;
+  margin-left: 6px;
+  color: #ffb33b;
+  font-size: .62rem;
+  font-weight: 900;
+  white-space: nowrap;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(255, 159, 26, .28);
+}
+
+.status_users tbody tr.slot-player-hidden td:nth-child(2) {
+  color: #d8e5f5;
 }

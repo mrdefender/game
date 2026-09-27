@@ -88,6 +88,7 @@ setSocketStatus(true);
 
 socket.on("room:joined", (data) => {
   console.log("Joined socket room:", data);
+  restoreSlotRoom();
 });
 
 socket.on("connect_error", () => {
@@ -2833,6 +2834,118 @@ console.error('Ошибка:', error);
 //let timerId = setInterval(() => update_list_user(), 5000);
 
 
+// ========================================
+// Свободный слот — активность вкладок игроков
+// ========================================
+const slotPlayerVisibility = new Map();
+
+function formatSlotAwayTime(timestamp) {
+    if (!timestamp) return "0 сек";
+
+    const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+    if (seconds < 60) return `${seconds} сек`;
+
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    if (minutes < 60) return `${minutes} мин ${remainingSeconds} сек`;
+
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours} ч ${remainingMinutes} мин`;
+}
+
+function applySlotPlayerVisibility(row, username) {
+    const state = slotPlayerVisibility.get(username);
+    if (!state) return;
+
+    row.classList.toggle("slot-player-hidden", state.hidden);
+
+    const usernameCell = row.cells[1];
+    if (!usernameCell) return;
+
+    usernameCell.dataset.username = username;
+    let status = usernameCell.querySelector(".slot-visibility-status");
+
+    if (!state.hidden) {
+        status?.remove();
+        row.removeAttribute("title");
+        return;
+    }
+
+    if (!status) {
+        status = document.createElement("span");
+        status.className = "slot-visibility-status";
+        usernameCell.appendChild(status);
+    }
+
+    status.textContent = ` ● НЕ В ИГРЕ · ${formatSlotAwayTime(state.hiddenSince)}`;
+    row.title = "Игрок переключился с вкладки";
+}
+
+function updateSlotPlayerVisibilityRow(username) {
+    const table = document.getElementById("status_users");
+    if (!table) return;
+
+    for (let i = 1; i < table.rows.length; i++) {
+        const row = table.rows[i];
+        const rowUsername = row.cells[1]?.dataset.username || row.cells[1]?.textContent.trim();
+        if (rowUsername === username) {
+            applySlotPlayerVisibility(row, username);
+            break;
+        }
+    }
+}
+
+function setSlotPlayerVisibility(username, hidden) {
+    username = String(username || "").trim();
+    if (!username) return;
+
+    if (hidden) {
+        const oldState = slotPlayerVisibility.get(username);
+        slotPlayerVisibility.set(username, {
+            hidden: true,
+            hiddenSince: oldState?.hidden && oldState.hiddenSince
+                ? oldState.hiddenSince
+                : Date.now()
+        });
+    } else {
+        slotPlayerVisibility.set(username, { hidden: false, hiddenSince: null });
+    }
+
+    updateSlotPlayerVisibilityRow(username);
+}
+
+function restoreSlotPlayerVisibility(row) {
+    const usernameCell = row.cells[1];
+    if (!usernameCell) return;
+
+    const username = usernameCell.textContent.trim();
+    usernameCell.dataset.username = username;
+
+    if (slotPlayerVisibility.has(username)) {
+        applySlotPlayerVisibility(row, username);
+    }
+}
+
+socket.on("slot_player_visibility_host", (data) => {
+    const username = String(data?.username || "").trim();
+    const hidden = Boolean(data?.hidden);
+
+    //console.log(
+      //  hidden
+     //       ? `[SLOT] ${username} переключился с вкладки`
+     //       : `[SLOT] ${username} вернулся во вкладку`
+  //  );
+
+    setSlotPlayerVisibility(username, hidden);
+});
+
+setInterval(() => {
+    slotPlayerVisibility.forEach((state, username) => {
+        if (state.hidden) updateSlotPlayerVisibilityRow(username);
+    });
+}, 1000);
+
 socket.on("updated_list_user", (data) => {
     update_list_user(data);
 }
@@ -2903,6 +3016,7 @@ function update_list_user(data)
     tr.appendChild(cell7);
     tr.appendChild(cell8);
     table.appendChild(tr);
+    restoreSlotPlayerVisibility(tr);
     return;
    }
 
@@ -2960,6 +3074,7 @@ function update_list_user(data)
     tr.appendChild(cell7);
     tr.appendChild(cell8);
     table.appendChild(tr);
+    restoreSlotPlayerVisibility(tr);
     }
     socket.emit("count_answer_interactive", {interactive: interactive_col});
 }  
@@ -3426,4 +3541,39 @@ function timer_wait(time_w){
 
     setTimeout(() => { timer_wait(time_w); }, 1000);
 
+}
+
+
+/* =========================================================
+   SLOT — restore room after page reload
+   ========================================================= */
+async function restoreSlotRoom() {
+    try {
+        const response = await fetch('/current_room_slot', {
+            method: 'GET',
+            cache: 'no-store'
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        const roomInput = document.getElementById("room");
+        const openButton = document.getElementById("open_room");
+        const closeButton = document.getElementById("close_room");
+
+        if (!roomInput || !openButton || !closeButton) return;
+
+        if (data.open && data.room) {
+            roomInput.value = data.room;
+            openButton.disabled = true;
+            closeButton.disabled = false;
+        } else {
+            roomInput.value = "";
+            openButton.disabled = false;
+            closeButton.disabled = true;
+        }
+    } catch (error) {
+        console.error("[SLOT] Не удалось восстановить код комнаты:", error);
+    }
 }

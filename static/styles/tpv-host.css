@@ -1727,3 +1727,22 @@ body::after {
   .ng-mini-state { position: static; margin-left:auto; }
   .ng-program-head { margin: -40px 0 8px; justify-content:space-between; }
 }
+#players-table tr {
+    transition:
+        opacity 0.25s ease,
+        background-color 0.25s ease;
+}
+
+#players-table tr.tpv-player-hidden {
+    opacity: 0.55;
+}
+
+#players-table tr.tpv-player-hidden td:nth-child(2)::after {
+    content: " ● НЕ В ИГРЕ";
+    margin-left: 8px;
+
+    color: #ff9f1a;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}

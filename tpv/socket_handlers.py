@@ -42,6 +42,7 @@ _REQUIRED_RUNTIME_NAMES = {
 
 TPV_SOCKET_EVENTS = [
     "room:join_tpv",
+    "tpv_player_visibility",
     "count_answer_interactive",
     "clean_db_tpv",
     "tpv_spectator_ready",
@@ -143,6 +144,7 @@ class TpvSocketHandlers:
         """Зарегистрировать все TPV Socket.IO events."""
         handlers = {
             "room:join_tpv": self.socket_join_room,
+            "tpv_player_visibility": self.tpv_player_visibility,
             "count_answer_interactive": self.count_interactive,
             "clean_db_tpv": self.clean_db_tpv,
             "tpv_spectator_ready": self.tpv_spectator_ready,
@@ -221,6 +223,24 @@ class TpvSocketHandlers:
                 "role": role,
                 "username": username,
             },
+        )
+
+    def tpv_player_visibility(self, data):
+        """Передать ведущему состояние видимости вкладки игрока."""
+        room_code = str(self.get_room_code() or self.DEFAULT_ROOM_CODE or "")
+        username = str(data.get("username") or "").strip()
+        hidden = bool(data.get("hidden", False))
+
+        if not username:
+            return
+
+        self.socketio.emit(
+            "tpv_player_visibility_host",
+            {
+                "username": username,
+                "hidden": hidden,
+            },
+            to=f"{self.DEFAULT_ROOM_CODE}:host",
         )
 
     def count_interactive(self, data):

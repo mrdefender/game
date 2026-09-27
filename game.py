@@ -187,6 +187,30 @@ def socket_join_room(data):
     })   
     
     
+
+
+# =========================================================
+# SLOT — PLAYER TAB VISIBILITY
+# =========================================================
+
+@socketio.on("slot_player_visibility")
+def slot_player_visibility(data):
+    """Передаёт ведущему состояние видимости вкладки игрока."""
+    username = str((data or {}).get("username") or "").strip()
+    hidden = bool((data or {}).get("hidden", False))
+
+    if not username:
+        return
+
+    socketio.emit(
+        "slot_player_visibility_host",
+        {
+            "username": username,
+            "hidden": hidden,
+        },
+        to=f"{DEFAULT_ROOM_CODE}:host",
+    )
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(Users, user_id)
@@ -1142,6 +1166,28 @@ def update_list_users():
             return result
             
 
+
+
+
+@app.route('/current_room_slot', methods=['GET'])
+def current_room_slot():
+    """Возвращает уже открытую комнату Свободного слота после перезагрузки страницы."""
+    room = get_current_room()
+
+    if room is None or room.game != 'slot':
+        return jsonify({
+            "open": False,
+            "room": None,
+            "joinUrl": None,
+        })
+
+    join_url = f"{request.host_url.rstrip('/')}{url_for('join')}?room={room.id}"
+
+    return jsonify({
+        "open": True,
+        "room": room.id,
+        "joinUrl": join_url,
+    })
 
 @app.route('/open_room', methods=["POST", "GET"])
 def open_room():

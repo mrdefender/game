@@ -81,6 +81,7 @@ socket.on("reconnect", () => {
 
 socket.on("room:joined", (data) => {
   console.log("Joined socket room:", data);
+  restoreSlotRoomForSpectator();
 });
 
 socket.on("updated_round", (data) => {
@@ -2114,3 +2115,37 @@ socket.on("show_intro", () => {
     intro.classList.remove("is-active");
   }, 7200);
 });
+
+
+/* =========================================================
+   SLOT — restore room code / QR after spectator page reload
+   ========================================================= */
+async function restoreSlotRoomForSpectator() {
+    try {
+        const response = await fetch('/current_room_slot', {
+            method: 'GET',
+            cache: 'no-store'
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        const toast = document.getElementById("room-code-toast");
+        const value = document.getElementById("room-code-value");
+
+        if (!toast || !value) return;
+
+        if (data.open && data.room) {
+            value.innerText = data.room;
+            toast.classList.add("is-visible");
+            showSpecRoomQR(data.room);
+        } else {
+            toast.classList.remove("is-visible");
+            value.innerText = "";
+            hideSpecRoomQR();
+        }
+    } catch (error) {
+        console.error("[SLOT] Не удалось восстановить код комнаты:", error);
+    }
+}

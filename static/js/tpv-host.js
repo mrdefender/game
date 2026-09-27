@@ -86,6 +86,18 @@ socket.on("room:joined", (data) => {
   console.log("Joined socket room:", data);
 });
 
+// TPV: состояние вкладки игрока.
+socket.on("tpv_player_visibility_host", (data) => {
+  const username = data?.username || "Неизвестный игрок";
+  const hidden = Boolean(data?.hidden);
+
+  console.log(
+    hidden
+      ? `[TPV] ${username} переключился с вкладки`
+      : `[TPV] ${username} вернулся во вкладку`
+  );
+});
+
 socket.on("connect_error", () => {
   setSocketStatus(false);
 });
@@ -650,6 +662,73 @@ socket.on("updated_users_tpv", (data) => {
 
 )
 
+// ========================================
+// TPV — активность вкладок игроков
+// ========================================
+
+const tpvPlayerVisibility = new Map();
+
+function setTpvPlayerVisibility(username, hidden) {
+    username = String(username || "").trim();
+
+    if (!username) return;
+
+    tpvPlayerVisibility.set(username, hidden);
+
+    const table = document.getElementById("players-table");
+    if (!table) return;
+
+    for (let i = 1; i < table.rows.length; i++) {
+        const row = table.rows[i];
+
+        // В текущей таблице имя игрока находится во второй ячейке
+        const rowUsername = row.cells[1]?.textContent.trim();
+
+        if (rowUsername === username) {
+            applyTpvPlayerVisibility(row, hidden);
+            break;
+        }
+    }
+}
+
+
+function applyTpvPlayerVisibility(row, hidden) {
+    row.classList.toggle("tpv-player-hidden", hidden);
+
+    if (hidden) {
+        row.title = "Игрок переключился с вкладки";
+    } else {
+        row.removeAttribute("title");
+    }
+}
+
+
+function restoreTpvPlayerVisibility(row) {
+    const username = row.cells[1]?.textContent.trim();
+
+    if (!username) return;
+
+    const hidden = tpvPlayerVisibility.get(username);
+
+    if (hidden !== undefined) {
+        applyTpvPlayerVisibility(row, hidden);
+    }
+}
+
+
+socket.on("tpv_player_visibility_host", (data) => {
+    const username = String(data?.username || "").trim();
+    const hidden = Boolean(data?.hidden);
+
+   // console.log(
+    //    hidden
+    //        ? `[TPV] ${username} переключился с вкладки`
+   //         : `[TPV] ${username} вернулся во вкладку`
+   // );
+
+    setTpvPlayerVisibility(username, hidden);
+});
+
 
 function update_list_user(data)
 {
@@ -681,6 +760,7 @@ function update_list_user(data)
     tr.appendChild(cell4);
     tr.appendChild(cell5);
     table.appendChild(tr);
+    restoreTpvPlayerVisibility(tr);
     return;
    }
 
@@ -704,6 +784,7 @@ function update_list_user(data)
     tr.appendChild(cell4);
     tr.appendChild(cell5);
     table.appendChild(tr);
+    restoreTpvPlayerVisibility(tr);
     }
 }  
 

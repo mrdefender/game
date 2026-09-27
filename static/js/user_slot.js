@@ -52,6 +52,27 @@ socket.on("room:joined", (data) => {
     document.getElementById("user_name").style.backgroundColor = "green";
 });
 
+// Свободный слот — отслеживание активности вкладки игрока
+let slotPageHidden = document.hidden;
+
+document.addEventListener("visibilitychange", () => {
+  const hidden = document.hidden;
+  if (hidden === slotPageHidden) return;
+
+  slotPageHidden = hidden;
+
+  socket.emit("slot_player_visibility", {
+    username: document.getElementById("user_name")?.value || "",
+    hidden: hidden
+  });
+
+  console.log(
+    hidden
+      ? "[SLOT] Вкладка скрыта"
+      : "[SLOT] Игрок вернулся во вкладку"
+  );
+});
+
 socket.on("connect_error", () => {
   setSocketStatus(false);
 });

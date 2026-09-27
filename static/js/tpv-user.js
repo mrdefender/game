@@ -98,6 +98,29 @@ socket.on("room:joined", (data) => {
   console.log("Joined socket room:", data);
 });
 
+// TPV: сообщаем серверу, когда игрок уходит со вкладки или возвращается.
+let tpvLastVisibilityState = document.hidden;
+
+function emitTpvVisibilityState() {
+  const hidden = document.hidden;
+
+  if (hidden === tpvLastVisibilityState) return;
+  tpvLastVisibilityState = hidden;
+
+  socket.emit("tpv_player_visibility", {
+    username: document.getElementById("user_name")?.value || "",
+    hidden: hidden
+  });
+
+  console.log(
+    hidden
+      ? "[TPV] Игрок переключился с вкладки"
+      : "[TPV] Игрок вернулся во вкладку"
+  );
+}
+
+document.addEventListener("visibilitychange", emitTpvVisibilityState);
+
 socket.on("connect_error", () => {
   setSocketStatus(false);
 });
