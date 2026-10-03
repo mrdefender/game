@@ -776,6 +776,7 @@ def alter():
     if request.method == 'POST':
         secret_rnd = secrets.SystemRandom()
         r = request.json["round"]
+        ds = request.json["disabled_slots"]
         task = db.session.scalar(db.select(Task).limit(1))
         jsn =[]
             #with open('task.json') as file:
@@ -796,7 +797,7 @@ def alter():
             jsn.append(task.r_bomb)
         f = jsn[1]
         cf = len(f)
-        rf = secret_rnd.randint(1,cf-1)
+        rf = secret_rnd.randint(0,cf-1)
         j = 0
         checked = False
         while (checked==False):
@@ -806,7 +807,12 @@ def alter():
                 if i == j:
                     checked = False
                     break
-        
+            if ds is not None and checked:
+                for k in ds:
+                    if k == f[rf]:
+                        checked = False
+                        rf = secret_rnd.randint(0,cf-1)
+                        break
         res = [f[rf],str(j)]
         socketio.emit("response_alter",res,to=f"{get_room_code()}")
         socketio.emit("response_alter",res,to=f"{DEFAULT_ROOM_CODE}:spectator")

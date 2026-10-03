@@ -2424,15 +2424,29 @@ console.error('Ошибка:', error);
 });
 
 
-
-
-
-
 }
 
 socket.on("request alter", (data) => {
     alter();
 })
+
+
+
+function find_disabled_slot(){
+    result = [];
+    for (var i=1;i<16;i++)
+    {
+        if (document.getElementById(get_o(i)).disabled)
+        {
+            result.push(i);
+        }
+    }
+    if (result.length==0)
+        return null;
+    return result;
+
+}
+
 
 /** Активирует подсказку Альтернатива. */
 function alter(){
@@ -2440,10 +2454,11 @@ function alter(){
         return;
     if ((select.value == "Раунд 1") || (select.value == "Раунд 2") || (select.value == "Раунд 3"))
         return;
-    
+    disabled_slots = find_disabled_slot();
+
     fetch('/alter', {
         method: 'POST',
-        body: JSON.stringify({ round:document.getElementById("status-round").value}),
+        body: JSON.stringify({ round:document.getElementById("status-round").value,disabled_slots:disabled_slots}),
         headers: {
             'Content-Type': 'application/json'
         }
