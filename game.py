@@ -611,8 +611,14 @@ def gen_task():
 def get_md5_hash(stroka):
     characters = string.ascii_letters + string.punctuation
     random_string ="".join(secrets.choice(characters) for _ in range(12))
+    if isinstance(stroka,list):
+        fatals_str = ""
+        for i in stroka:
+            fatals_str = fatals_str+ str(i) + '|'
+        result_str = fatals_str+'_'+random_string
+        return hashlib.md5(result_str.encode()).hexdigest()
     result_str = str(stroka)+'_'+random_string
-    return hashlib.md5(random_string.encode()).hexdigest()
+    return hashlib.md5(result_str.encode()).hexdigest()
     
     
 def generate_string(round_id,is_bombed):
