@@ -2093,7 +2093,7 @@ socket.on("show_intro", () => {
   if (!intro) return;
 
   const animatedItems = intro.querySelectorAll(
-    ".intro-beams-blue, .intro-beams-gold, .intro-smoke, .intro-scan, .intro-center, .intro-flash"
+    ".depth-space, .depth-rays, .depth-stars, .depth-tunnel, .depth-logo, .depth-core, .depth-sweep, .intro-flash"
   );
 
   intro.classList.remove("is-active");
@@ -2113,7 +2113,7 @@ socket.on("show_intro", () => {
   clearTimeout(window.introHideTimer);
   window.introHideTimer = setTimeout(() => {
     intro.classList.remove("is-active");
-  }, 7200);
+  }, 17000);
 });
 
 
