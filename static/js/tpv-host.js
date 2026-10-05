@@ -1179,7 +1179,9 @@ function wrong(){
         document.getElementById("control-current-money").value = 0;
         update_data();
         if (document.getElementById("bong-question-author").textContent!="— Автор вопроса —")
-            socket.emit("add_result_author",{sum_author:sum_bong_game,name_author:document.getElementById("bong-question-author").textContent})
+            document.getElementById("action-bong-author-win").disabled = false;
+            // setTimeout(() => { socket.emit("add_result_author",{sum_author:sum_bong_game,name_author:document.getElementById("bong-question-author").textContent})}, 5000);
+           
 
     }
 
@@ -1525,6 +1527,7 @@ function sum_for_author(){
     document.getElementById("bong-game-status").textContent=sum_bong_game.toLocaleString("ru-RU");
     document.getElementById("control-current-money").value = sum_results;
     if (document.getElementById("bong-question-author").textContent!="— Автор вопроса —")
+        
         socket.emit("add_result_author",{sum_author:sum_bong_game,name_author:document.getElementById("bong-question-author").textContent})
     update_data();
 }

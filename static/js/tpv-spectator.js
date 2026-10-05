@@ -14,7 +14,8 @@ let state = {
   question: 1,
   correct: 0,
   flips: 3,
-  pass: 0
+  pass: 0,
+  wrongIndex: 0
 };
 
 let replacementTopic = "—";
@@ -93,9 +94,19 @@ function renderIndicators() {
     $(`correct-indicator-${index}`)?.classList.add("correct");
   }
 
+  const wrongIndex = Number(state.wrongIndex) || 0;
+  if (wrongIndex >= 1 && wrongIndex <= 5) {
+    const indicator = $(`correct-indicator-${wrongIndex}`);
+    if (indicator) {
+      indicator.textContent = "В";
+      indicator.classList.remove("correct", "pass");
+      indicator.classList.add("wrong");
+    }
+  }
+
   for (let offset = 0; offset < Math.min(4, Number(state.pass) || 0); offset += 1) {
     const index = 5 - offset;
-    if (index > Number(state.correct || 0)) {
+    if (index > Number(state.correct || 0) && index !== wrongIndex) {
       const indicator = $(`correct-indicator-${index}`);
       if (indicator) {
         indicator.textContent = "—";
@@ -144,6 +155,7 @@ function renderState(payload) {
   if (incomingRound !== previousRound) {
     state.correct = 0;
     state.pass = 0;
+    state.wrongIndex = 0;
   }
 
   state = {...state, ...incoming, round: incomingRound};
@@ -303,6 +315,7 @@ function showCorrect(payload) {
   );
 
   state.correct = index;
+  state.wrongIndex = 0;
   if (data.state) state = {...state, ...normalize(data.state)};
 
   $("question-text").textContent = data.answer || "";
@@ -335,6 +348,8 @@ function showWrong(payload) {
     Math.min(5, Number(data.wrongIndex) || Number(state.correct) + 1)
   );
 
+  state.wrongIndex = index;
+
   $("question-text").textContent = data.answer || "";
   $("num_question").textContent =
     `О.${Number(data.questionNumber) || Number(state.question) || 1}`;
@@ -351,7 +366,9 @@ function showWrong(payload) {
 
   setTimeout(() => {
     $("section-question").hidden = true;
-    $("section-timer").hidden = true;
+      $("section-metrics").hidden = true;
+      $("money-tree").hidden = true;
+      $("section-timer").hidden = true;
   }, 2800);
 }
 
@@ -481,7 +498,8 @@ if (resultsList) {
     question: 1,
     correct: 0,
     flips: 3,
-    pass: 0
+    pass: 0,
+    wrongIndex: 0
   };
 
   const roomCard = $("room-card");
