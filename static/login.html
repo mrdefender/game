@@ -78,20 +78,8 @@
 
         {% if yandex_auth_enabled %}
         <div class="technical-entry-link">
-          <a href="/join?technical=1">Технический вход →</a>
+          <a href="/technical-login">Технический вход с YubiKey →</a>
         </div>
-
-        {% if request.args.get('technical') == '1' %}
-        <div class="technical-login" id="technical-login">
-          <div class="technical-login-title">Технический вход ведущего</div>
-          <form action="/join" method="post" class="form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="group"><div class="input"><input name="user_name" type="text" placeholder="Имя ведущего" required></div></div>
-            <div class="group"><div class="input room"><input name="room_id" type="text" inputmode="numeric" maxlength="8" placeholder="Код" required></div></div>
-            <button class="submit" type="submit">ТЕХНИЧЕСКИЙ ВХОД</button>
-          </form>
-        </div>
-        {% endif %}
         {% endif %}
 
         {% for msg in get_flashed_messages() %}

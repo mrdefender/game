@@ -865,3 +865,35 @@ label {
 .technical-entry-link a:hover{opacity:1;text-shadow:0 0 12px rgba(100,205,255,.45)}
 .technical-login{margin-top:14px;font-size:12px;opacity:.96}
 .technical-login-title{text-align:center;font-weight:700;margin-bottom:12px;color:#bfefff}
+
+/* Technical login */
+.technical-auth-page .main { padding: 30px 0; }
+.technical-auth-wrap { width: min(680px, 100%); }
+.technical-auth-card { padding: 38px; }
+.technical-auth-head { position: relative; z-index: 2; display:flex; justify-content:space-between; align-items:flex-start; gap:24px; }
+.technical-auth-badge { width:48px; height:48px; flex:0 0 48px; display:grid; place-items:center; border:1px solid rgba(89,231,255,.18); border-radius:15px; color:var(--cyan); background:rgba(89,231,255,.045); box-shadow:inset 0 0 24px rgba(89,231,255,.035); font-size:25px; }
+.technical-primary,.technical-login,.technical-unavailable { position:relative; z-index:2; margin-top:28px; padding:20px; border:1px solid rgba(135,181,229,.11); border-radius:18px; background:linear-gradient(180deg,rgba(16,24,37,.76),rgba(8,13,21,.86)); }
+.technical-primary { border-color:rgba(89,231,255,.16); background:radial-gradient(circle at 12% 0%,rgba(89,231,255,.07),transparent 38%),linear-gradient(180deg,rgba(14,24,37,.82),rgba(7,13,21,.9)); }
+.technical-login-title,.technical-section-label { color:#e7f5ff; font-size:13px; font-weight:900; letter-spacing:.01em; }
+.technical-section-text { margin-top:7px; color:#7f92a7; font-size:11px; line-height:1.65; }
+.technical-section-text strong { color:#b9cad9; }
+.technical-section-text code { color:#9eeaff; font-size:.95em; }
+.technical-key-btn,.technical-recovery-btn { width:100%; margin-top:17px; text-transform:none; letter-spacing:.015em; }
+.technical-key-btn { min-height:56px; display:flex; align-items:center; justify-content:center; gap:10px; border-color:rgba(89,231,255,.45); color:#04151b; background:linear-gradient(135deg,#8cf1ff,#52d8f3 52%,#5a9fff); box-shadow:0 0 20px rgba(89,231,255,.18),0 0 46px rgba(70,124,255,.09); }
+.technical-key-btn:hover { box-shadow:0 0 27px rgba(89,231,255,.27),0 0 58px rgba(70,124,255,.13); }
+.technical-key-icon { font-size:11px; }
+.technical-divider { position:relative; z-index:2; display:flex; align-items:center; gap:12px; margin:22px 3px -7px; color:#52667b; font-size:8px; font-weight:900; text-transform:uppercase; letter-spacing:.12em; }
+.technical-divider::before,.technical-divider::after { content:""; height:1px; flex:1; background:rgba(255,255,255,.055); }
+.technical-recovery { border-color:rgba(255,190,86,.1); background:rgba(255,190,86,.018); }
+.technical-recovery-btn { min-height:48px; border-color:rgba(255,190,86,.18); color:#c6a96d; background:rgba(255,190,86,.055); box-shadow:none; }
+.technical-recovery-btn:hover { color:#ffe0a1; border-color:rgba(255,190,86,.32); background:rgba(255,190,86,.085); box-shadow:none; }
+.technical-code-input { margin-top:14px; }
+.technical-code-input input { text-align:center; letter-spacing:.055em; }
+.technical-bootstrap { border-color:rgba(89,231,255,.15); }
+.technical-unavailable { border-color:rgba(255,100,125,.18); color:#9eabb8; line-height:1.65; }
+.technical-unavailable .technical-login-title { color:#ff9daf; margin-bottom:7px; }
+.technical-auth-message { position:relative; z-index:2; min-height:18px; margin:15px 4px 0; text-align:center; color:#ff8296; font-size:10px; font-weight:700; line-height:1.5; }
+.technical-back-link { position:relative; z-index:2; margin-top:8px; text-align:center; }
+.technical-back-link a { color:#64798e; text-decoration:none; font-size:9px; font-weight:800; transition:.18s ease; }
+.technical-back-link a:hover { color:#a9ddec; }
+@media (max-width:599px) { .technical-auth-card{padding:27px 19px 24px}.technical-auth-badge{width:40px;height:40px;flex-basis:40px;border-radius:12px}.technical-primary,.technical-login,.technical-unavailable{padding:17px;margin-top:22px}.technical-section-text{font-size:10px}.technical-divider{margin-top:18px} }

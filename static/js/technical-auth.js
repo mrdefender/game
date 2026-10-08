@@ -1,0 +1,10 @@
+const msg=document.getElementById('msg');
+const csrf=()=>document.querySelector('meta[name="csrf-token"]')?.content||'';
+function b64uToBuf(v){v=v.replace(/-/g,'+').replace(/_/g,'/');v+='='.repeat((4-v.length%4)%4);return Uint8Array.from(atob(v),c=>c.charCodeAt(0));}
+function bufToB64u(v){return btoa(String.fromCharCode(...new Uint8Array(v))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+function prep(o){o.challenge=b64uToBuf(o.challenge);if(o.allowCredentials)o.allowCredentials=o.allowCredentials.map(c=>({...c,id:b64uToBuf(c.id)}));return o;}
+function credentialJSON(c){return {id:c.id,rawId:bufToB64u(c.rawId),type:c.type,response:{clientDataJSON:bufToB64u(c.response.clientDataJSON),authenticatorData:bufToB64u(c.response.authenticatorData),signature:bufToB64u(c.response.signature),userHandle:c.response.userHandle?bufToB64u(c.response.userHandle):null}};}
+async function post(url,body){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':csrf()},body:JSON.stringify(body)});const j=await r.json();if(!r.ok)throw Error(j.message||j.error||'Ошибка');return j;}
+document.getElementById('keyLogin')?.addEventListener('click',async()=>{try{msg.textContent='Ожидание ключа…';const r=await fetch('/api/technical/auth/options',{method:'POST',headers:{'X-CSRFToken':csrf()}});const o=prep(await r.json());const c=await navigator.credentials.get({publicKey:o});const j=await post('/api/technical/auth/verify',credentialJSON(c));location.href=j.redirect;}catch(e){msg.textContent=e.message;}});
+document.getElementById('recoveryBtn')?.addEventListener('click',async()=>{try{const j=await post('/api/technical/recovery',{code:document.getElementById('recovery').value});location.href=j.redirect;}catch(e){msg.textContent='Код не принят.';}});
+document.getElementById('bootstrapBtn')?.addEventListener('click',async()=>{try{const j=await post('/api/technical/bootstrap',{token:document.getElementById('bootstrap').value});location.href=j.redirect;}catch(e){msg.textContent='Неверный bootstrap-токен.';}});

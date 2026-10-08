@@ -580,3 +580,145 @@ footer { font-size: 10px; }
     .select-btn { font-size: 12px; }
     footer { font-size: 9px; }
 }
+
+/* Security settings */
+.security-card{padding:1px;background:linear-gradient(135deg,rgba(89,231,255,.58),rgba(70,124,255,.12),rgba(154,99,255,.32));box-shadow:0 16px 55px rgba(0,0,0,.26)}
+.security-card .game{min-height:360px;border:1px solid rgba(255,255,255,.035);background:linear-gradient(145deg,rgba(12,18,29,.98),rgba(5,8,14,.995))}
+.security-card .game-top{display:flex;flex-direction:column;gap:16px}
+.security-card h2{font-size:24px;letter-spacing:-.025em}
+.security-card p{color:#94a7bb;font-size:12px;line-height:1.65}
+.security-badge{align-self:flex-start;padding:7px 10px;border-radius:999px;font-size:8px;font-weight:900;letter-spacing:.14em;border:1px solid currentColor;background:rgba(255,255,255,.025)}
+.yubikey-card{background:linear-gradient(135deg,rgba(54,226,255,.82),rgba(35,112,255,.20) 48%,rgba(85,83,255,.52))}
+.yubikey-card .security-badge{color:#64eaff}
+.yubikey-card .select-btn{background:linear-gradient(135deg,#48dcff,#497cff);color:#03101a;box-shadow:0 10px 30px rgba(72,200,255,.17)}
+.recovery-card{background:linear-gradient(135deg,rgba(255,205,87,.82),rgba(255,151,53,.20) 48%,rgba(255,100,63,.45))}
+.recovery-card .security-badge{color:#ffd36b}
+.recovery-card .select-btn{background:linear-gradient(135deg,#ffd46a,#ff9c42);color:#241300;box-shadow:0 10px 30px rgba(255,171,64,.14)}
+.yandex-card{background:linear-gradient(135deg,rgba(255,83,83,.82),rgba(255,48,64,.20) 48%,rgba(255,111,111,.42))}
+.yandex-card .security-badge{color:#ff7777}
+.yandex-card .select-btn{background:linear-gradient(135deg,#ff6464,#ff354d);color:#fff;box-shadow:0 10px 30px rgba(255,53,77,.16)}
+.security-card .select-btn{border:0;border-radius:13px;padding:14px 18px;font-weight:900;letter-spacing:.055em;cursor:pointer;transition:transform .16s ease,filter .16s ease}
+.security-card .select-btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.security-input{width:100%;padding:14px 15px;border-radius:12px;border:1px solid rgba(89,231,255,.20);outline:none;background:rgba(2,7,14,.76);color:#f7fbff;font:inherit;box-shadow:inset 0 0 0 1px rgba(255,255,255,.018)}
+.security-input:focus{border-color:rgba(89,231,255,.62);box-shadow:0 0 0 3px rgba(89,231,255,.08)}
+#keys{padding:12px 14px;border-radius:14px;background:rgba(2,7,14,.55);border:1px solid rgba(89,231,255,.09)}
+#keys button{margin-left:8px;padding:5px 9px;border:1px solid rgba(255,90,100,.32);border-radius:8px;background:rgba(255,65,78,.09);color:#ff8b93;cursor:pointer}
+#codes:not(:empty){padding:14px;border-radius:13px;background:rgba(0,0,0,.35);border:1px dashed rgba(255,211,107,.34);color:#ffe6a5;font-size:12px;line-height:1.75}
+.security-toggle{display:flex;align-items:center;gap:11px;padding:14px;border-radius:13px;background:rgba(255,55,70,.055);border:1px solid rgba(255,94,104,.13);color:#dce5ee;font-size:12px;font-weight:700;cursor:pointer}
+.security-toggle input{width:18px;height:18px;accent-color:#ff4054}
+.hub>p:last-child{margin-top:24px;text-align:center}.hub>p:last-child a{color:#8ea6bc;text-decoration:none;font-size:11px}.hub>p:last-child a:hover{color:#fff}
+@media (min-width:1050px){.games:has(.security-card){grid-template-columns:repeat(3,1fr)}.security-card .game{min-height:390px;padding:26px}}
+
+/* Secondary system settings card: intentionally quieter than game choices */
+.game-frame.security {
+    grid-column:1 / -1;
+    width:min(560px,100%);
+    justify-self:center;
+    padding:1px;
+    border-radius:18px;
+    background:rgba(118,137,158,.16);
+    box-shadow:none;
+    opacity:.72;
+}
+
+.game-frame.security .game {
+    min-height:0;
+    padding:17px 20px;
+    border-radius:17px;
+    flex-direction:row;
+    align-items:center;
+    gap:18px;
+    background:linear-gradient(145deg,rgba(10,15,23,.92),rgba(6,10,16,.96));
+}
+
+.game-frame.security .game::before,
+.game-frame.security .game::after { display:none; }
+.game-frame.security .game-top { flex:1; min-width:0; }
+.game-frame.security .game-index { justify-content:flex-start; gap:8px; }
+.game-frame.security .game-index strong { color:#536578; }
+.game-frame.security .icon {
+    width:34px;
+    height:34px;
+    margin-top:12px;
+    border-radius:10px;
+    display:inline-grid;
+    vertical-align:middle;
+    color:#75879a;
+    border:1px solid rgba(139,159,180,.13);
+    background:rgba(139,159,180,.035);
+    box-shadow:none;
+    font-size:15px;
+}
+.game-frame.security h2 {
+    display:inline-block;
+    margin:12px 0 0 9px;
+    vertical-align:middle;
+    color:#a3afbd;
+    font-size:17px;
+    letter-spacing:-.02em;
+}
+.game-frame.security p {
+    margin-top:7px;
+    color:#5f7082;
+    font-size:8.5px;
+}
+.game-frame.security .game-bottom { width:185px; flex:0 0 185px; }
+.game-frame.security .meta { display:none; }
+.game-frame.security .select-btn {
+    min-height:38px;
+    border-radius:10px;
+    border:1px solid rgba(139,159,180,.14);
+    color:#8393a4;
+    background:rgba(116,136,158,.055);
+    box-shadow:none;
+    font-size:8px;
+}
+.game-frame.security:hover {
+    transform:translateY(-2px);
+    opacity:.94;
+    box-shadow:0 8px 28px rgba(0,0,0,.16);
+}
+.game-frame.security:hover .select-btn {
+    border-color:rgba(139,159,180,.25);
+    color:#aeb9c5;
+    background:rgba(116,136,158,.09);
+}
+
+@media(max-width:699px) {
+    .game-frame.security { width:100%; }
+    .game-frame.security .game { padding:15px 16px; gap:12px; }
+    .game-frame.security .game-bottom { width:130px; flex-basis:130px; }
+    .game-frame.security h2 { font-size:14px; }
+    .game-frame.security p { display:none; }
+    .game-frame.security .select-btn { min-height:36px; font-size:7px; }
+}
+
+/* Compact secondary action for system settings */
+.game-frame.security .security-settings-btn {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    padding:0 14px;
+    text-align:center;
+    text-decoration:none;
+    text-transform:none;
+    letter-spacing:.035em;
+    font-size:9px;
+    font-weight:800;
+    white-space:nowrap;
+}
+.game-frame.security .security-settings-arrow {
+    font-size:13px;
+    line-height:1;
+    opacity:.55;
+    transform:translateX(0);
+    transition:transform .16s ease, opacity .16s ease;
+}
+.game-frame.security .security-settings-btn:hover .security-settings-arrow {
+    transform:translateX(3px);
+    opacity:.9;
+}
+@media(max-width:699px) {
+    .game-frame.security .security-settings-btn {font-size:8px;padding:0 10px;gap:6px;}
+}

@@ -362,16 +362,16 @@ def join():
         print(request.form)
         posted_name = str(request.form.get('user_name') or '').strip()
         posted_room = str(request.form.get('room_id') or '').strip()
-        technical_host = (posted_name == HOST_USERNAME and posted_room == DEFAULT_ROOM_CODE)
+        technical_host = False  # технический вход вынесен в WebAuthn /technical-login
 
-        if yandex_required and not yandex_user and not technical_host:
+        if yandex_required and not yandex_user:
             flash('Для входа игрока требуется авторизация через Яндекс')
             return redirect('/auth/yandex?next=/join')
 
         # При включённой Яндекс-авторизации обычному игроку имя нельзя
         # подменить формой. При выключенной настройке TPV Editor разрешён
         # прежний ручной ввод имени. Технический ведущий работает всегда.
-        if technical_host or not yandex_required:
+        if not yandex_required:
             user_name = posted_name
         else:
             user_name = str(yandex_user.get('display_name') or '').strip()
@@ -381,10 +381,9 @@ def join():
         if  (user_name!=HOST_USERNAME) and (request.form['room_id']==DEFAULT_ROOM_CODE):
            flash ('Неверный код комнаты')
            return render_template("login.html", yandex_user=yandex_user)
-        if (user_name==HOST_USERNAME)  and (request.form['room_id']==DEFAULT_ROOM_CODE):
-           # _users[0] = user_name
-            init_game()
-            return render_template("select.html")
+        if user_name == HOST_USERNAME:
+            flash('Технический вход выполняется через YubiKey')
+            return redirect('/technical-login')
         else:
             if check_id_room(request.form['room_id'])==False:
                 flash ('Неверный код комнаты')
@@ -465,6 +464,13 @@ def join():
 
 @app.route('/select', methods=["POST", "GET"])
 def select():
+    if session.get('tpv_technical_admin') is not True:
+        return redirect('/technical-login')
+    if request.method == 'GET':
+        if session.get('tpv_admin_game_initialized') is not True:
+            init_game()
+            session['tpv_admin_game_initialized'] = True
+        return render_template('select.html')
     if request.method == 'POST':
         if request.form.values == "Свободный слот":
          print (url_for('slot'))
@@ -475,6 +481,8 @@ def select():
 
 @app.route('/slot', methods=["POST", "GET"])
 def slot():
+    if session.get('tpv_technical_admin') is not True:
+        return redirect('/technical-login')
     if request.method == 'POST':
         print (url_for('slot'))
         return render_template("slot.html")
@@ -484,6 +492,8 @@ def slot():
 
 @app.route('/tpv', methods=["POST", "GET"])
 def tpv():
+    if session.get('tpv_technical_admin') is not True:
+        return redirect('/technical-login')
     # Лаунчер TPV открывается только после POST из общего выбора игр.
     # Повторный GET разрешён только после успешного входа в TPV-лаунчер.
     if request.method == "POST":
@@ -495,6 +505,8 @@ def tpv():
 
 @app.route('/tpv_host', methods=["POST", "GET"])
 def tpv_host():
+    if session.get('tpv_technical_admin') is not True:
+        return redirect('/technical-login')
     # Режим ведущего запускается только кнопкой из tpv.html.
     if request.method == "POST":
         if session.get("tpv_launcher_allowed") is not True:
@@ -2465,6 +2477,27 @@ TPV_APPLICATION_EXPORTS = register_tpv_application(
 
 # Совместимые глобальные имена для существующих маршрутов и общего кода.
 globals().update(TPV_APPLICATION_EXPORTS)
+
+from tpv.auth.technical import register_technical_auth
+TPV_TECHNICAL_AUTH = register_technical_auth(app, db)
+
+
+def ensure_database_tables():
+    """Создаёт только отсутствующие SQLAlchemy-таблицы без изменения существующих данных."""
+    with app.app_context():
+        before = set(inspect(db.engine).get_table_names())
+        db.create_all()
+        after = set(inspect(db.engine).get_table_names())
+        created = sorted(after - before)
+        if created:
+            app.logger.info("Созданы отсутствующие таблицы БД: %s", ", ".join(created))
+        else:
+            app.logger.info("Проверка БД: все зарегистрированные таблицы уже существуют.")
+
+
+# Выполняется после регистрации TPV и технической авторизации, когда metadata
+# уже содержит все ORM-модели приложения. Существующие таблицы не пересоздаются.
+ensure_database_tables()
 
 # КОНЕЦ UNIFIED APPLICATION BOOTSTRAP
 

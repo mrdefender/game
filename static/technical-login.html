@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Технический вход</title>
+    <link rel="stylesheet" href="/static/styles/login.css">
+    <script src="/static/js/csrf.js"></script>
+</head>
+<body class="technical-auth-page">
+<div class="page">
+    <main class="main">
+        <div class="terminal-wrap technical-auth-wrap">
+            <section class="terminal technical-auth-card">
+                <div class="technical-auth-head">
+                    <div>
+                        <div class="kicker">Защищённый доступ</div>
+                        <h1>Технический <span>вход.</span></h1>
+                        <p class="subtitle">Доступ к служебным разделам и настройкам системы.</p>
+                    </div>
+                    <div class="technical-auth-badge" aria-hidden="true">⌁</div>
+                </div>
+
+                {% if has_keys %}
+                <div class="technical-primary">
+                    <div class="technical-section-label">Ключ безопасности</div>
+                    <p class="technical-section-text">Подключите зарегистрированный YubiKey / FIDO2-ключ и подтвердите вход.</p>
+                    <button class="submit technical-key-btn" id="keyLogin">
+                        <span class="technical-key-icon">◆</span>
+                        <span>Войти с YubiKey</span>
+                    </button>
+                </div>
+
+                <div class="technical-divider"><span>резервный способ</span></div>
+
+                <div class="technical-login technical-recovery">
+                    <div class="technical-login-title">Аварийный доступ</div>
+                    <p class="technical-section-text">Используйте одноразовый recovery-код, если ключ недоступен.</p>
+                    <div class="group">
+                        <div class="input technical-code-input">
+                            <input id="recovery" autocomplete="one-time-code" placeholder="TPV-XXXXXX-XXXXXX">
+                        </div>
+                    </div>
+                    <button class="submit technical-recovery-btn" id="recoveryBtn">Использовать recovery-код</button>
+                </div>
+
+                {% elif bootstrap_enabled %}
+                <div class="technical-login technical-bootstrap">
+                    <div class="technical-login-title">Первичная настройка</div>
+                    <p class="technical-section-text">Ключи ещё не зарегистрированы. Введите <strong>YUBIKEY_BOOTSTRAP_TOKEN</strong> из <code>.env</code>, чтобы перейти к регистрации первого ключа.</p>
+                    <div class="group">
+                        <div class="input technical-code-input">
+                            <input id="bootstrap" type="text" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Вставьте YUBIKEY_BOOTSTRAP_TOKEN" style="-webkit-text-security:disc">
+                        </div>
+                    </div>
+                    <button class="submit technical-key-btn" id="bootstrapBtn">Настроить первый ключ</button>
+                </div>
+
+                {% else %}
+                <div class="technical-unavailable">
+                    <div class="technical-login-title">Вход пока недоступен</div>
+                    <p>Нет зарегистрированных ключей и не задан <strong>YUBIKEY_BOOTSTRAP_TOKEN</strong>.</p>
+                </div>
+                {% endif %}
+
+                <p id="msg" class="technical-auth-message" aria-live="polite"></p>
+                <div class="technical-entry-link technical-back-link"><a href="/join">← Вернуться на страницу входа</a></div>
+            </section>
+        </div>
+    </main>
+</div>
+<script src="/static/js/technical-auth.js"></script>
+</body>
+</html>
