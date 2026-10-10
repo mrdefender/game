@@ -1,5 +1,122 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>Безопасность и авторизация</title><link rel="stylesheet" href="/static/styles/select.css"><script src="/static/js/csrf.js"></script></head><body><div class="page"><header><div class="brand"><span class="orb"></span><strong>ВЕСЁЛЫЕ ИГРЫ</strong></div><div class="mode"><span>SECURITY</span></div></header><main class="main"><section class="hub"><div class="heading"><div class="kicker">Системные настройки</div><h1>Безопасность и <span>авторизация.</span></h1><p class="lead">Текущий способ входа: {{ auth_method }}.</p></div><div class="games">
-<div class="game-frame security-card yubikey-card"><article class="game"><div class="game-top"><div class="security-badge">АППАРАТНАЯ ЗАЩИТА</div><h2>YubiKey / FIDO2</h2><p>Зарегистрированные ключи:</p><div id="keys">{% for k in credentials %}<p><strong>{{ k.name }}</strong> · #{{ k.id }} · <span class="credential-rp">{{ k.rp_id }}</span> {% if credentials|length > 1 and auth_method == 'webauthn' %}<button data-delete-key="{{ k.id }}">Удалить</button>{% endif %}</p>{% else %}<p>Ключей пока нет.</p>{% endfor %}</div><input class="security-input" id="keyName" placeholder="Название ключа" value="YubiKey"><button class="select-btn" id="addKey">ДОБАВИТЬ КЛЮЧ</button><p id="keyMsg"></p></div></article></div>
-<div class="game-frame security-card recovery-card"><article class="game"><div class="game-top"><div class="security-badge">ВОССТАНОВЛЕНИЕ</div><h2>Аварийный доступ</h2><p>Неиспользованных кодов: <strong>{{ recovery_remaining }}</strong></p><button class="select-btn" id="regen">СОЗДАТЬ НОВЫЕ КОДЫ</button><pre id="codes" style="white-space:pre-wrap;user-select:all"></pre><p>Новые коды заменяют все предыдущие и показываются только один раз.</p></div></article></div>
-<div class="game-frame security-card yandex-card"><article class="game"><div class="game-top"><div class="security-badge">УЧАСТНИКИ</div><h2>Авторизация через Яндекс</h2><p>Для /join, /tpv-apply и /tpv-question.</p><label class="security-toggle"><input type="checkbox" id="yandex" {% if yandex_auth_enabled %}checked{% endif %}> Авторизация включена</label><button class="select-btn" id="saveYandex">СОХРАНИТЬ</button><p id="yandexMsg"></p></div></article></div>
-</div><p><a href="/select">← Вернуться к выбору игры</a></p></section></main></div><script src="/static/js/security-settings.js"></script></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Безопасность и авторизация</title>
+    <link rel="stylesheet" href="/static/styles/select.css">
+    <script src="/static/js/csrf.js"></script>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div class="brand">
+                <span class="orb"></span>
+                <strong>ВЕСЁЛЫЕ ИГРЫ</strong>
+            </div>
+            <div class="mode">
+                <span>SECURITY</span>
+            </div>
+        </header>
+
+        <main class="main">
+            <section class="hub">
+                <div class="heading">
+                    <div class="kicker">Системные настройки</div>
+                    <h1>Безопасность и <span>авторизация.</span></h1>
+                    <p class="lead">Текущий способ входа: {{ auth_method }}.</p>
+                </div>
+
+                <div class="games security-grid">
+                    <!-- Аппаратные ключи безопасности -->
+                    <div class="game-frame security-card yubikey-card">
+                        <article class="game">
+                            <div class="game-top">
+                                <div class="security-badge">АППАРАТНАЯ ЗАЩИТА</div>
+                                <h2>Ключи безопасности</h2>
+                                <p class="security-description">
+                                    Аппаратная защита административного доступа · FIDO2 / WebAuthn
+                                </p>
+                                <p>Зарегистрированные ключи:</p>
+
+                                <div id="keys" class="security-keys" aria-label="Зарегистрированные ключи">
+                                    {% for k in credentials %}
+                                        <p>
+                                            <strong>{{ k.name }}</strong> · #{{ k.id }} ·
+                                            <span class="credential-rp">{{ k.rp_id }}</span>
+                                            {% if credentials|length > 1 and auth_method == 'webauthn' %}
+                                                <button data-delete-key="{{ k.id }}">Удалить</button>
+                                            {% endif %}
+                                        </p>
+                                    {% else %}
+                                        <p>Ключей пока нет.</p>
+                                    {% endfor %}
+                                </div>
+
+                                <label class="security-field-label" for="keyName">
+                                    Название нового ключа
+                                </label>
+                                <input
+                                    class="security-input"
+                                    id="keyName"
+                                    placeholder="Название ключа"
+                                    value="YubiKey"
+                                >
+                                <button class="select-btn" id="addKey">ДОБАВИТЬ КЛЮЧ</button>
+                                <p id="keyMsg" class="security-feedback" role="status" aria-live="polite"></p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Аварийное восстановление доступа -->
+                    <div class="game-frame security-card recovery-card">
+                        <article class="game">
+                            <div class="game-top">
+                                <div class="security-badge">ВОССТАНОВЛЕНИЕ</div>
+                                <h2>Аварийный доступ</h2>
+                                <p class="security-description">
+                                    Резервный способ входа, если ключ недоступен.
+                                </p>
+                                <p>Неиспользованных кодов: <strong>{{ recovery_remaining }}</strong></p>
+                                <button class="select-btn" id="regen">СОЗДАТЬ НОВЫЕ КОДЫ</button>
+                                <pre id="codes" aria-label="Новые резервные коды"></pre>
+                                <p>Новые коды заменяют все предыдущие и показываются только один раз.</p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Авторизация участников через Яндекс -->
+                    <div class="game-frame security-card yandex-card">
+                        <article class="game">
+                            <div class="game-top">
+                                <div class="security-badge">УЧАСТНИКИ</div>
+                                <h2>Авторизация через Яндекс</h2>
+                                <p class="security-description">Управление входом участников.</p>
+                                <p>Для /join, /tpv-apply и /tpv-question.</p>
+
+                                <label class="security-toggle">
+                                    <input
+                                        type="checkbox"
+                                        id="yandex"
+                                        {% if yandex_auth_enabled %}checked{% endif %}
+                                    >
+                                    Авторизация включена
+                                </label>
+                                <button class="select-btn" id="saveYandex">СОХРАНИТЬ</button>
+                                <p id="yandexMsg" class="security-feedback" role="status" aria-live="polite"></p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <p class="security-return">
+                    <a href="/select">← Вернуться к выбору игры</a>
+                </p>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/security-settings.js"></script>
+</body>
+</html>

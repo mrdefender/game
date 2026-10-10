@@ -897,3 +897,26 @@ label {
 .technical-back-link a { color:#64798e; text-decoration:none; font-size:9px; font-weight:800; transition:.18s ease; }
 .technical-back-link a:hover { color:#a9ddec; }
 @media (max-width:599px) { .technical-auth-card{padding:27px 19px 24px}.technical-auth-badge{width:40px;height:40px;flex-basis:40px;border-radius:12px}.technical-primary,.technical-login,.technical-unavailable{padding:17px;margin-top:22px}.technical-section-text{font-size:10px}.technical-divider{margin-top:18px} }
+
+
+/* Technical access refresh — isolated from ordinary /join styles */
+.technical-auth-page .main::before,.technical-auth-page .main::after{opacity:.5}
+.technical-auth-page .technical-auth-wrap{width:min(610px,100%);padding:1px;border-radius:26px;background:linear-gradient(135deg,rgba(89,231,255,.36),rgba(105,122,177,.14) 52%,rgba(154,99,255,.3));box-shadow:0 22px 75px rgba(0,0,0,.4)}
+.technical-auth-page .technical-auth-card{padding:36px;border-radius:25px;background:linear-gradient(155deg,#111b29,#070c14 80%)}
+.technical-auth-page .technical-auth-head h1{font-size:clamp(32px,5vw,43px);line-height:1.08}
+.technical-auth-page .technical-auth-head .subtitle{font-size:13px;line-height:1.65}
+.technical-auth-page .technical-auth-badge{width:50px;height:50px;flex-basis:50px;border-radius:15px;font-size:25px}
+.technical-auth-page .technical-primary,.technical-auth-page .technical-login,.technical-auth-page .technical-unavailable{margin-top:24px;padding:22px;border-radius:16px}
+.technical-auth-page .technical-section-label,.technical-auth-page .technical-login-title{font-size:15px;text-align:left}
+.technical-auth-page .technical-section-text{font-size:12px;line-height:1.7}
+.technical-auth-page .technical-key-btn{font-size:14px;min-height:54px;letter-spacing:0}
+.technical-auth-page .technical-recovery{margin-top:14px;background:rgba(255,191,83,.025)}
+.technical-auth-page .technical-recovery-btn{font-size:12px;min-height:48px}
+.technical-auth-page .technical-code-input input{font-size:14px;min-height:48px;letter-spacing:.025em}
+.technical-auth-page .technical-divider{font-size:10px;margin-top:22px}
+.technical-auth-page .technical-auth-message{font-size:12px;min-height:20px}
+.technical-auth-page .technical-back-link{margin-top:14px}
+.technical-auth-page .technical-back-link a{font-size:12px}
+.technical-auth-page button:focus-visible,.technical-auth-page input:focus-visible,.technical-auth-page a:focus-visible{outline:2px solid #8cefff;outline-offset:3px}
+@media(max-width:599px){.technical-auth-page .technical-auth-card{padding:26px 19px}.technical-auth-page .technical-auth-head{gap:12px}.technical-auth-page .technical-auth-badge{width:40px;height:40px;flex-basis:40px}.technical-auth-page .technical-primary,.technical-auth-page .technical-login,.technical-auth-page .technical-unavailable{padding:18px}}
+@media(prefers-reduced-motion:reduce){.technical-auth-page .submit{transition:none!important}}

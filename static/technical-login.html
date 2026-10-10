@@ -19,20 +19,20 @@
                         <h1>Технический <span>вход.</span></h1>
                         <p class="subtitle">Доступ к служебным разделам и настройкам системы.</p>
                     </div>
-                    <div class="technical-auth-badge" aria-hidden="true">⌁</div>
+                    <div class="technical-auth-badge" aria-hidden="true">✧</div>
                 </div>
 
                 {% if has_keys %}
                 <div class="technical-primary">
                     <div class="technical-section-label">Ключ безопасности</div>
-                    <p class="technical-section-text">Подключите зарегистрированный YubiKey / FIDO2-ключ и подтвердите вход.</p>
+                    <p class="technical-section-text">Подключите зарегистрированный FIDO2-ключ, затем подтвердите вход с помощью PIN и касания, если браузер их запросит.</p>
                     <button class="submit technical-key-btn" id="keyLogin">
                         <span class="technical-key-icon">◆</span>
-                        <span>Войти с YubiKey</span>
+                        <span>Войти с ключом безопасности</span>
                     </button>
                 </div>
 
-                <div class="technical-divider"><span>резервный способ</span></div>
+                <div class="technical-divider"><span>Если ключ недоступен</span></div>
 
                 <div class="technical-login technical-recovery">
                     <div class="technical-login-title">Аварийный доступ</div>

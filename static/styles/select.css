@@ -722,3 +722,34 @@ footer { font-size: 10px; }
 @media(max-width:699px) {
     .game-frame.security .security-settings-btn {font-size:8px;padding:0 10px;gap:6px;}
 }
+
+
+/* Security center refresh — scoped to /settings/security */
+.security-grid {align-items:stretch;gap:18px}
+.security-grid .security-card{border-radius:22px;padding:1px;box-shadow:0 14px 36px rgba(0,0,0,.2);transform:none}
+.security-grid .security-card:hover{transform:translateY(-2px)}
+.security-grid .security-card .game{min-height:410px;height:100%;padding:26px;border-radius:21px;background:linear-gradient(155deg,#111b2a 0%,#0a111c 65%,#080d16 100%)}
+.security-grid .security-card .game::before{opacity:.35}
+.security-grid .security-card .game-top{height:100%;gap:12px}
+.security-grid .security-card h2{margin:2px 0 0;font-size:clamp(21px,2.2vw,27px);line-height:1.15;letter-spacing:-.035em}
+.security-grid .security-card p{margin:0;font-size:12px;line-height:1.6;color:#a4b4c7}
+.security-grid .security-card .security-description{color:#8298af;min-height:38px}
+.security-grid .security-badge{font-size:9px;letter-spacing:.09em;padding:7px 11px}
+.security-grid .security-keys{margin:2px 0 4px;min-height:62px;max-height:175px;overflow:auto;padding:12px;border-radius:12px;background:#080f19;border:1px solid rgba(135,181,229,.12)}
+.security-grid .security-keys p{overflow-wrap:anywhere;margin:0 0 8px;font-size:12px}
+.security-grid .security-keys p:last-child{margin-bottom:0}
+.security-grid .credential-rp{display:inline-block;color:#8bd8ec;font-size:11px}
+.security-grid .security-field-label{color:#c7d8e7;font-size:11px;font-weight:800;margin-top:auto}
+.security-grid .security-input{min-height:46px;font-size:14px}
+.security-grid .select-btn{min-height:46px;margin-top:4px;font-size:11px;letter-spacing:.02em;text-transform:none}
+.security-grid .security-feedback{min-height:18px;overflow-wrap:anywhere}
+.security-grid #codes{white-space:pre-wrap;user-select:all;overflow-wrap:anywhere;font-size:12px;line-height:1.7}
+.security-grid .security-toggle{min-height:64px;gap:12px;font-size:13px;line-height:1.45}
+.security-grid .security-toggle input{flex:0 0 19px;width:19px;height:19px}
+.security-grid #keys button{font:inherit;font-size:11px;font-weight:700;padding:6px 10px}
+.security-return{margin:26px 0 0!important}
+.security-return a{display:inline-flex;padding:10px 14px;border:1px solid rgba(147,171,195,.14);border-radius:11px;background:rgba(147,171,195,.035);font-size:12px!important}
+.security-grid button:focus-visible,.security-grid input:focus-visible,.security-return a:focus-visible{outline:2px solid #8ee9ff;outline-offset:3px}
+@media(max-width:1049px){.games.security-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.security-grid .security-card:last-child{grid-column:1/-1}.security-grid .security-card .game{min-height:365px}}
+@media(max-width:699px){.games.security-grid{grid-template-columns:1fr}.security-grid .security-card:last-child{grid-column:auto}.security-grid .security-card .game{min-height:0;padding:22px}.security-grid .security-card .game-top{gap:13px}.security-grid .security-card .security-description{min-height:0}}
+@media(prefers-reduced-motion:reduce){.security-grid .security-card,.security-grid .select-btn{transition:none!important}}
