@@ -1325,8 +1325,8 @@ output {
 }
 
 @keyframes creditsRoll {
-  from { transform: translateY(75vh); }
-  to { transform: translateY(-100%); }
+  from { transform: translateY(90vh); }
+  to { transform: translateY(-120%); }
 }
 
 .credits-title {

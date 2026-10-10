@@ -382,7 +382,7 @@ def join():
            flash ('Неверный код комнаты')
            return render_template("login.html", yandex_user=yandex_user)
         if user_name == HOST_USERNAME:
-            flash('Технический вход выполняется через YubiKey')
+            #flash('Технический вход выполняется через YubiKey')
             return redirect('/technical-login')
         else:
             if check_id_room(request.form['room_id'])==False:
