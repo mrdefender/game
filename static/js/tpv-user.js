@@ -280,11 +280,11 @@ function calc_flip() {
     ) || 0));
 
     const values = flips === 3
-        ? ["→", "→", "→"]
+        ? ["➩", "➩", "➩"]
         : flips === 2
-            ? ["x", "→", "→"]
+            ? ["x", "➩", "➩"]
             : flips === 1
-                ? ["x", "x", "→"]
+                ? ["x", "x", "➩"]
                 : ["x", "x", "x"];
 
     for (let index = 1; index <= 3; index += 1) {
@@ -576,7 +576,9 @@ socket.on("show_stats_user", (data) => {
     const metrics = document.getElementById("section-metrics");
     const bankValue = Number(document.getElementById("control-bank")?.value) || 0;
     const bankCard = document.getElementById("metric-bank");
-
+    document.getElementById("metric-money").hidden = false;
+    document.getElementById("metric-flip").hidden = false;
+    document.getElementById("metric-flips").hidden = false;
     if (bankCard) bankCard.hidden = bankValue <= 0;
     if (metrics) metrics.hidden = false;
     showPlayerTimer({showMetrics: true});
@@ -600,6 +602,7 @@ function showPlayerTimer({showMetrics = true} = {}) {
     if (showMetrics && metrics) metrics.hidden = false;
     if (timerSection) timerSection.hidden = false;
     if (displayTime) displayTime.hidden = false;
+
 
     calc_timer();
 }
@@ -640,7 +643,10 @@ socket.on("question_selected_user", async (payload) => {
     setQuestionMarker(replacementQuestionPending ? "replacement" : "question", data.questionNumber);
 
     showPlayerTimer({showMetrics: true});
-
+    document.getElementById("metric-bank").hidden = true;
+    document.getElementById("metric-money").hidden = true;
+    document.getElementById("metric-flip").hidden = true;
+    document.getElementById("metric-flips").hidden = true;
     await Promise.all([
         TPVAnimation.showQuestion(),
         TPVAnimation.showTimer(),

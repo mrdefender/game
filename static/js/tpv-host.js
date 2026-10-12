@@ -395,17 +395,17 @@ function calc_flip()
 {
       if (document.getElementById("control-flips-count").value==3)
     {
-        document.getElementById("flip-indicator-1").value = "→";
-        document.getElementById("flip-indicator-2").value = "→";
-        document.getElementById("flip-indicator-3").value = "→";
+        document.getElementById("flip-indicator-1").value = "➩";
+        document.getElementById("flip-indicator-2").value = "➩";
+        document.getElementById("flip-indicator-3").value = "➩";
         document.getElementById("action-question-flip").disabled = false;
         return;
     }
     if (document.getElementById("control-flips-count").value==2)
     {
         document.getElementById("flip-indicator-1").value = "x";
-        document.getElementById("flip-indicator-2").value = "→";
-        document.getElementById("flip-indicator-3").value = "→";
+        document.getElementById("flip-indicator-2").value = "➩";
+        document.getElementById("flip-indicator-3").value = "➩";
         document.getElementById("action-question-flip").disabled = false;
         return;
     }
@@ -413,7 +413,7 @@ function calc_flip()
     {
         document.getElementById("flip-indicator-1").value = "x";
         document.getElementById("flip-indicator-2").value = "x";
-        document.getElementById("flip-indicator-3").value = "→";
+        document.getElementById("flip-indicator-3").value = "➩";
         document.getElementById("action-question-flip").disabled = false;
         return;
     }

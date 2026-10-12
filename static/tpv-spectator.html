@@ -98,7 +98,7 @@
         <output id="display-time">4:00</output>
       </article>
 
-      <article class="public-stat current-stat">
+      <article class="public-stat current-stat" id="current-stat" hidden>
         <span>ТЕКУЩАЯ СУММА</span>
         <output id="display-current-money">0</output>
       </article>
@@ -108,17 +108,17 @@
         <output id="display-bank">0</output>
       </article>
 
-      <article class="public-stat topic-stat">
+      <article class="public-stat topic-stat" id="topic-stat" hidden>
         <span>ТЕМА ЗАМЕНЫ</span>
         <output id="display-replacement-topic">—-</output>
       </article>
 
-      <article class="public-stat flips-stat">
+      <article class="public-stat flips-stat" id="flips-stat">
         <span>ЗАМЕНЫ</span>
         <div class="replacement-orbs" id="replacement-orbs" aria-label="Оставшиеся замены">
-          <i id="replacement-orb-1">→</i>
-          <i id="replacement-orb-2">→</i>
-          <i id="replacement-orb-3">→</i>
+          <i id="replacement-orb-1">➩</i>
+          <i id="replacement-orb-2">➩</i>
+          <i id="replacement-orb-3">➩</i>
         </div>
       </article>
     </section>
@@ -207,7 +207,7 @@
         </div>
 
         <div class="bong-author-card">
-          <span>АВТОР ВОПРОСА</span>
+          <strong>АВТОР ВОПРОСА</strong>
           <div class="question-author" id="bong-question-author">— Автор вопроса —</div>
         </div>
 

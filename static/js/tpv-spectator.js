@@ -120,7 +120,7 @@ function renderIndicators() {
     if (!indicator) continue;
     const used = index <= 3 - Math.max(0, Number(state.flips) || 0);
     indicator.classList.toggle("used", used);
-    indicator.textContent = used ? "×" : "→";
+    indicator.textContent = used ? "×" : "➩";
   }
 
   const remainingFlips = Math.max(0, Math.min(3, Number(state.flips) || 0));
@@ -129,7 +129,7 @@ function renderIndicators() {
     if (!orb) continue;
     const isUsed = index > remainingFlips;
     orb.classList.toggle("is-used", isUsed);
-    orb.textContent = isUsed ? "×" : "→";
+    orb.textContent = isUsed ? "×" : "➩";
   }
 }
 
@@ -164,7 +164,7 @@ function renderState(payload) {
   $("display-time").textContent = formatTime(state.timer);
   $("display-current-money").textContent = fmt(state.currentMoney);
   $("display-bank").textContent = fmt(state.bank);
-  $("bank-stat").hidden = (Number(state.bank) || 0) <= 0;
+  //$("bank-stat").hidden = (Number(state.bank) || 0) <= 0;
   $("display-replacement-topic").textContent = replacementTopic || "-";
 
   renderTree();
@@ -290,6 +290,9 @@ function showQuestion(payload) {
   $("section-timer").hidden = false;
   $("round-stage").hidden = false;
   $("money-tree").hidden = true;
+  $("current-stat").hidden = true;
+  $("topic-stat").hidden = true;
+  $("flips-stat").hidden = true;
   $("section-question").hidden = false;
  $("question-author").textContent = " — Автор вопроса —";
   $("question-text").textContent = data.question || "";
@@ -301,6 +304,7 @@ function showQuestion(payload) {
     data.replacement ? "↻" : `В.${Number(data.questionNumber) || Number(state.question) || 1}`;
 
   renderState(state);
+  $("bank-stat").hidden = true;
   flash($("section-question"));
 }
 
@@ -552,6 +556,10 @@ onBoth("update_data_spec", "update_data_user", renderState);
 onBoth("show_stats_spec", "show_stats_user", () => {
   showGame();
   $("section-metrics").hidden = false;
+  $("bank-stat").hidden = (Number(state.bank) || 0) <= 0;
+  $("current-stat").hidden = false;
+  $("topic-stat").hidden = false;
+  $("flips-stat").hidden = false;
   $("section-timer").hidden = false;
 });
 onBoth("hide_stats_spec", "hide_stats_user", () => {

@@ -687,6 +687,7 @@ def generate_string(round_id,is_bombed):
         return js
     else:
         fatal = secure_rnd.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
+        fatal.sort()
         b_bomb = 'false'
         r_bomb = 'false'
         if bomb and (current_round >= 4):

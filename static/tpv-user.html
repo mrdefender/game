@@ -62,22 +62,22 @@
       <output id="display-time">4:00</output>
     </article>
 
-    <article class="metric-card metric-card--bank" id="metric-bank">
+    <article class="metric-card metric-card--bank" id="metric-bank" hidden>
       <span>БАНК</span>
       <output id="display-bank">0</output>
     </article>
 
-    <article class="metric-card metric-card--money">
+    <article class="metric-card metric-card--money" id="metric-money" hidden>
       <span>В КРУГЕ</span>
       <output id="display-current-money">0</output>
     </article>
 
-    <article class="metric-card metric-card--flip">
+    <article class="metric-card metric-card--flip" id="metric-flip" hidden>
       <span>ТЕМА ЗАМЕНЫ</span>
       <output id="display-current-flip">—</output>
     </article>
 
-    <article class="metric-card metric-card--flips">
+    <article class="metric-card metric-card--flips" id="metric-flips" hidden>
       <span>ЗАМЕНЫ</span>
       <div class="status-orbs" id="flip-indicators_stats">
         <output id="flip-indicator-1_stats" class="status-orb status-orb--flip">→</output>
@@ -162,9 +162,9 @@
             <div class="answer-state-group answer-state-group--flip">
               <span class="state-label">ЗАМЕНЫ</span>
               <div class="status-orbs" id="flip-indicators">
-                <output id="flip-indicator-1" class="status-orb status-orb--flip">→</output>
-                <output id="flip-indicator-2" class="status-orb status-orb--flip">→</output>
-                <output id="flip-indicator-3" class="status-orb status-orb--flip">→</output>
+                <output id="flip-indicator-1" class="status-orb status-orb--flip">➩</output>
+                <output id="flip-indicator-2" class="status-orb status-orb--flip">➩</output>
+                <output id="flip-indicator-3" class="status-orb status-orb--flip">➩</output>
               </div>
             </div>
           </div>
