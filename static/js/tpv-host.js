@@ -172,8 +172,8 @@ function init_game(){
     document.getElementById("control-flips-count").value=3;
     document.getElementById("control-pass-count").value=0;
     document.getElementById("control-player-id").value = "";
-    document.getElementById("display-current-player").textContent = "--";
-    document.getElementById("display-current-flip").textContent = "--";
+    document.getElementById("display-current-player").textContent = "--player--";
+    document.getElementById("display-current-flip").textContent = "--flip questions theme--";
     document.getElementById("action-start-circle").disabled = true;
     document.getElementById("action-start-round").disabled = true;
     document.getElementById("action-answer-correct").disabled = true;
