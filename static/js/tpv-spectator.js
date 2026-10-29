@@ -439,7 +439,7 @@ function showFlip(payload) {
   }
 
   $("question-text").textContent = data.answer || "";
-  $("num_question").textContent = "↻";
+  $("num_question").textContent = "➩";
 
   renderState(state);
   flash($("section-question"));

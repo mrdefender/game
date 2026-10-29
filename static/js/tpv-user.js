@@ -40,7 +40,7 @@ function setQuestionMarker(mode, questionNumber) {
         questionNumber || document.getElementById("control-question-number")?.value
     ) || 1;
     const nextText = mode === "replacement"
-        ? "↻"
+        ? "➩"
         : (mode === "answer" ? "О." : "В.") + number;
 
     if (output.textContent !== nextText) {
