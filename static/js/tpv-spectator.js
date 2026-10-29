@@ -224,7 +224,7 @@ function setVersusIntro(payload = {}) {
 
   if (data.show) {
     const name = String(data.player || $("current-player")?.textContent || "").trim();
-    $("tpv-versus-intro-player").textContent = name && name !== "--player--" ? name : "--player--";
+    $("tpv-versus-intro-player").textContent = name && name !== "—" ? name : "УЧАСТНИК";
     syncVersusRoomCode();
     intro.hidden = false;
     intro.setAttribute("aria-hidden", "false");
