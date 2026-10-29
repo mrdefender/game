@@ -828,11 +828,14 @@ socket.on("player_selected", (data) => {
 function tpv(){
     stop_current_sound();
     playAudio("tpv-versus.ogg", false);
-    socket.emit("tpv_versus");
+    const player = document.getElementById("display-current-player")?.textContent?.trim() || "";
+    socket.emit("tpv_versus", {player: player === "—" ? "" : player});
     document.getElementById("action-start-circle").disabled = false;
 }
 
 function start_circle(){
+    // Closing the intro is synchronized with all spectator screens.
+    socket.emit("tpv_versus_hide");
     stop_current_sound()
     playAudio("tpv-start-circle.ogg",false);
     document.getElementById("action-start-round").disabled = false;

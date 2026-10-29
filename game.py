@@ -167,6 +167,20 @@ def ping_test(data):
         "message": "Socket.IO работает"
     })
     
+# Текущее состояние дерева сумм для зрительского экрана.
+slot_money_tree_visible = False
+
+@socketio.on("slot_money_tree_visibility")
+def slot_money_tree_visibility(data):
+    """Синхронизирует видимость денежного дерева с экраном зрителя."""
+    global slot_money_tree_visible
+    slot_money_tree_visible = bool((data or {}).get("visible", False))
+    socketio.emit(
+        "slot_money_tree_visibility",
+        {"visible": slot_money_tree_visible},
+        to=f"{DEFAULT_ROOM_CODE}:spectator",
+    )
+
 @socketio.on("room:join_slot")
 def socket_join_room(data):
     room_code = str(data.get("room") or get_room_code() or "")
@@ -184,7 +198,9 @@ def socket_join_room(data):
         "room": room_code,
         "role": role,
         "username": username
-    })   
+    })
+    if role == "spectator":
+        emit("slot_money_tree_visibility", {"visible": slot_money_tree_visible}, to=request.sid)   
     
     
 
@@ -382,7 +398,7 @@ def join():
            flash ('Неверный код комнаты')
            return render_template("login.html", yandex_user=yandex_user)
         if user_name == HOST_USERNAME:
-            #flash('Технический вход выполняется через YubiKey')
+            flash('Технический вход выполняется через YubiKey')
             return redirect('/technical-login')
         else:
             if check_id_room(request.form['room_id'])==False:
@@ -687,7 +703,6 @@ def generate_string(round_id,is_bombed):
         return js
     else:
         fatal = secure_rnd.sample([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], count_fatal)
-        fatal.sort()
         b_bomb = 'false'
         r_bomb = 'false'
         if bomb and (current_round >= 4):

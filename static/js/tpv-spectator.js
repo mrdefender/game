@@ -194,37 +194,69 @@ function showRoom(data) {
   }
 
   $("room-card").hidden = false;
+  syncVersusRoomCode();
 }
 
 function hideRoom() {
   $("room-card").hidden = true;
+  $("tpv-versus-intro-room").hidden = true;
 }
 
-function versusReaction() {
-  const logo = $("versus-logo");
+// Replaces the old four-second animation: the intro remains on air
+// until the host presses "НАЧАТЬ КРУГ" (or explicitly resets the game).
+let versusHideTimer = null;
 
+function syncVersusRoomCode() {
+  const code = $("room-code")?.textContent?.trim() || "";
+  const room = $("tpv-versus-intro-room");
+  if (!room) return;
+  room.hidden = !code || code === "----";
+  $("tpv-versus-intro-code").textContent = code;
+}
 
-  // Реакция должна быть видна даже если spectator уже находился
-  // на другом экране.
-  $("game-layout").hidden = true;
-  $("selection-stage").hidden = true;
-  $("waiting-screen").hidden = false;
+function setVersusIntro(payload = {}) {
+  const data = payload && typeof payload === "object" ? payload : {show: !!payload};
+  const intro = $("tpv-versus-intro");
+  if (!intro) return;
 
-  if (!logo) {
-    showGame();
+  clearTimeout(versusHideTimer);
+  versusHideTimer = null;
+
+  if (data.show) {
+    const name = String(data.player || $("current-player")?.textContent || "").trim();
+    $("tpv-versus-intro-player").textContent = name && name !== "—" ? name : "УЧАСТНИК";
+    syncVersusRoomCode();
+    intro.hidden = false;
+    intro.setAttribute("aria-hidden", "false");
+    intro.classList.remove("is-leaving", "is-entering");
+    if (data.animate !== false) {
+      void intro.offsetWidth;
+      intro.classList.add("is-entering");
+    }
     return;
   }
 
-  logo.classList.remove("is-reacting");
-  void logo.offsetWidth;
-  logo.classList.add("is-reacting");
-  document.getElementById("vs-player").innerHTML = " "+document.getElementById("current-player").innerHTML
- //logo.innerHTML = logo.innerHTML + document.getElementById("vs-player").innerHTML;
-  setTimeout(() => {
-    logo.classList.remove("is-reacting");
+  // On the first launch reset() leaves all stages hidden. Reveal the
+  // normal game layout behind the closing overlay at the start of a circle.
+  if (!intro.hidden && data.animate !== false &&
+      $("game-layout").hidden && $("selection-stage").hidden) {
     showGame();
-  },4000);
+  }
+  intro.classList.remove("is-entering");
+  intro.setAttribute("aria-hidden", "true");
+  if (intro.hidden || data.animate === false) {
+    intro.hidden = true;
+    intro.classList.remove("is-leaving");
+    return;
+  }
+  intro.classList.add("is-leaving");
+  versusHideTimer = setTimeout(() => {
+    intro.hidden = true;
+    intro.classList.remove("is-leaving");
+    versusHideTimer = null;
+  }, 450);
 }
+
 
 function startSelection(data) {
   clearInterval(scanTimer);
@@ -474,6 +506,7 @@ function showAward(data, type) {
 }
 
 function reset() {
+  setVersusIntro({show: false, animate: false});
     hide_credits();
 const resultsOverlay =
     document.getElementById("results-overlay");
@@ -547,8 +580,7 @@ function onBoth(specEvent, legacyEvent, handler) {
 
 onBoth("room_code_show", null, showRoom);
 onBoth("room_code_hide", null, hideRoom);
-onBoth("tpv_versus_spec", "tpv_versus_user", versusReaction);
-socket.on("tpv_versus", versusReaction);
+onBoth("tpv_versus_spec", "tpv_versus_user", setVersusIntro);
 onBoth("tpv_spectator_select_start", null, startSelection);
 onBoth("tpv_spectator_player_selected", null, finishSelection);
 

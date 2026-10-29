@@ -1,0 +1,150 @@
+/* TPV live spectator intro. Intentionally scoped to this overlay. */
+.tpv-versus-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: none;
+  opacity: 1;
+  background:
+    radial-gradient(ellipse at 77% 60%, rgba(0, 37, 104, .42), transparent 36%),
+    linear-gradient(90deg, #202125 0%, #111317 34%, #030609 48%, #010307 100%);
+}
+.tpv-versus-intro[hidden] { display: none !important; }
+.tpv-versus-intro::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: min(40vw, 600px);
+  background: linear-gradient(90deg, rgba(255,255,255,.035), transparent 80%);
+  pointer-events: none;
+}
+.tpv-versus-intro__rings {
+  position: absolute;
+  top: -31%;
+  left: 13%;
+  width: 29%;
+  height: 166%;
+  border-radius: 50%;
+  transform: rotate(-5deg);
+  background: repeating-radial-gradient(ellipse at 0% 50%,
+    transparent 0 25px,
+    rgba(198,211,218,.44) 26px 27px,
+    transparent 29px 49px);
+  -webkit-mask-image: linear-gradient(90deg, transparent 2%, black 30%, black 82%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 2%, black 30%, black 82%, transparent 100%);
+  opacity: .72;
+}
+.tpv-versus-intro__light {
+  position: absolute;
+  left: 31%;
+  right: -5%;
+  top: 68%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #b4f6ff 15%, #00bde9 62%, transparent);
+  box-shadow: 0 0 5px white, 0 0 18px #00d7fa, 0 0 33px #0d41ba;
+  opacity: .86;
+}
+.tpv-versus-intro__stack {
+  position: absolute;
+  top: 22%;
+  left: clamp(24px, 16.6vw, 280px);
+  width: clamp(290px, 30.5vw, 490px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 1.5vw, 25px);
+  filter: drop-shadow(0 14px 12px rgba(0,0,0,.48));
+}
+.tpv-versus-intro__plate {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  background: linear-gradient(155deg, #f3fbfe, #667579 12%, #111619 20%, #010608 49%, #76888b 87%, #0a0b0d 96%);
+  border-radius: 999px;
+  padding: clamp(7px, .72vw, 12px) clamp(10px, 1.15vw, 19px);
+  box-shadow: inset 0 2px 4px rgba(255,255,255,.36), inset 0 -4px 9px #000, 0 4px 7px #000;
+}
+.tpv-versus-intro__plate::before {
+  content: "";
+  position: absolute;
+  inset: clamp(5px,.55vw,9px) clamp(9px,.9vw,15px);
+  border-radius: 999px;
+  border: 2px solid #28778c;
+  background: linear-gradient(180deg, #0c3948 0%, #003342 50%, #001a24 100%);
+  box-shadow: inset 0 2px 12px #0008, inset 0 1px 0 #c4ffff33, 0 0 7px #31e8fd22;
+}
+.tpv-versus-intro__plate > * { position: relative; z-index: 1; }
+.tpv-versus-intro__plate--brand,
+.tpv-versus-intro__plate--player { width: 100%; min-height: clamp(66px,6.6vw,104px); }
+.tpv-versus-intro__brand {
+  font-weight: 600;
+  font-style: italic;
+  color: #fff;
+  font-size: clamp(17px, 2vw, 33px);
+  line-height: 1.08;
+  max-width: calc(100% - 35px);
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-transform:uppercase;
+}
+.tpv-versus-intro__plate--versus {
+  width: 55%;
+  min-height: clamp(52px,4.4vw,71px);
+}
+.tpv-versus-intro__plate--versus span {
+  color: #f7ffff;
+  font: italic 500 clamp(20px,2.05vw,34px)/1 Georgia, serif;
+  letter-spacing: .06em;
+  text-transform:uppercase;
+}
+.tpv-versus-intro__plate--player { gap: clamp(7px,.8vw,14px); padding-inline: 24px; }
+.tpv-versus-intro__plate--player strong {
+  font-weight: 600;
+  font-style: italic;
+  color: #fff;
+  font-size: clamp(17px, 2vw, 33px);
+  line-height: 1.08;
+  max-width: calc(100% - 35px);
+  overflow-wrap: anywhere;
+  text-align: center;
+  
+}
+.tpv-versus-intro__badge { font-size: clamp(16px,1.65vw,26px); color: #fff; }
+.tpv-versus-intro__room {
+  position: absolute;
+  top: clamp(20px, 8vh, 78px);
+  right: clamp(20px, 5vw, 86px);
+  min-width: clamp(150px, 13vw, 210px);
+  padding: 10px 20px 11px;
+  border-radius: 23px;
+  border: 5px solid #202529;
+  box-shadow: 0 0 0 2px #737e80, 0 5px 12px #000a;
+  background: linear-gradient(180deg,#07566c,#002331);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tpv-versus-intro__room[hidden] { display: none !important; }
+.tpv-versus-intro__room span { color:#4fc9d5; font:italic 600 clamp(9px,.8vw,13px) Georgia,serif; }
+.tpv-versus-intro__room strong { color:white; font:italic 500 clamp(24px,2.5vw,41px)/1.15 Arial,sans-serif; }
+.tpv-versus-intro.is-entering .tpv-versus-intro__plate--brand { animation: tpv-versus-in-left .7s cubic-bezier(.18,.88,.22,1) both; }
+.tpv-versus-intro.is-entering .tpv-versus-intro__plate--versus { animation: tpv-versus-in-right .7s .18s cubic-bezier(.18,.88,.22,1) both; }
+.tpv-versus-intro.is-entering .tpv-versus-intro__plate--player { animation: tpv-versus-in-left .7s .34s cubic-bezier(.18,.88,.22,1) both; }
+.tpv-versus-intro.is-leaving { animation: tpv-versus-out .45s ease-in both; }
+@keyframes tpv-versus-in-left { from {opacity:0;transform:translateX(-70px) scale(.94)} to {opacity:1;transform:none} }
+@keyframes tpv-versus-in-right { from {opacity:0;transform:translateX(70px) scale(.94)} to {opacity:1;transform:none} }
+@keyframes tpv-versus-out { from {opacity:1} to {opacity:0} }
+@media (max-width: 700px) {
+  .tpv-versus-intro__rings {left: 0; width: 65%;}
+  .tpv-versus-intro__stack {left: 7%; top: 32%; width: 86%; gap: 12px;}
+  .tpv-versus-intro__plate--brand, .tpv-versus-intro__plate--player {min-height: 75px;}
+  .tpv-versus-intro__room { top: 7%; right: 7%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tpv-versus-intro.is-entering .tpv-versus-intro__plate,
+  .tpv-versus-intro.is-leaving { animation-duration: .01ms !important; animation-delay: 0ms !important; }
+}

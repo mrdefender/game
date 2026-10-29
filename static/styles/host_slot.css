@@ -1862,3 +1862,20 @@ tr.player-otbor:hover{
 .status_users tbody tr.slot-player-hidden td:nth-child(2) {
   color: #d8e5f5;
 }
+
+
+/* Управление видимостью дерева сумм на зрительском экране. */
+.tree-visibility-toggle {
+  border: 1px solid rgba(255, 190, 35, .42);
+  border-radius: 9px;
+  padding: 7px 11px;
+  color: #ffe4a0;
+  background: linear-gradient(180deg, #202a3c, #101827);
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+.tree-visibility-toggle:hover { border-color: rgba(255, 208, 0, .9); transform: translateY(-1px); }
+.tree-visibility-toggle:active { transform: translateY(0); }

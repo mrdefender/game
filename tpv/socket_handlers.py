@@ -48,6 +48,7 @@ TPV_SOCKET_EVENTS = [
     "tpv_spectator_ready",
     "tpv_selection_start",
     "tpv_versus",
+    "tpv_versus_hide",
     "choose_player_random",
     "choose_player_id",
     "reset_to_wait_tpv",
@@ -130,6 +131,8 @@ class TpvSocketHandlers:
         self.UsersTpv = runtime["UsersTpv"]
 
         self.archive = runtime["TPV_ARCHIVE_RUNTIME"]
+        # Transient state used for newly connected / reloaded spectators.
+        self._versus_state = {"show": False, "player": ""}
 
         self.get_room_code = runtime["get_room_code"]
         self.emit_tpv_host = runtime["emit_tpv_host"]
@@ -150,6 +153,7 @@ class TpvSocketHandlers:
             "tpv_spectator_ready": self.tpv_spectator_ready,
             "tpv_selection_start": self.tpv_selection_start,
             "tpv_versus": self.tpv_versus,
+            "tpv_versus_hide": self.tpv_versus_hide,
             "choose_player_random": self.choose_player_random,
             "choose_player_id": self.choose_player_id,
             "reset_to_wait_tpv": self.reset_to_wait_tpv,
@@ -317,6 +321,7 @@ class TpvSocketHandlers:
 
         if room_code is None:
             self.emit("room_code_hide", {})
+            self.emit("tpv_versus_spec", {**self._versus_state, "animate": False})
             return
 
         join_url = (
@@ -332,6 +337,7 @@ class TpvSocketHandlers:
                 "joinUrl": join_url,
             },
         )
+        self.emit("tpv_versus_spec", {**self._versus_state, "animate": False})
 
     # ------------------------------------------------------------------
     # Отбор игрока
@@ -356,11 +362,14 @@ class TpvSocketHandlers:
             },
         )
 
-    def tpv_versus(self):
-        self.emit_tpv_spectator(
-            "tpv_versus_spec",
-            {"show": True},
-        )
+    def tpv_versus(self, data=None):
+        player = str((data or {}).get("player") or "").strip()[:120]
+        self._versus_state = {"show": True, "player": player}
+        self.emit_tpv_spectator("tpv_versus_spec", self._versus_state)
+
+    def tpv_versus_hide(self):
+        self._versus_state = {"show": False, "player": ""}
+        self.emit_tpv_spectator("tpv_versus_spec", self._versus_state)
 
     @staticmethod
     def _selected_player_result(player):
@@ -492,6 +501,8 @@ class TpvSocketHandlers:
                     f"{self.get_room_code()}:user"
                 ),
             )
+            self._versus_state = {"show": False, "player": ""}
+            self.emit_tpv_spectator("tpv_versus_spec", {"show": False})
             self.emit_tpv_spectator(
                 "reset",
                 "wait",

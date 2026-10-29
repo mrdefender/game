@@ -91,6 +91,24 @@ socket.on("room:joined", (data) => {
   restoreSlotRoom();
 });
 
+// Переключает дерево сумм на экране ведущего и синхронизирует экран зрителя.
+let moneyTreeVisible = false;
+const initialMoneyTreeButton = document.getElementById("toggle-money-tree");
+if (initialMoneyTreeButton) {
+  initialMoneyTreeButton.textContent = "Показать дерево";
+  initialMoneyTreeButton.setAttribute("aria-pressed", "false");
+}
+function toggle_money_tree_visibility() {
+  moneyTreeVisible = !moneyTreeVisible;
+  const button = document.getElementById("toggle-money-tree");
+  if (button) {
+    button.textContent = moneyTreeVisible ? "Скрыть дерево" : "Показать дерево";
+    button.setAttribute("aria-pressed", String(moneyTreeVisible));
+  }
+  socket.emit("slot_money_tree_visibility", { visible: moneyTreeVisible });
+}
+
+
 socket.on("connect_error", () => {
   setSocketStatus(false);
 });

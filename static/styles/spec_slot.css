@@ -3210,3 +3210,28 @@ body.million-win-mode .room-code-toast {
   .intro-overlay.is-active .depth-tunnel,
   .intro-overlay.is-active .depth-sweep{animation:none!important}
 }
+
+
+/* Плавное появление/скрытие денежного дерева по команде ведущего. */
+#spec-money-tree-panel {
+  overflow: hidden;
+  max-height: 1200px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: max-height .42s ease, opacity .3s ease, transform .42s ease, padding .42s ease, margin .42s ease;
+  will-change: max-height, opacity, transform;
+}
+#spec-money-tree-panel.tree-panel-hidden {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  border-width: 0 !important;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #spec-money-tree-panel { transition: none; }
+}

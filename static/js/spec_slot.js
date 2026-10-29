@@ -84,6 +84,17 @@ socket.on("room:joined", (data) => {
   restoreSlotRoomForSpectator();
 });
 
+function setSpectatorMoneyTreeVisibility(visible) {
+  const panel = document.getElementById("spec-money-tree-panel");
+  if (!panel) return;
+  panel.classList.toggle("tree-panel-hidden", !visible);
+  panel.setAttribute("hidden", String(!visible));
+}
+
+socket.on("slot_money_tree_visibility", (data) => {
+  setSpectatorMoneyTreeVisibility(Boolean(data && data.visible));
+});
+
 socket.on("updated_round", (data) => {
     console.log("Раунд:", data);
   update_round(data);
@@ -400,6 +411,8 @@ function update_list_user(data)
             {
             }
             btn_default();
+            document.getElementById("results-panel").hidden = true;
+            document.getElementById("answers-zone").hidden = true;
             document.getElementById("o1").disabled = false;
             document.getElementById("o2").disabled = false;
             document.getElementById("o3").disabled = false;
@@ -492,6 +505,8 @@ function update_list_user(data)
             document.getElementById("question").hidden = false;
             document.getElementById("question").value = " ";
             document.getElementById('question').innerText = "";
+            document.getElementById("answers-zone").hidden = false;
+            document.getElementById("results-panel").hidden = true;
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -769,7 +784,8 @@ function update_list_user(data)
     {
        if (document.getElementById("ex2").value == "show_result")
             return;
-      if (data[0][0] == "show result")
+       document.getElementById("results-panel").hidden = false;
+       if (data[0][0] == "show result")
 	{
 	    inputName = document.createElement('input');
             inputName.setAttribute('type', 'submit');
@@ -966,7 +982,8 @@ function show_winner_otbor(data){
         {
             return;
         }
-       
+
+            document.getElementById("results-panel").hidden = false;
             inputName = document.createElement('input');
             inputName.setAttribute('type', 'submit');
             inputName.setAttribute('class', 'result_otbor');

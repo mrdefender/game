@@ -173,7 +173,8 @@ function sync_otbor_timer_ui() {
 
     if (!au || !strip || !valueNode || !fill || !status) return;
 
-    const isHidden = au.hidden;
+    //const isHidden = au.hidden;
+    const isHidden = false;
     // Полностью повторяем поведение au
     strip.hidden = isHidden;
     valueNode.hidden = isHidden;
@@ -182,7 +183,7 @@ function sync_otbor_timer_ui() {
     otbor_timer_title.hidden = isHidden;
 
     if (isHidden) {
-        strip.classList.remove("warning", "danger");
+       strip.classList.remove("warning", "danger");
         return;
     }
 
@@ -198,7 +199,8 @@ function sync_otbor_timer_ui() {
 
     if (safe <= 0) {
         status.textContent = "Время вышло";
-        strip.classList.add("danger");
+        strip.classList.remove("danger");
+        strip.classList.remove("warning");
     } else if (safe <= 5) {
         status.textContent = "Нужно ответить сейчас";
         strip.classList.add("danger");
@@ -245,6 +247,9 @@ function get_status(data){
             document.getElementById("otbor_submit").hidden = true;
 	        document.getElementById("time-start").value = "0";
             btn_default();
+            document.getElementById("answers-panel").hidden = true;
+            document.getElementById("helps-panel").hidden = true;
+            document.getElementById("otbor-panel").hidden = true;
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
             document.getElementById("o3").hidden = true;
@@ -311,6 +316,9 @@ function get_status(data){
             document.getElementById("question").value = "";
             document.getElementById("question").innerText = " ";
 	    document.getElementById("time-start").value = "0";
+            document.getElementById("answers-panel").hidden = false;
+            document.getElementById("helps-panel").hidden = true;
+            document.getElementById("otbor-panel").hidden = true;
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -346,6 +354,9 @@ function get_status(data){
             document.getElementById("question").innerText = " ";
             document.getElementById("time-start").value = "0";
             btn_default();
+            document.getElementById("answers-panel").hidden = false;
+            document.getElementById("helps-panel").hidden = false;
+            document.getElementById("otbor-panel").hidden = true;
             document.getElementById("o1").hidden = false;
             document.getElementById("o2").hidden = false;
             document.getElementById("o3").hidden = false;
@@ -453,10 +464,13 @@ function get_status(data){
             document.getElementById("question").hidden = false;
             document.getElementById("otbor_input").hidden = false;
             document.getElementById("otbor_submit").hidden = false;
-            document.getElementById("au").hidden = false;
+           // document.getElementById("au").hidden = false;
             sync_otbor_timer_ui();
             //document.getElementById("question").value = "";
-            document.getElementById("ex2").value ="0"
+            document.getElementById("ex2").value ="0";
+            document.getElementById("answers-panel").hidden = true;
+            document.getElementById("helps-panel").hidden = true;
+            document.getElementById("otbor-panel").hidden = false;
             document.getElementById("o1").hidden = true;
             document.getElementById("o2").hidden = true;
             document.getElementById("o3").hidden = true;

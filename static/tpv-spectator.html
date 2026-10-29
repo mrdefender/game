@@ -8,12 +8,35 @@
   <link rel="icon" href="{{ url_for('static', filename='img/tpv_favicon.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-spectator.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-animations.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/tpv-versus-intro.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>
 <main class="spectator" id="tpv-spectator">
+
+  <!-- Fullscreen broadcast intro controlled by tpv_host via Socket.IO. -->
+  <section class="tpv-versus-intro" id="tpv-versus-intro" hidden
+           aria-label="Заставка The People Versus" aria-hidden="true">
+    <div class="tpv-versus-intro__rings" aria-hidden="true"></div>
+    <div class="tpv-versus-intro__light" aria-hidden="true"></div>
+    <div class="tpv-versus-intro__room" id="tpv-versus-intro-room" hidden>
+      <span>КОД КОМНАТЫ</span><strong id="tpv-versus-intro-code">----</strong>
+    </div>
+    <div class="tpv-versus-intro__stack">
+      <div class="tpv-versus-intro__plate tpv-versus-intro__plate--brand">
+        <span class="tpv-versus-intro__brand">{{ game_name_short_1|default('The People') }}</span>
+      </div>
+      <div class="tpv-versus-intro__plate tpv-versus-intro__plate--versus">
+        <span>{{ game_name_short_2|default('VERSUS') }}</span>
+      </div>
+      <div class="tpv-versus-intro__plate tpv-versus-intro__plate--player">
+        <span class="tpv-versus-intro__badge" aria-hidden="true">▣</span>
+        <strong id="tpv-versus-intro-player">--player--</strong>
+      </div>
+    </div>
+  </section>
 
   <!-- =========================================================
        ROOM / QR
