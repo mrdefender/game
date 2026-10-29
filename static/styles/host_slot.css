@@ -1879,3 +1879,11 @@ tr.player-otbor:hover{
 }
 .tree-visibility-toggle:hover { border-color: rgba(255, 208, 0, .9); transform: translateY(-1px); }
 .tree-visibility-toggle:active { transform: translateY(0); }
+
+/* Презентация подсказок: отдельные кнопки, не запускающие игровые действия */
+.hint-present-panel {padding:12px}
+.hint-present-note {color:#a7bdd8;font-size:.78rem;margin:10px 0}
+.hint-present-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hint-present-btn {background:linear-gradient(180deg,#243f72,#102344);border:1px solid #468ed0;color:#eaf8ff;min-height:44px}
+.hint-present-btn:hover {filter:brightness(1.2)}
+@media(max-width:650px){.hint-present-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
