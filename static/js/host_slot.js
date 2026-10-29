@@ -3610,35 +3610,3 @@ async function restoreSlotRoom() {
         console.error("[SLOT] Не удалось восстановить код комнаты:", error);
     }
 }
-
-// Представление подсказки не вызывает игровую функцию использования подсказки.
-document.querySelectorAll("[data-hint-present]").forEach(button => {
-  button.addEventListener("click", () => { console.log(button.dataset.hintPresent)
-    if (!socket.connected) { console.warn("Нет соединения с сервером"); return; }
-    if (button.dataset.hintPresent=="50:50")
-    {
-        playAudio("h1.ogg",false);
-    }
-    if (button.dataset.hintPresent=="alter")
-    {
-        playAudio("h2.ogg",false);
-    }
-    if (button.dataset.hintPresent=="navi")
-    {
-        playAudio("h3.ogg",false);
-    }
-    if (button.dataset.hintPresent=="x2")
-    {
-        playAudio("h4.ogg",false);
-    }
-    if (button.dataset.hintPresent=="auden")
-    {
-        playAudio("h5.ogg",false);
-    }
-    if (button.dataset.hintPresent=="fact")
-    {
-        playAudio("h5.ogg",false);
-    }
-    socket.emit("slot:hint_present", {hint: button.dataset.hintPresent});
-  });
-});

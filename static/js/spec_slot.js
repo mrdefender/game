@@ -2166,27 +2166,3 @@ async function restoreSlotRoomForSpectator() {
         console.error("[SLOT] Не удалось восстановить код комнаты:", error);
     }
 }
-
-// Только визуальная демонстрация, без изменения игрового состояния подсказок.
-const hintPresentIds = {
-  "50:50":"p50_50",alter:"palter",navi:"pnavi",
-  x2:"px2",auden:"pauden",fact:"pfact"
-};
-let hintPresentTimer;
-socket.on("slot:hint_present", payload => {
-  const id = hintPresentIds[payload && payload.hint];
-  if (!id) return;
-  clearTimeout(hintPresentTimer);
-  document.querySelectorAll(".help-btn.hint-present-active").forEach(el =>
-    el.classList.remove("hint-present-active"));
-  const el = document.getElementById(id);
-  if (!el) return;
-  // Скрытые подсказки показываются только на время презентации.
-  const wasHidden = el.hidden;
-  if (wasHidden) el.hidden = false;
-  el.classList.add("hint-present-active");
-  hintPresentTimer = setTimeout(() => {
-    el.classList.remove("hint-present-active");
-    if (wasHidden) el.hidden = true;
-  }, 3500);
-});
