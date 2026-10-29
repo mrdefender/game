@@ -398,7 +398,7 @@ def join():
            flash ('Неверный код комнаты')
            return render_template("login.html", yandex_user=yandex_user)
         if user_name == HOST_USERNAME:
-            flash('Технический вход выполняется через YubiKey')
+            #flash('Технический вход выполняется через YubiKey')
             return redirect('/technical-login')
         else:
             if check_id_room(request.form['room_id'])==False:
@@ -2462,7 +2462,15 @@ def host_hide_credits():
 def handle_show_intro():
     emit("show_intro", to=f"{DEFAULT_ROOM_CODE}:spectator")
 
+ALLOWED_SLOT_HINTS = {"50:50", "alter", "navi", "x2", "auden", "fact"}
 
+@socketio.on("slot:hint_present")
+def slot_hint_present(data):
+    # ВАЖНО: заменить проверкой авторизованного ведущего в вашем проекте.
+    # Нельзя доверять роли, присланной самим клиентом.
+  
+   
+    emit("slot:hint_present", {"hint": data["hint"]}, to=f"{DEFAULT_ROOM_CODE}:spectator")
 
 
 #---------------------------------------------
