@@ -256,12 +256,42 @@ function showSpecRoomQR(roomId) {
 
   if (!box || !img || !code || !roomId) return;
 
-  const loginUrl = `https://games.mokaque-t.ru`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(loginUrl)}`;
+  // QR создаётся локально в браузере. Запросов к внешним QR API нет.
+  const loginUrl = "https://games.mokaque-t.ru";
+  code.textContent = String(roomId);
 
-  img.src = qrUrl;
-  code.textContent = roomId;
-  box.classList.add("is-visible");
+  if (typeof QRCode !== "function") {
+    console.error("[SLOT] Локальная библиотека qrcode.min.js не загружена");
+    img.removeAttribute("src");
+    box.classList.add("is-visible");
+    return;
+  }
+
+  const temp = document.createElement("div");
+  temp.style.cssText = "position:absolute;left:-10000px;top:-10000px;visibility:hidden";
+  document.body.appendChild(temp);
+
+  try {
+    new QRCode(temp, {
+      text: loginUrl,
+      width: 256,
+      height: 256,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    const canvas = temp.querySelector("canvas");
+    if (!canvas) throw new Error("Библиотека не создала canvas QR-кода");
+    img.src = canvas.toDataURL("image/png");
+    box.classList.add("is-visible");
+  } catch (error) {
+    img.removeAttribute("src");
+    console.error("[SLOT] Ошибка локальной генерации QR-кода:", error);
+    box.classList.add("is-visible");
+  } finally {
+    temp.remove();
+  }
 }
 
 function hideSpecRoomQR() {
