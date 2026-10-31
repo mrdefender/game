@@ -3637,7 +3637,7 @@ document.querySelectorAll("[data-hint-present]").forEach(button => {
     }
     if (button.dataset.hintPresent=="fact")
     {
-        playAudio("h5.ogg",false);
+        playAudio("h6.ogg",false);
     }
     socket.emit("slot:hint_present", {hint: button.dataset.hintPresent});
   });
