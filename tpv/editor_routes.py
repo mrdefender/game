@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from flask import (
+    abort,
     redirect,
     render_template,
     request,
@@ -51,7 +52,7 @@ def tpv_editor():
     """Открыть TPV Editor и установить роль редактора через POST."""
     if request.method == "POST":
         if session.get("tpv_launcher_allowed") is not True:
-            return redirect(url_for("tpv"))
+            abort(404)
 
         session["tpv_role"] = "editor"
         return render_template("tpv-editor.html")
@@ -59,7 +60,7 @@ def tpv_editor():
     if tpv_editor_allowed():
         return render_template("tpv-editor.html")
 
-    return redirect(url_for("tpv"))
+    abort(404)
 
 
 def register_tpv_editor_routes(

@@ -481,7 +481,7 @@ def join():
 @app.route('/select', methods=["POST", "GET"])
 def select():
     if session.get('tpv_technical_admin') is not True:
-        return redirect('/technical-login')
+        abort(404)
     if request.method == 'GET':
         if session.get('tpv_admin_game_initialized') is not True:
             init_game()
@@ -491,38 +491,38 @@ def select():
         if request.form.values == "Свободный слот":
          print (url_for('slot'))
          return render_template("slot.html")
-    abort(403)
+    abort(404)
     print (url_for('join'))
     return render_template("login.html")
 
 @app.route('/slot', methods=["POST", "GET"])
 def slot():
     if session.get('tpv_technical_admin') is not True:
-        return redirect('/technical-login')
+        abort(404)
     if request.method == 'POST':
         print (url_for('slot'))
         return render_template("slot.html")
-    abort(403)
+    abort(404)
     print (url_for('join'))
     return render_template("login.html")
 
 @app.route('/tpv', methods=["POST", "GET"])
 def tpv():
     if session.get('tpv_technical_admin') is not True:
-        return redirect('/technical-login')
+        abort(404)
     # Лаунчер TPV открывается только после POST из общего выбора игр.
     # Повторный GET разрешён только после успешного входа в TPV-лаунчер.
     if request.method == "POST":
         session["tpv_launcher_allowed"] = True
         session.pop("tpv_role", None)
         return render_template("tpv.html")
-    abort(403)
+    abort(404)
 
 
 @app.route('/tpv_host', methods=["POST", "GET"])
 def tpv_host():
     if session.get('tpv_technical_admin') is not True:
-        return redirect('/technical-login')
+        abort(404)
     # Режим ведущего запускается только кнопкой из tpv.html.
     if request.method == "POST":
         if session.get("tpv_launcher_allowed") is not True:
@@ -532,7 +532,7 @@ def tpv_host():
         return render_template("tpv-host.html")
 
     # Прямой ввод /tpv_host не открывает пульт.
-    abort(403)
+    abort(404)
 
 
 @app.route('/tpv_spectator', methods=["POST", "GET"])
@@ -546,7 +546,7 @@ def tpv_spectator():
         return render_template("tpv-spectator.html")
     #return render_template("tpv-spectator.html")
     # Прямой ввод /tpv_spectator не открывает экран зрителя.
-    abort(403)
+    abort(404)
 
 @app.route('/tpv_user', methods=["GET"])
 def tpv_user():
@@ -565,7 +565,7 @@ def spec_slot():
     if request.method == 'POST':
         print (url_for('slot'))
         return render_template("spec_slot.html")
-    abort(400)
+    abort(404)
     print (url_for('join'))
     return render_template("login.html")
 
@@ -579,7 +579,7 @@ def host_slot():
         #for i in _users:
           #  flash (i)
         return render_template("host_slot.html")
-    abort(403)
+    abort(404)
     print (url_for('join'))
     return render_template("login.html")
 
