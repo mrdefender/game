@@ -1,0 +1,174 @@
+/* TPV Editor — TV Metal Skin (host-inspired overlay)
+   Load AFTER tpv-editor.css. No IDs, visibility rules or JS behavior changed. */
+body.tpv-editor-refresh {
+  --tv-metal:#738891;--tv-teal:#00acc4;--tv-cyan:#54e9ff;
+  --line:rgba(67,205,229,.28);--line-strong:rgba(82,230,249,.65);
+  --border:rgba(67,205,229,.28);--accent:#37d8ec;
+  --text:#f2fbff;--muted:#a2c3cd;--cyan:#6be9fb;
+  background: radial-gradient(ellipse at 75% 5%,rgba(0,112,176,.25),transparent 48%),
+              radial-gradient(ellipse at 5% 48%,rgba(0,162,191,.1),transparent 40%),#02060a;
+  background-attachment:fixed;
+}
+body.tpv-editor-refresh::before {
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0 39px,rgba(66,179,220,.025) 40px),
+             linear-gradient(125deg,transparent 5%,rgba(50,190,239,.035) 32%,transparent 65%);
+}
+.tpv-editor-refresh .editor-shell{width:min(1740px,calc(100% - 30px));padding:20px 0 44px}
+.tpv-editor-refresh .editor-header{
+  position:relative;overflow:hidden;align-items:center;margin-bottom:13px;padding:20px 24px;
+  border:2px solid #34474f;border-radius:28px;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 8%),
+             linear-gradient(180deg,#151d23 0%,#03090e 14%,#064052 15%,#052939 81%,#020609);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.55),inset 0 -8px 18px rgba(0,0,0,.62),0 9px 25px rgba(0,0,0,.45),0 0 18px rgba(0,200,241,.08);
+}
+.tpv-editor-refresh .editor-header::after{content:"";position:absolute;inset:6px;border:1px solid rgba(91,232,249,.22);border-radius:22px;pointer-events:none}
+.tpv-editor-refresh .editor-header> *{position:relative;z-index:1}
+.tpv-editor-refresh .eyebrow{color:#66e5ef;letter-spacing:.15em;text-shadow:0 0 10px rgba(0,230,255,.32);font-weight:900}
+.tpv-editor-refresh .editor-header h1{font-weight:900;font-style:italic;letter-spacing:-.035em;text-shadow:0 3px 6px #000,0 0 16px rgba(117,242,255,.16)}
+.tpv-editor-refresh .editor-header p{color:#bad4dd}
+/* Navigation is scrollable instead of squeezing the 12 tabs. */
+.tpv-editor-refresh .editor-tabs{
+  display:flex;flex-wrap:nowrap;gap:7px;overflow-x:auto;overscroll-behavior-x:contain;
+  padding:10px;margin-bottom:15px;border:2px solid #33474f;border-radius:23px;
+  background:linear-gradient(180deg,#13212a,#03111b 40%,#02070c);
+  box-shadow:inset 0 2px rgba(255,255,255,.20),0 6px 17px rgba(0,0,0,.35);
+  scrollbar-width:thin;scrollbar-color:#12899e #061019;
+}
+.tpv-editor-refresh .editor-tab,.tpv-editor-refresh .games-subtab,.tpv-editor-refresh .game-card-tab,.tpv-editor-refresh .games-analytics-tab {
+  flex:0 0 auto;min-width:max-content;border:1px solid #215365;border-radius:18px;
+  color:#b6d5e1;background:linear-gradient(180deg,#0d3546,#06202d 60%,#020d15);
+  box-shadow:inset 0 1px rgba(180,243,255,.20),inset 0 -3px 5px rgba(0,0,0,.4);
+  font-weight:850;transition:filter .16s,box-shadow .16s,color .16s;
+}
+.tpv-editor-refresh .editor-tab:hover,.tpv-editor-refresh .games-subtab:hover,.tpv-editor-refresh .game-card-tab:hover{filter:brightness(1.2)}
+.tpv-editor-refresh .editor-tab.is-active,.tpv-editor-refresh .games-subtab.is-active,.tpv-editor-refresh .game-card-tab.is-active,.tpv-editor-refresh .games-analytics-tab.is-active{
+  border-color:#39d7e8;color:#fff;background:linear-gradient(180deg,#13aabd,#075b73 52%,#023747);
+  box-shadow:inset 0 2px rgba(222,255,255,.42),inset 0 -4px 7px rgba(0,0,0,.35),0 0 14px rgba(23,210,241,.32);
+  text-shadow:0 0 8px rgba(208,255,255,.45);
+}
+/* TV capsules for primary panels */
+.tpv-editor-refresh .editor-panel{
+  min-width:0;border:2px solid #35464d;border-radius:24px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),transparent 5%),
+             linear-gradient(180deg,#0d1c24 0%,#052d3b 9%,#042531 65%,#020c13 100%);
+  box-shadow:inset 0 2px rgba(215,250,255,.18),inset 0 -7px 12px rgba(0,0,0,.42),0 8px 18px rgba(0,0,0,.36),0 0 0 1px rgba(8,18,23,.7);
+}
+.tpv-editor-refresh .dashboard-hero{background:radial-gradient(circle at 78% 15%,rgba(60,228,243,.18),transparent 38%),linear-gradient(180deg,#0b3545,#04222d 65%,#020c12)}
+.tpv-editor-refresh .stats-grid article,.tpv-editor-refresh .dashboard-kpi,
+.tpv-editor-refresh .statistics-metrics>div,.tpv-editor-refresh .theme-summary-grid article,
+.tpv-editor-refresh .games-season-stats div,.tpv-editor-refresh .dashboard-growth-grid div,
+.tpv-editor-refresh .readiness-component,.tpv-editor-refresh .games-analytics-kpi-grid article,
+.tpv-editor-refresh .games-analytics-status-grid>div{
+  border:1px solid #1a6378;border-radius:16px;
+  background:linear-gradient(180deg,#0d4052 0%,#052431 60%,#02121a 100%);
+  box-shadow:inset 0 1px rgba(143,250,255,.22),inset 0 -4px 9px rgba(0,0,0,.3),0 4px 10px rgba(0,0,0,.20);
+}
+.tpv-editor-refresh .stats-grid strong,.tpv-editor-refresh .dashboard-kpi strong,.tpv-editor-refresh .statistics-metrics strong{color:#f4ffff;text-shadow:0 0 14px rgba(74,231,254,.20)}
+.tpv-editor-refresh .dashboard-kpi:hover{border-color:#4cdeef;box-shadow:inset 0 1px rgba(185,255,255,.32),0 0 17px rgba(23,205,227,.25)}
+.tpv-editor-refresh .statistics-card-header,.tpv-editor-refresh .panel-header,.tpv-editor-refresh .panel-heading{
+  border-bottom:1px solid rgba(76,212,237,.24);
+  background:linear-gradient(180deg,rgba(19,119,141,.15),rgba(0,0,0,.04));
+}
+.tpv-editor-refresh .statistics-card-header h2,.tpv-editor-refresh .panel-header h2{color:#f0fcff;text-shadow:0 0 12px rgba(56,216,246,.14)}
+/* Buttons */
+.tpv-editor-refresh .button,.tpv-editor-refresh .row-edit,.tpv-editor-refresh .icon-button{
+  border:1px solid #2b7182;border-radius:15px;color:#d9f8ff;
+  background:linear-gradient(180deg,#176177 0%,#063749 48%,#021722 100%);
+  box-shadow:inset 0 2px rgba(174,246,255,.26),inset 0 -4px 5px rgba(0,0,0,.34),0 3px 7px rgba(0,0,0,.28);
+  font-weight:850;text-decoration:none;transition:filter .15s,transform .15s,box-shadow .15s;
+}
+.tpv-editor-refresh .button:hover:not(:disabled),.tpv-editor-refresh .row-edit:hover,.tpv-editor-refresh .icon-button:hover{filter:brightness(1.16);transform:translateY(-1px)}
+.tpv-editor-refresh .button:active:not(:disabled){transform:translateY(1px)}
+.tpv-editor-refresh .button-primary{border-color:#f4573a;color:#fff;background:linear-gradient(180deg,#fa7d43,#ce2c0c 50%,#73160b);box-shadow:inset 0 2px rgba(255,219,199,.45),inset 0 -4px 7px rgba(58,0,0,.54),0 4px 12px rgba(162,37,4,.28)}
+.tpv-editor-refresh .button-secondary{border-color:#21bbd2;color:#f1feff;background:linear-gradient(180deg,#0f9faf,#075b72 55%,#032b3c)}
+.tpv-editor-refresh .button-muted{border-color:#4e737e;background:linear-gradient(180deg,#284550,#0b222c 60%,#07131b)}
+.tpv-editor-refresh .button-danger,.tpv-editor-refresh .button-danger-soft{border-color:#d95257;color:#ffe7e7;background:linear-gradient(180deg,#9a282e,#5b1016 55%,#2b080d)}
+.tpv-editor-refresh button:disabled,.tpv-editor-refresh .button:disabled{filter:saturate(.45);cursor:not-allowed;opacity:.52}
+/* Editable fields & toolbars */
+.tpv-editor-refresh .toolbar{border-bottom:1px solid #246076;background:linear-gradient(180deg,rgba(0,150,180,.1),transparent)}
+.tpv-editor-refresh input:not([type="checkbox"]):not([type="radio"]),
+.tpv-editor-refresh select,.tpv-editor-refresh textarea{
+  border:1px solid #28647a;border-radius:11px;background:#03141f;color:#f0fcff;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.42),0 1px rgba(111,227,245,.06);
+}
+.tpv-editor-refresh input:focus-visible,.tpv-editor-refresh select:focus-visible,.tpv-editor-refresh textarea:focus-visible,
+.tpv-editor-refresh button:focus-visible,.tpv-editor-refresh a:focus-visible{
+  outline:2px solid #45eaff;outline-offset:2px;border-color:#43d7f1;
+}
+.tpv-editor-refresh label span{color:#aed2df}
+.tpv-editor-refresh select option{background:#092635;color:#f0fcff}
+.tpv-editor-refresh .builder-checkbox,.tpv-editor-refresh .builder-fieldset,.tpv-editor-refresh .builder-check-item,
+.tpv-editor-refresh .transfer-group,.tpv-editor-refresh .transfer-format-grid>div,.tpv-editor-refresh .maintenance-card,
+.tpv-editor-refresh .dashboard-compact-item,.tpv-editor-refresh .dashboard-alert{
+  border-color:rgba(50,177,208,.3);background:linear-gradient(180deg,rgba(10,75,95,.4),rgba(2,19,29,.5));
+}
+/* Data grids */
+.tpv-editor-refresh .table-wrap,.tpv-editor-refresh .game-detail-table-wrap{max-width:100%;overflow:auto;scrollbar-width:thin;scrollbar-color:#147b94 #07141e}
+.tpv-editor-refresh table{background:rgba(0,7,12,.21)}
+.tpv-editor-refresh th{background:#082c3a;color:#91e6f4;border-bottom:1px solid #276e82;letter-spacing:.045em}
+.tpv-editor-refresh td{border-bottom:1px solid rgba(64,155,184,.19);color:#d8edf5}
+.tpv-editor-refresh tbody tr:hover{background:rgba(34,169,201,.09)}
+.tpv-editor-refresh .tag,.tpv-editor-refresh .status,.tpv-editor-refresh .application-status,
+.tpv-editor-refresh .game-status-badge,.tpv-editor-refresh .history-action-badge,.tpv-editor-refresh .history-entity-badge{
+  border:1px solid rgba(93,211,234,.26);box-shadow:inset 0 1px rgba(255,255,255,.06);
+}
+.tpv-editor-refresh .status-approved,.tpv-editor-refresh .application-status-approved{border-color:rgba(74,218,138,.5)}
+.tpv-editor-refresh .status-rejected,.tpv-editor-refresh .application-status-rejected{border-color:rgba(243,83,101,.5)}
+/* Modal metal framing; retain native dialog behavior */
+.tpv-editor-refresh dialog{
+  max-height:calc(100dvh - 28px);overflow:auto;border:2px solid #506774;border-radius:23px;
+  background:linear-gradient(180deg,#13262f 0%,#052b3a 9%,#031924 100%);
+  box-shadow:inset 0 2px rgba(238,252,255,.38),inset 0 -6px 14px rgba(0,0,0,.45),0 24px 70px rgba(0,0,0,.8),0 0 30px rgba(0,210,247,.16);
+}
+.tpv-editor-refresh dialog::backdrop{background:rgba(0,3,8,.83);backdrop-filter:blur(5px)}
+.tpv-editor-refresh .dialog-header{border-bottom:1px solid rgba(100,209,231,.27)}
+.tpv-editor-refresh .dialog-note{border-left-color:#48cde4;background:rgba(16,128,155,.14)}
+.tpv-editor-refresh .toast{border:1px solid #2c99b0;border-radius:16px;background:linear-gradient(180deg,#0d5366,#042532);box-shadow:0 8px 30px rgba(0,0,0,.42)}
+.tpv-editor-refresh .toast-error{border-color:#e3515b}
+.tpv-editor-refresh .progress-track,.tpv-editor-refresh .readiness-track{background:#02111b;border:1px solid #19485a}
+.tpv-editor-refresh .progress-track span{background:linear-gradient(90deg,#047b9e,#5dedf7);box-shadow:0 0 10px rgba(45,223,248,.4)}
+.tpv-editor-refresh .dashboard-health-score{background:radial-gradient(circle,#0b3b48,#03151f);box-shadow:inset 0 0 18px rgba(0,0,0,.55),0 0 18px rgba(35,230,150,.20)}
+.tpv-editor-refresh .empty-state{color:#a8c9d4}
+/* Guard custom switches, hidden controls and responsive behavior */
+.tpv-editor-refresh [hidden]{display:none!important}
+.tpv-editor-refresh .operational-switch input{position:absolute;opacity:0;pointer-events:none}
+@media(max-width:900px){
+ .tpv-editor-refresh .editor-shell{width:calc(100% - 16px)}
+ .tpv-editor-refresh .editor-header{padding:17px;gap:15px;flex-direction:column;align-items:stretch}
+ .tpv-editor-refresh .editor-tabs{padding:7px}
+ .tpv-editor-refresh .editor-tab{min-width:max-content;padding-inline:16px}
+}
+@media(max-width:580px){
+ .tpv-editor-refresh .editor-shell{width:calc(100% - 10px);padding-top:6px}
+ .tpv-editor-refresh .editor-header{border-radius:19px;padding:14px}
+ .tpv-editor-refresh .editor-panel{border-radius:17px}
+ .tpv-editor-refresh .editor-tabs{border-radius:15px}
+ .tpv-editor-refresh .button{min-height:44px}
+ .tpv-editor-refresh dialog{width:calc(100% - 14px);border-radius:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ .tpv-editor-refresh .button,.tpv-editor-refresh .editor-tab{transition:none}
+}
+
+/* Applications: link to the public question form */
+.applications-public-action {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:18px;
+  padding:17px 21px;
+  margin-bottom:14px;
+  border:2px solid #142229;
+  border-radius:23px;
+  background:linear-gradient(180deg,#142026 0%,#052e3c 25%,#03212d 85%,#050b0e 100%);
+  box-shadow:inset 0 2px 1px rgba(255,255,255,.34),inset 0 -5px 10px rgba(0,0,0,.5),0 6px 15px rgba(0,0,0,.3);
+}
+.applications-public-action__info {display:grid;gap:5px;min-width:0}
+.applications-public-action__info strong {font-size:19px;color:#effcff}
+.applications-public-action__info small {font-size:12px;color:#a9c8d4;line-height:1.45}
+.applications-public-action__button {flex:0 0 auto;white-space:nowrap;text-align:center}
+@media (max-width:650px) {
+  .applications-public-action {flex-direction:column;align-items:stretch;padding:16px}
+  .applications-public-action__button {width:100%}
+}

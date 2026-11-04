@@ -333,7 +333,7 @@ function showQuestion(payload) {
     }, 1500);
   
   $("num_question").textContent =
-    data.replacement ? "↻" : `В.${Number(data.questionNumber) || Number(state.question) || 1}`;
+    data.replacement ? "➩" : `В.${Number(data.questionNumber) || Number(state.question) || 1}`;
 
   renderState(state);
   $("bank-stat").hidden = true;
