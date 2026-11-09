@@ -108,124 +108,136 @@ socket.on("updated_script", (data) => {
   update_script(data);
 });
 
-socket.on("wait_4min", (data) => {
-    wait_4min();
-})
+// События совместимости: синхронизируемся по времени сервера, не запускаем локальный отсчёт.
+socket.on("wait_4min", data => { if (data && typeof data === "object") applySlotWaitState(data); });
+socket.on("wait_1min", data => { if (data && typeof data === "object") applySlotWaitState(data); });
 
-socket.on("wait_1min", (data) => {
-    wait_1min();
-})
-
-/** Показывает большой таймер ожидания 4:12. */
-function wait_1min(){
-    time = 60;
-   // inputName = document.createElement('input');
-   // inputName.setAttribute('type', 'submit');
-   // inputName.setAttribute('class', 'timer');
-   // inputName.setAttribute('id', 'r0');
-  //  inputName.setAttribute('value', "4:12");
-   // document.getElementById("r0").value
-    document.getElementById("au").value = "1:00";
-    setTimeout(() => {
-  timer_wait(time); 
-}, 1000);
+function formatSlotCountdown(seconds) {
+    const s = Math.max(0, Math.ceil(seconds));
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
-
-/** Показывает большой таймер ожидания 4:12. */
-function wait_4min(){
-    time = 257;
-   // inputName = document.createElement('input');
-   // inputName.setAttribute('type', 'submit');
-   // inputName.setAttribute('class', 'timer');
-   // inputName.setAttribute('id', 'r0');
-  //  inputName.setAttribute('value', "4:12");
-   // document.getElementById("r0").value
-    document.getElementById("au").value = "4:17";
-    setTimeout(() => {
-  timer_wait(time); 
-}, 1000);
+function slotCountdownElements() {
+    return {
+        stage: document.getElementById("slot-countdown-stage"),
+        monkey: document.getElementById("slot-countdown-monkey"),
+        logo: document.getElementById("slot-countdown-logo"),
+        time: document.getElementById("slot-countdown-time"),
+        status: document.getElementById("slot-countdown-status"),
+        capsuleTime: document.getElementById("slot-countdown-capsule-time"),
+        percent: document.getElementById("slot-countdown-percent"),
+        au: document.getElementById("au")
+    };
 }
-
-/** Сервисный обратный отсчёт для spectator. */
-function timer_wait(time_all){
-    if (time_all<=0)
-    {
-        setWait4MinStage(0);
-
-    setTimeout(() => {
-        clearWait4MinVisual();
-        clearWait4MinStage();
-        }, 900);
-        document.getElementById('au').value = ""
-        return;
+function showSlotCountdown(seconds) {
+    const {stage, monkey, logo, time, status, capsuleTime, percent, au} = slotCountdownElements();
+    if (!stage) return;
+    const lastMinute = seconds <= 60;
+    const filling = lastMinute ? Math.max(0, Math.min(100, (60 - seconds) / 60 * 100)) : 0;
+    stage.classList.add("is-visible");
+    stage.setAttribute("aria-hidden", "false");
+    stage.classList.toggle("is-last-minute", lastMinute);
+    stage.classList.toggle("is-complete", seconds === 0);
+    stage.classList.toggle("is-waiting-start", seconds > 0);
+    if (monkey) monkey.setAttribute("aria-hidden", String(lastMinute));
+    if (logo) logo.setAttribute("aria-hidden", String(!lastMinute));
+    stage.style.setProperty("--slot-fill", `${filling}%`);
+    stage.style.setProperty("--slot-fill-ratio", String(filling / 100));
+    if (capsuleTime) capsuleTime.textContent = formatSlotCountdown(seconds);
+    const capsuleLabel = stage.querySelector(".slot-countdown-capsule-label");
+    if (capsuleLabel) capsuleLabel.textContent = seconds === 0 ? "ИГРА НАЧИНАЕТСЯ!" : "ДО НАЧАЛА ИГРЫ";
+    if (percent) percent.textContent = seconds === 0 ? "СТАРТ!" : `${Math.round(filling)}% ЗАПОЛНЕНО`;
+    if (time) time.textContent = formatSlotCountdown(seconds);
+    if (status) status.textContent = seconds === 0 ? "ИГРА НАЧИНАЕТСЯ!" : "ДО НАЧАЛА ИГРЫ";
+    if (au) au.value = formatSlotCountdown(seconds);
+}
+let slotWaitFinishTimeout = null;
+function hideSlotCountdown() {
+    const {stage, au} = slotCountdownElements();
+    if (stage) {
+        stage.classList.remove("is-visible", "is-last-minute", "is-complete", "is-waiting-start");
+        stage.setAttribute("aria-hidden", "true");
     }
-    time_all = time_all -1
-    min = parseInt(time_all/60)
-    second = time_all%60;
-    if (second<10)
-    {
-        document.getElementById("au").value = min.toString()+':'+'0'+second.toString();
-        setTimeout(() => { timer_wait(time_all); }, 1000);
-        return;
-    }
-    document.getElementById("au").value = min.toString()+':'+second.toString();
-    syncWait4MinVisual(time_all);
-    setWait4MinStage(time_all);
-
-    setTimeout(() => { timer_wait(time_all); }, 1000);
-
+    if (au && /^\d+:\d{2}$/.test(au.value.trim())) au.value = "";
+    clearWait4MinVisual();
+    clearWait4MinStage();
 }
-
-function syncWait4MinVisual(secondsLeft) {
-    const au = document.getElementById("au");
-    const wrap = document.querySelector(".au-wrap");
-
-    if (!au || !wrap) return;
-
-    wrap.classList.add("wait-4min-mode");
-    au.classList.add("wait-4min-active");
-
-    if (secondsLeft <= 60 && secondsLeft > 0) {
-        au.classList.add("wait-4min-danger");
-    } else {
-        au.classList.remove("wait-4min-danger");
+function updateSynchronizedSlotWait(seconds) {
+    if (slotWaitFinishTimeout !== null) {
+        clearTimeout(slotWaitFinishTimeout);
+        slotWaitFinishTimeout = null;
     }
+    showSlotCountdown(seconds);
 }
-
+function finishSynchronizedSlotWait() {
+    showSlotCountdown(0);
+    if (slotWaitFinishTimeout !== null) clearTimeout(slotWaitFinishTimeout);
+    slotWaitFinishTimeout = setTimeout(hideSlotCountdown, 1700);
+}
+// Устаревшие локальные точки входа теперь только запрашивают авторитетное состояние.
+function wait_4min() { requestSlotWaitSync(); }
+function wait_1min() { requestSlotWaitSync(); }
+function timer_wait() { requestSlotWaitSync(); }
+function syncWait4MinVisual() {}
 function clearWait4MinVisual() {
-    const au = document.getElementById("au");
-    const wrap = document.querySelector(".au-wrap");
-
-    if (!au || !wrap) return;
-
-    wrap.classList.remove("wait-4min-mode");
-    au.classList.remove("wait-4min-active", "wait-4min-danger");
+    document.querySelector(".au-wrap")?.classList.remove("wait-4min-mode");
+    document.getElementById("au")?.classList.remove("wait-4min-active", "wait-4min-danger");
 }
-
-function setWait4MinStage(secondsLeft) {
-    document.body.classList.add("wait-4min-focus");
-
-    if (secondsLeft <= 60 && secondsLeft > 0) {
-        document.body.classList.add("wait-4min-ending");
-    } else {
-        document.body.classList.remove("wait-4min-ending");
-    }
-
-    if (secondsLeft <= 0) {
-        document.body.classList.add("wait-4min-freeze");
-    } else {
-        document.body.classList.remove("wait-4min-freeze");
-    }
-}
-
+function setWait4MinStage() {}
 function clearWait4MinStage() {
-    document.body.classList.remove(
-        "wait-4min-focus",
-        "wait-4min-ending",
-        "wait-4min-freeze"
-    );
+    document.body.classList.remove("wait-4min-focus", "wait-4min-ending", "wait-4min-freeze");
 }
 
+// SLOT SYNC V3: один срок окончания на сервере, поправка на RTT и monotonic clock.
+const slotWaitSync = {
+    revision: -1, endMono: 0, active: false, interval: null,
+    pending: new Map(), seq: 0, lastSeconds: null, finishShown: false
+};
+function requestSlotWaitSync() {
+    if (!socket.connected) return;
+    const id = ++slotWaitSync.seq;
+    slotWaitSync.pending.set(id, performance.now());
+    socket.emit("slot_wait_sync", { request_id: id });
+    for (const key of slotWaitSync.pending.keys()) if (key < id - 5) slotWaitSync.pending.delete(key);
+}
+function applySlotWaitState(data) {
+    if (!data || !Number.isFinite(Number(data.revision))) return;
+    const rev = Number(data.revision);
+    if (rev < slotWaitSync.revision) return;
+    const received = performance.now();
+    const sent = slotWaitSync.pending.get(data.request_id);
+    if (sent !== undefined) slotWaitSync.pending.delete(data.request_id);
+    const latency = sent === undefined ? 0 : Math.max(0, (received - sent) / 2);
+    const leftMs = Math.max(0, Number(data.ends_at_ms) - Number(data.server_now_ms) - latency);
+    if (rev === slotWaitSync.revision && !data.active && !slotWaitSync.active) return;
+    slotWaitSync.revision = rev;
+    slotWaitSync.active = Boolean(data.active) && leftMs > 0;
+    slotWaitSync.endMono = received + leftMs;
+    slotWaitSync.lastSeconds = null;
+    slotWaitSync.finishShown = false;
+    if (!data.active) {
+        hideSlotCountdown();
+        return;
+    }
+    renderSynchronizedSlotWait();
+    if (slotWaitSync.interval === null) slotWaitSync.interval = setInterval(renderSynchronizedSlotWait, 100);
+}
+function renderSynchronizedSlotWait() {
+    if (!slotWaitSync.active) return;
+    const remaining = Math.max(0, slotWaitSync.endMono - performance.now());
+    const seconds = Math.ceil(remaining / 1000);
+    if (seconds !== slotWaitSync.lastSeconds) {
+        slotWaitSync.lastSeconds = seconds;
+        updateSynchronizedSlotWait(seconds);
+    }
+    if (remaining === 0) {
+        slotWaitSync.active = false;
+        slotWaitSync.finishShown = true;
+        finishSynchronizedSlotWait();
+    }
+}
+socket.on("slot_wait_state", applySlotWaitState);
+socket.on("room:joined", requestSlotWaitSync);
+setInterval(requestSlotWaitSync, 15000);
 
 socket.on("room_code_show", (data) => {
   const toast = document.getElementById("room-code-toast");

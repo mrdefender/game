@@ -1,4 +1,5 @@
 from datetime import datetime, time
+import time as clock_time
 from flask import (
     Flask,
     Response,
@@ -170,6 +171,33 @@ def ping_test(data):
 # Текущее состояние дерева сумм для зрительского экрана.
 slot_money_tree_visible = False
 
+# Ожидание перед началом игры: единственный источник времени — сервер.
+# Для многопроцессного Gunicorn состояние надо хранить в Redis/БД (см. README).
+slot_wait_state = {"revision": 0, "ends_at_ms": 0, "duration_ms": 0, "active": False}
+
+def slot_wait_snapshot():
+    now_ms = int(clock_time.time() * 1000)
+    return {**slot_wait_state, "server_now_ms": now_ms}
+
+@socketio.on("slot_wait_sync")
+def slot_wait_sync(data=None):
+    # Ответ только запрашивающему; отправка timestamp из клиента позволяет оценить RTT.
+    result = slot_wait_snapshot()
+    if isinstance(data, dict):
+        result["request_id"] = data.get("request_id")
+    emit("slot_wait_state", result, to=request.sid)
+
+@socketio.on("slot_wait_stop")
+def slot_wait_stop():
+    # Останавливать ожидание может только авторизованный технический ведущий.
+    if session.get("tpv_technical_admin") is not True:
+        return
+    slot_wait_state.update(revision=slot_wait_state["revision"] + 1, active=False,
+                           ends_at_ms=0, duration_ms=0)
+    socketio.emit("slot_wait_state", slot_wait_snapshot(), to=f"{DEFAULT_ROOM_CODE}:host")
+    socketio.emit("slot_wait_state", slot_wait_snapshot(), to=f"{DEFAULT_ROOM_CODE}:spectator")
+
+
 @socketio.on("slot_money_tree_visibility")
 def slot_money_tree_visibility(data):
     """Синхронизирует видимость денежного дерева с экраном зрителя."""
@@ -200,7 +228,9 @@ def socket_join_room(data):
         "username": username
     })
     if role == "spectator":
-        emit("slot_money_tree_visibility", {"visible": slot_money_tree_visible}, to=request.sid)   
+        emit("slot_money_tree_visibility", {"visible": slot_money_tree_visible}, to=request.sid)
+    if role in ("host", "spectator"):
+        emit("slot_wait_state", slot_wait_snapshot(), to=request.sid)   
     
     
 
@@ -2427,13 +2457,32 @@ def show_result_interactive():
         except:
             return json.dumps("fail")
 
+def begin_slot_wait(seconds, legacy_event):
+    # Истечение срока общее для host и spec. Старые названия событий сохранены.
+    now_ms = int(clock_time.time() * 1000)
+    slot_wait_state.update(
+        revision=slot_wait_state["revision"] + 1,
+        active=True,
+        duration_ms=seconds * 1000,
+        ends_at_ms=now_ms + seconds * 1000,
+    )
+    state = slot_wait_snapshot()
+    socketio.emit("slot_wait_state", state, to=f"{DEFAULT_ROOM_CODE}:host")
+    socketio.emit("slot_wait_state", state, to=f"{DEFAULT_ROOM_CODE}:spectator")
+    # Подписчики старой версии spectator получат прежнее событие.
+    socketio.emit(legacy_event, state, to=f"{DEFAULT_ROOM_CODE}:spectator")
+
 @socketio.on("wait_4_min")
 def wait_4_min():
-    socketio.emit("wait_4min","ok",to=f"{DEFAULT_ROOM_CODE}:spectator")
-    
+    if session.get("tpv_technical_admin") is not True:
+        return
+    begin_slot_wait(257, "wait_4min")
+
 @socketio.on("wait_1_min")
 def wait_1_min():
-    socketio.emit("wait_1min","ok",to=f"{DEFAULT_ROOM_CODE}:spectator")
+    if session.get("tpv_technical_admin") is not True:
+        return
+    begin_slot_wait(60, "wait_1min")
 
 @socketio.on("host_show_credits")
 def host_show_credits():

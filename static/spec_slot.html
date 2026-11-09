@@ -149,6 +149,37 @@
     </section>
   </main>
 
+  <!-- Полноэкранный таймер для wait_4min / wait_1min -->
+  <div id="slot-countdown-stage" class="slot-countdown-stage" role="status" aria-live="off" aria-hidden="true">
+    <div class="slot-countdown-stars" aria-hidden="true"></div>
+    <section id="slot-countdown-monkey" class="slot-countdown-scene slot-countdown-monkey">
+      <div class="slot-monkey-photo" aria-hidden="true"></div>
+      <div class="slot-monkey-text">
+        <div class="slot-countdown-kicker">СВОБОДНЫЙ СЛОТ</div>
+        <h2>Игра скоро начнётся!</h2>
+        <p>Обезьяна тоже ждёт начала игры… 🐒</p>
+        <span class="slot-monkey-hint">До старта осталось совсем немного</span>
+      </div>
+    </section>
+    <section id="slot-countdown-logo" class="slot-countdown-scene slot-countdown-logo" aria-hidden="true">
+      <div class="slot-countdown-logo-backdrop" aria-hidden="true"></div>
+      <div class="slot-countdown-logo-caption">ПОСЛЕДНЯЯ МИНУТА ДО СТАРТА</div>
+      <div class="slot-countdown-capsule" aria-label="Таймер до начала игры">
+        <div class="slot-countdown-capsule-fill" aria-hidden="true"></div>
+        <div class="slot-countdown-capsule-shine" aria-hidden="true"></div>
+        <div class="slot-countdown-capsule-inner">
+          <div class="slot-countdown-capsule-label">ДО НАЧАЛА ИГРЫ</div>
+          <div id="slot-countdown-capsule-time" class="slot-countdown-capsule-time">1:00</div>
+        </div>
+      </div>
+      <div class="slot-countdown-capsule-percent" id="slot-countdown-percent">0% ЗАПОЛНЕНО</div>
+    </section>
+    <div class="slot-countdown-clock" aria-label="Оставшееся время">
+      <div id="slot-countdown-status" class="slot-countdown-status">ДО НАЧАЛА ИГРЫ</div>
+      <div id="slot-countdown-time" class="slot-countdown-time">4:17</div>
+    </div>
+  </div>
+
   <footer class="copyrights"></footer>
 
   <script src="/static/js/socket.io.min.js"></script>

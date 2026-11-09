@@ -3252,3 +3252,77 @@ body.million-win-mode .room-code-toast {
  to {transform:scale(1.65)}
 }
 @media(prefers-reduced-motion:reduce){.help-btn.hint-present-active{animation:none!important;transform:scale(1.35)!important}}
+
+/* === PRE-GAME COUNTDOWN: monkey -> capsule that fills, not an image === */
+.slot-countdown-stage{
+  --slot-fill:0%;position:fixed;inset:0;z-index:9000;overflow:hidden;
+  pointer-events:none;opacity:0;visibility:hidden;background:#020819;
+  transition:opacity .55s ease,visibility .55s ease;isolation:isolate;
+  font-family:Montserrat,Arial,sans-serif
+}
+.slot-countdown-stage.is-visible{opacity:1;visibility:visible}
+.slot-countdown-stars{position:absolute;inset:-20%;z-index:0;background:
+  radial-gradient(circle at 20% 18%,#81d8ff 0 1px,transparent 2px),
+  radial-gradient(circle at 69% 30%,#c0eaff 0 1px,transparent 2px),
+  radial-gradient(circle at 85% 78%,#4eabff 0 1px,transparent 2px),
+  radial-gradient(ellipse at 50% 50%,#092a67 0%,#020819 68%);
+  background-size:190px 190px,290px 290px,410px 410px,100% 100%;
+  animation:slotStarsFloat 30s linear infinite
+}
+.slot-countdown-scene{position:absolute;inset:0;transition:opacity .85s ease,transform 1s ease}
+.slot-countdown-monkey{display:flex;align-items:center;justify-content:center;gap:clamp(20px,5vw,100px);padding:clamp(22px,5vw,80px);z-index:1}
+.slot-monkey-photo{height:min(75vh,800px);width:min(37vw,520px);flex-shrink:0;
+  border-radius:34px;background:url('/static/img/mokaque.jpg') center 38%/cover no-repeat;
+  border:2px solid rgba(107,212,255,.65);box-shadow:0 0 70px rgba(29,137,255,.25),0 35px 90px #000a;
+  animation:slotMonkeyBreathing 7s ease-in-out infinite alternate
+}
+.slot-monkey-text{width:min(48vw,660px);text-align:left;filter:drop-shadow(0 6px 25px #000)}
+.slot-countdown-kicker{color:#61dfff;font-weight:900;letter-spacing:.25em;font-size:clamp(14px,1.5vw,22px);margin-bottom:18px}
+.slot-monkey-text h2{font-size:clamp(36px,5.5vw,90px);line-height:1.06;color:#fff;text-shadow:0 0 32px #1694ff65;margin-bottom:22px}
+.slot-monkey-text p{font-size:clamp(17px,2vw,29px);font-weight:600;color:#c9e9ff;line-height:1.4}
+.slot-monkey-hint{display:block;margin-top:28px;color:#72b9e9;letter-spacing:.1em;text-transform:uppercase;font-size:clamp(11px,1vw,15px);font-weight:800}
+.slot-countdown-clock{position:absolute;z-index:5;bottom:clamp(22px,5vh,66px);left:50%;transform:translateX(-50%);text-align:center;
+  padding:12px clamp(38px,5vw,84px);border-radius:100px;border:1px solid #67ceff94;
+  background:linear-gradient(135deg,#030b19e8,#061d42ee);box-shadow:0 0 45px #1189ff55,inset 0 0 25px #238dff22;white-space:nowrap;
+  transition:opacity .5s ease, transform .65s ease
+}
+.slot-countdown-status{font-size:clamp(11px,1.2vw,17px);font-weight:800;letter-spacing:.22em;color:#81dfff}
+.slot-countdown-time{font-variant-numeric:tabular-nums;font-size:clamp(48px,7vw,104px);font-weight:900;line-height:1.05;color:#fff;text-shadow:0 0 26px #36aeffb5}
+/* Logo is now ONLY the atmospheric scene background, never the fill target. */
+.slot-countdown-logo{z-index:2;opacity:0;transform:scale(1.07);background:radial-gradient(ellipse at center,#06418d 0%,#020819 72%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:clamp(22px,5vh,54px)}
+.slot-countdown-logo-backdrop{position:absolute;inset:0;background:url('/static/img/slot_timer.jpg') center/cover no-repeat;opacity:.32;filter:blur(8px) brightness(.8);transform:scale(1.06)}
+.slot-countdown-logo-caption{position:relative;text-align:center;color:#c5ecff;font-size:clamp(15px,2.3vw,35px);letter-spacing:.15em;font-weight:900;text-shadow:0 0 28px #128dff;padding:0 18px}
+/* Entire timer element becomes the filling slot-shaped capsule. */
+.slot-countdown-capsule{position:relative;overflow:hidden;isolation:isolate;width:min(86vw,900px);min-height:clamp(165px,28vh,280px);
+  display:grid;place-items:center;border-radius:999px;border:5px solid #219eff;
+  background:linear-gradient(135deg,#02050d,#03122d);box-shadow:0 0 0 4px #000b,0 0 35px #009dff,0 0 100px #0355c477,inset 0 0 36px #000e}
+.slot-countdown-capsule-fill{position:absolute;z-index:0;inset:0;transform-origin:left center;transform:scaleX(var(--slot-fill-ratio,0));
+  background:linear-gradient(90deg,#0048bd 0%,#077eff 42%,#33caff 80%,#a3faff 100%);
+  box-shadow:inset -12px 0 35px #b0fcff99;transition:transform .25s linear}
+.slot-countdown-capsule-fill::after{content:"";position:absolute;right:0;top:0;bottom:0;width:12px;background:#c7ffff;box-shadow:0 0 35px 14px #31cfff}
+.slot-countdown-capsule-shine{position:absolute;z-index:1;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,#ffffff2b,transparent 39%,#0006 74%,#ffffff18)}
+.slot-countdown-capsule-inner{position:relative;z-index:2;text-align:center;padding:22px 30px;text-shadow:0 3px 12px #000,0 0 22px #001c62}
+.slot-countdown-capsule-label{font-size:clamp(12px,1.5vw,21px);font-weight:900;letter-spacing:.2em;color:#e6f8ff}
+.slot-countdown-capsule-time{font-variant-numeric:tabular-nums;font-size:clamp(70px,12vw,152px);font-weight:900;line-height:1.03;color:white}
+.slot-countdown-capsule-percent{position:relative;font-weight:800;color:#b4eaff;letter-spacing:.13em;font-size:clamp(13px,1.5vw,20px)}
+.slot-countdown-stage.is-last-minute .slot-countdown-monkey{opacity:0;transform:translateX(-5%) scale(.95)}
+.slot-countdown-stage.is-last-minute .slot-countdown-logo{opacity:1;transform:scale(1)}
+.slot-countdown-stage.is-last-minute .slot-countdown-clock{opacity:0;transform:translate(-50%,30px)}
+.slot-countdown-stage.is-complete .slot-countdown-capsule{border-color:#c0ffef;box-shadow:0 0 50px #22ffd9,0 0 120px #22ffd977}
+.slot-countdown-stage.is-complete .slot-countdown-capsule-label{color:#fff}
+@keyframes slotMonkeyBreathing{from{transform:scale(1)}to{transform:scale(1.035)}}
+@keyframes slotStarsFloat{from{transform:translateY(0)}to{transform:translateY(-90px)}}
+@media(max-width:800px){
+ .slot-countdown-monkey{flex-direction:column;justify-content:flex-start;padding:5vh 18px;gap:20px}
+ .slot-monkey-photo{height:46vh;width:min(82vw,420px);border-radius:24px}
+ .slot-monkey-text{width:100%;text-align:center}
+ .slot-monkey-text h2{font-size:clamp(27px,6vw,48px);margin-bottom:10px}
+ .slot-monkey-text p{font-size:clamp(15px,3vw,20px)}
+ .slot-monkey-hint{display:none}
+ .slot-countdown-clock{bottom:3vh;padding:8px 28px}
+ .slot-countdown-time{font-size:clamp(43px,9vw,68px)}
+ .slot-countdown-capsule{border-width:3px;min-height:160px}
+ .slot-countdown-capsule-time{font-size:clamp(66px,14vw,112px)}
+}
+@media(prefers-reduced-motion:reduce){.slot-countdown-stage *, .slot-countdown-stage *::before,.slot-countdown-stage *::after{animation:none!important;transition:none!important}}
