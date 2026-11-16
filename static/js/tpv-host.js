@@ -44,6 +44,7 @@ function getCsrfToken() {
 }
 
 const socket = io();
+window.createTpvCountdown(socket);
 function setSocketStatus(isOnline) {
   const box = document.getElementById("socket-status");
   const text = document.getElementById("socket-status-text");

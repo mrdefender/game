@@ -200,6 +200,14 @@
 
      
 
+      <section class="ng-panel">
+        <header class="ng-panel-title">ДО НАЧАЛА ИГРЫ · <output id="tpv-wait-host-time">—</output></header>
+        <div class="ng-two">
+          <button id="tpv-wait-long" class="ng-btn ng-btn--cyan" type="button">ТАЙМЕР 4:20</button>
+          <button id="tpv-wait-stop" class="ng-btn ng-btn--red" type="button">СКРЫТЬ ТАЙМЕР</button>
+        </div>
+      </section>
+
       <section class="ng-panel ng-sound">
         <header class="ng-panel-title">МУЗЫКА / ЗВУК</header>
         <div class="ng-two">
@@ -242,6 +250,7 @@
 </main>
 
 <script src="/static/js/socket.io.min.js"></script>
+<script src="/static/js/tpv-countdown.js"></script>
 <script src="/static/js/tpv-host.js"></script>
 <script src="{{ url_for('static', filename='js/tpv-game-engine.js') }}"></script>
 <script src="/static/js/number_voice.js"></script>

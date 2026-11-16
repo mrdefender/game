@@ -3621,3 +3621,58 @@ body::after {
     font-size: clamp(16px, 5vw, 22px) !important;
   }
 }
+
+/* Pre-game countdown: one TPV scene from 4:17 to 0:00. */
+.tpv-countdown {
+  position: fixed; inset: 0; z-index: 9000; overflow: hidden; isolation: isolate;
+  background: #020819; pointer-events: none;
+}
+.tpv-countdown__stars {
+  position: absolute; inset: -20%; z-index: -1;
+  background:
+    radial-gradient(circle at 20% 18%, #81d8ff 0 1px, transparent 2px),
+    radial-gradient(circle at 69% 30%, #e8b3ff 0 1px, transparent 2px),
+    radial-gradient(ellipse at 65% 40%, #30115b 0%, #031027 45%, #020819 70%);
+  background-size: 190px 190px, 290px 290px, 100% 100%;
+  animation: tpvCountdownStars 30s linear infinite;
+}
+.tpv-countdown__scene {
+  height: 100%; display: flex; align-items: center; justify-content: center;
+  gap: clamp(24px, 5vw, 100px); padding: 5vh 5vw 22vh;
+}
+.tpv-countdown__photo {
+  height: min(66vh, 750px); width: min(35vw, 500px); flex-shrink: 0;
+  border-radius: 34px; background: url('/static/img/mokaque.jpg') center 38% / cover no-repeat;
+  border: 2px solid #a78cff; box-shadow: 0 0 70px #b13cff40, 0 35px 90px #000a;
+  animation: tpvCountdownBreathing 7s ease-in-out infinite alternate;
+}
+.tpv-countdown__copy { width: min(48vw, 700px); }
+.tpv-countdown__brand { display: grid; gap: .15em; color: #e4c8ff; font-weight: 900; letter-spacing: .15em; }
+.tpv-countdown__brand span { font-size: clamp(14px, 1.7vw, 28px); }
+.tpv-countdown__brand strong {
+  font-size: clamp(38px, 6vw, 100px); line-height: 1;
+  color: #fff; text-shadow: 0 0 38px #b13cff99;
+}
+.tpv-countdown h1 { font-size: clamp(30px, 4.2vw, 70px); line-height: 1.1; margin: 3vh 0 2vh; }
+.tpv-countdown p { color: #c9e9ff; font-size: clamp(16px, 1.8vw, 28px); line-height: 1.4; }
+.tpv-countdown__hint { color: #91b7d9; font-size: clamp(11px, 1vw, 16px); letter-spacing: .1em; text-transform: uppercase; }
+.tpv-countdown__clock {
+  position: absolute; bottom: 4vh; left: 50%; transform: translateX(-50%);
+  text-align: center; padding: 12px clamp(28px, 5vw, 84px); white-space: nowrap;
+  border-radius: 100px; border: 1px solid #a78cff; background: #050d25ed;
+  box-shadow: 0 0 45px #773cff55, inset 0 0 25px #238dff22;
+}
+#tpv-countdown-status { font-size: clamp(10px, 1.2vw, 18px); font-weight: 800; letter-spacing: .18em; color: #cbb4ff; }
+#tpv-countdown-time { display: block; font-variant-numeric: tabular-nums; font-size: clamp(48px, 7vw, 104px); font-weight: 900; line-height: 1.05; text-shadow: 0 0 26px #7c4dffb5; }
+@keyframes tpvCountdownBreathing { from { transform: scale(1); } to { transform: scale(1.025); } }
+@keyframes tpvCountdownStars { to { transform: translateY(-90px); } }
+@media (max-aspect-ratio: 4/5) {
+  .tpv-countdown__scene { flex-direction: column; justify-content: flex-start; gap: 2vh; padding: 3vh 18px 22vh; }
+  .tpv-countdown__photo { height: 34vh; width: min(75vw, 420px); border-radius: 24px; }
+  .tpv-countdown__copy { width: 100%; text-align: center; }
+  .tpv-countdown__brand strong { font-size: 40px; }
+  .tpv-countdown h1 { font-size: clamp(24px, 6vw, 44px); margin: 2vh 0; }
+  .tpv-countdown p { font-size: 16px; }
+  .tpv-countdown__hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .tpv-countdown * { animation: none !important; } }

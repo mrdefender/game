@@ -11,6 +11,9 @@
 from __future__ import annotations
 
 import logging
+import time
+
+from flask import session
 from typing import Any, Mapping
 
 
@@ -46,6 +49,9 @@ TPV_SOCKET_EVENTS = [
     "count_answer_interactive",
     "clean_db_tpv",
     "tpv_spectator_ready",
+    "tpv_wait_start",
+    "tpv_wait_stop",
+    "tpv_wait_sync",
     "tpv_selection_start",
     "tpv_versus",
     "tpv_versus_hide",
@@ -133,6 +139,8 @@ class TpvSocketHandlers:
         self.archive = runtime["TPV_ARCHIVE_RUNTIME"]
         # Transient state used for newly connected / reloaded spectators.
         self._versus_state = {"show": False, "player": ""}
+        self._wait_state = {"revision": 0, "active": False, "ends_at_ms": 0}
+        self._wait_deadline = 0.0
 
         self.get_room_code = runtime["get_room_code"]
         self.emit_tpv_host = runtime["emit_tpv_host"]
@@ -151,6 +159,9 @@ class TpvSocketHandlers:
             "count_answer_interactive": self.count_interactive,
             "clean_db_tpv": self.clean_db_tpv,
             "tpv_spectator_ready": self.tpv_spectator_ready,
+            "tpv_wait_start": self.tpv_wait_start,
+            "tpv_wait_stop": self.tpv_wait_stop,
+            "tpv_wait_sync": self.tpv_wait_sync,
             "tpv_selection_start": self.tpv_selection_start,
             "tpv_versus": self.tpv_versus,
             "tpv_versus_hide": self.tpv_versus_hide,
@@ -315,8 +326,55 @@ class TpvSocketHandlers:
         self.update_users_tpv()
         self.emit_tpv_host("DB_clean", "ok")
 
+    # Independent from SLOT and the four-minute in-game round clock.
+    # Like the existing game state, this requires one Socket.IO worker.
+    def _wait_snapshot(self):
+        remaining = max(0, round((self._wait_deadline - time.monotonic()) * 1000))
+        return {
+            **self._wait_state,
+            "remaining_ms": remaining,
+            "active": self._wait_state["active"] and remaining > 0,
+        }
+
+    def _broadcast_wait(self):
+        snapshot = self._wait_snapshot()
+        self.emit_tpv_host("tpv_wait_state", snapshot)
+        self.emit_tpv_spectator("tpv_wait_state", snapshot)
+
+    def tpv_wait_start(self, data=None):
+        if session.get("tpv_technical_admin") is not True:
+            return
+        seconds = (data or {}).get("seconds") if isinstance(data, dict) else None
+        if isinstance(seconds, bool) or seconds not in (60, 261):
+            return
+        self._wait_deadline = time.monotonic() + seconds
+        self._wait_state = {
+            "revision": self._wait_state["revision"] + 1,
+            "active": True,
+            "ends_at_ms": round(time.time() * 1000) + seconds * 1000,
+        }
+        self._broadcast_wait()
+
+    def _stop_wait(self):
+        self._wait_deadline = 0.0
+        self._wait_state.update(
+            revision=self._wait_state["revision"] + 1, active=False, ends_at_ms=0,
+        )
+        self._broadcast_wait()
+
+    def tpv_wait_stop(self):
+        if session.get("tpv_technical_admin") is True:
+            self._stop_wait()
+
+    def tpv_wait_sync(self, data=None):
+        snapshot = self._wait_snapshot()
+        if isinstance(data, dict):
+            snapshot["request_id"] = data.get("request_id")
+        self.emit("tpv_wait_state", snapshot)
+
     def tpv_spectator_ready(self):
         """Восстановить код комнаты после reload spectator."""
+        self.tpv_wait_sync()
         room_code = self.get_room_code()
 
         if room_code is None:
@@ -344,6 +402,7 @@ class TpvSocketHandlers:
     # ------------------------------------------------------------------
 
     def tpv_selection_start(self):
+        self._stop_wait()
         self.archive.start()
 
         players = self.db.session.scalars(
@@ -363,11 +422,13 @@ class TpvSocketHandlers:
         )
 
     def tpv_versus(self, data=None):
+        self._stop_wait()
         player = str((data or {}).get("player") or "").strip()[:120]
         self._versus_state = {"show": True, "player": player}
         self.emit_tpv_spectator("tpv_versus_spec", self._versus_state)
 
     def tpv_versus_hide(self):
+        self._stop_wait()
         self._versus_state = {"show": False, "player": ""}
         self.emit_tpv_spectator("tpv_versus_spec", self._versus_state)
 
@@ -477,6 +538,7 @@ class TpvSocketHandlers:
             )
 
     def reset_to_wait_tpv(self):
+        self._stop_wait()
         try:
             players = self.db.session.scalars(
                 self.db.select(self.QueryTpv)
@@ -1620,12 +1682,14 @@ class TpvSocketHandlers:
     # ------------------------------------------------------------------
 
     def start_intro(self):
+        self._stop_wait()
         self.emit_tpv_spectator(
             "start_intro",
             {"": ""},
         )
 
     def host_show_credits(self):
+        self._stop_wait()
         self.archive.finalize()
         self.socketio.emit(
             "show_credits_tpv",
@@ -1637,6 +1701,7 @@ class TpvSocketHandlers:
         )
 
     def show_results_tpv(self):
+        self._stop_wait()
       #  self.archive.finalize()
 
         users = self.db.session.scalars(

@@ -330,7 +330,7 @@ function showQuestion(payload) {
   $("question-text").textContent = data.question || "";
   setTimeout(() => {
     $("question-author").textContent = data.author || "— Автор вопроса —";
-    }, 1500);
+    }, 800);
   
   $("num_question").textContent =
     data.replacement ? "➩" : `В.${Number(data.questionNumber) || Number(state.question) || 1}`;
@@ -506,6 +506,7 @@ function showAward(data, type) {
 }
 
 function reset() {
+  pregameCountdown?.hide();
   setVersusIntro({show: false, animate: false});
     hide_credits();
 const resultsOverlay =
@@ -559,6 +560,7 @@ if (resultsList) {
 }
 
 const socket = io();
+const pregameCountdown = window.createTpvCountdown(socket);
 
 socket.on("connect", () => {
   setOnline(true);

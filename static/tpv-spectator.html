@@ -16,6 +16,24 @@
 <body>
 <main class="spectator" id="tpv-spectator">
 
+  <!-- Pre-game countdown keeps the same scene through the final minute. -->
+  <section id="tpv-countdown-stage" class="tpv-countdown" hidden aria-label="До начала игры">
+    <div class="tpv-countdown__stars" aria-hidden="true"></div>
+    <div class="tpv-countdown__scene">
+      <div class="tpv-countdown__photo" aria-hidden="true"></div>
+      <div class="tpv-countdown__copy">
+        <div class="tpv-countdown__brand"><span>THE PEOPLE</span><strong>VERSUS</strong></div>
+        <h1>Игра скоро начнётся!</h1>
+        <p>Обезьяна тоже ждёт начала игры… 🐒</p>
+        <span class="tpv-countdown__hint">До старта осталось совсем немного</span>
+      </div>
+    </div>
+    <div class="tpv-countdown__clock" role="timer" aria-live="off">
+      <div id="tpv-countdown-status">ДО НАЧАЛА ИГРЫ</div>
+      <output id="tpv-countdown-time">4:17</output>
+    </div>
+  </section>
+
   <!-- Fullscreen broadcast intro controlled by tpv_host via Socket.IO. -->
   <section class="tpv-versus-intro" id="tpv-versus-intro" hidden
            aria-label="Заставка The People Versus" aria-hidden="true">
@@ -300,6 +318,7 @@
 <script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tpv-game-engine.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tpv-animations.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tpv-countdown.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tpv-spectator.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tpv-spectator-animation-bridge.js') }}"></script>
 </body>
