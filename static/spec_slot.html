@@ -110,6 +110,12 @@
           </div>
         </div>
 
+        <section id="slot-otbor-timer" class="slot-otbor-timer" hidden aria-label="Таймер отборочного тура">
+          <div class="slot-otbor-label">Отборочный тур</div>
+          <div id="slot-otbor-time" class="slot-otbor-time">0:20</div>
+          <div class="slot-otbor-track"><div id="slot-otbor-fill"></div></div>
+          <div id="slot-otbor-status" class="slot-otbor-status">Приготовьтесь</div>
+        </section>
         <div class="au-wrap panel-glow-soft">
           <input type="submit" class="message display-field message-field au-inline" id="au" value="">
         </div>
@@ -185,6 +191,7 @@
   <script src="/static/js/socket.io.min.js"></script>
   <script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
   <script src="/static/js/spec_slot.js"></script>
+   <script src="/static/js/spec_slot_otbor_timer.js"></script>
   <script src="/static/js/spec_slot_stage_addon.js"></script>
   <script src="/static/js/help_icons_show_patch.js"></script>
   <script src="/static/js/help_disabled_states.js"></script>

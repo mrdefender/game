@@ -3326,3 +3326,16 @@ body.million-win-mode .room-code-toast {
  .slot-countdown-capsule-time{font-size:clamp(66px,14vw,112px)}
 }
 @media(prefers-reduced-motion:reduce){.slot-countdown-stage *, .slot-countdown-stage *::before,.slot-countdown-stage *::after{animation:none!important;transition:none!important}}
+
+/* Independent qualification timer */
+#slot-otbor-timer[hidden], .au-wrap.slot-otbor-suppressed { display:none !important; }
+.slot-otbor-timer { display:grid; gap:10px; text-align:center; padding:16px 24px; border-radius:20px; border:1px solid rgba(103,197,255,.45); background:radial-gradient(ellipse at top,#183866,#080f20 75%); box-shadow:0 0 30px rgba(49,142,255,.18); }
+.slot-otbor-label,.slot-otbor-status { text-transform:uppercase; letter-spacing:.13em; font-weight:800; font-size:.78rem; color:#9bcfff; }
+.slot-otbor-time { font-size:clamp(2.8rem,7vw,5rem); line-height:1; font-weight:900; font-variant-numeric:tabular-nums; color:#fff4c2; text-shadow:0 0 20px rgba(255,210,120,.4); }
+.slot-otbor-track { height:10px; border-radius:999px; overflow:hidden; background:#050b16; border:1px solid rgba(255,255,255,.12); }
+#slot-otbor-fill { height:100%; width:100%; background:linear-gradient(90deg,#198cff,#80e7ff); border-radius:inherit; transition:width .12s linear; }
+.slot-otbor-timer.is-danger { border-color:#ff526c; }
+.slot-otbor-timer.is-danger .slot-otbor-time { color:#ff7a8e; }
+.slot-otbor-timer.is-danger #slot-otbor-fill { background:#ff526c; }
+.slot-otbor-timer.is-complete .slot-otbor-status { color:#fff4c2; }
+@media(prefers-reduced-motion:reduce){#slot-otbor-fill{transition:none;}}
